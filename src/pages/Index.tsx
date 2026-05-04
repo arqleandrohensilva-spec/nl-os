@@ -79,7 +79,29 @@ const Index = () => {
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
   useEffect(() => {
-    if (!user) return;
+    // Check current session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        setUser(session.user.email?.split('@')[0] || 'User');
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        setUser(session.user.email?.split('@')[0] || 'User');
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!session) return;
     fetchLeads();
 
     // Realtime subscriptions
@@ -96,7 +118,7 @@ const Index = () => {
     return () => {
       supabase.removeChannel(leadsChannel);
     };
-  }, [user]);
+  }, [session]);
 
   const fetchLeads = async () => {
     setIsLoading(true);
