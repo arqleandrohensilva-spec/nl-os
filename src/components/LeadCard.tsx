@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lead } from '@/lib/types';
-import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare } from 'lucide-react';
+import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare, Calendar } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
 import { Draggable } from '@hello-pangea/dnd';
 
@@ -92,6 +92,20 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
               </div>
             </div>
 
+            {lead.proxima_acao_tipo && (
+              <div className="mb-4 p-2 bg-bronze/5 border border-bronze/10 rounded-[2px] flex items-start gap-2 animate-in fade-in duration-500">
+                <Calendar size={12} className="text-bronze mt-0.5 shrink-0" />
+                <div className="space-y-0.5">
+                  <p className="text-[8px] font-bold text-bronze uppercase tracking-widest leading-none">
+                    Próxima: {lead.proxima_acao_tipo} · {lead.proxima_acao_data}
+                  </p>
+                  <p className="text-[9px] text-graphite/70 line-clamp-1 leading-tight italic">
+                    "{lead.proxima_acao_nota}"
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-wrap gap-1.5 mb-4">
               <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-[8px] font-bold uppercase tracking-widest">
                 {lead.tipo}
@@ -110,7 +124,6 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Ação de registrar contato aqui
                 }}
                 className="opacity-0 group-hover:opacity-100 transition-all p-1.5 hover:bg-bronze/10 rounded-full text-bronze flex items-center gap-1"
                 title="Registrar contato"
