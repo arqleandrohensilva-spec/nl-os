@@ -72,10 +72,24 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
 );
 
 const Sidebar = ({ user }: { user: string }) => {
-  const [openSection, setOpenSection] = useState<string | null>('LEADS');
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const saved = sessionStorage.getItem('sidebar_sections');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return { 'LEADS': true };
+      }
+    }
+    return { 'LEADS': true };
+  });
 
   const toggleSection = (section: string) => {
-    setOpenSection(openSection === section ? null : section);
+    setOpenSections(prev => {
+      const next = { ...prev, [section]: !prev[section] };
+      sessionStorage.setItem('sidebar_sections', JSON.stringify(next));
+      return next;
+    });
   };
 
   const initials = user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
