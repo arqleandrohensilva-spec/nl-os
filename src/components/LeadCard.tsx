@@ -29,7 +29,6 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
     return `R$ ${(val / 1000).toFixed(0)}k`;
   };
 
-  return (
   const {
     attributes,
     listeners,
@@ -143,7 +142,6 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
         </div>
       </div>
 
-      {/* Footer / Hover Actions */}
       <div className="pt-4 border-t border-beige min-h-[40px] relative">
         <div className="flex items-center justify-between transition-opacity duration-150 group-hover:opacity-0">
           <div className={cn(
@@ -156,7 +154,6 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <ArrowUpRight size={14} className="text-muted" />
         </div>
 
-        {/* Hover Buttons */}
         <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 py-1 bg-white">
           <button 
             onClick={handleWhatsApp}
