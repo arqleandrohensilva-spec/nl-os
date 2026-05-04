@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
 
 interface MetricCardProps {
@@ -20,13 +20,13 @@ const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }
     </div>
     
     <div className={cn(
-      "text-[40px] font-cormorant leading-none tracking-tight",
+      "text-[36px] font-cormorant leading-none tracking-tight",
       isNegative ? "text-red" : "text-graphite"
     )}>
       {value}
     </div>
     
-    {subLabel && <div className="mt-2 text-[9px] font-medium uppercase tracking-wider">{subLabel}</div>}
+    {subLabel && <div className="mt-3 text-[11px] font-bold uppercase tracking-wider">{subLabel}</div>}
     
     <div className={cn(
       "absolute bottom-0 left-0 right-0 h-[1px] transition-opacity",
@@ -44,25 +44,20 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
 
   const averageTicket = activeLeads > 0 ? inNegotiationValue / activeLeads : 0;
   
-  // Lógica corrigida de follow-ups hoje
   const followUpsToday = leads.filter(l => {
     const hasNoLogs = !l.logs || l.logs.length === 0;
-    
-    if (l.stage === 'Novo Lead' && hasNoLogs) {
-      return true;
-    }
-    
+    if (l.stage === 'Novo Lead' && hasNoLogs) return true;
     if (l.stage === 'Proposta Enviada') {
       const daysInStage = differenceInDays(new Date(), parseISO(l.etapa_desde));
-      if (daysInStage > 2 && hasNoLogs) {
-        return true;
-      }
+      if (daysInStage > 2 && hasNoLogs) return true;
     }
-    
     return false;
   }).length;
 
-  const formatCurrency = (val: number) => {
+  const formatCleanValue = (val: number) => {
+    if (val >= 1000000) {
+      return `R$ ${(val / 1000000).toFixed(1).replace('.', ',')}M`;
+    }
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -78,17 +73,17 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
       />
       <MetricCard 
         label="TICKET MÉDIO" 
-        value={formatCurrency(averageTicket)}
+        value={formatCleanValue(averageTicket)}
         subLabel={
-          <span className="flex items-center gap-1 text-green-600">
-            +12% vs mês anterior <TrendingUp size={10} />
+          <span className="flex items-center gap-1.5 text-emerald-600">
+            +12% vs mês anterior <TrendingUp size={12} />
           </span>
         }
       />
       <MetricCard 
         label="EM NEGOCIAÇÃO" 
-        value={formatCurrency(inNegotiationValue)}
-        subLabel={<span className="text-muted opacity-60">estimado</span>}
+        value={formatCleanValue(inNegotiationValue)}
+        subLabel={<span className="text-muted opacity-60 font-medium">estimado</span>}
       />
       <MetricCard 
         label="FOLLOW-UPS HOJE" 
