@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check } from 'lucide-react';
-import { Lead, Stage, LogTipo } from '@/lib/types';
+import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
