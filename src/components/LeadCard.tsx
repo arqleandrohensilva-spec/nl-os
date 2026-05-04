@@ -14,6 +14,7 @@ interface LeadCardProps {
 
 const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
+  const { score } = calculateLeadScore(lead);
   
   const tempMap = {
     'Quente': { color: '#B83232', pulse: true },
