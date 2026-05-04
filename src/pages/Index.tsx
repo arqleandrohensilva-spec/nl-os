@@ -307,7 +307,7 @@ const Index = () => {
           l.score,
           Math.floor((new Date().getTime() - new Date(l.etapa_desde).getTime()) / (1000 * 60 * 60 * 24))
         ]),
-        headStyles: { fillColor: graphite, textColor: [255, 255, 255], fontSize: 8 },
+        headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 8 },
         styles: { fontSize: 8, cellPadding: 2 },
         margin: { left: 14, right: 14 }
       });
