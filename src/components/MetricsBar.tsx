@@ -144,6 +144,7 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
         highlightBase={followUpsToday > 0}
         isNegative={followUpsToday > 0}
       />
+      </div>
     </div>
   );
 };
