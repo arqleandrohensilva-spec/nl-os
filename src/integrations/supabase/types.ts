@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      lead_logs: {
+        Row: {
+          autor: string
+          created_at: string
+          data: string
+          id: string
+          lead_id: string
+          nota: string
+          tipo: string
+        }
+        Insert: {
+          autor?: string
+          created_at?: string
+          data?: string
+          id?: string
+          lead_id: string
+          nota?: string
+          tipo: string
+        }
+        Update: {
+          autor?: string
+          created_at?: string
+          data?: string
+          id?: string
+          lead_id?: string
+          nota?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          area: number
+          cidade: string
+          created_at: string
+          criado: string
+          criado_por: string | null
+          etapa_desde: string
+          fechado_em: string | null
+          id: string
+          nome: string
+          obs: string
+          orcamento: number
+          origem: string
+          proxima_acao_data: string | null
+          proxima_acao_nota: string | null
+          proxima_acao_tipo: string | null
+          score: number
+          stage: string
+          temp: string
+          tipo: string
+          updated_at: string
+          whats: string
+        }
+        Insert: {
+          area?: number
+          cidade?: string
+          created_at?: string
+          criado?: string
+          criado_por?: string | null
+          etapa_desde?: string
+          fechado_em?: string | null
+          id?: string
+          nome: string
+          obs?: string
+          orcamento?: number
+          origem?: string
+          proxima_acao_data?: string | null
+          proxima_acao_nota?: string | null
+          proxima_acao_tipo?: string | null
+          score?: number
+          stage?: string
+          temp?: string
+          tipo?: string
+          updated_at?: string
+          whats?: string
+        }
+        Update: {
+          area?: number
+          cidade?: string
+          created_at?: string
+          criado?: string
+          criado_por?: string | null
+          etapa_desde?: string
+          fechado_em?: string | null
+          id?: string
+          nome?: string
+          obs?: string
+          orcamento?: number
+          origem?: string
+          proxima_acao_data?: string | null
+          proxima_acao_nota?: string | null
+          proxima_acao_tipo?: string | null
+          score?: number
+          stage?: string
+          temp?: string
+          tipo?: string
+          updated_at?: string
+          whats?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
