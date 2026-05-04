@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NavItemProps {
   label: string;
