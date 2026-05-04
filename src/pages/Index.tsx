@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { initialLeads, Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
@@ -42,6 +42,7 @@ import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
 import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
+import { supabase } from '@/integrations/supabase/client';
 
 const STAGES: Stage[] = [
   'Novo Lead', 
@@ -54,7 +55,8 @@ const STAGES: Stage[] = [
 
 const Index = () => {
   const [user, setUser] = useState<string | null>(() => sessionStorage.getItem('nl_user'));
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
@@ -74,6 +76,44 @@ const Index = () => {
   );
 
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
+
+  useEffect(() => {
+    if (user) {
+      fetchLeads();
+    }
+  }, [user]);
+
+  const fetchLeads = async () => {
+    setIsLoading(true);
+    try {
+      const { data: leadsData, error: leadsError } = await supabase
+        .from('leads')
+        .select(`
+          *,
+          logs:lead_logs(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (leadsError) throw leadsError;
+
+      // Map Supabase data to our Lead type
+      const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
+        ...l,
+        logs: (l.logs || []).sort((a: any, b: any) => 
+          new Date(b.data).getTime() - new Date(a.data).getTime()
+        )
+      }));
+
+      setLeads(mappedLeads);
+    } catch (error: any) {
+      console.error('Error fetching leads:', error);
+      toast.error('Erro ao carregar leads');
+      // Fallback to initial leads if database fails/empty
+      setLeads(initialLeads);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = (username: string) => {
     sessionStorage.setItem('nl_user', username);
@@ -114,23 +154,37 @@ const Index = () => {
       const lead = leads.find(l => l.id === activeId);
       
       if (lead && lead.stage !== overStage) {
+        const updateData = { 
+          stage: overStage, 
+          etapa_desde: new Date().toISOString(),
+          fechado_em: overStage === 'Fechado' ? new Date().toISOString() : lead.fechado_em
+        };
+
+        const newLog = { 
+          tipo: 'N' as const, 
+          nota: `Movido para ${overStage}`, 
+          data: new Date().toISOString(), 
+          autor: user || 'Sistema' 
+        };
+
+        // Optimistic update
         setLeads(prev => prev.map(l => 
           l.id === activeId ? { 
             ...l, 
-            stage: overStage, 
-            etapa_desde: new Date().toISOString(),
-            fechado_em: overStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
-            logs: [
-              { 
-                tipo: 'N', 
-                nota: `Movido para ${overStage}`, 
-                data: new Date().toISOString(), 
-                autor: user || 'Sistema' 
-              }, 
-              ...l.logs
-            ]
+            ...updateData,
+            logs: [newLog, ...l.logs]
           } : l
         ));
+
+        // Background update
+        Promise.all([
+          supabase.from('leads').update(updateData).eq('id', activeId),
+          supabase.from('lead_logs').insert({ ...newLog, lead_id: activeId })
+        ]).catch(err => {
+          console.error('Error updating stage:', err);
+          toast.error('Erro ao salvar no banco');
+          fetchLeads(); // Revert on error
+        });
       }
       return;
     }
@@ -195,38 +249,77 @@ const Index = () => {
     ), { duration: 6000, position: 'bottom-right' });
   };
 
-  const handleUpdateStage = (leadId: string, newStage: Stage) => {
+  const handleUpdateStage = async (leadId: string, newStage: Stage) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (!lead) return;
+
+    const updateData = { 
+      stage: newStage, 
+      etapa_desde: new Date().toISOString(),
+      fechado_em: newStage === 'Fechado' ? new Date().toISOString() : lead.fechado_em
+    };
+
+    const newLog = { 
+      tipo: 'N' as const, 
+      nota: `Movido para ${newStage}`, 
+      data: new Date().toISOString(), 
+      autor: user || 'Sistema' 
+    };
+
+    // Optimistic update
     setLeads(prev => prev.map(l => 
       l.id === leadId ? { 
         ...l, 
-        stage: newStage, 
-        etapa_desde: new Date().toISOString(),
-        fechado_em: newStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
-        logs: [
-          { 
-            tipo: 'N', 
-            nota: `Movido para ${newStage}`, 
-            data: new Date().toISOString(), 
-            autor: user || 'Sistema' 
-          }, 
-          ...l.logs
-        ]
+        ...updateData,
+        logs: [newLog, ...l.logs]
       } : l
     ));
-    toast.success(`Lead movido para ${newStage}`);
+
+    try {
+      await Promise.all([
+        supabase.from('leads').update(updateData).eq('id', leadId),
+        supabase.from('lead_logs').insert({ ...newLog, lead_id: leadId })
+      ]);
+      toast.success(`Lead movido para ${newStage}`);
+    } catch (err) {
+      console.error('Error updating stage:', err);
+      toast.error('Erro ao atualizar estágio');
+      fetchLeads();
+    }
   };
 
-  const handleDeleteLead = (leadId: string) => {
-    setLeads(prev => prev.filter(l => l.id !== leadId));
-    setSelectedLeadId(null);
-    toast.success("Lead excluído com sucesso");
+  const handleDeleteLead = async (leadId: string) => {
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', leadId);
+      if (error) throw error;
+      
+      setLeads(prev => prev.filter(l => l.id !== leadId));
+      setSelectedLeadId(null);
+      toast.success("Lead excluído com sucesso");
+    } catch (err) {
+      console.error('Error deleting lead:', err);
+      toast.error('Erro ao excluir lead');
+    }
   };
 
-  const handleAddLog = (leadId: string, log: any) => {
-    setLeads(prev => prev.map(l => 
-      l.id === leadId ? { ...l, logs: [log, ...l.logs] } : l
-    ));
-    toast.success("Contato registrado");
+  const handleAddLog = async (leadId: string, log: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('lead_logs')
+        .insert({ ...log, lead_id: leadId })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(prev => prev.map(l => 
+        l.id === leadId ? { ...l, logs: [data, ...l.logs] } : l
+      ));
+      toast.success("Contato registrado");
+    } catch (err) {
+      console.error('Error adding log:', err);
+      toast.error('Erro ao registrar contato');
+    }
   };
 
   const filteredLeads = leads.filter(l => {
