@@ -112,9 +112,21 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Histórico de Contatos</h4>
             <div className="space-y-4">
               {lead.logs.map((log, i) => (
-                <div key={i} className="text-[11px] p-3 border border-beige rounded-[2px]">
-                  <div className="flex justify-between text-muted text-[9px] mb-1"><span>{log.data} · {log.autor}</span></div>
-                  <p className="text-graphite">{log.nota}</p>
+                <div key={i} className={cn(
+                  "text-[11px] p-3 border rounded-[2px]",
+                  log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-beige"
+                )}>
+                  <div className="flex justify-between text-muted text-[9px] mb-1">
+                    <span>{log.data} · {log.autor}</span>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
+                  </div>
+                  <p className={cn(
+                    "text-graphite",
+                    log.tipo === 'N' && "italic text-muted/80 flex items-center gap-2"
+                  )}>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
+                    {log.nota}
+                  </p>
                 </div>
               ))}
             </div>
