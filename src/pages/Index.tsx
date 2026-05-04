@@ -154,23 +154,38 @@ const Index = () => {
       const lead = leads.find(l => l.id === activeId);
       
       if (lead && lead.stage !== overStage) {
+        const updateData = { 
+          stage: overStage, 
+          etapa_desde: new Date().toISOString(),
+          fechado_em: overStage === 'Fechado' ? new Date().toISOString() : lead.fechado_em
+        };
+
+        const newLog = { 
+          lead_id: activeId,
+          tipo: 'N', 
+          nota: `Movido para ${overStage}`, 
+          data: new Date().toISOString(), 
+          autor: user || 'Sistema' 
+        };
+
+        // Optimistic update
         setLeads(prev => prev.map(l => 
           l.id === activeId ? { 
             ...l, 
-            stage: overStage, 
-            etapa_desde: new Date().toISOString(),
-            fechado_em: overStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
-            logs: [
-              { 
-                tipo: 'N', 
-                nota: `Movido para ${overStage}`, 
-                data: new Date().toISOString(), 
-                autor: user || 'Sistema' 
-              }, 
-              ...l.logs
-            ]
+            ...updateData,
+            logs: [newLog, ...l.logs]
           } : l
         ));
+
+        // Background update
+        Promise.all([
+          supabase.from('leads').update(updateData).eq('id', activeId),
+          supabase.from('lead_logs').insert(newLog)
+        ]).catch(err => {
+          console.error('Error updating stage:', err);
+          toast.error('Erro ao salvar no banco');
+          fetchLeads(); // Revert on error
+        });
       }
       return;
     }
