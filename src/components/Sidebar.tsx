@@ -78,18 +78,20 @@ const Sidebar = ({ user }: { user: string }) => {
     setOpenSection(openSection === section ? null : section);
   };
 
+  const initials = user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
   return (
     <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
-      <div className="p-8 mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-bronze flex items-center justify-center text-white font-cormorant text-lg">
+      <div className="p-8 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)]">
             NL
           </div>
-          <div>
+          <div className="space-y-0.5">
             <div className="flex items-baseline gap-1">
-              <span className="text-sm font-medium text-white tracking-widest uppercase">OS</span>
+              <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
             </div>
-            <p className="text-[8px] text-muted uppercase tracking-[0.2em] leading-none font-mono">Sistema Operacional</p>
+            <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">Módulo Pipeline</p>
           </div>
         </div>
       </div>
@@ -151,19 +153,19 @@ const Sidebar = ({ user }: { user: string }) => {
 
       <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-bronze/20 flex items-center justify-center text-bronze text-[10px] font-bold border border-bronze/20 uppercase">
-            {user.substring(0, 2)}
+          <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase">
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-white font-medium truncate capitalize">{user}</p>
-            <p className="text-[9px] text-muted uppercase tracking-tighter">Sócio</p>
+            <p className="text-[9px] text-bronze/60 uppercase tracking-widest font-bold">Sócio</p>
           </div>
           <button 
             onClick={() => {
               sessionStorage.removeItem('nl_user');
               window.location.reload();
             }}
-            className="text-muted hover:text-white transition-colors"
+            className="text-white/20 hover:text-white transition-colors p-1"
           >
             <LogOut size={12} />
           </button>

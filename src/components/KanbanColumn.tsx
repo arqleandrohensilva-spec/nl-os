@@ -24,14 +24,17 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
   const isLost = stage === 'Perdido';
   const totalValue = leads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
   const theme = STAGE_THEME[stage];
+  
+  // Destaque para colunas com muito valor (ex: > 1M ou apenas Negociação como solicitado)
+  const isHighValue = stage === 'Negociação' || totalValue >= 1000000;
 
   return (
     <div className={cn(
-      "w-[300px] flex-shrink-0 flex flex-col h-full bg-[#F5F5F5]/50 border-r border-beige last:border-r-0",
+      "w-[320px] flex-shrink-0 flex flex-col h-full bg-[#F5F5F5]/50 border-r border-beige last:border-r-0",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>
       {/* Header */}
-      <div className={cn("p-6 pb-4", isLost && "opacity-45")}>
+      <div className={cn("p-6 pb-4 relative", isLost && "opacity-45")}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div 
@@ -54,9 +57,20 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
           <span className="text-[18px] font-cormorant text-graphite">{leads.length}</span>
           <span className="text-[8px] font-bold text-muted uppercase tracking-widest">Leads</span>
           <div className="ml-auto flex items-center gap-1.5">
-            <span className="text-[10px] font-bold text-bronze">R$ {(totalValue / 1000).toLocaleString('pt-BR')}k</span>
+            <span className={cn(
+              "text-[11px] font-bold",
+              isHighValue ? "text-bronze scale-110 origin-right transition-transform" : "text-muted/70"
+            )}>
+              R$ {(totalValue / 1000).toLocaleString('pt-BR')}k
+            </span>
           </div>
         </div>
+
+        {/* Linha de valor mais espessa para colunas importantes */}
+        <div className={cn(
+          "absolute bottom-0 left-6 right-6 h-[1px] bg-beige",
+          isHighValue && "h-[2px] bg-bronze/40"
+        )} />
       </div>
 
       {/* Cards List */}
@@ -66,8 +80,8 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={cn(
-              "flex-1 overflow-y-auto px-4 pb-10 space-y-4 transition-colors duration-200",
-              snapshot.isDraggingOver && "bg-bronze/5"
+              "flex-1 overflow-y-auto px-4 pb-10 pt-4 space-y-4 transition-all duration-300",
+              snapshot.isDraggingOver ? "bg-bronze/[0.03] ring-1 ring-inset ring-bronze/10" : ""
             )}
           >
             {leads.length > 0 ? (
