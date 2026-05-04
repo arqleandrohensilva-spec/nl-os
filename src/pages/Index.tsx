@@ -78,9 +78,23 @@ const Index = () => {
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
   useEffect(() => {
-    if (user) {
-      fetchLeads();
-    }
+    if (!user) return;
+    fetchLeads();
+
+    // Realtime subscriptions
+    const leadsChannel = supabase
+      .channel('leads-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+        fetchLeads();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lead_logs' }, () => {
+        fetchLeads();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(leadsChannel);
+    };
   }, [user]);
 
   const fetchLeads = async () => {
@@ -313,7 +327,7 @@ const Index = () => {
       if (error) throw error;
 
       setLeads(prev => prev.map(l => 
-        l.id === leadId ? { ...l, logs: [data, ...l.logs] } : l
+        l.id === leadId ? { ...l, logs: [data as any, ...l.logs] } : l
       ));
       toast.success("Contato registrado");
     } catch (err) {
