@@ -99,23 +99,23 @@ const Index = () => {
         <div className="flex-shrink-0 bg-white z-10">
           <div className="px-10 py-6 border-b border-beige flex items-center justify-between">
             <div className="space-y-1">
-              <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none">Pipeline do Studio</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Aquisição & Conversão de Leads</p>
+              <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none uppercase">Pipeline de Leads</h1>
+              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
             </div>
             
             <div className="flex items-center gap-6">
               <div className="relative group">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-bronze transition-colors" />
                 <Input 
-                  placeholder="BUSCAR PROSPECTOS..." 
+                  placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-72 h-10 pl-10 bg-[#FAFAFA] border-beige focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
                 />
               </div>
               <div className="h-8 w-[1px] bg-beige" />
-              <Button className="h-10 bg-graphite hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold">
-                <UserPlus size={16} /> Novo Prospecto
+              <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
+                <Plus size={16} /> + Novo Lead
               </Button>
             </div>
           </div>
@@ -172,7 +172,7 @@ const Index = () => {
               </div>
 
               <div className="flex items-center gap-2 text-muted hover:text-graphite cursor-pointer transition-colors">
-                <span className="text-[9px] font-bold uppercase tracking-widest">Ordem: Score Dec.</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span>
                 <ChevronDown size={14} />
               </div>
             </div>
