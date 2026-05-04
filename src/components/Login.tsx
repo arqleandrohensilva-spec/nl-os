@@ -66,10 +66,11 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
             />
           </div>
           
-          {error && <p className="text-[10px] text-red uppercase text-center">{error}</p>}
+          {isLoading && <p className="text-[10px] text-muted uppercase text-center animate-pulse">Autenticando...</p>}
           
           <Button 
             type="submit" 
+            disabled={isLoading}
             className="w-full h-11 bg-graphite hover:bg-bronze transition-colors duration-200 rounded-none text-[10px] uppercase tracking-widest mt-2"
           >
             Entrar
