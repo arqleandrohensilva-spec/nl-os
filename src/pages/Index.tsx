@@ -234,10 +234,17 @@ const Index = () => {
           </div>
 
           <MetricsBar leads={leads} />
+          <OriginBreakdown leads={leads} />
 
-          <div className="px-10 py-4 border-b border-beige flex items-center justify-between bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+          <div className="px-10 py-4 border-b border-beige flex items-center justify-between bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
-              <div className="p-2 border border-beige rounded-[2px] text-muted"><Settings2 size={14} /></div>
+              <button 
+                onClick={showMockToast}
+                className="p-2 border border-beige rounded-[2px] text-muted hover:text-bronze transition-colors"
+                title="Simular proposta aberta"
+              >
+                <Settings2 size={14} />
+              </button>
               <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite")}>{type}</button>
