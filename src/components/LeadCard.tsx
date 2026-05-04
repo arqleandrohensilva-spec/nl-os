@@ -37,11 +37,11 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           {...provided.dragHandleProps}
           onClick={onClick}
           className={cn(
-            "group relative bg-white border border-beige p-5 cursor-pointer transition-all duration-300 hover:border-bronze hover:shadow-[0_15px_30px_rgba(139,115,85,0.08)]",
-            "min-h-[220px] flex flex-col justify-between",
-            lead.score >= 8 && "border-t-[3px] border-t-bronze",
-            snapshot.isDragging && "shadow-2xl ring-2 ring-bronze/20 z-50 scale-[1.02]",
-            isLost && "opacity-45"
+            "group relative bg-white border border-beige p-5 cursor-pointer transition-all duration-500 hover:border-bronze hover:shadow-[0_25px_50px_-12px_rgba(139,115,85,0.15)] hover:-translate-y-1",
+            "min-h-[230px] flex flex-col justify-between",
+            lead.score >= 8 && "border-t-[4px] border-t-bronze",
+            snapshot.isDragging && "shadow-2xl ring-2 ring-bronze/30 z-50 scale-[1.05] rotate-2",
+            isLost && "opacity-45 grayscale-[0.5]"
           )}
         >
           <div 
