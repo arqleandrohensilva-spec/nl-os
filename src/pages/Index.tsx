@@ -55,7 +55,8 @@ const STAGES: Stage[] = [
 
 const Index = () => {
   const [user, setUser] = useState<string | null>(() => sessionStorage.getItem('nl_user'));
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
