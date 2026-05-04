@@ -391,6 +391,24 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
+                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Responsável:</span>
+                <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
+                  {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
+                    <button 
+                      key={resp} 
+                      onClick={() => setFilterResponsavel(resp)} 
+                      className={cn(
+                        "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
+                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite"
+                      )}
+                    >
+                      {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
+                      {resp}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
                 <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
