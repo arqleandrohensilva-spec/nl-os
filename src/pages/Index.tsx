@@ -11,11 +11,33 @@ import {
   Plus, 
   Search, 
   ChevronDown, 
-  Settings2
+  Settings2,
+  Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { 
+  DndContext, 
+  DragOverlay, 
+  closestCorners, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  DragStartEvent, 
+  DragEndEvent,
+  DragOverEvent,
+  defaultDropAnimationSideEffects
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy 
+} from '@dnd-kit/sortable';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
+import OriginBreakdown from '@/components/OriginBreakdown';
+import LeadCard from '@/components/LeadCard';
 
 const STAGES: Stage[] = [
   'Novo Lead', 
