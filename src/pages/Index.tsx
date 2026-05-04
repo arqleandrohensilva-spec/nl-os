@@ -169,6 +169,17 @@ const Index = () => {
     // Session is handled by supabase.auth.onAuthStateChange
   };
 
+  if (isAuthLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-bronze/20 border-t-bronze rounded-full animate-spin" />
+          <p className="text-[10px] uppercase tracking-widest text-muted">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return <Login onLogin={handleLogin} />;
   }
