@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { initialLeads, Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
+import { Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
 import KanbanColumn from '@/components/KanbanColumn';
@@ -158,8 +158,7 @@ const Index = () => {
     } catch (error: any) {
       console.error('Error fetching leads:', error);
       toast.error('Erro ao carregar leads');
-      // Fallback to initial leads if database fails/empty
-      setLeads(initialLeads);
+      setLeads([]);
     } finally {
       setIsLoading(false);
     }
