@@ -313,7 +313,7 @@ const Index = () => {
       if (error) throw error;
 
       setLeads(prev => prev.map(l => 
-        l.id === leadId ? { ...l, logs: [data, ...l.logs] } : l
+        l.id === leadId ? { ...l, logs: [data as any, ...l.logs] } : l
       ));
       toast.success("Contato registrado");
     } catch (err) {
