@@ -356,9 +356,18 @@ const Index = () => {
                 />
               </div>
               <div className="h-8 w-[1px] bg-beige" />
-              <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
-                + Novo Lead
-              </Button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={exportToPDF}
+                  className="p-2 text-muted hover:text-bronze transition-colors"
+                  title="Exportar Pipeline"
+                >
+                  <Download size={18} />
+                </button>
+                <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
+                  + Novo Lead
+                </Button>
+              </div>
             </div>
           </div>
 
