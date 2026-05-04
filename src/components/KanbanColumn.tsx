@@ -28,10 +28,10 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
   return (
     <div className={cn(
       "w-[300px] flex-shrink-0 flex flex-col h-full bg-[#F5F5F5]/50 border-r border-beige last:border-r-0",
-      isLost && "opacity-60 saturate-[0.2]"
+      isLost && "opacity-45 bg-black/[0.02]"
     )}>
       {/* Header */}
-      <div className="p-6 pb-4">
+      <div className={cn("p-6 pb-4", isLost && "opacity-45")}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div 
@@ -82,7 +82,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
             ) : (
               <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
                 <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
-                <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Sem registros</span>
+                <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Nenhum lead aqui</span>
               </div>
             )}
             {provided.placeholder}
