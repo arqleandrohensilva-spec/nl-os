@@ -1,18 +1,38 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((username === 'leandro' || username === 'neandro') && password === 'nl2026') {
-      onLogin(username);
-    } else {
-      setError('Credenciais inválidas');
+    setIsLoading(true);
+    
+    // Convert username to email if it doesn't look like one
+    const email = username.includes('@') ? username : `${username}@nlarquitetos.com.br`;
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        if (error.message === 'Invalid login credentials') {
+          toast.error('Usuário ou senha incorretos');
+        } else {
+          toast.error(error.message);
+        }
+      }
+    } catch (err) {
+      toast.error('Erro ao conectar ao servidor');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,10 +66,11 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
             />
           </div>
           
-          {error && <p className="text-[10px] text-red uppercase text-center">{error}</p>}
+          {isLoading && <p className="text-[10px] text-muted uppercase text-center animate-pulse">Autenticando...</p>}
           
           <Button 
             type="submit" 
+            disabled={isLoading}
             className="w-full h-11 bg-graphite hover:bg-bronze transition-colors duration-200 rounded-none text-[10px] uppercase tracking-widest mt-2"
           >
             Entrar
