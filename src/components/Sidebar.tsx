@@ -72,10 +72,24 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
 );
 
 const Sidebar = ({ user }: { user: string }) => {
-  const [openSection, setOpenSection] = useState<string | null>('LEADS');
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+    const saved = sessionStorage.getItem('sidebar_sections');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return { 'LEADS': true };
+      }
+    }
+    return { 'LEADS': true };
+  });
 
   const toggleSection = (section: string) => {
-    setOpenSection(openSection === section ? null : section);
+    setOpenSections(prev => {
+      const next = { ...prev, [section]: !prev[section] };
+      sessionStorage.setItem('sidebar_sections', JSON.stringify(next));
+      return next;
+    });
   };
 
   const initials = user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -100,7 +114,7 @@ const Sidebar = ({ user }: { user: string }) => {
         <SectionAccordion 
           label="LEADS" 
           icon={<LayoutGrid size={14} />}
-          isOpen={openSection === 'LEADS'}
+          isOpen={!!openSections['LEADS']}
           onToggle={() => toggleSection('LEADS')}
         >
           <NavItem label="01 · Pipeline de Leads" active />
@@ -110,7 +124,7 @@ const Sidebar = ({ user }: { user: string }) => {
         <SectionAccordion 
           label="FINANCEIRO" 
           icon={<DollarSign size={14} />}
-          isOpen={openSection === 'FINANCEIRO'}
+          isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
           <NavItem label="03 · Base Financeira" disabled />
@@ -121,7 +135,7 @@ const Sidebar = ({ user }: { user: string }) => {
         <SectionAccordion 
           label="PROJETOS" 
           icon={<PenTool size={14} />}
-          isOpen={openSection === 'PROJETOS'}
+          isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
         >
           <NavItem label="06 · Controle de Horas" disabled />
@@ -132,7 +146,7 @@ const Sidebar = ({ user }: { user: string }) => {
         <SectionAccordion 
           label="PROPOSTAS" 
           icon={<FileText size={14} />}
-          isOpen={openSection === 'PROPOSTAS'}
+          isOpen={!!openSections['PROPOSTAS']}
           onToggle={() => toggleSection('PROPOSTAS')}
         >
           <NavItem label="09 · Tracking Comercial" disabled />
@@ -143,7 +157,7 @@ const Sidebar = ({ user }: { user: string }) => {
         <SectionAccordion 
           label="MARKETING" 
           icon={<BarChart3 size={14} />}
-          isOpen={openSection === 'MARKETING'}
+          isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
         >
           <NavItem label="12 · Satisfação (NPS)" disabled />
