@@ -1,85 +1,101 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { TrendingUp, Users, Target, DollarSign } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
+import { differenceInDays, parseISO } from 'date-fns';
 
 interface MetricCardProps {
   label: string;
   value: string | number;
-  subValue?: string;
-  icon: React.ElementType;
-  trend?: {
-    value: string;
-    positive: boolean;
-  };
+  subLabel?: React.ReactNode;
+  pulse?: boolean;
+  highlightBase?: boolean;
+  isNegative?: boolean;
 }
 
-const MetricCard = ({ label, value, subValue, icon: Icon, trend }: MetricCardProps) => (
-  <div className="flex-1 px-8 py-7 border-r border-beige last:border-r-0 group hover:bg-beige/10 transition-colors">
-    <div className="flex justify-between items-start mb-4">
-      <div className="p-2 border border-beige rounded-[2px] group-hover:border-bronze/30 transition-colors">
-        <Icon className="w-4 h-4 text-bronze/60" />
-      </div>
-      {trend && (
-        <div className={cn(
-          "flex items-center gap-1 text-[10px] font-medium tracking-tight",
-          trend.positive ? "text-green-600" : "text-red-500"
-        )}>
-          {trend.positive ? <TrendingUp size={10} /> : <TrendingUp size={10} className="rotate-180" />}
-          {trend.value}
-        </div>
-      )}
+const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }: MetricCardProps) => (
+  <div className="flex-1 px-8 py-7 border-r border-beige last:border-r-0 relative group hover:bg-beige/10 transition-colors">
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-[9px] text-muted uppercase tracking-[0.2em] font-bold">{label}</span>
+      {pulse && <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse" />}
     </div>
     
-    <div className="space-y-1">
-      <p className="text-[9px] text-muted uppercase tracking-[0.2em] font-bold">{label}</p>
-      <div className="flex items-baseline gap-2">
-        <h3 className="text-[34px] font-cormorant text-graphite leading-none tracking-tight">{value}</h3>
-        {subValue && <span className="text-[10px] text-muted font-medium uppercase tracking-tighter">{subValue}</span>}
-      </div>
+    <div className={cn(
+      "text-[40px] font-cormorant leading-none tracking-tight",
+      isNegative ? "text-red" : "text-graphite"
+    )}>
+      {value}
     </div>
+    
+    {subLabel && <div className="mt-2 text-[9px] font-medium uppercase tracking-wider">{subLabel}</div>}
+    
+    <div className={cn(
+      "absolute bottom-0 left-0 right-0 h-[1px] transition-opacity",
+      highlightBase ? "bg-bronze opacity-100" : "bg-bronze opacity-20 group-hover:opacity-40"
+    )} />
   </div>
 );
 
 const MetricsBar = ({ leads }: { leads: any[] }) => {
-  const activeLeads = leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido');
-  const totalValue = activeLeads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
-  const avgTicket = activeLeads.length > 0 ? totalValue / activeLeads.length : 0;
+  const activeLeads = leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length;
   
+  const inNegotiationValue = leads
+    .filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido')
+    .reduce((acc, l) => acc + (l.orcamento || 0), 0);
+
+  const averageTicket = activeLeads > 0 ? inNegotiationValue / activeLeads : 0;
+  
+  // Lógica corrigida de follow-ups hoje
   const followUpsToday = leads.filter(l => {
-    if (!l.proxima_acao_data) return false;
-    const today = new Date().toISOString().split('T')[0];
-    return l.proxima_acao_data.startsWith(today);
+    const hasNoLogs = !l.logs || l.logs.length === 0;
+    
+    if (l.stage === 'Novo Lead' && hasNoLogs) {
+      return true;
+    }
+    
+    if (l.stage === 'Proposta Enviada') {
+      const daysInStage = differenceInDays(new Date(), parseISO(l.etapa_desde));
+      if (daysInStage > 2 && hasNoLogs) {
+        return true;
+      }
+    }
+    
+    return false;
   }).length;
 
-  const formatK = (val: number) => `R$ ${(val / 1000).toFixed(0)}k`;
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      maximumFractionDigits: 0,
+    }).format(val).replace('R$', 'R$ ');
+  };
 
   return (
     <div className="flex border-b border-beige bg-white">
       <MetricCard 
-        label="Pipeline Ativo" 
-        value={activeLeads.length} 
-        subValue="Leads"
-        icon={Users}
-        trend={{ value: "+12%", positive: true }}
+        label="LEADS ATIVOS" 
+        value={activeLeads} 
       />
       <MetricCard 
-        label="Ticket Médio" 
-        value={formatK(avgTicket)}
-        icon={Target}
-        trend={{ value: "Standard", positive: true }}
+        label="TICKET MÉDIO" 
+        value={formatCurrency(averageTicket)}
+        subLabel={
+          <span className="flex items-center gap-1 text-green-600">
+            +12% vs mês anterior <TrendingUp size={10} />
+          </span>
+        }
       />
       <MetricCard 
-        label="Volume Total" 
-        value={formatK(totalValue)}
-        subValue="Estimated"
-        icon={DollarSign}
+        label="EM NEGOCIAÇÃO" 
+        value={formatCurrency(inNegotiationValue)}
+        subLabel={<span className="text-muted opacity-60">estimado</span>}
       />
       <MetricCard 
-        label="Urgências" 
+        label="FOLLOW-UPS HOJE" 
         value={followUpsToday}
-        subValue="Follow-ups"
-        icon={TrendingUp}
-        trend={{ value: "Immediate", positive: false }}
+        pulse={followUpsToday > 0}
+        highlightBase={followUpsToday > 0}
+        isNegative={followUpsToday > 0}
       />
     </div>
   );
