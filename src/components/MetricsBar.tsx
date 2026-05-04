@@ -131,12 +131,12 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
             </span>
           }
         />
-      <MetricCard 
-        label="FORECAST PONDERADO" 
-        value={formatCleanValue(weightedValue)}
-        subLabel={<span className="text-bronze opacity-80 font-bold flex items-center gap-1">Probabilidade média <TrendingUp size={10} /></span>}
-        highlightBase
-      />
+        <MetricCard 
+          label="FORECAST PONDERADO" 
+          value={formatCleanValue(weightedValue)}
+          subLabel={<span className="text-bronze opacity-80 font-bold flex items-center gap-1">Probabilidade média <TrendingUp size={10} /></span>}
+          highlightBase
+        />
       <MetricCard 
         label="FOLLOW-UPS HOJE" 
         value={followUpsToday}
