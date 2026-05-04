@@ -12,8 +12,12 @@ import {
   Search, 
   ChevronDown, 
   Settings2,
-  Eye
+  Eye,
+  Download,
+  Users
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { cn } from '@/lib/utils';
 import { 
   DndContext, 
@@ -56,6 +60,7 @@ const Index = () => {
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -228,8 +233,104 @@ const Index = () => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
     const matchesTemp = filterTemp.length === 0 || filterTemp.includes(l.temp);
-    return matchesSearch && matchesType && matchesTemp;
+    
+    let matchesResponsavel = true;
+    if (filterResponsavel !== 'Todos') {
+      const isCreator = l.criado_por === filterResponsavel;
+      const isLogAuthor = l.logs.some(log => log.autor === filterResponsavel);
+      matchesResponsavel = isCreator || isLogAuthor;
+    }
+    
+    return matchesSearch && matchesType && matchesTemp && matchesResponsavel;
   });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    // Cores NL
+    const graphite = [26, 26, 26]; // #1A1A1A
+    const bronze = [139, 115, 85]; // #8B7355
+
+    // Capa
+    doc.setFillColor(graphite[0], graphite[1], graphite[2]);
+    doc.rect(0, 0, 210, 297, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(40);
+    doc.text('NL OS', 105, 100, { align: 'center' });
+    
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.setFontSize(24);
+    doc.text('Pipeline de Leads', 105, 120, { align: 'center' });
+    
+    doc.setTextColor(255, 255, 255, 0.5);
+    doc.setFontSize(10);
+    doc.text(`Gerado em ${dateStr} às ${timeStr}`, 105, 140, { align: 'center' });
+
+    doc.addPage();
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+
+    // Resumo Executivo
+    doc.setFontSize(14);
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.text('RESUMO EXECUTIVO', 14, 20);
+    
+    const activeLeads = filteredLeads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length;
+    const totalValue = filteredLeads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text(`Leads Ativos: ${activeLeads}`, 14, 30);
+    doc.text(`Volume Total: R$ ${(totalValue / 1000).toLocaleString('pt-BR')}k`, 14, 35);
+
+    // Tabela por Etapa
+    let yPos = 45;
+    STAGES.forEach(stage => {
+      const stageLeads = filteredLeads.filter(l => l.stage === stage);
+      if (stageLeads.length === 0) return;
+
+      doc.setFontSize(12);
+      doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+      doc.text(stage.toUpperCase(), 14, yPos);
+      
+      autoTable(doc, {
+        startY: yPos + 5,
+        head: [['Nome', 'Tipo', 'Cidade', 'Orçamento', 'Score', 'Dias']],
+        body: stageLeads.map(l => [
+          l.nome,
+          l.tipo,
+          l.cidade,
+          `R$ ${(l.orcamento / 1000).toLocaleString('pt-BR')}k`,
+          l.score,
+          Math.floor((new Date().getTime() - new Date(l.etapa_desde).getTime()) / (1000 * 60 * 60 * 24))
+        ]),
+        headStyles: { fillColor: [26, 26, 26], textColor: [255, 255, 255], fontSize: 8 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { left: 14, right: 14 }
+      });
+      
+      yPos = (doc as any).lastAutoTable.finalY + 15;
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+    });
+
+    // Rodapé em todas as páginas
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`NL Arquitetos · São José dos Campos · gerado em ${dateStr}`, 105, 285, { align: 'center' });
+    }
+
+    doc.save(`Pipeline_NL_OS_${dateStr.replace(/\//g, '-')}.pdf`);
+    toast.success('Pipeline exportado com sucesso');
+  };
 
   return (
     <div className="flex min-h-screen bg-[#FDFDFD]">
@@ -255,9 +356,18 @@ const Index = () => {
                 />
               </div>
               <div className="h-8 w-[1px] bg-beige" />
-              <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
-                + Novo Lead
-              </Button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={exportToPDF}
+                  className="p-2 text-muted hover:text-bronze transition-colors"
+                  title="Exportar Pipeline"
+                >
+                  <Download size={18} />
+                </button>
+                <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
+                  + Novo Lead
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -280,6 +390,24 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Responsável:</span>
+                <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
+                  {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
+                    <button 
+                      key={resp} 
+                      onClick={() => setFilterResponsavel(resp)} 
+                      className={cn(
+                        "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
+                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite"
+                      )}
+                    >
+                      {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
+                      {resp}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="flex items-center gap-3">
                 <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
