@@ -56,6 +56,7 @@ const STAGES: Stage[] = [
 const Index = () => {
   const [user, setUser] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
@@ -80,21 +81,33 @@ const Index = () => {
 
   useEffect(() => {
     // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        setUser(session.user.email?.split('@')[0] || 'User');
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        if (session?.user) {
+          const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
+          setUser(name.charAt(0).toUpperCase() + name.slice(1));
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+      } finally {
+        setIsAuthLoading(false);
       }
-    });
+    };
+
+    checkAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
-        setUser(session.user.email?.split('@')[0] || 'User');
+        const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
+        setUser(name.charAt(0).toUpperCase() + name.slice(1));
       } else {
         setUser(null);
       }
+      setIsAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -155,6 +168,17 @@ const Index = () => {
   const handleLogin = (username: string) => {
     // Session is handled by supabase.auth.onAuthStateChange
   };
+
+  if (isAuthLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-4 border-bronze/20 border-t-bronze rounded-full animate-spin" />
+          <p className="text-[10px] uppercase tracking-widest text-muted">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return <Login onLogin={handleLogin} />;
