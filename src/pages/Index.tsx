@@ -11,11 +11,33 @@ import {
   Plus, 
   Search, 
   ChevronDown, 
-  Settings2
+  Settings2,
+  Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { 
+  DndContext, 
+  DragOverlay, 
+  closestCorners, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors, 
+  DragStartEvent, 
+  DragEndEvent,
+  DragOverEvent,
+  defaultDropAnimationSideEffects
+} from '@dnd-kit/core';
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  verticalListSortingStrategy 
+} from '@dnd-kit/sortable';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
+import OriginBreakdown from '@/components/OriginBreakdown';
+import LeadCard from '@/components/LeadCard';
 
 const STAGES: Stage[] = [
   'Novo Lead', 
@@ -29,10 +51,22 @@ const STAGES: Stage[] = [
 const Index = () => {
   const [user, setUser] = useState<string | null>(() => sessionStorage.getItem('nl_user'));
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [activeLead, setActiveLead] = useState<Lead | null>(null);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
@@ -51,13 +85,95 @@ const Index = () => {
     );
   };
 
-  const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
-    if (!destination) return;
-    if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const lead = active.data.current?.lead;
+    if (lead) setActiveLead(lead);
+  };
 
-    const newStage = destination.droppableId as Stage;
-    handleUpdateStage(draggableId, newStage);
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    const activeData = active.data.current;
+    const overData = over.data.current;
+
+    if (!activeData || activeData.type !== 'Lead') return;
+
+    // Se estiver sobre uma coluna
+    if (overData?.type === 'Column') {
+      const overStage = overData.stage as Stage;
+      const lead = leads.find(l => l.id === activeId);
+      
+      if (lead && lead.stage !== overStage) {
+        setLeads(prev => prev.map(l => 
+          l.id === activeId ? { ...l, stage: overStage, etapa_desde: new Date().toISOString() } : l
+        ));
+      }
+      return;
+    }
+
+    // Se estiver sobre outro lead
+    if (overData?.type === 'Lead') {
+      const overLead = overData.lead as Lead;
+      const activeLead = activeData.lead as Lead;
+      
+      if (activeLead.stage !== overLead.stage) {
+        setLeads(prev => prev.map(l => 
+          l.id === activeId ? { ...l, stage: overLead.stage, etapa_desde: new Date().toISOString() } : l
+        ));
+      }
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveLead(null);
+    
+    if (!over) return;
+    
+    if (active.id !== over.id) {
+      const oldIndex = leads.findIndex(l => l.id === active.id);
+      const newIndex = leads.findIndex(l => l.id === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        setLeads(prev => arrayMove(prev, oldIndex, newIndex));
+      }
+    }
+    
+    const lead = leads.find(l => l.id === active.id);
+    if (lead) {
+      toast.success(`Lead atualizado`);
+    }
+  };
+
+  const showMockToast = () => {
+    const randomLead = leads[Math.floor(Math.random() * leads.length)];
+    toast.custom((t) => (
+      <div className="bg-[#1A1A1A] text-white p-4 rounded-[2px] shadow-2xl border-l-4 border-bronze flex items-center justify-between gap-4 min-w-[320px] animate-in slide-in-from-right duration-300">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-bronze/10 rounded-full">
+            <Eye size={18} className="text-bronze" />
+          </div>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest">{randomLead.nome} abriu a proposta agora</p>
+            <p className="text-[9px] text-white/50">Módulo 04 · Tracking em tempo real</p>
+          </div>
+        </div>
+        <button 
+          onClick={() => {
+            setSelectedLeadId(randomLead.id);
+            toast.dismiss(t);
+          }}
+          className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
+        >
+          Ver Lead
+        </button>
+      </div>
+    ), { duration: 6000, position: 'bottom-right' });
   };
 
   const handleUpdateStage = (leadId: string, newStage: Stage) => {
@@ -118,10 +234,17 @@ const Index = () => {
           </div>
 
           <MetricsBar leads={leads} />
+          <OriginBreakdown leads={leads} />
 
-          <div className="px-10 py-4 border-b border-beige flex items-center justify-between bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+          <div className="px-10 py-4 border-b border-beige flex items-center justify-between bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
-              <div className="p-2 border border-beige rounded-[2px] text-muted"><Settings2 size={14} /></div>
+              <button 
+                onClick={showMockToast}
+                className="p-2 border border-beige rounded-[2px] text-muted hover:text-bronze transition-colors"
+                title="Simular proposta aberta"
+              >
+                <Settings2 size={14} />
+              </button>
               <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite")}>{type}</button>
@@ -144,7 +267,14 @@ const Index = () => {
 
         {/* Kanban Board */}
         <div className="flex-1 bg-[#FAFAFA] overflow-hidden p-6 pt-2">
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToWindowEdges]}
+          >
             <div className="grid grid-cols-6 h-full gap-4">
               {STAGES.map(stage => (
                 <KanbanColumn 
@@ -155,7 +285,25 @@ const Index = () => {
                 />
               ))}
             </div>
-          </DragDropContext>
+
+            <DragOverlay dropAnimation={{
+              sideEffects: defaultDropAnimationSideEffects({
+                styles: {
+                  active: {
+                    opacity: '0.4',
+                  },
+                },
+              }),
+            }}>
+              {activeLead ? (
+                <LeadCard 
+                  lead={activeLead} 
+                  index={0} 
+                  onClick={() => {}} 
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         </div>
       </main>
 

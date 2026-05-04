@@ -3,7 +3,8 @@ import { cn } from '@/lib/utils';
 import { Lead, Stage } from '@/lib/types';
 import LeadCard from './LeadCard';
 import { MoreHorizontal } from 'lucide-react';
-import { Droppable } from '@hello-pangea/dnd';
+import { useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 interface KanbanColumnProps {
   stage: Stage;
@@ -25,12 +26,17 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
   const totalValue = leads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
   const theme = STAGE_THEME[stage];
   
-  // Destaque para colunas com muito valor (ex: > 1M ou apenas Negociação como solicitado)
   const isHighValue = stage === 'Negociação' || totalValue >= 1000000;
+
+  const { setNodeRef, isOver } = useDroppable({
+    id: stage,
+    data: { type: 'Column', stage }
+  });
 
   return (
     <div className={cn(
-      "w-full flex-shrink-1 flex flex-col h-full bg-[#F5F5F5]/50 border border-beige rounded-[2px]",
+      "w-full flex-shrink-1 flex flex-col h-full bg-[#F5F5F5]/50 border transition-all duration-200 rounded-[2px]",
+      isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-beige",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>
       {/* Header */}
@@ -74,35 +80,31 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
       </div>
 
       {/* Cards List */}
-      <Droppable droppableId={stage}>
-        {(provided, snapshot) => (
-          <div 
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            className={cn(
-              "flex-1 overflow-y-auto px-4 pb-10 pt-4 space-y-4 transition-all duration-300",
-              snapshot.isDraggingOver ? "bg-bronze/[0.03] ring-1 ring-inset ring-bronze/10" : ""
-            )}
-          >
-            {leads.length > 0 ? (
-              leads.map((lead, index) => (
-                <LeadCard 
-                  key={lead.id} 
-                  lead={lead} 
-                  index={index}
-                  onClick={() => onLeadClick(lead)} 
-                />
-              ))
-            ) : (
-              <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
-                <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
-                <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Nenhum lead aqui</span>
-              </div>
-            )}
-            {provided.placeholder}
-          </div>
+      <div 
+        ref={setNodeRef}
+        className={cn(
+          "flex-1 overflow-y-auto px-4 pb-10 pt-4 space-y-4 transition-all duration-300",
+          isOver ? "bg-bronze/[0.03]" : ""
         )}
-      </Droppable>
+      >
+        <SortableContext items={leads.map(l => l.id)} strategy={verticalListSortingStrategy}>
+          {leads.length > 0 ? (
+            leads.map((lead, index) => (
+              <LeadCard 
+                key={lead.id} 
+                lead={lead} 
+                index={index}
+                onClick={() => onLeadClick(lead)} 
+              />
+            ))
+          ) : (
+            <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
+              <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
+              <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Nenhum lead aqui</span>
+            </div>
+          )}
+        </SortableContext>
+      </div>
     </div>
   );
 };
