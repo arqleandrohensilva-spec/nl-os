@@ -42,6 +42,20 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
     .filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido')
     .reduce((acc, l) => acc + (l.orcamento || 0), 0);
 
+  const stageWeights: Record<string, number> = {
+    'Novo Lead': 0.1,
+    'Reunião Agendada': 0.3,
+    'Proposta Enviada': 0.6,
+    'Negociação': 0.85,
+    'Fechado': 1.0,
+    'Perdido': 0
+  };
+
+  const weightedValue = leads.reduce((acc, l) => {
+    const weight = stageWeights[l.stage] || 0;
+    return acc + ((l.orcamento || 0) * weight);
+  }, 0);
+
   const averageTicket = activeLeads > 0 ? inNegotiationValue / activeLeads : 0;
   
   const followUpsToday = leads.filter(l => {
@@ -58,6 +72,7 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
     if (val >= 1000000) {
       return `R$ ${(val / 1000000).toFixed(1).replace('.', ',')}M`;
     }
+    if (val === 0) return "R$ 0";
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -81,9 +96,10 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
         }
       />
       <MetricCard 
-        label="EM NEGOCIAÇÃO" 
-        value={formatCleanValue(inNegotiationValue)}
-        subLabel={<span className="text-muted opacity-60 font-medium">estimado</span>}
+        label="FORECAST PONDERADO" 
+        value={formatCleanValue(weightedValue)}
+        subLabel={<span className="text-bronze opacity-80 font-bold flex items-center gap-1">Probabilidade média <TrendingUp size={10} /></span>}
+        highlightBase
       />
       <MetricCard 
         label="FOLLOW-UPS HOJE" 
