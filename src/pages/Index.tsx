@@ -66,6 +66,19 @@ const Index = () => {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
+
   useEffect(() => {
     // Check current session
     const checkAuth = async () => {
