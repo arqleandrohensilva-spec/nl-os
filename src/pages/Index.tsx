@@ -15,6 +15,8 @@ import {
   UserPlus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
+import { toast } from "sonner";
 
 const STAGES: Stage[] = [
   'Novo Lead', 
@@ -48,6 +50,39 @@ const Index = () => {
     );
   };
 
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return;
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    const newStage = destination.droppableId as Stage;
+    const leadId = draggableId;
+
+    setLeads(prevLeads => {
+      const updatedLeads = prevLeads.map(lead => {
+        if (lead.id === leadId) {
+          if (lead.stage !== newStage) {
+            toast.success(`Lead movido para ${newStage}`);
+            return {
+              ...lead,
+              stage: newStage,
+              etapa_desde: new Date().toISOString()
+            };
+          }
+        }
+        return lead;
+      });
+      return updatedLeads;
+    });
+  };
+
   const filteredLeads = leads.filter(l => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
@@ -64,15 +99,15 @@ const Index = () => {
         <div className="flex-shrink-0 bg-white z-10">
           <div className="px-10 py-6 border-b border-beige flex items-center justify-between">
             <div className="space-y-1">
-              <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none">Studio Pipeline</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Lead Acquisition & Conversion</p>
+              <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none">Pipeline do Studio</h1>
+              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Aquisição & Conversão de Leads</p>
             </div>
             
             <div className="flex items-center gap-6">
               <div className="relative group">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-bronze transition-colors" />
                 <Input 
-                  placeholder="SEARCH PROSPECTS..." 
+                  placeholder="BUSCAR PROSPECTOS..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-72 h-10 pl-10 bg-[#FAFAFA] border-beige focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
@@ -80,7 +115,7 @@ const Index = () => {
               </div>
               <div className="h-8 w-[1px] bg-beige" />
               <Button className="h-10 bg-graphite hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold">
-                <UserPlus size={16} /> New Prospect
+                <UserPlus size={16} /> Novo Prospecto
               </Button>
             </div>
           </div>
@@ -113,7 +148,7 @@ const Index = () => {
 
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Priority:</span>
+                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
                     <button
@@ -137,7 +172,7 @@ const Index = () => {
               </div>
 
               <div className="flex items-center gap-2 text-muted hover:text-graphite cursor-pointer transition-colors">
-                <span className="text-[9px] font-bold uppercase tracking-widest">Sort: Score Desc</span>
+                <span className="text-[9px] font-bold uppercase tracking-widest">Ordem: Score Dec.</span>
                 <ChevronDown size={14} />
               </div>
             </div>
@@ -146,16 +181,18 @@ const Index = () => {
 
         {/* Kanban Board */}
         <div className="flex-1 overflow-x-auto overflow-y-hidden bg-[#FAFAFA]">
-          <div className="flex h-full min-w-max">
-            {STAGES.map(stage => (
-              <KanbanColumn 
-                key={stage}
-                stage={stage}
-                leads={filteredLeads.filter(l => l.stage === stage)}
-                onLeadClick={setSelectedLead}
-              />
-            ))}
-          </div>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <div className="flex h-full min-w-max">
+              {STAGES.map(stage => (
+                <KanbanColumn 
+                  key={stage}
+                  stage={stage}
+                  leads={filteredLeads.filter(l => l.stage === stage)}
+                  onLeadClick={setSelectedLead}
+                />
+              ))}
+            </div>
+          </DragDropContext>
         </div>
       </main>
 
@@ -200,7 +237,7 @@ const Index = () => {
               {/* Panel Content */}
               <div className="flex-1 overflow-y-auto p-10 space-y-12">
                 <section>
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Current Progress</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Progresso Atual</h4>
                   <div className="grid grid-cols-6 gap-2">
                     {STAGES.map((s, idx) => {
                       const isPast = STAGES.indexOf(selectedLead.stage) > idx;
@@ -225,27 +262,27 @@ const Index = () => {
 
                 <div className="grid grid-cols-2 gap-10">
                   <section className="space-y-4">
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Lead Intelligence</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Inteligência do Lead</h4>
                     <div className="space-y-4">
                       <div className="p-4 border border-beige rounded-[2px] bg-[#FAFAFA]">
-                        <p className="text-[8px] font-bold text-muted uppercase tracking-widest mb-1">Est. Budget</p>
+                        <p className="text-[8px] font-bold text-muted uppercase tracking-widest mb-1">Orçamento Est.</p>
                         <p className="text-lg font-cormorant text-graphite">R$ {(selectedLead.orcamento / 1000).toLocaleString('pt-BR')}k</p>
                       </div>
                       <div className="p-4 border border-beige rounded-[2px]">
-                        <p className="text-[8px] font-bold text-muted uppercase tracking-widest mb-1">Area M²</p>
+                        <p className="text-[8px] font-bold text-muted uppercase tracking-widest mb-1">Área M²</p>
                         <p className="text-lg font-cormorant text-graphite">{selectedLead.area} m²</p>
                       </div>
                     </div>
                   </section>
 
                   <section className="space-y-4">
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Communications</h4>
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Comunicações</h4>
                     <div className="space-y-3">
                       <Button className="w-full bg-[#25D366] hover:bg-[#128C7E] rounded-[2px] text-[9px] uppercase tracking-widest font-bold h-10 gap-2">
-                        WhatsApp Studio
+                        WhatsApp do Studio
                       </Button>
                       <Button variant="outline" className="w-full border-beige rounded-[2px] text-[9px] uppercase tracking-widest font-bold h-10">
-                        Schedule Meeting
+                        Agendar Reunião
                       </Button>
                     </div>
                   </section>
@@ -253,8 +290,8 @@ const Index = () => {
 
                 <section className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Activity History</h4>
-                    <Button variant="link" className="text-[9px] uppercase tracking-widest font-bold text-bronze p-0 h-auto">Add Note</Button>
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Histórico de Atividades</h4>
+                    <Button variant="link" className="text-[9px] uppercase tracking-widest font-bold text-bronze p-0 h-auto">Add Nota</Button>
                   </div>
                   <div className="space-y-6">
                     {selectedLead.logs.map((log, i) => (
@@ -281,10 +318,10 @@ const Index = () => {
               {/* Panel Footer */}
               <div className="p-10 border-t border-beige bg-[#FAFAFA] flex gap-4">
                 <Button variant="outline" className="flex-1 border-beige rounded-[2px] text-[10px] uppercase tracking-widest font-bold h-12 hover:bg-red/5 hover:border-red/20 hover:text-red transition-all">
-                  Archive Lead
+                  Arquivar Lead
                 </Button>
                 <Button className="flex-[2] bg-graphite hover:bg-bronze rounded-[2px] text-[10px] uppercase tracking-widest font-bold h-12">
-                  Update Stage
+                  Atualizar Etapa
                 </Button>
               </div>
             </div>

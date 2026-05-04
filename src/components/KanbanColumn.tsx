@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Lead, Stage } from '@/lib/types';
 import LeadCard from './LeadCard';
 import { MoreHorizontal } from 'lucide-react';
+import { Droppable } from '@hello-pangea/dnd';
 
 interface KanbanColumnProps {
   stage: Stage;
@@ -59,18 +60,35 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
       </div>
 
       {/* Cards List */}
-      <div className="flex-1 overflow-y-auto px-4 pb-10 space-y-4">
-        {leads.length > 0 ? (
-          leads.map(lead => (
-            <LeadCard key={lead.id} lead={lead} onClick={() => onLeadClick(lead)} />
-          ))
-        ) : (
-          <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
-            <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
-            <span className="text-[8px] font-bold uppercase tracking-[0.3em]">No entries</span>
+      <Droppable droppableId={stage}>
+        {(provided, snapshot) => (
+          <div 
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className={cn(
+              "flex-1 overflow-y-auto px-4 pb-10 space-y-4 transition-colors duration-200",
+              snapshot.isDraggingOver && "bg-bronze/5"
+            )}
+          >
+            {leads.length > 0 ? (
+              leads.map((lead, index) => (
+                <LeadCard 
+                  key={lead.id} 
+                  lead={lead} 
+                  index={index}
+                  onClick={() => onLeadClick(lead)} 
+                />
+              ))
+            ) : (
+              <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
+                <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
+                <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Sem registros</span>
+              </div>
+            )}
+            {provided.placeholder}
           </div>
         )}
-      </div>
+      </Droppable>
     </div>
   );
 };
