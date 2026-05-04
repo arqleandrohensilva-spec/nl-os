@@ -36,6 +36,25 @@ const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }
 );
 
 const MetricsBar = ({ leads }: { leads: any[] }) => {
+  const metaFechamentos = 3;
+  const mesAtual = new Date().getMonth();
+  const anoAtual = new Date().getFullYear();
+
+  const fechadosMes = leads.filter(l => {
+    if (l.stage !== 'Fechado' || !l.fechado_em) return false;
+    const dataFechamento = parseISO(l.fechado_em);
+    return dataFechamento.getMonth() === mesAtual && dataFechamento.getFullYear() === anoAtual;
+  }).length;
+
+  const percentualMeta = Math.min((fechadosMes / metaFechamentos) * 100, 100);
+  
+  const corMeta = fechadosMes >= metaFechamentos 
+    ? "bg-green-600" 
+    : (percentualMeta < 50 ? "bg-red" : "bg-bronze");
+  
+  const corTextoMeta = fechadosMes >= metaFechamentos 
+    ? "text-green-600" 
+    : (percentualMeta < 50 ? "text-red" : "text-bronze");
   const activeLeads = leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length;
   
   const inNegotiationValue = leads
