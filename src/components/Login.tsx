@@ -1,18 +1,38 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((username === 'leandro' || username === 'neandro') && password === 'nl2026') {
-      onLogin(username);
-    } else {
-      setError('Credenciais inválidas');
+    setIsLoading(true);
+    
+    // Convert username to email if it doesn't look like one
+    const email = username.includes('@') ? username : `${username}@nlarquitetos.com.br`;
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        if (error.message === 'Invalid login credentials') {
+          toast.error('Usuário ou senha incorretos');
+        } else {
+          toast.error(error.message);
+        }
+      }
+    } catch (err) {
+      toast.error('Erro ao conectar ao servidor');
+    } finally {
+      setIsLoading(false);
     }
   };
 
