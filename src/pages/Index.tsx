@@ -233,8 +233,104 @@ const Index = () => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
     const matchesTemp = filterTemp.length === 0 || filterTemp.includes(l.temp);
-    return matchesSearch && matchesType && matchesTemp;
+    
+    let matchesResponsavel = true;
+    if (filterResponsavel !== 'Todos') {
+      const isCreator = l.criado_por === filterResponsavel;
+      const isLogAuthor = l.logs.some(log => log.autor === filterResponsavel);
+      matchesResponsavel = isCreator || isLogAuthor;
+    }
+    
+    return matchesSearch && matchesType && matchesTemp && matchesResponsavel;
   });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    // Cores NL
+    const graphite = [26, 26, 26]; // #1A1A1A
+    const bronze = [139, 115, 85]; // #8B7355
+
+    // Capa
+    doc.setFillColor(graphite[0], graphite[1], graphite[2]);
+    doc.rect(0, 0, 210, 297, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(40);
+    doc.text('NL OS', 105, 100, { align: 'center' });
+    
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.setFontSize(24);
+    doc.text('Pipeline de Leads', 105, 120, { align: 'center' });
+    
+    doc.setTextColor(255, 255, 255, 0.5);
+    doc.setFontSize(10);
+    doc.text(`Gerado em ${dateStr} às ${timeStr}`, 105, 140, { align: 'center' });
+
+    doc.addPage();
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+
+    // Resumo Executivo
+    doc.setFontSize(14);
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.text('RESUMO EXECUTIVO', 14, 20);
+    
+    const activeLeads = filteredLeads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length;
+    const totalValue = filteredLeads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text(`Leads Ativos: ${activeLeads}`, 14, 30);
+    doc.text(`Volume Total: R$ ${(totalValue / 1000).toLocaleString('pt-BR')}k`, 14, 35);
+
+    // Tabela por Etapa
+    let yPos = 45;
+    STAGES.forEach(stage => {
+      const stageLeads = filteredLeads.filter(l => l.stage === stage);
+      if (stageLeads.length === 0) return;
+
+      doc.setFontSize(12);
+      doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+      doc.text(stage.toUpperCase(), 14, yPos);
+      
+      autoTable(doc, {
+        startY: yPos + 5,
+        head: [['Nome', 'Tipo', 'Cidade', 'Orçamento', 'Score', 'Dias']],
+        body: stageLeads.map(l => [
+          l.nome,
+          l.tipo,
+          l.cidade,
+          `R$ ${(l.orcamento / 1000).toLocaleString('pt-BR')}k`,
+          l.score,
+          Math.floor((new Date().getTime() - new Date(l.etapa_desde).getTime()) / (1000 * 60 * 60 * 24))
+        ]),
+        headStyles: { fillColor: graphite, textColor: [255, 255, 255], fontSize: 8 },
+        styles: { fontSize: 8, cellPadding: 2 },
+        margin: { left: 14, right: 14 }
+      });
+      
+      yPos = (doc as any).lastAutoTable.finalY + 15;
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+    });
+
+    // Rodapé em todas as páginas
+    const pageCount = (doc as any).internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`NL Arquitetos · São José dos Campos · gerado em ${dateStr}`, 105, 285, { align: 'center' });
+    }
+
+    doc.save(`Pipeline_NL_OS_${dateStr.replace(/\//g, '-')}.pdf`);
+    toast.success('Pipeline exportado com sucesso');
+  };
 
   return (
     <div className="flex min-h-screen bg-[#FDFDFD]">
