@@ -77,6 +77,44 @@ const Index = () => {
 
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
+  useEffect(() => {
+    if (user) {
+      fetchLeads();
+    }
+  }, [user]);
+
+  const fetchLeads = async () => {
+    setIsLoading(true);
+    try {
+      const { data: leadsData, error: leadsError } = await supabase
+        .from('leads')
+        .select(`
+          *,
+          logs:lead_logs(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (leadsError) throw leadsError;
+
+      // Map Supabase data to our Lead type
+      const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
+        ...l,
+        logs: (l.logs || []).sort((a: any, b: any) => 
+          new Date(b.data).getTime() - new Date(a.data).getTime()
+        )
+      }));
+
+      setLeads(mappedLeads);
+    } catch (error: any) {
+      console.error('Error fetching leads:', error);
+      toast.error('Erro ao carregar leads');
+      // Fallback to initial leads if database fails/empty
+      setLeads(initialLeads);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLogin = (username: string) => {
     sessionStorage.setItem('nl_user', username);
     setUser(username);
