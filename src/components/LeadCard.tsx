@@ -47,7 +47,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
 
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const phone = lead.telefone?.replace(/\D/g, '') || '55';
+    const phone = lead.whats?.replace(/\D/g, '') || '55';
     window.open(`https://wa.me/${phone.startsWith('55') ? phone : '55' + phone}`, '_blank');
   };
 
