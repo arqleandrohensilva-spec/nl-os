@@ -180,9 +180,9 @@ const Index = () => {
         </div>
 
         {/* Kanban Board */}
-        <div className="flex-1 overflow-x-auto overflow-y-hidden bg-[#FAFAFA]">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden bg-[#FAFAFA] scrollbar-thin scrollbar-thumb-bronze/10 scrollbar-track-transparent">
           <DragDropContext onDragEnd={onDragEnd}>
-            <div className="flex h-full min-w-max">
+            <div className="flex h-full min-w-max pb-4">
               {STAGES.map(stage => (
                 <KanbanColumn 
                   key={stage}
