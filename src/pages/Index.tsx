@@ -161,8 +161,7 @@ const Index = () => {
         };
 
         const newLog = { 
-          lead_id: activeId,
-          tipo: 'N', 
+          tipo: 'N' as const, 
           nota: `Movido para ${overStage}`, 
           data: new Date().toISOString(), 
           autor: user || 'Sistema' 
@@ -180,7 +179,7 @@ const Index = () => {
         // Background update
         Promise.all([
           supabase.from('leads').update(updateData).eq('id', activeId),
-          supabase.from('lead_logs').insert(newLog)
+          supabase.from('lead_logs').insert({ ...newLog, lead_id: activeId })
         ]).catch(err => {
           console.error('Error updating stage:', err);
           toast.error('Erro ao salvar no banco');
