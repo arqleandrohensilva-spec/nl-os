@@ -89,10 +89,23 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
                 )}>
                   {formatCurrency(lead.orcamento)}
                 </span>
+          </div>
+
+          {lead.proxima_acao_tipo && (
+            <div className="mb-4 p-2 bg-bronze/5 border border-bronze/10 rounded-[2px] flex items-start gap-2 animate-in fade-in duration-500">
+              <Calendar size={12} className="text-bronze mt-0.5 shrink-0" />
+              <div className="space-y-0.5">
+                <p className="text-[8px] font-bold text-bronze uppercase tracking-widest leading-none">
+                  Próxima: {lead.proxima_acao_tipo} · {lead.proxima_acao_data}
+                </p>
+                <p className="text-[9px] text-graphite/70 line-clamp-1 leading-tight italic">
+                  "{lead.proxima_acao_nota}"
+                </p>
               </div>
             </div>
+          )}
 
-            <div className="flex flex-wrap gap-1.5 mb-4">
+          <div className="flex flex-wrap gap-1.5 mb-4">
               <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-[8px] font-bold uppercase tracking-widest">
                 {lead.tipo}
               </span>
