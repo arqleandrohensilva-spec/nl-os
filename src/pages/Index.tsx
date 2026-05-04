@@ -54,7 +54,8 @@ const STAGES: Stage[] = [
 ];
 
 const Index = () => {
-  const [user, setUser] = useState<string | null>(() => sessionStorage.getItem('nl_user'));
+  const [user, setUser] = useState<string | null>(null);
+  const [session, setSession] = useState<any>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
