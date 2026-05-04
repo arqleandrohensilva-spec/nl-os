@@ -78,9 +78,23 @@ const Index = () => {
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
   useEffect(() => {
-    if (user) {
-      fetchLeads();
-    }
+    if (!user) return;
+    fetchLeads();
+
+    // Realtime subscriptions
+    const leadsChannel = supabase
+      .channel('leads-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+        fetchLeads();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lead_logs' }, () => {
+        fetchLeads();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(leadsChannel);
+    };
   }, [user]);
 
   const fetchLeads = async () => {
