@@ -44,7 +44,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
                 boxShadow: `0 0 0 4px ${theme.indicator}20`
               }} 
             />
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-graphite">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black font-mono">
               {stage}
             </h2>
           </div>
