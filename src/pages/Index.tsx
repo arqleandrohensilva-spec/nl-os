@@ -60,6 +60,7 @@ const Index = () => {
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
