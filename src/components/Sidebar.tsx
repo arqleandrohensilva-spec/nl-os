@@ -176,9 +176,8 @@ const Sidebar = ({ user }: { user: string }) => {
             <p className="text-[9px] text-bronze/60 uppercase tracking-widest font-bold">Sócio</p>
           </div>
           <button 
-            onClick={() => {
-              sessionStorage.removeItem('nl_user');
-              window.location.reload();
+            onClick={async () => {
+              await supabase.auth.signOut();
             }}
             className="text-white/20 hover:text-white transition-colors p-1"
           >
