@@ -1,9 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lead } from '@/lib/types';
-import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare, Calendar } from 'lucide-react';
+import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
-import { Draggable } from '@hello-pangea/dnd';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface LeadCardProps {
   lead: Lead;
