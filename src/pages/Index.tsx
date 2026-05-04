@@ -58,7 +58,14 @@ const Index = () => {
   const [session, setSession] = useState<any>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
-...
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeLead, setActiveLead] = useState<Lead | null>(null);
+  const [search, setSearch] = useState('');
+  const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
+  const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
+
   useEffect(() => {
     // Check current session
     const checkAuth = async () => {
