@@ -94,7 +94,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <div className="ml-3">
             <div className="w-9 h-9 border border-beige rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
               <span className="text-[7px] text-muted font-bold leading-none uppercase mb-0.5">Sc.</span>
-              <span className="text-[13px] font-medium text-graphite leading-none">{lead.score}</span>
+              <span className="text-graphite font-bold">{score}</span>
             </div>
           </div>
         </div>
