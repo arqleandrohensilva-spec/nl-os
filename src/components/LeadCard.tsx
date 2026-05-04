@@ -15,12 +15,13 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   
   const tempMap = {
-    'Quente': { color: '#B83232', label: 'Prioritário' },
-    'Morno': { color: '#C49A2A', label: 'Em Nutrição' },
-    'Frio': { color: '#999999', label: 'Monitorar' }
+    'Quente': { color: '#B83232' },
+    'Morno': { color: '#C49A2A' },
+    'Frio': { color: '#E8E4DF' }
   };
 
   const currentTemp = tempMap[lead.temp];
+  const isLost = lead.stage === 'Perdido';
 
   return (
     <Draggable draggableId={lead.id} index={index}>
@@ -33,7 +34,8 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           className={cn(
             "group relative bg-white border border-beige p-5 cursor-pointer transition-all duration-300 hover:border-bronze hover:shadow-[0_15px_30px_rgba(139,115,85,0.08)]",
             lead.score >= 8 && "border-t-[3px] border-t-bronze",
-            snapshot.isDragging && "shadow-2xl ring-2 ring-bronze/20 z-50 scale-[1.02]"
+            snapshot.isDragging && "shadow-2xl ring-2 ring-bronze/20 z-50 scale-[1.02]",
+            isLost && "opacity-45"
           )}
         >
           <div 
@@ -44,13 +46,10 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <div className="flex justify-between items-start mb-5">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[8px] font-bold text-muted uppercase tracking-[0.2em]">
-                  {currentTemp.label}
-                </span>
                 {lead.score >= 8 && (
                   <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em] flex items-center gap-1">
                     <span className="w-1 h-1 bg-bronze rounded-full" />
-                    Lead Elite
+                    Lead Premium
                   </span>
                 )}
               </div>
@@ -78,7 +77,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
             <div className="flex items-center gap-2 text-muted col-span-2">
               <DollarSign size={12} className="opacity-50" />
               <span className="text-[10px] font-bold tracking-tight text-graphite/80">
-                {lead.orcamento > 0 ? `EST. R$ ${(lead.orcamento / 1000).toFixed(0)}k` : 'ORÇAMENTO PENDENTE'}
+                {lead.orcamento > 0 ? `R$ ${(lead.orcamento / 1000).toFixed(0)}k` : 'ORÇAMENTO NÃO INFORMADO'}
               </span>
             </div>
           </div>
@@ -93,9 +92,8 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           </div>
 
           <div className="pt-4 border-t border-beige flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[9px] text-muted uppercase tracking-widest font-bold">
-              <Calendar size={11} className="opacity-40" />
-              <span>Etapa {daysInStage}d</span>
+            <div className="flex items-center gap-2 text-[10px] text-muted font-mono">
+              <span>há {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'} nesta etapa</span>
             </div>
             <div className="opacity-0 group-hover:opacity-100 transition-opacity">
               <ArrowUpRight size={14} className="text-bronze" />
