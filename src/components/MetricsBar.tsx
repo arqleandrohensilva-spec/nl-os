@@ -137,13 +137,13 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
           subLabel={<span className="text-bronze opacity-80 font-bold flex items-center gap-1">Probabilidade média <TrendingUp size={10} /></span>}
           highlightBase
         />
-      <MetricCard 
-        label="FOLLOW-UPS HOJE" 
-        value={followUpsToday}
-        pulse={followUpsToday > 0}
-        highlightBase={followUpsToday > 0}
-        isNegative={followUpsToday > 0}
-      />
+        <MetricCard 
+          label="FOLLOW-UPS HOJE" 
+          value={followUpsToday}
+          pulse={followUpsToday > 0}
+          highlightBase={followUpsToday > 0}
+          isNegative={followUpsToday > 0}
+        />
       </div>
     </div>
   );
