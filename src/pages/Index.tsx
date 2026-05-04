@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { initialLeads, Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
-import Sidebar from '@/components/Sidebar';
-import MetricsBar from '@/components/MetricsBar';
-import KanbanColumn from '@/components/KanbanColumn';
+import LeadDetailPanel from '@/components/LeadDetailPanel';
 import Login from '@/components/Login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
