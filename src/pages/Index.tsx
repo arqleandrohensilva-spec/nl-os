@@ -153,8 +153,7 @@ const Index = () => {
   };
 
   const handleLogin = (username: string) => {
-    sessionStorage.setItem('nl_user', username);
-    setUser(username);
+    // Session is handled by supabase.auth.onAuthStateChange
   };
 
   if (!user) {
