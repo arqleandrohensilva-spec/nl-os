@@ -122,15 +122,15 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
           label="LEADS ATIVOS" 
           value={activeLeads} 
         />
-      <MetricCard 
-        label="TICKET MÉDIO" 
-        value={formatCleanValue(averageTicket)}
-        subLabel={
-          <span className="flex items-center gap-1.5 text-emerald-600">
-            +12% vs mês anterior <TrendingUp size={12} />
-          </span>
-        }
-      />
+        <MetricCard 
+          label="TICKET MÉDIO" 
+          value={formatCleanValue(averageTicket)}
+          subLabel={
+            <span className="flex items-center gap-1.5 text-emerald-600">
+              +12% vs mês anterior <TrendingUp size={12} />
+            </span>
+          }
+        />
       <MetricCard 
         label="FORECAST PONDERADO" 
         value={formatCleanValue(weightedValue)}
