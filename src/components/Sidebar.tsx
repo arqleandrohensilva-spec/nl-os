@@ -1,41 +1,39 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { 
-  Users, 
-  LayoutGrid, 
-  BarChart3, 
-  FileText, 
-  Target,
-  Clock,
-  Settings,
-  LogOut,
-  ChevronRight
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface NavItemProps {
   label: string;
-  icon: React.ReactNode;
   active?: boolean;
   disabled?: boolean;
 }
 
-const NavItem = ({ label, icon, active, disabled }: NavItemProps) => (
+const NavItem = ({ label, active, disabled }: NavItemProps) => (
   <div className={cn(
-    "flex items-center gap-3 py-2.5 px-4 transition-all duration-200 group relative",
-    active ? "text-white" : "text-white/40 hover:text-white/70",
-    disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+    "flex flex-col py-2.5 px-6 transition-all duration-200 group relative border-l-2",
+    active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
+    disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
   )}>
-    {active && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-bronze" />}
-    <span className={cn("transition-colors", active ? "text-bronze" : "group-hover:text-bronze/70")}>
-      {icon}
-    </span>
-    <span className="text-[11px] tracking-[0.1em] uppercase font-medium">{label}</span>
-    {disabled && (
-      <span className="ml-auto text-[7px] border border-white/10 px-1 py-0.5 rounded-[1px] tracking-tighter opacity-50">
-        SOON
+    <div className="flex items-center justify-between gap-2">
+      <span className={cn(
+        "text-[11px] tracking-[0.05em] font-medium transition-colors",
+        active ? "text-white" : "group-hover:text-white/70"
+      )}>
+        {label}
       </span>
-    )}
+      {disabled && (
+        <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
+          em breve
+        </span>
+      )}
+    </div>
   </div>
+);
+
+const SectionHeader = ({ label }: { label: string }) => (
+  <p className="px-6 mt-8 mb-3 text-[9px] text-muted uppercase tracking-[0.2em] font-bold opacity-50">
+    ─── {label} ───
+  </p>
 );
 
 const Sidebar = ({ user }: { user: string }) => {
@@ -48,43 +46,45 @@ const Sidebar = ({ user }: { user: string }) => {
           </div>
           <div>
             <div className="flex items-baseline gap-1">
-              <span className="text-sm font-medium text-white tracking-widest">ARCH</span>
-              <span className="text-[10px] text-bronze font-mono">OS</span>
+              <span className="text-sm font-medium text-white tracking-widest uppercase">OS</span>
             </div>
-            <p className="text-[8px] text-muted uppercase tracking-[0.2em] leading-none">Studio System</p>
+            <p className="text-[8px] text-muted uppercase tracking-[0.2em] leading-none font-mono">Sistema Operacional</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 px-2">
-        <div className="mb-8">
-          <p className="px-4 mb-4 text-[9px] text-muted uppercase tracking-[0.2em] font-bold opacity-50">Intelligence</p>
-          <NavItem label="Pipeline" icon={<Target size={14} />} active />
-          <NavItem label="Analytics" icon={<BarChart3 size={14} />} disabled />
-        </div>
+      <div className="flex-1 overflow-y-auto pb-8">
+        <SectionHeader label="LEADS" />
+        <NavItem label="01 · Pipeline" active />
 
-        <div className="mb-8">
-          <p className="px-4 mb-4 text-[9px] text-muted uppercase tracking-[0.2em] font-bold opacity-50">Operations</p>
-          <NavItem label="Projetos" icon={<LayoutGrid size={14} />} disabled />
-          <NavItem label="Time Log" icon={<Clock size={14} />} disabled />
-          <NavItem label="Propostas" icon={<FileText size={14} />} disabled />
-        </div>
+        <SectionHeader label="FINANCEIRO" />
+        <NavItem label="02 · Base Financeira" disabled />
+        <NavItem label="07 · Fin. de Projetos" disabled />
+        <NavItem label="12 · Dashboard" disabled />
 
-        <div>
-          <p className="px-4 mb-4 text-[9px] text-muted uppercase tracking-[0.2em] font-bold opacity-50">Management</p>
-          <NavItem label="Financeiro" icon={<Settings size={14} />} disabled />
-          <NavItem label="Settings" icon={<Settings size={14} />} disabled />
-        </div>
+        <SectionHeader label="PROJETOS" />
+        <NavItem label="03 · Controle de Horas" disabled />
+        <NavItem label="06 · Gestão" disabled />
+        <NavItem label="10 · Modo Cliente" disabled />
+
+        <SectionHeader label="PROPOSTAS" />
+        <NavItem label="04 · Tracking" disabled />
+        <NavItem label="05 · Biblioteca" disabled />
+        <NavItem label="08 · Documentos" disabled />
+
+        <SectionHeader label="MARKETING" />
+        <NavItem label="09 · Satisfação" disabled />
+        <NavItem label="11 · CMO Virtual" disabled />
       </div>
 
-      <div className="p-4 m-4 bg-white/5 border border-white/5 rounded-[2px] mt-auto">
+      <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-bronze/20 flex items-center justify-center text-bronze text-[10px] font-bold border border-bronze/20 uppercase">
             {user.substring(0, 2)}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[11px] text-white font-medium truncate capitalize">{user}</p>
-            <p className="text-[9px] text-muted uppercase tracking-tighter">Partner</p>
+            <p className="text-[9px] text-muted uppercase tracking-tighter">Sócio</p>
           </div>
           <button 
             onClick={() => {
