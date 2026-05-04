@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check } from 'lucide-react';
-import { Lead, Stage, LogTipo } from '@/lib/types';
+import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
@@ -66,16 +66,37 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
         <div className="flex-1 overflow-y-auto p-10 space-y-10">
           <section>
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Dados do Lead</h4>
-            <div className="grid grid-cols-2 gap-6 text-[11px]">
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">Dados do Lead</h4>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold text-graphite uppercase tracking-widest">Score Total:</span>
+                <span className="text-sm font-bold text-bronze">{calculateLeadScore(lead).score}/10</span>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-6 text-[11px] mb-8">
               <div><p className="text-muted">WhatsApp</p><a href={`https://wa.me/55${lead.whats.replace(/\D/g, '')}`} className="text-bronze underline">{lead.whats}</a></div>
               <div><p className="text-muted">Cidade</p><p className="text-graphite">{lead.cidade}</p></div>
               <div><p className="text-muted">Tipo</p><p className="text-graphite">{lead.tipo}</p></div>
               <div><p className="text-muted">Área</p><p className="text-graphite">{lead.area} m²</p></div>
               <div><p className="text-muted">Orçamento</p><p className="text-graphite">{formatCurrency(lead.orcamento)}</p></div>
-              <div><p className="text-muted">Score</p><p className="text-graphite font-bold">{lead.score}</p></div>
               <div><p className="text-muted">Entrada</p><p className="text-graphite">{lead.criado}</p></div>
               <div><p className="text-muted">Origem</p><p className="text-graphite">{lead.origem}</p></div>
+            </div>
+
+            <div className="bg-[#FAFAFA] border border-beige p-4 rounded-[2px] space-y-2">
+              <p className="text-[9px] font-bold text-muted uppercase tracking-widest mb-2">Breakdown do Score</p>
+              {calculateLeadScore(lead).breakdown.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between text-[10px]">
+                  <div className="flex items-center gap-2">
+                    {item.achieved ? <Check size={10} className="text-green-600" /> : <X size={10} className="text-red" />}
+                    <span className={cn(item.achieved ? "text-graphite" : "text-muted")}>{item.label}</span>
+                  </div>
+                  <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-muted")}>
+                    {item.achieved ? `+${item.value}` : '+0'}
+                  </span>
+                </div>
+              ))}
             </div>
           </section>
 
@@ -91,9 +112,21 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Histórico de Contatos</h4>
             <div className="space-y-4">
               {lead.logs.map((log, i) => (
-                <div key={i} className="text-[11px] p-3 border border-beige rounded-[2px]">
-                  <div className="flex justify-between text-muted text-[9px] mb-1"><span>{log.data} · {log.autor}</span></div>
-                  <p className="text-graphite">{log.nota}</p>
+                <div key={i} className={cn(
+                  "text-[11px] p-3 border rounded-[2px]",
+                  log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-beige"
+                )}>
+                  <div className="flex justify-between text-muted text-[9px] mb-1">
+                    <span>{log.data} · {log.autor}</span>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
+                  </div>
+                  <p className={cn(
+                    "text-graphite",
+                    log.tipo === 'N' && "italic text-muted/80 flex items-center gap-2"
+                  )}>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
+                    {log.nota}
+                  </p>
                 </div>
               ))}
             </div>

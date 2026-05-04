@@ -110,7 +110,21 @@ const Index = () => {
       
       if (lead && lead.stage !== overStage) {
         setLeads(prev => prev.map(l => 
-          l.id === activeId ? { ...l, stage: overStage, etapa_desde: new Date().toISOString() } : l
+          l.id === activeId ? { 
+            ...l, 
+            stage: overStage, 
+            etapa_desde: new Date().toISOString(),
+            fechado_em: overStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
+            logs: [
+              { 
+                tipo: 'N', 
+                nota: `Movido para ${overStage}`, 
+                data: new Date().toISOString(), 
+                autor: user || 'Sistema' 
+              }, 
+              ...l.logs
+            ]
+          } : l
         ));
       }
       return;
@@ -178,7 +192,21 @@ const Index = () => {
 
   const handleUpdateStage = (leadId: string, newStage: Stage) => {
     setLeads(prev => prev.map(l => 
-      l.id === leadId ? { ...l, stage: newStage, etapa_desde: new Date().toISOString() } : l
+      l.id === leadId ? { 
+        ...l, 
+        stage: newStage, 
+        etapa_desde: new Date().toISOString(),
+        fechado_em: newStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
+        logs: [
+          { 
+            tipo: 'N', 
+            nota: `Movido para ${newStage}`, 
+            data: new Date().toISOString(), 
+            autor: user || 'Sistema' 
+          }, 
+          ...l.logs
+        ]
+      } : l
     ));
     toast.success(`Lead movido para ${newStage}`);
   };

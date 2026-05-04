@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lead } from '@/lib/types';
+import { Lead, calculateLeadScore } from '@/lib/types';
 import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
 import { useSortable } from '@dnd-kit/sortable';
@@ -14,6 +14,7 @@ interface LeadCardProps {
 
 const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
+  const { score } = calculateLeadScore(lead);
   
   const tempMap = {
     'Quente': { color: '#B83232', pulse: true },
@@ -93,7 +94,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <div className="ml-3">
             <div className="w-9 h-9 border border-beige rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
               <span className="text-[7px] text-muted font-bold leading-none uppercase mb-0.5">Sc.</span>
-              <span className="text-[13px] font-medium text-graphite leading-none">{lead.score}</span>
+              <span className="text-graphite font-bold">{score}</span>
             </div>
           </div>
         </div>
