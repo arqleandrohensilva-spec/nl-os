@@ -15,9 +15,9 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   
   const tempMap = {
-    'Quente': { color: '#B83232' },
-    'Morno': { color: '#C49A2A' },
-    'Frio': { color: '#E8E4DF' }
+    'Quente': { color: '#B83232', pulse: true },
+    'Morno': { color: '#C49A2A', pulse: false },
+    'Frio': { color: '#E8E4DF', pulse: false }
   };
 
   const currentTemp = tempMap[lead.temp];
@@ -45,9 +45,13 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           )}
         >
           <div 
-            className="absolute left-0 top-0 bottom-0 w-[3px]" 
+            className="absolute left-0 top-0 bottom-0 w-[3px] flex flex-col justify-center items-center" 
             style={{ backgroundColor: currentTemp.color }} 
-          />
+          >
+            {currentTemp.pulse && (
+              <div className="absolute left-0 w-[3px] h-full bg-red animate-pulse opacity-50" />
+            )}
+          </div>
           
           <div>
             <div className="flex justify-between items-start mb-4">
@@ -117,7 +121,11 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           </div>
 
           <div className="pt-4 border-t border-beige flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[10px] text-muted font-mono">
+            <div className={cn(
+              "flex items-center gap-2 text-[10px] font-mono",
+              daysInStage > 5 ? "text-red font-bold" : "text-muted"
+            )}>
+              {daysInStage > 5 && <span className="w-1 h-1 bg-red rounded-full animate-ping" />}
               <span>há {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'} nesta etapa</span>
             </div>
             <div className="flex items-center gap-3">
