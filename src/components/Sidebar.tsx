@@ -72,7 +72,7 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
 );
 
 const Sidebar = ({ user }: { user: string }) => {
-  const [openSection, setOpenSection] = useState<string | null>('COMERCIAL');
+  const [openSection, setOpenSection] = useState<string | null>('LEADS');
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section);
@@ -98,13 +98,13 @@ const Sidebar = ({ user }: { user: string }) => {
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
         <SectionAccordion 
-          label="COMERCIAL" 
+          label="LEADS" 
           icon={<LayoutGrid size={14} />}
-          isOpen={openSection === 'COMERCIAL'}
-          onToggle={() => toggleSection('COMERCIAL')}
+          isOpen={openSection === 'LEADS'}
+          onToggle={() => toggleSection('LEADS')}
         >
           <NavItem label="01 · Pipeline de Leads" active />
-          <NavItem label="Contatos" disabled />
+          <NavItem label="02 · Contatos" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -113,9 +113,9 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={openSection === 'FINANCEIRO'}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
-          <NavItem label="02 · Base Financeira" disabled />
-          <NavItem label="07 · Fin. de Projetos" disabled />
-          <NavItem label="12 · Dashboard" disabled />
+          <NavItem label="03 · Base Financeira" disabled />
+          <NavItem label="04 · Fin. de Projetos" disabled />
+          <NavItem label="05 · Dashboard" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -124,9 +124,9 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={openSection === 'PROJETOS'}
           onToggle={() => toggleSection('PROJETOS')}
         >
-          <NavItem label="03 · Controle de Horas" disabled />
-          <NavItem label="06 · Gestão" disabled />
-          <NavItem label="10 · Modo Cliente" disabled />
+          <NavItem label="06 · Controle de Horas" disabled />
+          <NavItem label="07 · Gestão de Projetos" disabled />
+          <NavItem label="08 · Modo Cliente" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -135,9 +135,9 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={openSection === 'PROPOSTAS'}
           onToggle={() => toggleSection('PROPOSTAS')}
         >
-          <NavItem label="04 · Tracking" disabled />
-          <NavItem label="05 · Biblioteca" disabled />
-          <NavItem label="08 · Documentos" disabled />
+          <NavItem label="09 · Tracking Comercial" disabled />
+          <NavItem label="10 · Biblioteca" disabled />
+          <NavItem label="11 · Documentos" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -146,8 +146,8 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={openSection === 'MARKETING'}
           onToggle={() => toggleSection('MARKETING')}
         >
-          <NavItem label="09 · Satisfação" disabled />
-          <NavItem label="11 · CMO Virtual" disabled />
+          <NavItem label="12 · Satisfação (NPS)" disabled />
+          <NavItem label="13 · CMO Virtual" disabled />
         </SectionAccordion>
       </div>
 

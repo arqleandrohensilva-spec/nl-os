@@ -58,8 +58,8 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
           <span className="text-[8px] font-bold text-muted uppercase tracking-widest">Leads</span>
           <div className="ml-auto flex items-center gap-1.5">
             <span className={cn(
-              "text-[11px] font-bold",
-              isHighValue ? "text-bronze scale-110 origin-right transition-transform" : "text-muted/70"
+              "text-[11px] font-bold text-graphite",
+              isHighValue && "scale-110 origin-right transition-transform"
             )}>
               R$ {(totalValue / 1000).toLocaleString('pt-BR')}k
             </span>
