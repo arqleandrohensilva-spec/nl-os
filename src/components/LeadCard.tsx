@@ -1,6 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lead } from '@/lib/types';
+import { Lead, calculateLeadScore } from '@/lib/types';
 import { MapPin, Maximize2, DollarSign, ArrowUpRight, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
 import { useSortable } from '@dnd-kit/sortable';
