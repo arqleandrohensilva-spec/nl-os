@@ -1,9 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Lead, Stage } from '@/lib/types';
-import { MapPin, Square, DollarSign, Clock, AlertCircle } from 'lucide-react';
-import { formatDistanceToNow, parseISO, differenceInDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Lead } from '@/lib/types';
+import { MapPin, Maximize2, DollarSign, Calendar, ArrowUpRight } from 'lucide-react';
+import { parseISO, differenceInDays } from 'date-fns';
 
 interface LeadCardProps {
   lead: Lead;
@@ -11,88 +10,87 @@ interface LeadCardProps {
 }
 
 const LeadCard = ({ lead, onClick }: LeadCardProps) => {
-  const initials = lead.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   
-  const tempColors = {
-    'Quente': 'bg-red',
-    'Morno': 'bg-amber',
-    'Frio': 'bg-beige'
+  const tempMap = {
+    'Quente': { color: '#B83232', label: 'Priority' },
+    'Morno': { color: '#C49A2A', label: 'Nurturing' },
+    'Frio': { color: '#999999', label: 'Monitor' }
   };
 
-  const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
-  const daysSinceCreated = differenceInDays(new Date(), parseISO(lead.criado));
-  
-  const hasNoContact = lead.logs.length === 0;
-  const isStale = (lead.stage === 'Novo Lead' && daysSinceCreated >= 1 && hasNoContact);
+  const currentTemp = tempMap[lead.temp];
 
   return (
     <div 
       onClick={onClick}
       className={cn(
-        "group relative bg-white border border-beige p-4 cursor-pointer transition-all duration-200 hover:border-bronze hover:-translate-y-0.5 hover:shadow-[0_2px_12px_rgba(139,115,85,0.12)]",
-        lead.score >= 8 && "border-t-2 border-t-bronze/50"
+        "group relative bg-white border border-beige p-5 cursor-pointer transition-all duration-300 hover:border-bronze hover:shadow-[0_15px_30px_rgba(139,115,85,0.08)]",
+        lead.score >= 8 && "border-t-[3px] border-t-bronze"
       )}
     >
-      <div className={cn("absolute left-0 top-0 bottom-0 w-[2px]", tempColors[lead.temp])} />
+      <div 
+        className="absolute left-0 top-0 bottom-0 w-[3px]" 
+        style={{ backgroundColor: currentTemp.color }} 
+      />
       
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-bronze/10 flex items-center justify-center text-bronze font-bold text-xs">
-            {initials}
+      <div className="flex justify-between items-start mb-5">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[8px] font-bold text-muted uppercase tracking-[0.2em]">
+              {currentTemp.label}
+            </span>
+            {lead.score >= 8 && (
+              <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em] flex items-center gap-1">
+                <span className="w-1 h-1 bg-bronze rounded-full" />
+                Elite Lead
+              </span>
+            )}
           </div>
-          <h3 className="text-base font-cormorant text-graphite line-clamp-1">{lead.nome}</h3>
+          <h3 className="text-[17px] font-cormorant text-graphite leading-tight group-hover:text-bronze transition-colors truncate">
+            {lead.nome}
+          </h3>
         </div>
-        <div className={cn(
-          "w-6 h-6 flex items-center justify-center rounded-[4px] text-[10px] font-medium",
-          lead.score >= 8 ? "bg-bronze text-white" : lead.score >= 5 ? "bg-graphite text-white" : "border border-beige text-muted"
-        )}>
-          {lead.score}
+        <div className="ml-3">
+          <div className="w-9 h-9 border border-beige rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
+            <span className="text-[7px] text-muted font-bold leading-none uppercase mb-0.5">Sc.</span>
+            <span className="text-[13px] font-medium text-graphite leading-none">{lead.score}</span>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-1.5 mb-4">
-        <div className="flex items-center gap-1.5 text-muted">
-          <MapPin className="w-3 h-3" />
-          <span className="text-[10px] uppercase tracking-wider">{lead.cidade}</span>
+      <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-6">
+        <div className="flex items-center gap-2 text-muted">
+          <MapPin size={12} className="opacity-50" />
+          <span className="text-[10px] font-medium tracking-tight truncate">{lead.cidade}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-muted">
-          <Square className="w-3 h-3" />
-          <span className="text-[10px] uppercase tracking-wider">{lead.area} m²</span>
+        <div className="flex items-center gap-2 text-muted">
+          <Maximize2 size={12} className="opacity-50" />
+          <span className="text-[10px] font-medium tracking-tight">{lead.area} m²</span>
         </div>
-        {lead.orcamento > 0 && (
-          <div className="flex items-center gap-1.5 text-muted">
-            <DollarSign className="w-3 h-3" />
-            <span className="text-[10px] uppercase tracking-wider">R$ {(lead.orcamento / 1000).toFixed(0)}k</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-muted col-span-2">
+          <DollarSign size={12} className="opacity-50" />
+          <span className="text-[10px] font-bold tracking-tight text-graphite/80">
+            {lead.orcamento > 0 ? `EST. R$ ${(lead.orcamento / 1000).toFixed(0)}k` : 'BUDGET PENDING'}
+          </span>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="px-2 py-0.5 bg-bronze/10 text-bronze border border-bronze/30 text-[8px] uppercase font-medium tracking-widest">
+      <div className="flex flex-wrap gap-1.5 mb-6">
+        <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-[8px] font-bold uppercase tracking-widest">
           {lead.tipo}
         </span>
-        <span className="px-2 py-0.5 border border-beige text-muted text-[8px] uppercase font-medium tracking-widest">
+        <span className="px-2 py-0.5 border border-beige text-muted text-[8px] font-bold uppercase tracking-widest">
           {lead.origem}
         </span>
       </div>
 
-      {isStale && (
-        <div className="mb-4 p-2 bg-red/5 border border-red/10 flex items-center gap-2">
-          <AlertCircle className="w-3 h-3 text-red" />
-          <span className="text-[9px] text-red uppercase tracking-wider font-medium">
-            ! Sem contato há {daysSinceCreated} {daysSinceCreated === 1 ? 'dia' : 'dias'}
-          </span>
+      <div className="pt-4 border-t border-beige flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[9px] text-muted uppercase tracking-widest font-bold">
+          <Calendar size={11} className="opacity-40" />
+          <span>Etapa {daysInStage}d</span>
         </div>
-      )}
-
-      <div className="pt-3 border-t border-beige flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <div className={cn("w-1.5 h-1.5 rounded-full", tempColors[lead.temp])} />
-          <span className="text-[9px] text-muted uppercase tracking-wider">{lead.temp}</span>
-        </div>
-        <div className="flex items-center gap-1 text-[9px] text-muted uppercase tracking-wider">
-          <Clock className="w-3 h-3" />
-          <span>há {daysInStage}d nesta etapa</span>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <ArrowUpRight size={14} className="text-bronze" />
         </div>
       </div>
     </div>
