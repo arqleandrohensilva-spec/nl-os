@@ -30,7 +30,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
 
   return (
     <div className={cn(
-      "w-[320px] flex-shrink-0 flex flex-col h-full bg-[#F5F5F5]/50 border-r border-beige last:border-r-0",
+      "w-full flex-shrink-1 flex flex-col h-full bg-[#F5F5F5]/50 border border-beige rounded-[2px]",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>
       {/* Header */}
