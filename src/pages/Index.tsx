@@ -249,38 +249,77 @@ const Index = () => {
     ), { duration: 6000, position: 'bottom-right' });
   };
 
-  const handleUpdateStage = (leadId: string, newStage: Stage) => {
+  const handleUpdateStage = async (leadId: string, newStage: Stage) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (!lead) return;
+
+    const updateData = { 
+      stage: newStage, 
+      etapa_desde: new Date().toISOString(),
+      fechado_em: newStage === 'Fechado' ? new Date().toISOString() : lead.fechado_em
+    };
+
+    const newLog = { 
+      tipo: 'N' as const, 
+      nota: `Movido para ${newStage}`, 
+      data: new Date().toISOString(), 
+      autor: user || 'Sistema' 
+    };
+
+    // Optimistic update
     setLeads(prev => prev.map(l => 
       l.id === leadId ? { 
         ...l, 
-        stage: newStage, 
-        etapa_desde: new Date().toISOString(),
-        fechado_em: newStage === 'Fechado' ? new Date().toISOString() : l.fechado_em,
-        logs: [
-          { 
-            tipo: 'N', 
-            nota: `Movido para ${newStage}`, 
-            data: new Date().toISOString(), 
-            autor: user || 'Sistema' 
-          }, 
-          ...l.logs
-        ]
+        ...updateData,
+        logs: [newLog, ...l.logs]
       } : l
     ));
-    toast.success(`Lead movido para ${newStage}`);
+
+    try {
+      await Promise.all([
+        supabase.from('leads').update(updateData).eq('id', leadId),
+        supabase.from('lead_logs').insert({ ...newLog, lead_id: leadId })
+      ]);
+      toast.success(`Lead movido para ${newStage}`);
+    } catch (err) {
+      console.error('Error updating stage:', err);
+      toast.error('Erro ao atualizar estágio');
+      fetchLeads();
+    }
   };
 
-  const handleDeleteLead = (leadId: string) => {
-    setLeads(prev => prev.filter(l => l.id !== leadId));
-    setSelectedLeadId(null);
-    toast.success("Lead excluído com sucesso");
+  const handleDeleteLead = async (leadId: string) => {
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', leadId);
+      if (error) throw error;
+      
+      setLeads(prev => prev.filter(l => l.id !== leadId));
+      setSelectedLeadId(null);
+      toast.success("Lead excluído com sucesso");
+    } catch (err) {
+      console.error('Error deleting lead:', err);
+      toast.error('Erro ao excluir lead');
+    }
   };
 
-  const handleAddLog = (leadId: string, log: any) => {
-    setLeads(prev => prev.map(l => 
-      l.id === leadId ? { ...l, logs: [log, ...l.logs] } : l
-    ));
-    toast.success("Contato registrado");
+  const handleAddLog = async (leadId: string, log: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('lead_logs')
+        .insert({ ...log, lead_id: leadId })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(prev => prev.map(l => 
+        l.id === leadId ? { ...l, logs: [data, ...l.logs] } : l
+      ));
+      toast.success("Contato registrado");
+    } catch (err) {
+      console.error('Error adding log:', err);
+      toast.error('Erro ao registrar contato');
+    }
   };
 
   const filteredLeads = leads.filter(l => {
