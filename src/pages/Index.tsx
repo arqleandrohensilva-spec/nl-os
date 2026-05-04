@@ -267,7 +267,14 @@ const Index = () => {
 
         {/* Kanban Board */}
         <div className="flex-1 bg-[#FAFAFA] overflow-hidden p-6 pt-2">
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DndContext 
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToWindowEdges]}
+          >
             <div className="grid grid-cols-6 h-full gap-4">
               {STAGES.map(stage => (
                 <KanbanColumn 
@@ -278,7 +285,25 @@ const Index = () => {
                 />
               ))}
             </div>
-          </DragDropContext>
+
+            <DragOverlay dropAnimation={{
+              sideEffects: defaultDropAnimationSideEffects({
+                styles: {
+                  active: {
+                    opacity: '0.4',
+                  },
+                },
+              }),
+            }}>
+              {activeLead ? (
+                <LeadCard 
+                  lead={activeLead} 
+                  index={0} 
+                  onClick={() => {}} 
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
         </div>
       </main>
 
