@@ -31,6 +31,7 @@ export interface Lead {
   proxima_acao_tipo?: string;
   proxima_acao_nota?: string;
   proxima_acao_data?: string;
+  criado_por?: string;
 }
 
 export const calculateLeadScore = (lead: Lead) => {
