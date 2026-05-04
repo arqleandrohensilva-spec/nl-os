@@ -12,8 +12,12 @@ import {
   Search, 
   ChevronDown, 
   Settings2,
-  Eye
+  Eye,
+  Download,
+  Users
 } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { cn } from '@/lib/utils';
 import { 
   DndContext, 
