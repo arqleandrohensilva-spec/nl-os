@@ -76,3 +76,27 @@ export const calculateLeadScore = (lead: Lead) => {
   return { score, breakdown };
 };
 
+export interface ConfigEscritorio {
+  id: string;
+  horas_dia: number;
+  dias_mes: number;
+  percentual_produtivo: number;
+  num_arquitetos: number;
+  margem_lucro: number;
+  atualizado_em: string;
+}
+
+export type CategoriaCusto = 'fixo' | 'prolabore' | 'softwares' | 'variavel' | 'impostos' | 'reservas';
+export type FrequenciaCusto = 'mensal' | 'anual' | 'percentual';
+
+export interface CustoEscritorio {
+  id: string;
+  categoria: CategoriaCusto;
+  nome: string;
+  valor: number;
+  frequencia: FrequenciaCusto;
+  ativo: boolean;
+  criado_em: string;
+}
+
+
