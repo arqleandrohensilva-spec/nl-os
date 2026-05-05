@@ -153,9 +153,21 @@ const BaseFinanceira = () => {
       if (percentChange > 10) {
         getAIDiagnostic();
         lastCustoHoraRef.current = calculations.costPerHour;
+        
+        // Sync custo_hora to global config in database
+        if (config?.id) {
+          supabase
+            .from('config_escritorio')
+            .update({ custo_hora: calculations.costPerHour })
+            .eq('id', config.id)
+            .then(({ error }) => {
+              if (error) console.error('Error syncing custo_hora:', error);
+            });
+        }
       }
     }
-  }, [calculations.costPerHour]);
+  }, [calculations.costPerHour, config?.id]);
+
 
   const getAIDiagnostic = async () => {
     if (isAiLoading) return;
