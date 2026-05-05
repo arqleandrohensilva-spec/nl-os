@@ -528,7 +528,39 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               </div>
               
-              <div className="ml-12 pl-12 border-l border-beige text-right">
+              <div className="px-8 border-l border-beige flex flex-col justify-center min-w-[250px]">
+                <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest mb-3">Mercados de Atuação</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {config?.mercados?.map((m) => (
+                    <span key={m} className="bg-bronze/10 text-bronze text-[10px] px-2 py-1 rounded flex items-center gap-1 font-dm-mono">
+                      {m}
+                      <button onClick={() => {
+                        const newMercados = config.mercados?.filter(item => item !== m) || [];
+                        updateConfig({ mercados: newMercados });
+                      }} className="hover:text-red-500">
+                        <X size={10} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Adicionar cidade..."
+                    className="h-8 border-beige text-[10px] font-dm-mono"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = e.currentTarget.value.trim();
+                        if (val && !config?.mercados?.includes(val)) {
+                          updateConfig({ mercados: [...(config?.mercados || []), val] });
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <div className="ml-8 pl-8 border-l border-beige text-right">
                 <p className="text-3xl font-cormorant font-bold text-bronze">
                   = {Math.round(calculations.faturableHours)}h
                 </p>
