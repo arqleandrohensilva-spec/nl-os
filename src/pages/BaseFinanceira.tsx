@@ -431,35 +431,117 @@ Máximo 3 linhas. Sem markdown. Em português.
           </div>
 
           {/* AI Diagnostic Card */}
-          <div className="bg-[#E8E4DF]/30 p-6 border border-bronze rounded-[4px] space-y-4">
+          <div className={cn(
+            "p-6 border rounded-[4px] space-y-4 transition-all duration-300 overflow-hidden cursor-pointer",
+            aiStatus === 'critico' ? "bg-red-50 border-red-200" :
+            aiStatus === 'atencao' ? "bg-amber-50 border-amber-200" :
+            "bg-green-50 border-green-200"
+          )}
+          onClick={() => !isAiExpanded && setIsAiExpanded(true)}
+          >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-bronze">
-                <Brain size={16} />
-                <span className="text-[10px] font-bold uppercase tracking-widest font-dm-mono">DIAGNÓSTICO FINANCEIRO · IA</span>
+              <div className="flex items-center gap-4">
+                <div className={cn(
+                  "flex items-center gap-2",
+                  aiStatus === 'critico' ? "text-red-700" :
+                  aiStatus === 'atencao' ? "text-amber-700" :
+                  "text-green-700"
+                )}>
+                  <Brain size={16} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest font-dm-mono">DIAGNÓSTICO FINANCEIRO · IA</span>
+                </div>
+                
+                <span className={cn(
+                  "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border",
+                  aiStatus === 'critico' ? "bg-red-100 border-red-300 text-red-800" :
+                  aiStatus === 'atencao' ? "bg-amber-100 border-amber-300 text-amber-800" :
+                  "bg-green-100 border-green-300 text-green-800"
+                )}>
+                  {aiStatus === 'critico' ? 'Crítico' : aiStatus === 'atencao' ? 'Atenção' : 'Saudável'}
+                </span>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={getAIDiagnostic}
-                className="h-8 text-[9px] uppercase tracking-widest text-muted hover:text-bronze flex items-center gap-2"
-              >
-                <RotateCcw size={10} /> Atualizar
-              </Button>
+
+              <div className="flex items-center gap-4">
+                {lastAiAnalysis && (
+                  <p className="text-[9px] text-muted font-dm-mono italic">
+                    Última análise: {lastAiAnalysis.toLocaleTimeString()}
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      getAIDiagnostic();
+                    }}
+                    className="h-8 text-[9px] uppercase tracking-widest text-muted hover:text-bronze flex items-center gap-2"
+                  >
+                    <RotateCcw size={10} /> Atualizar
+                  </Button>
+                  {isAiExpanded && (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAiExpanded(false);
+                      }}
+                      className="p-1 text-muted hover:text-graphite transition-colors"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
-            {isAiLoading ? (
-              <div className="flex items-center gap-2 text-muted text-xs font-dm-mono">
-                <Loader2 size={14} className="animate-spin" /> Analisando dados...
-              </div>
-            ) : (
-              <p className="text-xs font-dm-mono text-graphite leading-relaxed whitespace-pre-line">
-                {aiDiagnostic || "Clique em atualizar para gerar o diagnóstico financeiro baseado nos seus dados."}
-              </p>
-            )}
-            {lastAiAnalysis && (
-              <p className="text-[9px] text-muted font-dm-mono italic">
-                Última análise: {lastAiAnalysis.toLocaleTimeString()}
-              </p>
-            )}
+
+            <div className={cn(
+              "transition-all duration-300 ease-in-out",
+              isAiExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
+            )}>
+              {isAiLoading ? (
+                <div className="flex items-center gap-2 text-muted text-xs font-dm-mono py-4">
+                  <Loader2 size={14} className="animate-spin" /> Analisando dados...
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <p className="text-xs font-dm-mono text-graphite leading-relaxed whitespace-pre-line border-b border-black/5 pb-6">
+                    {aiDiagnostic || "Clique em atualizar para gerar o diagnóstico financeiro baseado nos seus dados."}
+                  </p>
+
+                  {/* History Section */}
+                  <div className="space-y-4">
+                    <h4 className="text-[9px] font-bold text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+                      <Target size={12} /> Histórico de Análises
+                    </h4>
+                    <div className="space-y-2">
+                      {aiHistory.map((item) => (
+                        <div key={item.id} className="bg-white/50 p-3 border border-black/5 rounded-[2px] space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <span className="text-[9px] font-dm-mono text-muted">
+                                {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                              <span className={cn(
+                                "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
+                                item.status === 'critico' ? "bg-red-50 border-red-200 text-red-700" :
+                                item.status === 'atencao' ? "bg-amber-50 border-amber-200 text-amber-700" :
+                                "bg-green-50 border-green-200 text-green-700"
+                              )}>
+                                {item.status}
+                              </span>
+                            </div>
+                            <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
+                          </div>
+                          <p className="text-[10px] font-dm-mono text-graphite/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+                            {item.conteudo}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           </div>
