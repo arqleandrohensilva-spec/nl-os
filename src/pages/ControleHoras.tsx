@@ -205,7 +205,7 @@ const ControleHoras = () => {
     toast.success(`Timer iniciado: ${selectedProjeto.nome}`);
   };
 
-  const stopTimer = async () => {
+  const stopTimer = async (discountInactivity: boolean = false) => {
     if (!activeTimer) return;
     const now = new Date();
     const duracao = Math.floor((now.getTime() - activeTimer.start.getTime()) / 60000);
