@@ -12,27 +12,25 @@ serve(async (req) => {
 
   try {
     const { prompt, systemPrompt } = await req.json()
-    const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY')
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
 
-    if (!anthropicKey) {
+    if (!LOVABLE_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' }),
+        JSON.stringify({ error: 'LOVABLE_API_KEY not set' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": anthropicKey,
-        "anthropic-version": "2023-06-01"
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20240620", // Using current stable sonnet as 4-2025 is placeholder
-        max_tokens: 1000,
-        system: systemPrompt,
+        model: "google/gemini-3-flash-preview",
         messages: [
+          { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
         ],
       })

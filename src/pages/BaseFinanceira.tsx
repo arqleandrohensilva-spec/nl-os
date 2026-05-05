@@ -241,7 +241,7 @@ Responda em português.
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      setAiDiagnostic(data.content[0].text);
+      setAiDiagnostic(data.choices[0].message.content);
       setLastAiAnalysis(new Date());
     } catch (error) {
       console.error('Error getting AI diagnostic:', error);
@@ -274,7 +274,7 @@ Máximo 3 linhas. Sem markdown. Em português.
       });
 
       if (error) throw error;
-      setSimAnalysis(data.content[0].text);
+      setSimAnalysis(data.choices[0].message.content);
     } catch (error) {
       console.error('Error getting simulator analysis:', error);
       toast.error('Erro ao analisar cenário');
