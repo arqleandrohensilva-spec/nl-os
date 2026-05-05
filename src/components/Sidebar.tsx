@@ -9,10 +9,14 @@ interface NavItemProps {
   label: string;
   active?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
-const NavItem = ({ label, active, disabled }: NavItemProps) => (
-  <div className={cn(
+const NavItem = ({ label, active, disabled, onClick }: NavItemProps) => (
+  <div 
+    onClick={!disabled ? onClick : undefined}
+    className={cn(
+
     "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
     active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
     disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
