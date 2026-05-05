@@ -19,7 +19,11 @@ import {
   RotateCcw,
   Loader2,
   ChevronUp,
-  Target
+  Target,
+  Lightbulb,
+  FileText,
+  History,
+  ArrowRight
 } from 'lucide-react';
 
 import { toast } from "sonner";
@@ -48,13 +52,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const CATEGORIES: { id: CategoriaCusto; label: string; icon: any }[] = [
-  { id: 'fixo', label: 'Custo Fixo', icon: Building2 },
-  { id: 'prolabore', label: 'Pró-labore', icon: Users },
-  { id: 'softwares', label: 'Softwares e Assinaturas', icon: Monitor },
-  { id: 'variavel', label: 'Custo Variável', icon: TrendingUp },
-  { id: 'impostos', label: 'Impostos', icon: Receipt },
-  { id: 'reservas', label: 'Reservas', icon: Shield },
+import FinancialHealthBar from '@/components/financeiro/FinancialHealthBar';
+import CountUp from '@/components/financeiro/CountUp';
+import DonutChartSection from '@/components/financeiro/DonutChartSection';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+const CATEGORIES: { id: CategoriaCusto; label: string; icon: any; color: string }[] = [
+  { id: 'fixo', label: 'Custo Fixo', icon: Building2, color: '#3A3A3A' },
+  { id: 'prolabore', label: 'Pró-labore', icon: Users, color: '#8B7355' },
+  { id: 'softwares', label: 'Softwares e Assinaturas', icon: Monitor, color: '#5A5A5A' },
+  { id: 'variavel', label: 'Custo Variável', icon: TrendingUp, color: '#B5A48A' },
+  { id: 'impostos', label: 'Impostos', icon: Receipt, color: '#777777' },
+  { id: 'reservas', label: 'Reservas', icon: Shield, color: '#D1D1D1' },
 ];
 
 const BaseFinanceira = () => {
