@@ -74,8 +74,11 @@ const BaseFinanceira = () => {
   
   // AI State
   const [aiDiagnostic, setAiDiagnostic] = useState<string>('');
+  const [aiStatus, setAiStatus] = useState<'critico' | 'atencao' | 'saudavel'>('atencao');
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [lastAiAnalysis, setLastAiAnalysis] = useState<Date | null>(null);
+  const [isAiExpanded, setIsAiExpanded] = useState(false);
+  const [aiHistory, setAiHistory] = useState<any[]>([]);
   const lastCustoHoraRef = useRef<number>(0);
 
   // Simulator State
