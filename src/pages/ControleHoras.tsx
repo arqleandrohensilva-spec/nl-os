@@ -109,9 +109,64 @@ const ControleHoras = () => {
   const [panelProjeto, setPanelProjeto] = useState<Projeto | null>(null);
   const [isReportExpanded, setIsReportExpanded] = useState(false);
 
+  // New features states
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [manualSession, setManualSession] = useState({
+    projetoId: '',
+    etapa: 'Briefing',
+    responsavel: 'Leandro' as 'Leandro' | 'Neandro',
+    data: new Date(),
+    horas: '0',
+    minutos: '0',
+    obs: ''
+  });
+  const [lastNotificationTime, setLastNotificationTime] = useState<number>(0);
+  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
+
+  useEffect(() => {
+    // Show weekly summary only on Mondays
+    if (isMonday(new Date())) {
+      const dismissed = sessionStorage.getItem('weekly_summary_dismissed');
+      const today = format(new Date(), 'yyyy-MM-dd');
+      if (dismissed !== today) {
+        setShowWeeklySummary(true);
+      }
+    }
+  }, []);
+
   const handleActivity = useCallback(() => {
     setLastActivity(Date.now());
   }, []);
+
+  // Notification for long sessions (3h+)
+  useEffect(() => {
+    if (activeTimer) {
+      const checkTimer = setInterval(() => {
+        const diff = (Date.now() - activeTimer.start.getTime()) / (1000 * 60 * 60); // hours
+        if (diff >= 3) {
+          const now = Date.now();
+          // Notify if first time or every 1 hour after
+          if (lastNotificationTime === 0 || (now - lastNotificationTime) >= (60 * 60 * 1000)) {
+            const projeto = projetos.find(p => p.id === activeTimer.id);
+            toast("Timer rodando há 3h+", {
+              description: `O timer de ${projeto?.nome || 'projeto'} está rodando há ${Math.floor(diff)}h. Considere fazer uma pausa.`,
+              icon: <Coffee size={18} className="text-bronze" />,
+              action: {
+                label: "Pausar agora",
+                onClick: () => stopTimer()
+              },
+              duration: 10000,
+            });
+            setLastNotificationTime(now);
+          }
+        }
+      }, 60000); // Check every minute
+
+      return () => clearInterval(checkTimer);
+    } else {
+      setLastNotificationTime(0);
+    }
+  }, [activeTimer, lastNotificationTime, projetos]);
 
   useEffect(() => {
     if (activeTimer && !showInactivityModal) {
