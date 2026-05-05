@@ -83,6 +83,8 @@ export interface ConfigEscritorio {
   percentual_produtivo: number;
   num_arquitetos: number;
   margem_lucro: number;
+  custo_hora?: number;
+  mercados?: string[];
   atualizado_em: string;
 }
 
