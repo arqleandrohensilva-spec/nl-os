@@ -177,15 +177,15 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] text-white">
+    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A]">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
-            <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
-          <Button variant="outline" className="border-white/10 hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+          <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
             + Novo Projeto
           </Button>
         </header>
