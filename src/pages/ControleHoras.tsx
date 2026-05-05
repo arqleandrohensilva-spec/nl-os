@@ -288,19 +288,19 @@ const ControleHoras = () => {
               <TrendingUp size={18} className="text-bronze" />
               <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Relatório de Lucratividade</h3>
             </div>
-            <ChevronRight className={cn("transition-transform text-white/20", isReportExpanded && "rotate-90")} />
+            <ChevronRight className={cn("transition-transform text-muted-foreground/30", isReportExpanded && "rotate-90")} />
           </button>
           
           {isReportExpanded && (
-            <div className="px-6 pb-6 border-t border-white/5 pt-6">
+            <div className="px-6 pb-6 border-t border-[#E8E4DF] pt-6">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-widest text-white/30 border-b border-white/5">
-                    <th className="pb-4 font-bold">Projeto</th>
-                    <th className="pb-4 font-bold">Receita</th>
-                    <th className="pb-4 font-bold">Custo Int.</th>
-                    <th className="pb-4 font-bold">Margem</th>
-                    <th className="pb-4 font-bold text-right">Status</th>
+                  <tr className="text-[9px] uppercase tracking-widest text-muted-foreground border-b border-[#E8E4DF]">
+                    <th className="pb-4 font-bold text-muted-foreground">Projeto</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Receita</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Custo Int.</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Margem</th>
+                    <th className="pb-4 font-bold text-right text-muted-foreground">Status</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px]">
@@ -311,20 +311,20 @@ const ControleHoras = () => {
                     const margem = p.valor_proposta > 0 ? ((p.valor_proposta - custo) / p.valor_proposta) * 100 : 0;
                     
                     return (
-                      <tr key={p.id} className="border-b border-white/[0.02] last:border-0">
-                        <td className="py-4 font-medium">{p.nome}</td>
-                        <td className="py-4 text-white/60 font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
-                        <td className="py-4 text-white/60 font-mono">R$ {Math.round(custo).toLocaleString()}</td>
+                      <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
+                        <td className="py-4 font-medium text-[#1A1A1A]">{p.nome}</td>
+                        <td className="py-4 text-muted-foreground font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
+                        <td className="py-4 text-muted-foreground font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(
                           "py-4 font-bold font-mono",
-                          margem > 30 ? "text-emerald-500" : margem > 15 ? "text-bronze" : "text-rose-500"
+                          margem > 30 ? "text-emerald-600" : margem > 15 ? "text-bronze" : "text-rose-500"
                         )}>
                           {Math.round(margem)}%
                         </td>
                         <td className="py-4 text-right">
                           <span className={cn(
-                            "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm",
-                            p.status === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-white/5 text-white/40"
+                            "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
+                            p.status === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-muted-foreground"
                           )}>
                             {p.status}
                           </span>
@@ -336,7 +336,7 @@ const ControleHoras = () => {
               </table>
               
               <div className="mt-8 flex justify-end">
-                <Button className="bg-bronze hover:bg-bronze/90 text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
+                <Button className="bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
                   <BarChart3 size={14} className="mr-2" />
                   Análise com IA
                 </Button>
