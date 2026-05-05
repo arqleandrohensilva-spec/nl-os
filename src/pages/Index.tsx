@@ -76,6 +76,19 @@ const Index = () => {
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
+  const [isNewLeadDialogOpen, setIsNewLeadDialogOpen] = useState(false);
+  const [config, setConfig] = useState<ConfigEscritorio | null>(null);
+  const [newLead, setNewLead] = useState({
+    nome: '',
+    whats: '',
+    cidade: '',
+    tipo: 'Arq+Int' as TipoProjeto,
+    area: 0,
+    orcamento: 0,
+    origem: 'Instagram' as Origem,
+    temp: 'Morno' as Temp,
+    obs: ''
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
