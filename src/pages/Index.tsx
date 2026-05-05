@@ -90,6 +90,16 @@ const Index = () => {
     obs: ''
   });
 
+  // Project Conversion State
+  const [showProjectConversion, setShowProjectConversion] = useState(false);
+  const [conversionLead, setConversionLead] = useState<Lead | null>(null);
+  const [conversionHours, setConversionHours] = useState({
+    briefing: 20,
+    anteprojeto: 120,
+    executivo: 100,
+    acompanhamento: 40
+  });
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -842,6 +852,99 @@ const Index = () => {
           onAddLog={handleAddLog}
         />
       )}
+
+      {/* Project Conversion Modal */}
+      <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
+        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
+          <div className="p-8">
+            <h2 className="text-2xl font-cormorant font-bold mb-1">Converter em Projeto?</h2>
+            <p className="text-[11px] text-white/40 mb-8 font-mono">{conversionLead?.nome} acabou de ser fechado. Deseja criar o projeto no Controle de Horas?</p>
+            
+            <div className="space-y-6">
+              <div className="p-4 bg-white/5 border border-white/10 rounded-none space-y-2">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">Resumo do Lead</p>
+                <div className="grid grid-cols-2 gap-4 text-[11px]">
+                  <div>
+                    <span className="text-white/30 block text-[9px] uppercase">Nome</span>
+                    {conversionLead?.nome}
+                  </div>
+                  <div>
+                    <span className="text-white/30 block text-[9px] uppercase">Cliente</span>
+                    {conversionLead?.nome}
+                  </div>
+                  <div>
+                    <span className="text-white/30 block text-[9px] uppercase">Tipo</span>
+                    {conversionLead?.tipo} · {conversionLead?.area}m²
+                  </div>
+                  <div>
+                    <span className="text-white/30 block text-[9px] uppercase">Valor</span>
+                    R$ {conversionLead?.orcamento?.toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-[10px] uppercase font-bold tracking-widest text-white/40">Horas Estimadas</p>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                  {[
+                    { id: 'briefing', label: 'Briefing' },
+                    { id: 'anteprojeto', label: 'Anteprojeto' },
+                    { id: 'executivo', label: 'Executivo' },
+                    { id: 'acompanhamento', label: 'Acompanhamento' },
+                  ].map(h => (
+                    <div key={h.id}>
+                      <label className="text-[9px] uppercase text-white/30 block mb-1.5">{h.label}</label>
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="number"
+                          value={(conversionHours as any)[h.id]}
+                          onChange={(e) => setConversionHours({...conversionHours, [h.id]: Number(e.target.value)})}
+                          className="bg-white/5 border-white/10 text-white rounded-none h-9 text-xs"
+                        />
+                        <span className="text-[9px] text-white/30 uppercase">h</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button variant="ghost" onClick={() => setShowProjectConversion(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Agora não</Button>
+                <Button 
+                  onClick={async () => {
+                    if (!conversionLead) return;
+                    try {
+                      const { error } = await supabase.from('projetos').insert({
+                        nome: conversionLead.nome,
+                        cliente_nome: conversionLead.nome,
+                        lead_id: conversionLead.id,
+                        tipo: conversionLead.tipo,
+                        area_m2: conversionLead.area,
+                        valor_proposta: conversionLead.orcamento,
+                        horas_estimadas: conversionHours.briefing + conversionHours.anteprojeto + conversionHours.executivo + conversionHours.acompanhamento,
+                        horas_briefing: conversionHours.briefing,
+                        horas_anteprojeto: conversionHours.anteprojeto,
+                        horas_executivo: conversionHours.executivo,
+                        horas_acompanhamento: conversionHours.acompanhamento,
+                        status: 'ativo'
+                      });
+                      if (error) throw error;
+                      toast.success("Projeto criado no Controle de Horas!");
+                      setShowProjectConversion(false);
+                    } catch (err) {
+                      toast.error("Erro ao criar projeto");
+                    }
+                  }}
+                  className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest"
+                >
+                  Criar Projeto
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };

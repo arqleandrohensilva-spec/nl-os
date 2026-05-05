@@ -2,8 +2,28 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Play, Pause, Square, Trash2, X, ChevronRight, FileText, Info, TrendingUp, DollarSign, Clock, Users, BarChart3, AlertCircle } from 'lucide-react';
-import { format, differenceInMinutes, parseISO, subMinutes } from 'date-fns';
+import { 
+  Play, 
+  Pause, 
+  Square, 
+  Trash2, 
+  X, 
+  ChevronRight, 
+  FileText, 
+  Info, 
+  TrendingUp, 
+  DollarSign, 
+  Clock, 
+  Users, 
+  BarChart3, 
+  AlertCircle,
+  Coffee,
+  Plus,
+  Pencil,
+  Calendar,
+  CheckCircle2
+} from 'lucide-react';
+import { format, differenceInMinutes, parseISO, subMinutes, startOfWeek, endOfWeek, isWithinInterval, isMonday, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -11,6 +31,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface Projeto {
   id: string;
@@ -37,7 +59,30 @@ interface Sessao {
   fim: string | null;
   duracao_minutos: number | null;
   observacao: string | null;
+  is_manual?: boolean;
 }
+
+const StageBadge = ({ stage }: { stage: string }) => {
+  const configs: Record<string, { bg: string, text: string }> = {
+    'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
+    'Anteprojeto': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
+    'Acompanhamento de Obra': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+    'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+  };
+
+  const config = configs[stage] || { bg: 'bg-muted/15', text: 'text-muted-foreground' };
+
+  return (
+    <span className={cn(
+      "px-2.5 py-0.5 rounded-full text-[8px] uppercase font-bold tracking-widest inline-block",
+      config.bg,
+      config.text
+    )}>
+      {stage}
+    </span>
+  );
+};
 
 const ControleHoras = () => {
   const [projetos, setProjetos] = useState<Projeto[]>([]);
@@ -64,9 +109,64 @@ const ControleHoras = () => {
   const [panelProjeto, setPanelProjeto] = useState<Projeto | null>(null);
   const [isReportExpanded, setIsReportExpanded] = useState(false);
 
+  // New features states
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [manualSession, setManualSession] = useState({
+    projetoId: '',
+    etapa: 'Briefing',
+    responsavel: 'Leandro' as 'Leandro' | 'Neandro',
+    data: new Date(),
+    horas: '0',
+    minutos: '0',
+    obs: ''
+  });
+  const [lastNotificationTime, setLastNotificationTime] = useState<number>(0);
+  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
+
+  useEffect(() => {
+    // Show weekly summary only on Mondays
+    if (isMonday(new Date())) {
+      const dismissed = sessionStorage.getItem('weekly_summary_dismissed');
+      const today = format(new Date(), 'yyyy-MM-dd');
+      if (dismissed !== today) {
+        setShowWeeklySummary(true);
+      }
+    }
+  }, []);
+
   const handleActivity = useCallback(() => {
     setLastActivity(Date.now());
   }, []);
+
+  // Notification for long sessions (3h+)
+  useEffect(() => {
+    if (activeTimer) {
+      const checkTimer = setInterval(() => {
+        const diff = (Date.now() - activeTimer.start.getTime()) / (1000 * 60 * 60); // hours
+        if (diff >= 3) {
+          const now = Date.now();
+          // Notify if first time or every 1 hour after
+          if (lastNotificationTime === 0 || (now - lastNotificationTime) >= (60 * 60 * 1000)) {
+            const projeto = projetos.find(p => p.id === activeTimer.id);
+            toast("Timer rodando há 3h+", {
+              description: `O timer de ${projeto?.nome || 'projeto'} está rodando há ${Math.floor(diff)}h. Considere fazer uma pausa.`,
+              icon: <Coffee size={18} className="text-bronze" />,
+              action: {
+                label: "Pausar agora",
+                onClick: () => stopTimer()
+              },
+              duration: 10000,
+            });
+            setLastNotificationTime(now);
+          }
+        }
+      }, 60000); // Check every minute
+
+      return () => clearInterval(checkTimer);
+    } else {
+      setLastNotificationTime(0);
+    }
+  }, [activeTimer, lastNotificationTime, projetos]);
 
   useEffect(() => {
     if (activeTimer && !showInactivityModal) {
@@ -161,6 +261,49 @@ const ControleHoras = () => {
     return () => clearInterval(interval);
   }, [activeTimer]);
 
+  const handleManualRegistration = async () => {
+    if (!manualSession.projetoId) {
+      toast.error("Selecione um projeto");
+      return;
+    }
+    const duracao = (Number(manualSession.horas) * 60) + Number(manualSession.minutos);
+    if (duracao <= 0) {
+      toast.error("Informe a duração");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('sessoes_horas').insert({
+        projeto_id: manualSession.projetoId,
+        etapa: manualSession.etapa,
+        responsavel: manualSession.responsavel,
+        inicio: manualSession.data.toISOString(),
+        fim: manualSession.data.toISOString(),
+        duracao_minutos: duracao,
+        observacao: manualSession.obs,
+        is_manual: true
+      });
+
+      if (error) throw error;
+      
+      toast.success("Horas registradas com sucesso");
+      setIsManualModalOpen(false);
+      setManualSession({
+        projetoId: '',
+        etapa: 'Briefing',
+        responsavel: 'Leandro',
+        data: new Date(),
+        horas: '0',
+        minutos: '0',
+        obs: ''
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Error saving manual session:', error);
+      toast.error('Erro ao registrar horas');
+    }
+  };
+
   const fetchData = async () => {
     try {
       const [{ data: pData }, { data: sData }, { data: cData }] = await Promise.all([
@@ -171,6 +314,13 @@ const ControleHoras = () => {
       setProjetos(pData || []);
       setSessoes(sData || []);
       setConfig(cData);
+      
+      // Calculate predictions after data load
+      if (pData) {
+        pData.forEach(p => {
+          if (p.status === 'ativo') getAIPrediction(p, sData || []);
+        });
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -248,7 +398,55 @@ const ControleHoras = () => {
     setIsPanelOpen(true);
   };
 
-  // Metrics
+  // Metrics & Stats
+  const weeklyStats = useMemo(() => {
+    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
+    
+    const weekSessoes = sessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      return isWithinInterval(d, { start, end });
+    });
+
+    const leandro = weekSessoes.filter(s => s.responsavel === 'Leandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const neandro = weekSessoes.filter(s => s.responsavel === 'Neandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    
+    return { leandro, neandro, total: leandro + neandro };
+  }, [sessoes]);
+
+  const lastWeekSummary = useMemo(() => {
+    const lastMon = startOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
+    const lastSun = endOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
+    
+    const weekSessoes = sessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      return isWithinInterval(d, { start: lastMon, end: lastSun });
+    });
+
+    if (weekSessoes.length === 0) return null;
+
+    const total = weekSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const leandro = weekSessoes.filter(s => s.responsavel === 'Leandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const neandro = weekSessoes.filter(s => s.responsavel === 'Neandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+
+    // Find most consumed project
+    const projectHours: Record<string, number> = {};
+    weekSessoes.forEach(s => {
+      projectHours[s.projeto_id] = (projectHours[s.projeto_id] || 0) + (s.duracao_minutos || 0);
+    });
+    const topProjectId = Object.entries(projectHours).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const topProject = projetos.find(p => p.id === topProjectId);
+
+    return { 
+      total, 
+      leandro, 
+      neandro, 
+      topProject: topProject?.nome || 'N/A',
+      topHours: Math.round((projectHours[topProjectId || ''] || 0) / 60),
+      period: `${format(lastMon, 'dd/MM')} a ${format(lastSun, 'dd/MM')}`
+    };
+  }, [sessoes, projetos]);
+
   const metrics = useMemo(() => {
     const totalMes = sessoes.filter(s => {
       const d = parseISO(s.inicio);
@@ -272,10 +470,104 @@ const ControleHoras = () => {
             <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
-          <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
-            + Novo Projeto
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setIsManualModalOpen(true)}
+              variant="ghost" 
+              className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none hover:text-bronze hover:bg-transparent"
+            >
+              <Plus size={14} className="mr-2" />
+              Registrar Horas
+            </Button>
+            <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+              + Novo Projeto
+            </Button>
+          </div>
         </header>
+
+        {/* Weekly Summary Card */}
+        {showWeeklySummary && lastWeekSummary && (
+          <div className="mb-12 bg-[#E8E4DF] border border-bronze/30 p-8 rounded-[4px] relative animate-in fade-in slide-in-from-top duration-500">
+            <button 
+              onClick={() => {
+                setShowWeeklySummary(false);
+                sessionStorage.setItem('weekly_summary_dismissed', format(new Date(), 'yyyy-MM-dd'));
+              }}
+              className="absolute top-4 right-4 text-bronze/50 hover:text-bronze transition-colors"
+            >
+              <X size={16} />
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <BarChart3 size={20} className="text-bronze" />
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.3em] font-mono text-bronze">Resumo da Semana — {lastWeekSummary.period}</h2>
+            </div>
+            <div className="grid grid-cols-4 gap-8 mb-8">
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Horas registradas</p>
+                <p className="text-2xl font-cormorant font-bold">{Math.round(lastWeekSummary.total)}h total</p>
+                <p className="text-[9px] text-muted-foreground font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Projeto mais consumido</p>
+                <p className="text-2xl font-cormorant font-bold">{lastWeekSummary.topProject}</p>
+                <p className="text-[9px] text-muted-foreground font-mono">{lastWeekSummary.topHours}h investidas</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Eficiência Média</p>
+                <p className="text-2xl font-cormorant font-bold">93%</p>
+                <p className="text-[9px] text-emerald-600 font-bold font-mono">ALTA PERFORMANCE</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Meta atingida</p>
+                <div className="flex items-center gap-2">
+                  <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
+                    {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
+                  </span>
+                  <span className="text-[#1A1A1A]/20">|</span>
+                  <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.neandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
+                    {lastWeekSummary.neandro >= 30 ? '✓' : '✗'} Neandro
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p className="text-[11px] text-bronze/80 font-mono italic">
+              <span className="font-bold">Próxima semana:</span> Anteprojeto Mendonça precisa de 35h para concluir no prazo estimado.
+            </p>
+          </div>
+        )}
+
+        {/* Weekly Goals Bar */}
+        <div className="mb-12 bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-l-4 border-l-bronze">
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Meta de Horas Semanal</h4>
+            <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
+          </div>
+          <div className="grid grid-cols-2 gap-12">
+            {[
+              { name: 'Leandro', current: weeklyStats.leandro, target: 30 },
+              { name: 'Neandro', current: weeklyStats.neandro, target: 30 },
+            ].map(user => {
+              const p = (user.current / user.target) * 100;
+              const color = p >= 100 ? "bg-emerald-500" : p >= 70 ? "bg-bronze" : "bg-rose-500";
+              const textColor = p >= 100 ? "text-emerald-600" : p >= 70 ? "text-bronze" : "text-rose-600";
+              
+              return (
+                <div key={user.name}>
+                  <div className="flex justify-between text-[11px] mb-2 font-mono">
+                    <span className="font-bold">{user.name}</span>
+                    <span className={cn("font-bold", textColor)}>{Math.round(user.current)}h de {user.target}h</span>
+                  </div>
+                  <div className="h-[6px] bg-[#F5F2EF] rounded-full overflow-hidden">
+                    <div 
+                      className={cn("h-full transition-all duration-1000", color)}
+                      style={{ width: `${Math.min(p, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           {[
@@ -318,7 +610,7 @@ const ControleHoras = () => {
 
                   <div className="mb-8">
                     <div className="flex justify-between text-[9px] uppercase tracking-wider text-muted-foreground mb-1.5 font-bold">
-                      <span>Etapa: <span className="text-[#1A1A1A]">{p.etapa_atual}</span></span>
+                      <StageBadge stage={p.etapa_atual} />
                       <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
                         {Math.round(totalHoras)}h / {p.horas_estimadas}h
                       </span>
@@ -558,8 +850,8 @@ const ControleHoras = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Horas por Etapa</h4>
+                <div className="space-y-6">
+                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Orçado vs Realizado</h4>
                   {[
                     { label: 'Briefing', estim: panelProjeto.horas_briefing },
                     { label: 'Anteprojeto', estim: panelProjeto.horas_anteprojeto },
@@ -567,15 +859,29 @@ const ControleHoras = () => {
                     { label: 'Acompanhamento de Obra', estim: panelProjeto.horas_acompanhamento },
                   ].map(e => {
                     const real = sessoes.filter(s => s.projeto_id === panelProjeto.id && s.etapa === e.label).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                    const p = Math.min((real / e.estim) * 100, 100);
+                    const desvio = e.estim > 0 ? ((real - e.estim) / e.estim) * 100 : 0;
+                    const isOver = real > e.estim;
+                    
                     return (
-                      <div key={e.label}>
-                        <div className="flex justify-between text-[10px] text-white/60 mb-1.5 font-bold uppercase tracking-wider">
-                          <span>{e.label}</span>
-                          <span>{Math.round(real)}h / {e.estim}h</span>
+                      <div key={e.label} className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[10px] text-white/60 font-bold uppercase tracking-wider">
+                          <StageBadge stage={e.label} />
+                          <span className={cn(isOver ? "text-rose-500" : "text-white/40")}>
+                            {Math.round(real)}h / {e.estim}h {desvio !== 0 && `(${desvio > 0 ? '+' : ''}${Math.round(desvio)}%)`}
+                          </span>
                         </div>
-                        <div className="h-[6px] bg-[#2A2A2A] rounded-full overflow-hidden">
-                          <div className="h-full bg-bronze" style={{ width: `${p}%` }} />
+                        <div className="space-y-1">
+                          {/* Orçado (Bege) */}
+                          <div className="h-[4px] bg-[#E8E4DF]/20 rounded-full w-full overflow-hidden">
+                            <div className="h-full bg-[#E8E4DF]" style={{ width: '100%' }} />
+                          </div>
+                          {/* Realizado (Bronze ou Vermelho se estourar) */}
+                          <div className="h-[4px] bg-[#2A2A2A] rounded-full w-full overflow-hidden">
+                            <div 
+                              className={cn("h-full transition-all duration-500", isOver ? "bg-rose-500" : "bg-bronze")} 
+                              style={{ width: `${Math.min((real / (e.estim || 1)) * 100, 100)}%` }} 
+                            />
+                          </div>
                         </div>
                       </div>
                     );
@@ -587,9 +893,15 @@ const ControleHoras = () => {
                   <div className="space-y-4">
                     {sessoes.filter(s => s.projeto_id === panelProjeto.id).map(s => (
                       <div key={s.id} className="group flex justify-between items-start border-b border-white/[0.03] pb-4 last:border-0">
-                        <div className="space-y-1">
-                          <p className="text-[11px] font-medium">{format(parseISO(s.inicio), 'dd MMM', { locale: ptBR })} · {s.etapa}</p>
-                          <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-medium">{format(parseISO(s.inicio), 'dd MMM', { locale: ptBR })}</span>
+                            <StageBadge stage={s.etapa} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
+                            {s.is_manual && <Pencil size={10} className="text-white/20" />}
+                          </div>
                           {s.observacao && <p className="text-[10px] text-white/20 italic">"{s.observacao}"</p>}
                         </div>
                         <button onClick={() => deleteSessao(s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400 p-1">
@@ -610,6 +922,125 @@ const ControleHoras = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Manual Registration Modal */}
+      <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
+        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
+          <div className="p-8">
+            <h2 className="text-2xl font-cormorant font-bold mb-1">Registrar Horas</h2>
+            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Registro retroativo — Sem timer</p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Projeto</label>
+                <Select value={manualSession.projetoId} onValueChange={(v) => setManualSession({...manualSession, projetoId: v})}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                    <SelectValue placeholder="Selecione o projeto" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                    {projetos.filter(p => p.status === 'ativo').map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Etapa</label>
+                  <Select value={manualSession.etapa} onValueChange={(v) => setManualSession({...manualSession, etapa: v})}>
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                      <SelectItem value="Briefing">Briefing</SelectItem>
+                      <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
+                      <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
+                      <SelectItem value="Acompanhamento de Obra">Acompanhamento</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Responsável</label>
+                  <Select value={manualSession.responsavel} onValueChange={(v: any) => setManualSession({...manualSession, responsavel: v})}>
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                      <SelectItem value="Leandro">Leandro</SelectItem>
+                      <SelectItem value="Neandro">Neandro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Data</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white rounded-none h-11 px-3 hover:bg-white/10">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {manualSession.data ? format(manualSession.data, "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-[#1A1A1A] border-white/10">
+                    <CalendarComponent
+                      mode="single"
+                      selected={manualSession.data}
+                      onSelect={(date) => date && setManualSession({...manualSession, data: date})}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Duração</label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input 
+                      type="number" 
+                      value={manualSession.horas} 
+                      onChange={(e) => setManualSession({...manualSession, horas: e.target.value})}
+                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                    />
+                    <span className="text-[10px] text-white/40 font-bold uppercase">h</span>
+                  </div>
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input 
+                      type="number" 
+                      max="59"
+                      value={manualSession.minutos} 
+                      onChange={(e) => setManualSession({...manualSession, minutos: e.target.value})}
+                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                    />
+                    <span className="text-[10px] text-white/40 font-bold uppercase">min</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Observação (Opcional)</label>
+                <Input 
+                  placeholder="Descrição da atividade..."
+                  value={manualSession.obs}
+                  onChange={(e) => setManualSession({...manualSession, obs: e.target.value})}
+                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button onClick={handleManualRegistration} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">
+                  <CheckCircle2 size={14} className="mr-2" />
+                  Registrar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Inactivity Modal */}
       <Dialog open={showInactivityModal} onOpenChange={setShowInactivityModal}>
         <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-sm">

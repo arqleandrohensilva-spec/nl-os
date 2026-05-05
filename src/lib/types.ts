@@ -102,4 +102,16 @@ export interface CustoEscritorio {
   criado_em: string;
 }
 
+export interface SessaoHoras {
+  id: string;
+  projeto_id: string;
+  etapa: string;
+  responsavel: 'Leandro' | 'Neandro';
+  inicio: string;
+  fim: string | null;
+  duracao_minutos: number | null;
+  observacao: string | null;
+  is_manual?: boolean;
+}
+
 
