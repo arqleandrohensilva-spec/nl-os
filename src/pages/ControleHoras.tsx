@@ -610,7 +610,7 @@ const ControleHoras = () => {
 
                   <div className="mb-8">
                     <div className="flex justify-between text-[9px] uppercase tracking-wider text-muted-foreground mb-1.5 font-bold">
-                      <span>Etapa: <span className="text-[#1A1A1A]">{p.etapa_atual}</span></span>
+                      <StageBadge stage={p.etapa_atual} />
                       <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
                         {Math.round(totalHoras)}h / {p.horas_estimadas}h
                       </span>
