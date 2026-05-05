@@ -205,8 +205,7 @@ const ControleHoras = () => {
           ))}
         </div>
 
-        {/* Projects List - Single Column */}
-        <div className="space-y-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {projetos.map((p) => {
             const projetoSessoes = sessoes.filter(s => s.projeto_id === p.id);
             const totalMinutos = projetoSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
@@ -215,63 +214,63 @@ const ControleHoras = () => {
             const isRunning = activeTimer?.id === p.id;
 
             return (
-              <div key={p.id} className="bg-white border border-[#E8E4DF] p-8 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex items-center gap-8">
-                <div className="flex-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-2xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors">{p.nome}</h3>
+              <div key={p.id} className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
+                <div>
+                  <div className="flex justify-between items-start mb-1">
+                    <h3 className="text-xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
                     {isRunning && (
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-bronze rounded-full animate-ping" />
-                        <span className="text-[9px] text-bronze font-bold uppercase tracking-widest">Em andamento</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-ping" />
+                        <span className="text-[8px] text-bronze font-bold uppercase tracking-widest">Live</span>
                       </div>
                     )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-6 font-bold">{p.cliente_nome} · {p.tipo} · {p.area_m2}m²</p>
+                  <p className="text-[9px] text-muted-foreground uppercase tracking-wider mb-6 font-bold truncate">
+                    {p.cliente_nome} · {p.tipo} · {p.area_m2}m²
+                  </p>
 
-                  <div className="grid grid-cols-2 gap-8 items-end">
-                    <div>
-                      <div className="flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground mb-2 font-bold">
-                        <span>Etapa Atual: <span className="text-[#1A1A1A]">{p.etapa_atual}</span></span>
-                        <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
-                          {Math.round(totalHoras)}h realizadas de {p.horas_estimadas}h estimadas
-                        </span>
-                      </div>
-                      <div className="h-[4px] bg-[#F5F2EF] rounded-full overflow-hidden">
-                        <div 
-                          className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                      </div>
+                  <div className="mb-8">
+                    <div className="flex justify-between text-[9px] uppercase tracking-wider text-muted-foreground mb-1.5 font-bold">
+                      <span>Etapa: <span className="text-[#1A1A1A]">{p.etapa_atual}</span></span>
+                      <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
+                        {Math.round(totalHoras)}h / {p.horas_estimadas}h
+                      </span>
                     </div>
-
-                    <div className="flex gap-3 justify-end">
-                      {isRunning ? (
-                        <Button 
-                          onClick={stopTimer}
-                          className="bg-bronze hover:bg-bronze/90 text-white rounded-none h-11 px-8 text-[10px] uppercase font-bold tracking-[0.1em]"
-                        >
-                          <Square size={12} className="mr-2 fill-white" />
-                          Encerrar ({timerDisplay})
-                        </Button>
-                      ) : (
-                        <Button 
-                          onClick={() => openTimerModal(p)}
-                          variant="outline"
-                          className="border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white rounded-none h-11 px-8 text-[10px] uppercase font-bold tracking-[0.1em] transition-all"
-                        >
-                          <Play size={12} className="mr-2" />
-                          Iniciar
-                        </Button>
-                      )}
-                      <Button 
-                        variant="ghost"
-                        onClick={() => openPanel(p)}
-                        className="text-muted-foreground hover:text-bronze hover:bg-transparent rounded-none h-11 px-6 text-[10px] uppercase font-bold tracking-[0.1em]"
-                      >
-                        Ver Sessões
-                      </Button>
+                    <div className="h-[3px] bg-[#F5F2EF] rounded-full overflow-hidden">
+                      <div 
+                        className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
                     </div>
                   </div>
+                </div>
+
+                <div className="flex gap-2 pt-4 border-t border-[#F5F2EF]">
+                  {isRunning ? (
+                    <Button 
+                      onClick={stopTimer}
+                      className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
+                    >
+                      <Square size={10} className="mr-2 fill-white" />
+                      {timerDisplay}
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => openTimerModal(p)}
+                      variant="outline"
+                      className="flex-1 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                    >
+                      <Play size={10} className="mr-2" />
+                      Iniciar
+                    </Button>
+                  )}
+                  <Button 
+                    variant="ghost"
+                    onClick={() => openPanel(p)}
+                    className="flex-1 text-muted-foreground hover:text-bronze hover:bg-transparent rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
+                  >
+                    Sessões
+                  </Button>
                 </div>
               </div>
             );
