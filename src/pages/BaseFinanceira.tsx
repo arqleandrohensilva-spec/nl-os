@@ -231,10 +231,17 @@ CONTEXTO DE BENCHMARK POR MERCADO:
 DADOS DE PIPELINE:
 - Ticket médio atual do pipeline: R$ ${ticketMedio}
 
+Lógica de classificação de STATUS:
+- Crítico: custo/hora abaixo de 50% do mercado OU margem < 10%
+- Atenção: custo/hora entre 50–80% do mercado OU margem entre 10–25%  
+- Saudável: custo/hora acima de 80% do mercado E margem > 25%
+
 Gere o diagnóstico com:
 1. Uma avaliação direta do custo/hora atual comparado aos mercados de atuação cadastrados.
 2. Identifique qual mercado representa a maior oportunidade de reajuste de preço para a NL.
 3. Uma recomendação concreta e acionável para esta semana visando aumentar a lucratividade.
+
+IMPORTANTE: No final da resposta, adicione uma linha oculta com o status no formato exato: STATUS: [critico|atencao|saudavel]
 
 Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
 Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
@@ -252,8 +259,24 @@ Responda em português.
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      setAiDiagnostic(data.choices[0].message.content);
+      const content = data.choices[0].message.content;
+      const statusMatch = content.match(/STATUS:\s*(critico|atencao|saudavel)/i);
+      const status = statusMatch ? statusMatch[1].toLowerCase() : 'atencao';
+      const cleanContent = content.replace(/STATUS:\s*(critico|atencao|saudavel)/i, '').trim();
+
+      setAiDiagnostic(cleanContent);
+      setAiStatus(status as any);
       setLastAiAnalysis(new Date());
+
+      // Persist to Supabase
+      await supabase.from('diagnosticos_ia').insert({
+        conteudo: cleanContent,
+        status: status,
+        custo_hora_momento: calculations.costPerHour,
+        criado_por: user || 'Sócio'
+      });
+
+      fetchAiHistory();
     } catch (error) {
       console.error('Error getting AI diagnostic:', error);
       setAiDiagnostic('Desculpe, não foi possível gerar o diagnóstico no momento. Verifique sua conexão ou tente novamente mais tarde.');
@@ -261,6 +284,20 @@ Responda em português.
       setIsAiLoading(false);
     }
   };
+
+  const fetchAiHistory = async () => {
+    const { data } = await supabase
+      .from('diagnosticos_ia')
+      .select('*')
+      .order('criado_em', { ascending: false })
+      .limit(5);
+    
+    if (data) setAiHistory(data);
+  };
+
+  useEffect(() => {
+    fetchAiHistory();
+  }, []);
 
   const getSimulatorAnalysis = async () => {
     if (isSimLoading) return;
