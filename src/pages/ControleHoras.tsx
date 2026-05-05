@@ -59,7 +59,9 @@ const ControleHoras = () => {
   const [timerDisplay, setTimerDisplay] = useState('00:00:00');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProjeto, setSelectedProjeto] = useState<Projeto | null>(null);
-  const [newSession, setNewSession] = useState({ etapa: '', responsavel: 'Leandro', obs: '' });
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [panelProjeto, setPanelProjeto] = useState<Projeto | null>(null);
+  const [isReportExpanded, setIsReportExpanded] = useState(false);
 
   useEffect(() => {
     fetchData();
