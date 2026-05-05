@@ -892,38 +892,52 @@ Máximo 3 linhas. Sem markdown. Em português.
                   {isOpen && (
                     <div className="px-5 pb-5 animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="space-y-1 mt-2">
-                        {catCosts.map((item) => (
-                          <div key={item.id} className="group flex items-center justify-between py-3 border-b border-beige/50 last:border-0 hover:bg-beige/5 px-2 -mx-2 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
-                              <div className="flex items-center gap-2">
-                                <span className={cn(
-                                  "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
-                                  item.frequencia === 'mensal' ? "bg-beige/30 text-muted" : "bg-bronze/10 text-bronze"
-                                )}>
-                                  {item.frequencia}
-                                </span>
-                                {item.frequencia === 'anual' && (
-                                  <span className="text-[10px] text-muted italic">
-                                    (R$ {(item.valor / 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês)
-                                  </span>
+                        {catCosts.map((item) => {
+                          const isNew = new Date(item.criado_em).toDateString() === new Date().toDateString();
+                          return (
+                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-beige/50 last:border-0 hover:bg-beige/5 px-2 -mx-2 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
+                                {isNew && (
+                                  <span className="text-[8px] font-bold text-bronze bg-bronze/10 px-1.5 py-0.5 rounded-[2px] uppercase">Novo hoje</span>
                                 )}
+                                <div className="flex items-center gap-2">
+                                  <span className={cn(
+                                    "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
+                                    item.frequencia === 'mensal' ? "bg-beige/30 text-muted" : "bg-bronze/10 text-bronze"
+                                  )}>
+                                    {item.frequencia}
+                                  </span>
+                                  {item.frequencia === 'anual' && (
+                                    <span className="text-[10px] text-muted italic">
+                                      (R$ {(item.valor / 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês)
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-6">
+                                <span className="text-xs font-dm-mono text-bronze font-medium">
+                                  {item.frequencia === 'percentual' ? `${item.valor}%` : `R$ ${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                                </span>
+                                <button 
+                                  onClick={() => deleteItem(item.id)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-red-400 hover:text-red-600"
+                                >
+                                  <X size={12} />
+                                </button>
                               </div>
                             </div>
-                            <div className="flex items-center gap-6">
-                              <span className="text-xs font-dm-mono text-bronze font-medium">
-                                {item.frequencia === 'percentual' ? `${item.valor}%` : `R$ ${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                              </span>
-                              <button 
-                                onClick={() => deleteItem(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-red-400 hover:text-red-600"
-                              >
-                                <X size={12} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
+
+                      {cat.id !== 'impostos' && (
+                        <div className="mt-4 pt-3 border-t border-beige border-dashed">
+                          <p className="text-[10px] font-dm-mono text-muted italic uppercase tracking-wider">
+                            Impacto anual: R$ {(totalCat * 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+                          </p>
+                        </div>
+                      )}
 
                       <Dialog open={isAddingItem && newItem.categoria === cat.id} onOpenChange={(open) => {
                         setIsAddingItem(open);
