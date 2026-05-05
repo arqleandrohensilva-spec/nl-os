@@ -17,6 +17,7 @@ export type Database = {
       config_escritorio: {
         Row: {
           atualizado_em: string | null
+          custo_hora: number | null
           dias_mes: number | null
           horas_dia: number | null
           id: string
@@ -26,6 +27,7 @@ export type Database = {
         }
         Insert: {
           atualizado_em?: string | null
+          custo_hora?: number | null
           dias_mes?: number | null
           horas_dia?: number | null
           id?: string
@@ -35,6 +37,7 @@ export type Database = {
         }
         Update: {
           atualizado_em?: string | null
+          custo_hora?: number | null
           dias_mes?: number | null
           horas_dia?: number | null
           id?: string
