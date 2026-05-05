@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Play, Pause, Square, Trash2, X, ChevronRight, FileText, Info, TrendingUp, DollarSign, Clock, Users, BarChart3 } from 'lucide-react';
-import { format, differenceInMinutes, parseISO } from 'date-fns';
+import { Play, Pause, Square, Trash2, X, ChevronRight, FileText, Info, TrendingUp, DollarSign, Clock, Users, BarChart3, AlertCircle } from 'lucide-react';
+import { format, differenceInMinutes, parseISO, subMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -45,19 +45,21 @@ const ControleHoras = () => {
   const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
+  // IA Predictions State
+  const [aiPredictions, setAiPredictions] = useState<Record<string, { text: string; status: 'ok' | 'alert' }>>({});
+  const [loadingPredictions, setLoadingPredictions] = useState<Record<string, boolean>>({});
+
+  // Inactivity State
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [showInactivityModal, setShowInactivityModal] = useState(false);
+  const INACTIVITY_THRESHOLD = 10 * 60 * 1000; // 10 minutes
+
   // Timer State
   const [activeTimer, setActiveTimer] = useState<{ id: string, start: Date, etapa: string, responsavel: string, obs: string } | null>(null);
   const [timerDisplay, setTimerDisplay] = useState('00:00:00');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProjeto, setSelectedProjeto] = useState<Projeto | null>(null);
   const [newSession, setNewSession] = useState({ etapa: '', responsavel: 'Leandro', obs: '' });
-
-  // Sidebar Panel State
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [panelProjeto, setPanelProjeto] = useState<Projeto | null>(null);
-
-  // Profitability Report State
-  const [isReportExpanded, setIsReportExpanded] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -237,12 +239,34 @@ const ControleHoras = () => {
                       </span>
                     </div>
                     <div className="h-[3px] bg-[#F5F2EF] rounded-full overflow-hidden">
-                      <div 
-                        className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      />
+                    <div 
+                      className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* AI Prediction */}
+                {p.status === 'ativo' && aiPredictions[p.id] && (
+                  <div className={cn(
+                    "mb-6 p-2.5 border-l-2 text-[10px] font-mono leading-relaxed",
+                    aiPredictions[p.id].status === 'alert' 
+                      ? "border-rose-500 bg-rose-50/50" 
+                      : "border-emerald-500 bg-emerald-50/50"
+                  )}>
+                    <div className="flex items-start gap-2">
+                      <TrendingUp size={12} className={cn("shrink-0 mt-0.5", aiPredictions[p.id].status === 'alert' ? "text-rose-500" : "text-emerald-500")} />
+                      <p className="text-muted-foreground">{aiPredictions[p.id].text}</p>
                     </div>
                   </div>
+                )}
+                
+                {p.status === 'ativo' && !aiPredictions[p.id] && loadingPredictions[p.id] && (
+                  <div className="mb-6 p-2.5 border-l-2 border-bronze/20 bg-muted/20 animate-pulse flex items-center gap-2">
+                    <Clock size={12} className="text-bronze/30" />
+                    <span className="text-[10px] text-muted-foreground font-mono">Analisando ritmo...</span>
+                  </div>
+                )}
                 </div>
 
                 <div className="flex gap-2 pt-4 border-t border-[#F5F2EF]">
@@ -501,6 +525,44 @@ const ControleHoras = () => {
           </div>
         </SheetContent>
       </Sheet>
+      {/* Inactivity Modal */}
+      <Dialog open={showInactivityModal} onOpenChange={setShowInactivityModal}>
+        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-sm">
+          <div className="p-8 text-center">
+            <AlertCircle size={32} className="mx-auto text-bronze mb-4" />
+            <h2 className="text-xl font-cormorant font-bold mb-2">Ausência detectada</h2>
+            <p className="text-[11px] text-white/40 mb-8 leading-relaxed">
+              Não detectamos atividade nos últimos 10 minutos. O que deseja fazer com o timer atual?
+            </p>
+            
+            <div className="space-y-3">
+              <Button 
+                onClick={() => {
+                  setShowInactivityModal(false);
+                  handleActivity();
+                }}
+                className="w-full bg-bronze hover:bg-bronze/90 text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
+              >
+                Continuar trabalhando
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => pauseInactivity(false)}
+                className="w-full border-white/10 hover:border-white/20 text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
+              >
+                Pausar agora
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={() => pauseInactivity(true)}
+                className="w-full text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
+              >
+                Descontar ausência e parar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
