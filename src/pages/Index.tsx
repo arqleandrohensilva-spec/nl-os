@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
+import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
 import KanbanColumn from '@/components/KanbanColumn';
@@ -13,7 +13,8 @@ import {
   Settings2,
   Eye,
   Download,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -40,6 +41,20 @@ import { toast } from "sonner";
 import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const STAGES: Stage[] = [
   'Novo Lead', 
