@@ -90,6 +90,16 @@ const Index = () => {
     obs: ''
   });
 
+  // Project Conversion State
+  const [showProjectConversion, setShowProjectConversion] = useState(false);
+  const [conversionLead, setConversionLead] = useState<Lead | null>(null);
+  const [conversionHours, setConversionHours] = useState({
+    briefing: 20,
+    anteprojeto: 120,
+    executivo: 100,
+    acompanhamento: 40
+  });
+
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
