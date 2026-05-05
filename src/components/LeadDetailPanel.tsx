@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check } from 'lucide-react';
+import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2 } from 'lucide-react';
 import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
+import { verificarViabilidade } from '@/lib/finance-utils';
+import { supabase } from '@/integrations/supabase/client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
