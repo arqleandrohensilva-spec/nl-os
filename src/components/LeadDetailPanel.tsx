@@ -27,13 +27,13 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const { data } = await supabase.from('config_escritorio').select('custo_hora').single();
+      const { data } = await supabase.from('config_escritorio').select('custo_hora, mercados').single();
       if (data) setCustoHora(data.custo_hora);
     };
     fetchConfig();
   }, []);
 
-  const viability = verificarViabilidade(lead.orcamento, horasEstimadas, custoHora);
+  const viability = verificarViabilidade(lead.orcamento, horasEstimadas, custoHora, lead.cidade);
 
 
   const formatCurrency = (val: number) => val > 0 ? `R$ ${(val / 1000).toFixed(0)}k` : "—";
