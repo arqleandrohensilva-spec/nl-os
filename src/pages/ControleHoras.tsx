@@ -177,20 +177,19 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] text-white">
+    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A]">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
-            <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
-          <Button variant="outline" className="border-white/10 hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+          <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
             + Novo Projeto
           </Button>
         </header>
 
-        {/* Metrics Bar */}
         <div className="grid grid-cols-4 gap-6 mb-12">
           {[
             { label: 'HORAS NO MÊS', value: `${Math.round(metrics.totalMes)}h`, sub: 'Total registrado' },
@@ -198,16 +197,16 @@ const ControleHoras = () => {
             { label: 'CUSTO INTERNO', value: `R$ ${metrics.custoInterno.toLocaleString()}`, sub: `horas × R$ ${metrics.custoHora}/h`, bronze: true },
             { label: 'EFICIÊNCIA', value: '92%', sub: 'estimado vs realizado', green: true },
           ].map((m, i) => (
-            <div key={i} className="bg-[#141414] border border-white/5 p-6 rounded-[4px] border-b-2 border-b-bronze/30">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 mb-2 font-bold">{m.label}</p>
-              <h2 className={cn("text-4xl font-cormorant font-bold mb-1", m.bronze && "text-bronze", m.green && "text-emerald-500")}>{m.value}</h2>
-              <p className="text-[9px] uppercase tracking-wider text-white/20 font-bold">{m.sub}</p>
+            <div key={i} className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden">
+              <p className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 font-bold">{m.label}</p>
+              <h2 className={cn("text-4xl font-cormorant font-bold mb-1", m.bronze ? "text-bronze" : "text-[#1A1A1A]", m.green && "text-emerald-600")}>{m.value}</h2>
+              <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-bold">{m.sub}</p>
             </div>
           ))}
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+        {/* Projects List - Single Column */}
+        <div className="space-y-6 mb-16">
           {projetos.map((p) => {
             const projetoSessoes = sessoes.filter(s => s.projeto_id === p.id);
             const totalMinutos = projetoSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
@@ -216,58 +215,63 @@ const ControleHoras = () => {
             const isRunning = activeTimer?.id === p.id;
 
             return (
-              <div key={p.id} className="bg-[#141414] border border-white/5 p-6 rounded-[4px] group relative transition-all duration-300 hover:border-white/10">
-                {isRunning && (
-                  <div className="absolute top-4 right-4 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-bronze rounded-full animate-ping" />
-                    <span className="text-[9px] text-bronze font-bold uppercase tracking-widest">Em andamento</span>
+              <div key={p.id} className="bg-white border border-[#E8E4DF] p-8 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex items-center gap-8">
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-2xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors">{p.nome}</h3>
+                    {isRunning && (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-bronze rounded-full animate-ping" />
+                        <span className="text-[9px] text-bronze font-bold uppercase tracking-widest">Em andamento</span>
+                      </div>
+                    )}
                   </div>
-                )}
-                
-                <h3 className="text-xl font-cormorant mb-1 group-hover:text-bronze transition-colors">{p.nome}</h3>
-                <p className="text-[10px] text-white/40 uppercase tracking-wider mb-6 font-bold">{p.cliente_nome} · {p.tipo} · {p.area_m2}m²</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-6 font-bold">{p.cliente_nome} · {p.tipo} · {p.area_m2}m²</p>
 
-                <div className="mb-6">
-                  <div className="flex justify-between text-[10px] uppercase tracking-wider text-white/60 mb-2 font-bold">
-                    <span>Etapa: {p.etapa_atual}</span>
-                    <span className={cn(progress > 90 && "text-rose-500")}>
-                      {Math.round(totalHoras)}h / {p.horas_estimadas}h
-                    </span>
-                  </div>
-                  <div className="h-[4px] bg-[#2A2A2A] rounded-full overflow-hidden">
-                    <div 
-                      className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
-                      style={{ width: `${Math.min(progress, 100)}%` }}
-                    />
-                  </div>
-                </div>
+                  <div className="grid grid-cols-2 gap-8 items-end">
+                    <div>
+                      <div className="flex justify-between text-[10px] uppercase tracking-wider text-muted-foreground mb-2 font-bold">
+                        <span>Etapa Atual: <span className="text-[#1A1A1A]">{p.etapa_atual}</span></span>
+                        <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
+                          {Math.round(totalHoras)}h realizadas de {p.horas_estimadas}h estimadas
+                        </span>
+                      </div>
+                      <div className="h-[4px] bg-[#F5F2EF] rounded-full overflow-hidden">
+                        <div 
+                          className={cn("h-full transition-all duration-500", progress > 90 ? "bg-rose-500" : "bg-bronze")}
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                    </div>
 
-                <div className="flex gap-2">
-                  {isRunning ? (
-                    <Button 
-                      onClick={stopTimer}
-                      className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-10 text-[10px] uppercase font-bold tracking-[0.1em]"
-                    >
-                      <Square size={12} className="mr-2 fill-white" />
-                      Encerrar ({timerDisplay})
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={() => openTimerModal(p)}
-                      variant="outline"
-                      className="flex-1 border-white/10 hover:border-bronze rounded-none h-10 text-[10px] uppercase font-bold tracking-[0.1em]"
-                    >
-                      <Play size={12} className="mr-2 fill-white/20" />
-                      Iniciar
-                    </Button>
-                  )}
-                  <Button 
-                    variant="outline"
-                    onClick={() => openPanel(p)}
-                    className="border-white/10 hover:border-bronze rounded-none h-10 text-[10px] uppercase font-bold tracking-[0.1em]"
-                  >
-                    Ver Sessões
-                  </Button>
+                    <div className="flex gap-3 justify-end">
+                      {isRunning ? (
+                        <Button 
+                          onClick={stopTimer}
+                          className="bg-bronze hover:bg-bronze/90 text-white rounded-none h-11 px-8 text-[10px] uppercase font-bold tracking-[0.1em]"
+                        >
+                          <Square size={12} className="mr-2 fill-white" />
+                          Encerrar ({timerDisplay})
+                        </Button>
+                      ) : (
+                        <Button 
+                          onClick={() => openTimerModal(p)}
+                          variant="outline"
+                          className="border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white rounded-none h-11 px-8 text-[10px] uppercase font-bold tracking-[0.1em] transition-all"
+                        >
+                          <Play size={12} className="mr-2" />
+                          Iniciar
+                        </Button>
+                      )}
+                      <Button 
+                        variant="ghost"
+                        onClick={() => openPanel(p)}
+                        className="text-muted-foreground hover:text-bronze hover:bg-transparent rounded-none h-11 px-6 text-[10px] uppercase font-bold tracking-[0.1em]"
+                      >
+                        Ver Sessões
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -275,7 +279,7 @@ const ControleHoras = () => {
         </div>
 
         {/* Profitability Report */}
-        <div className="bg-[#141414] border border-white/5 rounded-[4px] overflow-hidden">
+        <div className="bg-white border border-[#E8E4DF] rounded-[4px] overflow-hidden">
           <button 
             onClick={() => setIsReportExpanded(!isReportExpanded)}
             className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors"
@@ -284,19 +288,19 @@ const ControleHoras = () => {
               <TrendingUp size={18} className="text-bronze" />
               <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Relatório de Lucratividade</h3>
             </div>
-            <ChevronRight className={cn("transition-transform text-white/20", isReportExpanded && "rotate-90")} />
+            <ChevronRight className={cn("transition-transform text-muted-foreground/30", isReportExpanded && "rotate-90")} />
           </button>
           
           {isReportExpanded && (
-            <div className="px-6 pb-6 border-t border-white/5 pt-6">
+            <div className="px-6 pb-6 border-t border-[#E8E4DF] pt-6">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-widest text-white/30 border-b border-white/5">
-                    <th className="pb-4 font-bold">Projeto</th>
-                    <th className="pb-4 font-bold">Receita</th>
-                    <th className="pb-4 font-bold">Custo Int.</th>
-                    <th className="pb-4 font-bold">Margem</th>
-                    <th className="pb-4 font-bold text-right">Status</th>
+                  <tr className="text-[9px] uppercase tracking-widest text-muted-foreground border-b border-[#E8E4DF]">
+                    <th className="pb-4 font-bold text-muted-foreground">Projeto</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Receita</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Custo Int.</th>
+                    <th className="pb-4 font-bold text-muted-foreground">Margem</th>
+                    <th className="pb-4 font-bold text-right text-muted-foreground">Status</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px]">
@@ -307,20 +311,20 @@ const ControleHoras = () => {
                     const margem = p.valor_proposta > 0 ? ((p.valor_proposta - custo) / p.valor_proposta) * 100 : 0;
                     
                     return (
-                      <tr key={p.id} className="border-b border-white/[0.02] last:border-0">
-                        <td className="py-4 font-medium">{p.nome}</td>
-                        <td className="py-4 text-white/60 font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
-                        <td className="py-4 text-white/60 font-mono">R$ {Math.round(custo).toLocaleString()}</td>
+                      <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
+                        <td className="py-4 font-medium text-[#1A1A1A]">{p.nome}</td>
+                        <td className="py-4 text-muted-foreground font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
+                        <td className="py-4 text-muted-foreground font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(
                           "py-4 font-bold font-mono",
-                          margem > 30 ? "text-emerald-500" : margem > 15 ? "text-bronze" : "text-rose-500"
+                          margem > 30 ? "text-emerald-600" : margem > 15 ? "text-bronze" : "text-rose-500"
                         )}>
                           {Math.round(margem)}%
                         </td>
                         <td className="py-4 text-right">
                           <span className={cn(
-                            "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm",
-                            p.status === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-white/5 text-white/40"
+                            "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
+                            p.status === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-muted-foreground"
                           )}>
                             {p.status}
                           </span>
@@ -332,7 +336,7 @@ const ControleHoras = () => {
               </table>
               
               <div className="mt-8 flex justify-end">
-                <Button className="bg-bronze hover:bg-bronze/90 text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
+                <Button className="bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
                   <BarChart3 size={14} className="mr-2" />
                   Análise com IA
                 </Button>
