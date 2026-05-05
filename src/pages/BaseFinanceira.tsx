@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfigEscritorio, CustoEscritorio, CategoriaCusto } from '@/lib/types';
@@ -13,8 +13,15 @@ import {
   X, 
   ChevronDown, 
   ChevronRight,
-  Info
+  Info,
+  Brain,
+  Sparkles,
+  RotateCcw,
+  Loader2,
+  ChevronUp,
+  Target
 } from 'lucide-react';
+
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
