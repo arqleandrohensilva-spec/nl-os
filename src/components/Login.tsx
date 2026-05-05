@@ -58,7 +58,7 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
         <img 
           src="https://krzuroijejfozljhchok.supabase.co/storage/v1/object/public/assets/logo.png" 
           alt="NL Arquitetos" 
-          className="w-48 mb-6"
+          className="w-48 mb-2"
         />
         <p className="text-[10px] font-medium text-muted uppercase tracking-[0.2em] mb-6">
           Sistema Operacional · NL Arquitetos
