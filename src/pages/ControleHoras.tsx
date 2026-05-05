@@ -7,7 +7,7 @@ interface Projeto {
   id: string;
   nome: string;
   cliente_nome: string;
-  tipo: 'Arq+Int' | 'Interiores' | 'Comercial';
+  tipo: string;
   area_m2: number;
   valor_proposta: number;
   horas_estimadas: number;
