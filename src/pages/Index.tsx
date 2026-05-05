@@ -104,6 +104,14 @@ const Index = () => {
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
 
   useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase.from('config_escritorio').select('*').single();
+      if (data) setConfig(data as ConfigEscritorio);
+    };
+    fetchConfig();
+  }, []);
+
+  useEffect(() => {
     // Check current session
     const checkAuth = async () => {
       try {
