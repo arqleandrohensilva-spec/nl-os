@@ -840,38 +840,54 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
           </div>
 
-          {/* Categories Accordion */}
-          <div className="space-y-4">
-            {CATEGORIES.map((cat) => {
-              const catCosts = costs.filter(c => c.categoria === cat.id);
-              const totalCat = catCosts.reduce((acc, c) => {
-                if (c.frequencia === 'percentual') return acc;
-                return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
-              }, 0);
-              const isOpen = openAccordion === cat.id;
+          <div className="grid grid-cols-3 gap-8">
+            <div className="col-span-2 space-y-4">
+              {CATEGORIES.map((cat) => {
+                const catCosts = costs.filter(c => c.categoria === cat.id);
+                const totalCat = catCosts.reduce((acc, c) => {
+                  if (c.frequencia === 'percentual') return acc;
+                  return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
+                }, 0);
+                const isOpen = openAccordion === cat.id;
+                const mostExpensive = [...catCosts].sort((a, b) => b.valor - a.valor)[0];
 
-              return (
-                <div key={cat.id} className="border border-beige rounded-[4px] overflow-hidden bg-white">
-                  <button 
-                    onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
-                    className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={cn("p-2 rounded-full", isOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
-                        <cat.icon size={16} />
-                      </div>
-                      <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <span className="text-xs font-dm-mono text-bronze font-bold">
-                        {cat.id === 'impostos' 
-                          ? `${catCosts.reduce((acc, c) => acc + c.valor, 0)}%`
-                          : `R$ ${totalCat.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                        }
-                      </span>
-                      {isOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
-                    </div>
-                  </button>
+                return (
+                  <div key={cat.id} className="border border-beige rounded-[4px] overflow-hidden bg-white group/cat">
+                    <TooltipProvider>
+                      <Tooltip delayDuration={300}>
+                        <TooltipTrigger asChild>
+                          <button 
+                            id={`accordion-trigger-${cat.id}`}
+                            onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
+                            className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div 
+                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}
+                                style={isOpen ? {} : { backgroundColor: `${cat.color}15`, color: cat.color }}
+                              >
+                                <cat.icon size={16} />
+                              </div>
+                              <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
+                            </div>
+                            <div className="flex items-center gap-6">
+                              <span className="text-xs font-dm-mono text-bronze font-bold">
+                                {cat.id === 'impostos' 
+                                  ? `${catCosts.reduce((acc, c) => acc + c.valor, 0)}%`
+                                  : `R$ ${totalCat.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                                }
+                              </span>
+                              {isOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+                            </div>
+                          </button>
+                        </TooltipTrigger>
+                        {mostExpensive && (
+                          <TooltipContent side="top" className="bg-graphite text-white text-[10px] font-dm-mono border-none py-1.5 px-3 rounded-[4px]">
+                            Item mais caro: {mostExpensive.nome} · R$ {mostExpensive.valor.toLocaleString('pt-BR')}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
 
                   {isOpen && (
                     <div className="px-5 pb-5 animate-in fade-in slide-in-from-top-2 duration-200">
