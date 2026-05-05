@@ -79,7 +79,10 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
 );
 
 const Sidebar = ({ user }: { user: string }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
       try {
