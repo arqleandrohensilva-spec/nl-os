@@ -1260,7 +1260,116 @@ Máximo 3 linhas. Sem markdown. Em português.
         </div>
 
 
-        {/* Footer info */}
+        {/* Comparison Panel */}
+        <Dialog open={isComparingCenários} onOpenChange={setIsComparingCenários}>
+          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-beige bg-white animate-in slide-in-from-right duration-500">
+            <DialogHeader className="border-b border-beige pb-6">
+              <DialogTitle className="font-cormorant text-2xl font-bold text-graphite uppercase tracking-tight">Comparador de Margem</DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-8 space-y-12 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
+              <div className="grid grid-cols-2 gap-8">
+                {/* Cenário A */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-dm-mono text-bronze uppercase font-bold tracking-widest">Cenário A</p>
+                    <div className="flex justify-between items-center text-xs font-dm-mono">
+                      <span className="text-muted">Margem:</span>
+                      <span className="font-bold">{cenarioAMargem}%</span>
+                    </div>
+                    <Slider 
+                      value={[cenarioAMargem]} 
+                      max={100} 
+                      onValueChange={([v]) => setCenarioAMargem(v)}
+                      className="[&_[role=slider]]:bg-bronze [&_[role=slider]]:border-bronze"
+                    />
+                  </div>
+                  
+                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="pt-4 space-y-1">
+                      <p className="text-[9px] text-muted uppercase font-bold text-bronze">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-bronze">R$ {( (calculations.costPerHour * (1 + cenarioAMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => {
+                      updateConfig({ margem_lucro: cenarioAMargem });
+                      setIsComparingCenários(false);
+                      toast.success('Cenário A aplicado');
+                    }}
+                    className="w-full h-10 bg-graphite text-white text-[9px] uppercase tracking-widest font-bold"
+                  >
+                    Aplicar Cenário A
+                  </Button>
+                </div>
+
+                {/* Cenário B */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-dm-mono text-graphite uppercase font-bold tracking-widest">Cenário B</p>
+                    <div className="flex justify-between items-center text-xs font-dm-mono">
+                      <span className="text-muted">Margem:</span>
+                      <span className="font-bold">{cenarioBMargem}%</span>
+                    </div>
+                    <Slider 
+                      value={[cenarioBMargem]} 
+                      max={100} 
+                      onValueChange={([v]) => setCenarioBMargem(v)}
+                      className="[&_[role=slider]]:bg-graphite [&_[role=slider]]:border-graphite"
+                    />
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="pt-4 space-y-1">
+                      <p className="text-[9px] text-muted uppercase font-bold text-graphite">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-graphite">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={() => {
+                      updateConfig({ margem_lucro: cenarioBMargem });
+                      setIsComparingCenários(false);
+                      toast.success('Cenário B aplicado');
+                    }}
+                    className="w-full h-10 bg-bronze text-white text-[9px] uppercase tracking-widest font-bold"
+                  >
+                    Aplicar Cenário B
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-8 p-4 bg-beige/10 border border-beige/30 rounded-[4px]">
+                <p className="text-[9px] text-muted font-dm-mono italic">*Estimado para 2 projetos de 250h/mês totais. O lucro líquido real depende da eficiência produtiva e dos impostos variáveis.</p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
         <div className="flex-shrink-0 bg-white border-t border-beige px-10 py-4 flex justify-between items-center">
           <p className="text-[9px] text-muted uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
           <p className="text-[9px] text-muted uppercase tracking-widest">São José dos Campos SP · 2026</p>
