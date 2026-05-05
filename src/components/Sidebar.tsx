@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -78,11 +78,11 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
   </div>
 );
 
-const Sidebar = ({ user }: { user: string }) => {
+const Sidebar = ({ user: initialUser }: { user: string }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
-
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
       try {
@@ -94,6 +94,16 @@ const Sidebar = ({ user }: { user: string }) => {
     return { 'LEADS': true };
   });
 
+  useEffect(() => {
+    const getAuthUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    };
+    getAuthUser();
+  }, []);
+
   const toggleSection = (section: string) => {
     setOpenSections(prev => {
       const next = { ...prev, [section]: !prev[section] };
@@ -102,7 +112,17 @@ const Sidebar = ({ user }: { user: string }) => {
     });
   };
 
-  const initials = user ? user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+  const getDisplayName = () => {
+    if (!userEmail) return initialUser || 'Sócio';
+    if (userEmail.toLowerCase() === 'leandro@nlarquitetos.com.br') return 'Leandro';
+    if (userEmail.toLowerCase() === 'neandro@nlarquitetos.com.br') return 'Neandro';
+    return initialUser || userEmail.split('@')[0];
+  };
+
+  const displayName = getDisplayName();
+  const initials = displayName.toLowerCase() === 'leandro' ? 'LE' : 
+                   displayName.toLowerCase() === 'neandro' ? 'NE' : 
+                   displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
   return (
     <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
@@ -193,7 +213,7 @@ const Sidebar = ({ user }: { user: string }) => {
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] text-white font-medium truncate capitalize">{user}</p>
+            <p className="text-[11px] text-white font-medium truncate capitalize">{displayName}</p>
             <p className="text-[9px] text-bronze/60 uppercase tracking-widest font-bold">Sócio</p>
           </div>
           <button 
