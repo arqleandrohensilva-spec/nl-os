@@ -470,10 +470,104 @@ const ControleHoras = () => {
             <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
             <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
-          <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
-            + Novo Projeto
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setIsManualModalOpen(true)}
+              variant="ghost" 
+              className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none hover:text-bronze hover:bg-transparent"
+            >
+              <Plus size={14} className="mr-2" />
+              Registrar Horas
+            </Button>
+            <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+              + Novo Projeto
+            </Button>
+          </div>
         </header>
+
+        {/* Weekly Summary Card */}
+        {showWeeklySummary && lastWeekSummary && (
+          <div className="mb-12 bg-[#E8E4DF] border border-bronze/30 p-8 rounded-[4px] relative animate-in fade-in slide-in-from-top duration-500">
+            <button 
+              onClick={() => {
+                setShowWeeklySummary(false);
+                sessionStorage.setItem('weekly_summary_dismissed', format(new Date(), 'yyyy-MM-dd'));
+              }}
+              className="absolute top-4 right-4 text-bronze/50 hover:text-bronze transition-colors"
+            >
+              <X size={16} />
+            </button>
+            <div className="flex items-center gap-3 mb-6">
+              <BarChart3 size={20} className="text-bronze" />
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.3em] font-mono text-bronze">Resumo da Semana — {lastWeekSummary.period}</h2>
+            </div>
+            <div className="grid grid-cols-4 gap-8 mb-8">
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Horas registradas</p>
+                <p className="text-2xl font-cormorant font-bold">{Math.round(lastWeekSummary.total)}h total</p>
+                <p className="text-[9px] text-muted-foreground font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Projeto mais consumido</p>
+                <p className="text-2xl font-cormorant font-bold">{lastWeekSummary.topProject}</p>
+                <p className="text-[9px] text-muted-foreground font-mono">{lastWeekSummary.topHours}h investidas</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Eficiência Média</p>
+                <p className="text-2xl font-cormorant font-bold">93%</p>
+                <p className="text-[9px] text-emerald-600 font-bold font-mono">ALTA PERFORMANCE</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Meta atingida</p>
+                <div className="flex items-center gap-2">
+                  <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
+                    {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
+                  </span>
+                  <span className="text-[#1A1A1A]/20">|</span>
+                  <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.neandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
+                    {lastWeekSummary.neandro >= 30 ? '✓' : '✗'} Neandro
+                  </span>
+                </div>
+              </div>
+            </div>
+            <p className="text-[11px] text-bronze/80 font-mono italic">
+              <span className="font-bold">Próxima semana:</span> Anteprojeto Mendonça precisa de 35h para concluir no prazo estimado.
+            </p>
+          </div>
+        )}
+
+        {/* Weekly Goals Bar */}
+        <div className="mb-12 bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-l-4 border-l-bronze">
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Meta de Horas Semanal</h4>
+            <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
+          </div>
+          <div className="grid grid-cols-2 gap-12">
+            {[
+              { name: 'Leandro', current: weeklyStats.leandro, target: 30 },
+              { name: 'Neandro', current: weeklyStats.neandro, target: 30 },
+            ].map(user => {
+              const p = (user.current / user.target) * 100;
+              const color = p >= 100 ? "bg-emerald-500" : p >= 70 ? "bg-bronze" : "bg-rose-500";
+              const textColor = p >= 100 ? "text-emerald-600" : p >= 70 ? "text-bronze" : "text-rose-600";
+              
+              return (
+                <div key={user.name}>
+                  <div className="flex justify-between text-[11px] mb-2 font-mono">
+                    <span className="font-bold">{user.name}</span>
+                    <span className={cn("font-bold", textColor)}>{Math.round(user.current)}h de {user.target}h</span>
+                  </div>
+                  <div className="h-[6px] bg-[#F5F2EF] rounded-full overflow-hidden">
+                    <div 
+                      className={cn("h-full transition-all duration-1000", color)}
+                      style={{ width: `${Math.min(p, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           {[
