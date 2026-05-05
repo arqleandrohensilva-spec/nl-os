@@ -180,7 +180,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
         >
-          <NavItem label="03 · Controle de Horas" disabled />
+          <NavItem 
+            label="03 · Controle de Horas" 
+            active={location.pathname === '/projetos/horas'} 
+            onClick={() => navigate('/projetos/horas')} 
+          />
           <NavItem label="06 · Gestão de Projetos" disabled />
           <NavItem label="10 · Modo Cliente" disabled />
         </SectionAccordion>
