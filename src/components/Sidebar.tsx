@@ -127,7 +127,11 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={!!openSections['LEADS']}
           onToggle={() => toggleSection('LEADS')}
         >
-          <NavItem label="01 · Pipeline de Leads" active />
+          <NavItem 
+            label="01 · Pipeline de Leads" 
+            active={location.pathname === '/'} 
+            onClick={() => navigate('/')} 
+          />
           <NavItem label="02 · Contatos" disabled />
         </SectionAccordion>
 
@@ -137,10 +141,15 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
-          <NavItem label="03 · Base Financeira" disabled />
+          <NavItem 
+            label="02 · Base Financeira" 
+            active={location.pathname === '/financeiro/base'} 
+            onClick={() => navigate('/financeiro/base')} 
+          />
           <NavItem label="04 · Fin. de Projetos" disabled />
           <NavItem label="05 · Dashboard" disabled />
         </SectionAccordion>
+
 
         <SectionAccordion 
           label="PROJETOS" 
