@@ -28,11 +28,14 @@ import {
   DragStartEvent, 
   DragEndEvent,
   DragOverEvent,
+  closestCorners,
+  defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
 import { 
   arrayMove, 
   sortableKeyboardCoordinates, 
 } from '@dnd-kit/sortable';
+import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
 import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
@@ -102,6 +105,57 @@ const Index = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    fetchLeads();
+
+    // Realtime subscriptions
+    const leadsChannel = supabase
+      .channel('leads-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+        fetchLeads();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lead_logs' }, () => {
+        fetchLeads();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(leadsChannel);
+    };
+  }, [session]);
+
+  const fetchLeads = async () => {
+    setIsLoading(true);
+    try {
+      const { data: leadsData, error: leadsError } = await supabase
+        .from('leads')
+        .select(`
+          *,
+          logs:lead_logs(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (leadsError) throw leadsError;
+
+      // Map Supabase data to our Lead type
+      const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
+        ...l,
+        logs: (l.logs || []).sort((a: any, b: any) => 
+          new Date(b.data).getTime() - new Date(a.data).getTime()
+        )
+      }));
+
+      setLeads(mappedLeads);
+    } catch (error: any) {
+      console.error('Error fetching leads:', error);
+      toast.error('Erro ao carregar leads');
+      setLeads([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const toggleTempFilter = (temp: Temp) => {
     setFilterTemp(prev => 
