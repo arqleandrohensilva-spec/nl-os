@@ -528,16 +528,34 @@ Máximo 3 linhas. Sem markdown. Em português.
     <div className="flex min-h-screen bg-[#FDFDFD]">
       <Sidebar user={user || ''} />
       
-      <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
         <div className="flex-shrink-0 bg-white z-10">
           <div className="px-10 py-6 border-b border-beige">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
-          </div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
+                <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={exportReport}
+                disabled={isExporting}
+                className="h-8 border-beige text-[9px] uppercase tracking-widest text-graphite hover:bg-beige/10 flex items-center gap-2"
+              >
+                {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
+                Exportar Relatório
+              </Button>
+            </div>
 
-          {/* AI Diagnostic Card */}
+            <FinancialHealthBar 
+              costPerHour={calculations.costPerHour}
+              benchmark={120}
+              marketName={config?.mercados?.[0] || 'SJC'}
+            />
+
+            {/* AI Diagnostic Card */}
           <div className={cn(
             "p-6 border rounded-[4px] space-y-4 transition-all duration-300 overflow-hidden cursor-pointer",
             aiStatus === 'critico' ? "bg-red-50 border-red-200" :
