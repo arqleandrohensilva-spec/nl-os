@@ -922,6 +922,125 @@ const ControleHoras = () => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Manual Registration Modal */}
+      <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
+        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
+          <div className="p-8">
+            <h2 className="text-2xl font-cormorant font-bold mb-1">Registrar Horas</h2>
+            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Registro retroativo — Sem timer</p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Projeto</label>
+                <Select value={manualSession.projetoId} onValueChange={(v) => setManualSession({...manualSession, projetoId: v})}>
+                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                    <SelectValue placeholder="Selecione o projeto" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                    {projetos.filter(p => p.status === 'ativo').map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Etapa</label>
+                  <Select value={manualSession.etapa} onValueChange={(v) => setManualSession({...manualSession, etapa: v})}>
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                      <SelectItem value="Briefing">Briefing</SelectItem>
+                      <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
+                      <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
+                      <SelectItem value="Acompanhamento de Obra">Acompanhamento</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Responsável</label>
+                  <Select value={manualSession.responsavel} onValueChange={(v: any) => setManualSession({...manualSession, responsavel: v})}>
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
+                      <SelectItem value="Leandro">Leandro</SelectItem>
+                      <SelectItem value="Neandro">Neandro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Data</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white rounded-none h-11 px-3 hover:bg-white/10">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {manualSession.data ? format(manualSession.data, "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-[#1A1A1A] border-white/10">
+                    <CalendarComponent
+                      mode="single"
+                      selected={manualSession.data}
+                      onSelect={(date) => date && setManualSession({...manualSession, data: date})}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Duração</label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input 
+                      type="number" 
+                      value={manualSession.horas} 
+                      onChange={(e) => setManualSession({...manualSession, horas: e.target.value})}
+                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                    />
+                    <span className="text-[10px] text-white/40 font-bold uppercase">h</span>
+                  </div>
+                  <div className="flex-1 flex items-center gap-2">
+                    <Input 
+                      type="number" 
+                      max="59"
+                      value={manualSession.minutos} 
+                      onChange={(e) => setManualSession({...manualSession, minutos: e.target.value})}
+                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                    />
+                    <span className="text-[10px] text-white/40 font-bold uppercase">min</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Observação (Opcional)</label>
+                <Input 
+                  placeholder="Descrição da atividade..."
+                  value={manualSession.obs}
+                  onChange={(e) => setManualSession({...manualSession, obs: e.target.value})}
+                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button onClick={handleManualRegistration} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">
+                  <CheckCircle2 size={14} className="mr-2" />
+                  Registrar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Inactivity Modal */}
       <Dialog open={showInactivityModal} onOpenChange={setShowInactivityModal}>
         <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-sm">
