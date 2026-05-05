@@ -59,7 +59,30 @@ interface Sessao {
   fim: string | null;
   duracao_minutos: number | null;
   observacao: string | null;
+  is_manual?: boolean;
 }
+
+const StageBadge = ({ stage }: { stage: string }) => {
+  const configs: Record<string, { bg: string, text: string }> = {
+    'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
+    'Anteprojeto': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
+    'Acompanhamento de Obra': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+    'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+  };
+
+  const config = configs[stage] || { bg: 'bg-muted/15', text: 'text-muted-foreground' };
+
+  return (
+    <span className={cn(
+      "px-2.5 py-0.5 rounded-full text-[8px] uppercase font-bold tracking-widest inline-block",
+      config.bg,
+      config.text
+    )}>
+      {stage}
+    </span>
+  );
+};
 
 const ControleHoras = () => {
   const [projetos, setProjetos] = useState<Projeto[]>([]);
