@@ -739,96 +739,95 @@ Máximo 3 linhas. Sem markdown. Em português.
 
           {/* Configuração de Horas Produtivas */}
           <div className="bg-white p-8 border border-beige rounded-[4px]">
-            <div className="flex items-center justify-between">
-              <div className="grid grid-cols-4 gap-8 flex-1">
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
-                  <Input 
-                    type="number" 
-                    value={config?.horas_dia} 
-                    onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
-                  <Input 
-                    type="number" 
-                    value={config?.dias_mes} 
-                    onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Info size={10} className="text-muted" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-[10px]">Tempo efetivamente faturável descontando reuniões, admin, etc.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between">
+                <div className="grid grid-cols-5 gap-8 flex-1">
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
+                    <Input 
+                      type="number" 
+                      value={config?.horas_dia} 
+                      onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
                   </div>
-                  <Input 
-                    type="number" 
-                    value={config?.percentual_produtivo} 
-                    onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
+                    <Input 
+                      type="number" 
+                      value={config?.dias_mes} 
+                      onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
+                    <Input 
+                      type="number" 
+                      value={config?.percentual_produtivo} 
+                      onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
+                    <Input 
+                      type="number" 
+                      value={config?.num_arquitetos} 
+                      onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-bronze uppercase tracking-widest font-bold">Meta Custo/Hora</label>
+                    <Input 
+                      type="number" 
+                      value={config?.meta_custo_hora || ''} 
+                      placeholder="Ex: 120"
+                      onChange={(e) => updateConfig({ meta_custo_hora: parseFloat(e.target.value) })}
+                      className="h-9 border-bronze/50 bg-bronze/5 text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
-                  <Input 
-                    type="number" 
-                    value={config?.num_arquitetos} 
-                    onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-              </div>
-              
-              <div className="px-8 border-l border-beige flex flex-col justify-center min-w-[250px]">
-                <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest mb-3">Mercados de Atuação</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {config?.mercados?.map((m) => (
-                    <span key={m} className="bg-bronze/10 text-bronze text-[10px] px-2 py-1 rounded flex items-center gap-1 font-dm-mono">
-                      {m}
-                      <button onClick={() => {
-                        const newMercados = config.mercados?.filter(item => item !== m) || [];
-                        updateConfig({ mercados: newMercados });
-                      }} className="hover:text-red-500">
-                        <X size={10} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Input 
-                    placeholder="Adicionar cidade..."
-                    className="h-8 border-beige text-[10px] font-dm-mono"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const val = e.currentTarget.value.trim();
-                        if (val && !config?.mercados?.includes(val)) {
-                          updateConfig({ mercados: [...(config?.mercados || []), val] });
-                          e.currentTarget.value = '';
-                        }
-                      }
-                    }}
-                  />
+                
+                <div className="ml-8 pl-8 border-l border-beige text-right">
+                  <p className="text-3xl font-cormorant font-bold text-bronze">
+                    = <CountUp value={calculations.faturableHours} />h
+                  </p>
+                  <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
                 </div>
               </div>
-              
-              <div className="ml-8 pl-8 border-l border-beige text-right">
-                <p className="text-3xl font-cormorant font-bold text-bronze">
-                  = {Math.round(calculations.faturableHours)}h
-                </p>
-                <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
-              </div>
+
+              {config?.meta_custo_hora && config.meta_custo_hora > 0 && (
+                <div className="bg-bronze/5 p-6 rounded-[4px] border border-bronze/20 space-y-4 animate-in fade-in slide-in-from-left-4">
+                  <div className="flex items-center gap-2">
+                    <Target size={14} className="text-bronze" />
+                    <span className="text-[10px] font-dm-mono font-bold text-graphite uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-graphite uppercase">A) Reduzir Custos</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Reduzir R$ {(calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês 
+                        ({Math.round(((calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)) / calculations.monthlyCosts) * 100)}% dos custos)
+                      </p>
+                    </div>
+                    <div className="space-y-1 border-x border-bronze/10 px-6">
+                      <p className="text-[10px] font-bold text-bronze uppercase">B) Aumentar Horas (Recomendado)</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Aumentar para {Math.round(calculations.monthlyCosts / config.meta_custo_hora)}h/mês 
+                        (+{Math.round(((calculations.monthlyCosts / config.meta_custo_hora) / calculations.faturableHours - 1) * 100)}%)
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-graphite uppercase">C) Combinar Estratégias</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 pt-6 border-t border-beige border-dashed">
@@ -836,7 +835,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 {config?.horas_dia}h × {config?.dias_mes} dias × {config?.percentual_produtivo}% × {config?.num_arquitetos} arquitetos = {Math.round(calculations.faturableHours)}h faturáveis/mês
               </p>
               <p className="text-[10px] font-dm-mono text-muted mt-1">
-                Total de custos R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ÷ {Math.round(calculations.faturableHours)}h = R$ {calculations.costPerHour.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/hora
+                Total de custos R$ <CountUp value={calculations.monthlyCosts} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} /> ÷ {Math.round(calculations.faturableHours)}h = R$ <CountUp value={calculations.costPerHour} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} />/hora
               </p>
             </div>
           </div>
