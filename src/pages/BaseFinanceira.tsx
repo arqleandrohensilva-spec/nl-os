@@ -359,7 +359,40 @@ Máximo 3 linhas. Sem markdown. Em português.
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
               <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
+          </div>
+
+          {/* AI Diagnostic Card */}
+          <div className="bg-[#E8E4DF]/30 p-6 border border-bronze rounded-[4px] space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-bronze">
+                <Brain size={16} />
+                <span className="text-[10px] font-bold uppercase tracking-widest font-dm-mono">DIAGNÓSTICO FINANCEIRO · IA</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={getAIDiagnostic}
+                className="h-8 text-[9px] uppercase tracking-widest text-muted hover:text-bronze flex items-center gap-2"
+              >
+                <RotateCcw size={10} /> Atualizar
+              </Button>
             </div>
+            {isAiLoading ? (
+              <div className="flex items-center gap-2 text-muted text-xs font-dm-mono">
+                <Loader2 size={14} className="animate-spin" /> Analisando dados...
+              </div>
+            ) : (
+              <p className="text-xs font-dm-mono text-graphite leading-relaxed whitespace-pre-line">
+                {aiDiagnostic || "Clique em atualizar para gerar o diagnóstico financeiro baseado nos seus dados."}
+              </p>
+            )}
+            {lastAiAnalysis && (
+              <p className="text-[9px] text-muted font-dm-mono italic">
+                Última análise: {lastAiAnalysis.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+
           </div>
         </div>
 
