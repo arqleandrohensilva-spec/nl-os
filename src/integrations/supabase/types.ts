@@ -296,6 +296,7 @@ export type Database = {
           fim: string | null
           id: string
           inicio: string
+          is_manual: boolean | null
           observacao: string | null
           projeto_id: string | null
           responsavel: string | null
@@ -307,6 +308,7 @@ export type Database = {
           fim?: string | null
           id?: string
           inicio: string
+          is_manual?: boolean | null
           observacao?: string | null
           projeto_id?: string | null
           responsavel?: string | null
@@ -318,6 +320,7 @@ export type Database = {
           fim?: string | null
           id?: string
           inicio?: string
+          is_manual?: boolean | null
           observacao?: string | null
           projeto_id?: string | null
           responsavel?: string | null

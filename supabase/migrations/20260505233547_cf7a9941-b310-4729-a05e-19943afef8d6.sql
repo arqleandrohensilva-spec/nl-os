@@ -1,0 +1,1 @@
+ALTER TABLE public.sessoes_horas ADD COLUMN is_manual BOOLEAN DEFAULT false;
