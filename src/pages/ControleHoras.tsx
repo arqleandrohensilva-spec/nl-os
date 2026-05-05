@@ -850,8 +850,8 @@ const ControleHoras = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Horas por Etapa</h4>
+                <div className="space-y-6">
+                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Orçado vs Realizado</h4>
                   {[
                     { label: 'Briefing', estim: panelProjeto.horas_briefing },
                     { label: 'Anteprojeto', estim: panelProjeto.horas_anteprojeto },
@@ -859,15 +859,29 @@ const ControleHoras = () => {
                     { label: 'Acompanhamento de Obra', estim: panelProjeto.horas_acompanhamento },
                   ].map(e => {
                     const real = sessoes.filter(s => s.projeto_id === panelProjeto.id && s.etapa === e.label).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                    const p = Math.min((real / e.estim) * 100, 100);
+                    const desvio = e.estim > 0 ? ((real - e.estim) / e.estim) * 100 : 0;
+                    const isOver = real > e.estim;
+                    
                     return (
-                      <div key={e.label}>
-                        <div className="flex justify-between text-[10px] text-white/60 mb-1.5 font-bold uppercase tracking-wider">
-                          <span>{e.label}</span>
-                          <span>{Math.round(real)}h / {e.estim}h</span>
+                      <div key={e.label} className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[10px] text-white/60 font-bold uppercase tracking-wider">
+                          <StageBadge stage={e.label} />
+                          <span className={cn(isOver ? "text-rose-500" : "text-white/40")}>
+                            {Math.round(real)}h / {e.estim}h {desvio !== 0 && `(${desvio > 0 ? '+' : ''}${Math.round(desvio)}%)`}
+                          </span>
                         </div>
-                        <div className="h-[6px] bg-[#2A2A2A] rounded-full overflow-hidden">
-                          <div className="h-full bg-bronze" style={{ width: `${p}%` }} />
+                        <div className="space-y-1">
+                          {/* Orçado (Bege) */}
+                          <div className="h-[4px] bg-[#E8E4DF]/20 rounded-full w-full overflow-hidden">
+                            <div className="h-full bg-[#E8E4DF]" style={{ width: '100%' }} />
+                          </div>
+                          {/* Realizado (Bronze ou Vermelho se estourar) */}
+                          <div className="h-[4px] bg-[#2A2A2A] rounded-full w-full overflow-hidden">
+                            <div 
+                              className={cn("h-full transition-all duration-500", isOver ? "bg-rose-500" : "bg-bronze")} 
+                              style={{ width: `${Math.min((real / (e.estim || 1)) * 100, 100)}%` }} 
+                            />
+                          </div>
                         </div>
                       </div>
                     );
@@ -879,9 +893,15 @@ const ControleHoras = () => {
                   <div className="space-y-4">
                     {sessoes.filter(s => s.projeto_id === panelProjeto.id).map(s => (
                       <div key={s.id} className="group flex justify-between items-start border-b border-white/[0.03] pb-4 last:border-0">
-                        <div className="space-y-1">
-                          <p className="text-[11px] font-medium">{format(parseISO(s.inicio), 'dd MMM', { locale: ptBR })} · {s.etapa}</p>
-                          <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[11px] font-medium">{format(parseISO(s.inicio), 'dd MMM', { locale: ptBR })}</span>
+                            <StageBadge stage={s.etapa} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
+                            {s.is_manual && <Pencil size={10} className="text-white/20" />}
+                          </div>
                           {s.observacao && <p className="text-[10px] text-white/20 italic">"{s.observacao}"</p>}
                         </div>
                         <button onClick={() => deleteSessao(s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400 p-1">
