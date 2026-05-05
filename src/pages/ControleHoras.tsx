@@ -279,7 +279,7 @@ const ControleHoras = () => {
         </div>
 
         {/* Profitability Report */}
-        <div className="bg-[#141414] border border-white/5 rounded-[4px] overflow-hidden">
+        <div className="bg-white border border-[#E8E4DF] rounded-[4px] overflow-hidden">
           <button 
             onClick={() => setIsReportExpanded(!isReportExpanded)}
             className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors"
