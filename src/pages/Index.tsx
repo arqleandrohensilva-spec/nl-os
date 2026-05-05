@@ -393,18 +393,14 @@ const Index = () => {
     // Adicionamos a logo com fundo transparente. No jsPDF, imagens remotas precisam ser carregadas ou convertidas.
     // Para simplificar e garantir funcionamento imediato, usaremos a URL direta se o jsPDF suportar ou apenas texto se falhar.
     try {
-      doc.addImage(logoUrl, 'PNG', 85, 40, 40, 40);
+      doc.addImage(logoUrl, 'PNG', 65, 80, 80, 40); // Ajustado para ficar centralizado e maior no lugar do texto
     } catch (e) {
       console.error("Erro ao carregar logo no PDF:", e);
     }
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(40);
-    doc.text('NL OS', 105, 100, { align: 'center' });
-    
     doc.setTextColor(bronze[0], bronze[1], bronze[2]);
     doc.setFontSize(24);
-    doc.text('Pipeline de Leads', 105, 120, { align: 'center' });
+    doc.text('Pipeline de Leads', 105, 130, { align: 'center' });
     
     doc.setTextColor(255, 255, 255, 0.5);
     doc.setFontSize(10);
