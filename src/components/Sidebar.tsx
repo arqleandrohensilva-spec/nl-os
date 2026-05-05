@@ -180,9 +180,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
         >
-          <NavItem label="06 · Controle de Horas" disabled />
-          <NavItem label="07 · Gestão de Projetos" disabled />
-          <NavItem label="08 · Modo Cliente" disabled />
+          <NavItem label="03 · Controle de Horas" disabled />
+          <NavItem label="06 · Gestão de Projetos" disabled />
+          <NavItem label="10 · Modo Cliente" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -191,9 +191,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROPOSTAS']}
           onToggle={() => toggleSection('PROPOSTAS')}
         >
-          <NavItem label="09 · Tracking Comercial" disabled />
-          <NavItem label="10 · Biblioteca" disabled />
-          <NavItem label="11 · Documentos" disabled />
+          <NavItem label="04 · Tracking" disabled />
+          <NavItem label="05 · Biblioteca" disabled />
+          <NavItem label="08 · Documentos" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -202,8 +202,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
         >
-          <NavItem label="12 · Satisfação (NPS)" disabled />
-          <NavItem label="13 · CMO Virtual" disabled />
+          <NavItem label="09 · Satisfação" disabled />
+          <NavItem label="11 · CMO Virtual" disabled />
         </SectionAccordion>
       </div>
 
