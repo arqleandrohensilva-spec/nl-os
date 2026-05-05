@@ -83,7 +83,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
       <div 
         ref={setNodeRef}
         className={cn(
-          "flex-1 overflow-y-auto px-4 pb-10 pt-4 space-y-4 transition-all duration-300",
+          "flex-1 overflow-y-auto px-4 pb-10 pt-4 space-y-4 transition-all duration-300 scrollbar-custom",
           isOver ? "bg-bronze/[0.03]" : ""
         )}
       >
