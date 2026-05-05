@@ -2,8 +2,28 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Play, Pause, Square, Trash2, X, ChevronRight, FileText, Info, TrendingUp, DollarSign, Clock, Users, BarChart3, AlertCircle } from 'lucide-react';
-import { format, differenceInMinutes, parseISO, subMinutes } from 'date-fns';
+import { 
+  Play, 
+  Pause, 
+  Square, 
+  Trash2, 
+  X, 
+  ChevronRight, 
+  FileText, 
+  Info, 
+  TrendingUp, 
+  DollarSign, 
+  Clock, 
+  Users, 
+  BarChart3, 
+  AlertCircle,
+  Coffee,
+  Plus,
+  Pencil,
+  Calendar,
+  CheckCircle2
+} from 'lucide-react';
+import { format, differenceInMinutes, parseISO, subMinutes, startOfWeek, endOfWeek, isWithinInterval, isMonday, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -11,6 +31,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface Projeto {
   id: string;
