@@ -223,6 +223,115 @@ export type Database = {
         }
         Relationships: []
       }
+      projetos: {
+        Row: {
+          area_m2: number | null
+          cliente_nome: string | null
+          criado_em: string | null
+          criado_por: string | null
+          etapa_atual: string | null
+          horas_acompanhamento: number | null
+          horas_anteprojeto: number | null
+          horas_briefing: number | null
+          horas_estimadas: number | null
+          horas_executivo: number | null
+          id: string
+          lead_id: string | null
+          nome: string
+          status: string | null
+          tipo: string | null
+          valor_proposta: number | null
+        }
+        Insert: {
+          area_m2?: number | null
+          cliente_nome?: string | null
+          criado_em?: string | null
+          criado_por?: string | null
+          etapa_atual?: string | null
+          horas_acompanhamento?: number | null
+          horas_anteprojeto?: number | null
+          horas_briefing?: number | null
+          horas_estimadas?: number | null
+          horas_executivo?: number | null
+          id?: string
+          lead_id?: string | null
+          nome: string
+          status?: string | null
+          tipo?: string | null
+          valor_proposta?: number | null
+        }
+        Update: {
+          area_m2?: number | null
+          cliente_nome?: string | null
+          criado_em?: string | null
+          criado_por?: string | null
+          etapa_atual?: string | null
+          horas_acompanhamento?: number | null
+          horas_anteprojeto?: number | null
+          horas_briefing?: number | null
+          horas_estimadas?: number | null
+          horas_executivo?: number | null
+          id?: string
+          lead_id?: string | null
+          nome?: string
+          status?: string | null
+          tipo?: string | null
+          valor_proposta?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projetos_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessoes_horas: {
+        Row: {
+          criado_em: string | null
+          duracao_minutos: number | null
+          etapa: string | null
+          fim: string | null
+          id: string
+          inicio: string
+          observacao: string | null
+          projeto_id: string | null
+          responsavel: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          duracao_minutos?: number | null
+          etapa?: string | null
+          fim?: string | null
+          id?: string
+          inicio: string
+          observacao?: string | null
+          projeto_id?: string | null
+          responsavel?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          duracao_minutos?: number | null
+          etapa?: string | null
+          fim?: string | null
+          id?: string
+          inicio?: string
+          observacao?: string | null
+          projeto_id?: string | null
+          responsavel?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessoes_horas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
