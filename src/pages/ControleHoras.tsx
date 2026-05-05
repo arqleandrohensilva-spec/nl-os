@@ -261,6 +261,49 @@ const ControleHoras = () => {
     return () => clearInterval(interval);
   }, [activeTimer]);
 
+  const handleManualRegistration = async () => {
+    if (!manualSession.projetoId) {
+      toast.error("Selecione um projeto");
+      return;
+    }
+    const duracao = (Number(manualSession.horas) * 60) + Number(manualSession.minutos);
+    if (duracao <= 0) {
+      toast.error("Informe a duração");
+      return;
+    }
+
+    try {
+      const { error } = await supabase.from('sessoes_horas').insert({
+        projeto_id: manualSession.projetoId,
+        etapa: manualSession.etapa,
+        responsavel: manualSession.responsavel,
+        inicio: manualSession.data.toISOString(),
+        fim: manualSession.data.toISOString(),
+        duracao_minutos: duracao,
+        observacao: manualSession.obs,
+        is_manual: true
+      });
+
+      if (error) throw error;
+      
+      toast.success("Horas registradas com sucesso");
+      setIsManualModalOpen(false);
+      setManualSession({
+        projetoId: '',
+        etapa: 'Briefing',
+        responsavel: 'Leandro',
+        data: new Date(),
+        horas: '0',
+        minutos: '0',
+        obs: ''
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Error saving manual session:', error);
+      toast.error('Erro ao registrar horas');
+    }
+  };
+
   const fetchData = async () => {
     try {
       const [{ data: pData }, { data: sData }, { data: cData }] = await Promise.all([
@@ -271,6 +314,13 @@ const ControleHoras = () => {
       setProjetos(pData || []);
       setSessoes(sData || []);
       setConfig(cData);
+      
+      // Calculate predictions after data load
+      if (pData) {
+        pData.forEach(p => {
+          if (p.status === 'ativo') getAIPrediction(p, sData || []);
+        });
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
