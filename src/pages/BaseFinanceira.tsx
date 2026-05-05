@@ -19,7 +19,11 @@ import {
   RotateCcw,
   Loader2,
   ChevronUp,
-  Target
+  Target,
+  Lightbulb,
+  FileText,
+  History,
+  ArrowRight
 } from 'lucide-react';
 
 import { toast } from "sonner";
@@ -48,13 +52,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const CATEGORIES: { id: CategoriaCusto; label: string; icon: any }[] = [
-  { id: 'fixo', label: 'Custo Fixo', icon: Building2 },
-  { id: 'prolabore', label: 'Pró-labore', icon: Users },
-  { id: 'softwares', label: 'Softwares e Assinaturas', icon: Monitor },
-  { id: 'variavel', label: 'Custo Variável', icon: TrendingUp },
-  { id: 'impostos', label: 'Impostos', icon: Receipt },
-  { id: 'reservas', label: 'Reservas', icon: Shield },
+import FinancialHealthBar from '@/components/financeiro/FinancialHealthBar';
+import CountUp from '@/components/financeiro/CountUp';
+import DonutChartSection from '@/components/financeiro/DonutChartSection';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+const CATEGORIES: { id: CategoriaCusto; label: string; icon: any; color: string }[] = [
+  { id: 'fixo', label: 'Custo Fixo', icon: Building2, color: '#3A3A3A' },
+  { id: 'prolabore', label: 'Pró-labore', icon: Users, color: '#8B7355' },
+  { id: 'softwares', label: 'Softwares e Assinaturas', icon: Monitor, color: '#5A5A5A' },
+  { id: 'variavel', label: 'Custo Variável', icon: TrendingUp, color: '#B5A48A' },
+  { id: 'impostos', label: 'Impostos', icon: Receipt, color: '#777777' },
+  { id: 'reservas', label: 'Reservas', icon: Shield, color: '#D1D1D1' },
 ];
 
 const BaseFinanceira = () => {
@@ -87,6 +98,15 @@ const BaseFinanceira = () => {
   const [simHorasPorProjeto, setSimHorasPorProjeto] = useState(200);
   const [simAnalysis, setSimAnalysis] = useState<string>('');
   const [isSimLoading, setIsSimLoading] = useState(false);
+
+  // Premium Features State
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [isAiSuggestionsLoading, setIsAiSuggestionsLoading] = useState(false);
+  const [isComparingCenários, setIsComparingCenários] = useState(false);
+  const [cenarioAMargem, setCenarioAMargem] = useState(30);
+  const [cenarioBMargem, setCenarioBMargem] = useState(50);
+  const [isEvolucaoOpen, setIsEvolucaoOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
 
   // Calculations
@@ -332,6 +352,82 @@ Máximo 3 linhas. Sem markdown. Em português.
   };
 
 
+  const getAiSuggestions = async () => {
+    if (isAiSuggestionsLoading || !config) return;
+    setIsAiSuggestionsLoading(true);
+    
+    try {
+      const lista_de_custos = costs.map(c => `- ${c.nome}: R$ ${c.valor}`).join('\n');
+      const prompt = `
+        Analise os custos cadastrados deste escritório de arquitetura e identifique até 3 custos 
+        que provavelmente existem mas não foram cadastrados.
+
+        CUSTOS CADASTRADOS:
+        ${lista_de_custos}
+
+        PERFIL: Escritório de arquitetura com ${config.num_arquitetos} arquitetos em ${config.mercados?.[0] || 'São José dos Campos'}, SP.
+
+        Para cada custo esquecido potencial, retorne:
+        - Nome do custo
+        - Valor médio estimado para escritórios similares
+        - Por que é importante cadastrar
+
+        Responda em JSON no formato:
+        [{"nome": "...", "valor_estimado": 000, "motivo": "..."}]
+
+        Máximo 3 sugestões. Apenas custos realmente prováveis para este perfil.
+        Responda apenas o JSON, sem markdown, sem explicação adicional.
+      `;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt,
+          systemPrompt: "Você é um assistente financeiro que retorna apenas JSON."
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = data.choices[0].message.content;
+      const suggestions = JSON.parse(content.replace(/```json|```/g, '').trim());
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error getting AI suggestions:', error);
+    } finally {
+      setIsAiSuggestionsLoading(false);
+    }
+  };
+
+  const exportReport = async () => {
+    setIsExporting(true);
+    try {
+      const element = document.getElementById('base-financeira-content');
+      if (!element) return;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#FDFDFD'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Relatorio_Financeiro_NL_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+      toast.success('Relatório exportado com sucesso');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast.error('Erro ao exportar relatório');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const [configRes, costsRes] = await Promise.all([
@@ -344,6 +440,11 @@ Máximo 3 linhas. Sem markdown. Em português.
 
       setConfig(configRes.data as ConfigEscritorio);
       setCosts(costsRes.data as CustoEscritorio[]);
+      
+      // Auto trigger suggestions if we have data
+      if (costsRes.data.length > 0 && aiSuggestions.length === 0) {
+        // We'll call this after setting state in useEffect
+      }
     } catch (error) {
       console.error('Error fetching financial data:', error);
       toast.error('Erro ao carregar dados financeiros');
@@ -351,6 +452,12 @@ Máximo 3 linhas. Sem markdown. Em português.
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (costs.length > 5 && !isAiSuggestionsLoading && aiSuggestions.length === 0) {
+      getAiSuggestions();
+    }
+  }, [costs.length]);
 
   const updateConfig = async (updates: Partial<ConfigEscritorio>) => {
     if (!config) return;
@@ -421,16 +528,34 @@ Máximo 3 linhas. Sem markdown. Em português.
     <div className="flex min-h-screen bg-[#FDFDFD]">
       <Sidebar user={user || ''} />
       
-      <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
         <div className="flex-shrink-0 bg-white z-10">
           <div className="px-10 py-6 border-b border-beige">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
-          </div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
+                <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={exportReport}
+                disabled={isExporting}
+                className="h-8 border-beige text-[9px] uppercase tracking-widest text-graphite hover:bg-beige/10 flex items-center gap-2"
+              >
+                {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
+                Exportar Relatório
+              </Button>
+            </div>
 
-          {/* AI Diagnostic Card */}
+            <FinancialHealthBar 
+              costPerHour={calculations.costPerHour}
+              benchmark={120}
+              marketName={config?.mercados?.[0] || 'SJC'}
+            />
+
+            {/* AI Diagnostic Card */}
           <div className={cn(
             "p-6 border rounded-[4px] space-y-4 transition-all duration-300 overflow-hidden cursor-pointer",
             aiStatus === 'critico' ? "bg-red-50 border-red-200" :
@@ -551,12 +676,15 @@ Máximo 3 linhas. Sem markdown. Em português.
           {/* Top Result Cards */}
           <div className="grid grid-cols-2 gap-6">
             {/* Card 1: Custo/Hora Real */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group">
+            <div className="bg-white p-8 border border-beige border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
               <div className="space-y-1">
                 <p className="text-[9px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold">CUSTO/HORA REAL</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-cormorant font-bold text-graphite">
-                    R$ {calculations.costPerHour.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-[64px] font-cormorant font-bold text-graphite leading-none">
+                    R$ <CountUp 
+                      value={calculations.costPerHour} 
+                      formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                    />
                   </span>
                 </div>
                 <p className="text-[10px] text-muted">baseado nos seus custos cadastrados</p>
@@ -570,12 +698,25 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
 
             {/* Card 2: Preço Sugerido */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between">
+            <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
-                <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsComparingCenários(true)}
+                    className="h-6 text-[8px] uppercase tracking-widest text-bronze hover:bg-bronze/5 px-2"
+                  >
+                    Comparar Cenários
+                  </Button>
+                </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-cormorant font-bold text-bronze">
-                    R$ {calculations.suggestedPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-[64px] font-cormorant font-bold text-bronze leading-none">
+                    R$ <CountUp 
+                      value={calculations.suggestedPrice} 
+                      formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                    />
                   </span>
                 </div>
                 <p className="text-[10px] text-muted">custo + {config?.margem_lucro}% de margem</p>
@@ -598,96 +739,95 @@ Máximo 3 linhas. Sem markdown. Em português.
 
           {/* Configuração de Horas Produtivas */}
           <div className="bg-white p-8 border border-beige rounded-[4px]">
-            <div className="flex items-center justify-between">
-              <div className="grid grid-cols-4 gap-8 flex-1">
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
-                  <Input 
-                    type="number" 
-                    value={config?.horas_dia} 
-                    onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
-                  <Input 
-                    type="number" 
-                    value={config?.dias_mes} 
-                    onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Info size={10} className="text-muted" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-[10px]">Tempo efetivamente faturável descontando reuniões, admin, etc.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+            <div className="flex flex-col gap-8">
+              <div className="flex items-center justify-between">
+                <div className="grid grid-cols-5 gap-8 flex-1">
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
+                    <Input 
+                      type="number" 
+                      value={config?.horas_dia} 
+                      onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
                   </div>
-                  <Input 
-                    type="number" 
-                    value={config?.percentual_produtivo} 
-                    onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
+                    <Input 
+                      type="number" 
+                      value={config?.dias_mes} 
+                      onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
+                    <Input 
+                      type="number" 
+                      value={config?.percentual_produtivo} 
+                      onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
+                    <Input 
+                      type="number" 
+                      value={config?.num_arquitetos} 
+                      onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[9px] font-dm-mono text-bronze uppercase tracking-widest font-bold">Meta Custo/Hora</label>
+                    <Input 
+                      type="number" 
+                      value={config?.meta_custo_hora || ''} 
+                      placeholder="Ex: 120"
+                      onChange={(e) => updateConfig({ meta_custo_hora: parseFloat(e.target.value) })}
+                      className="h-9 border-bronze/50 bg-bronze/5 text-xs font-dm-mono focus:border-bronze"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
-                  <Input 
-                    type="number" 
-                    value={config?.num_arquitetos} 
-                    onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                    className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
-                  />
-                </div>
-              </div>
-              
-              <div className="px-8 border-l border-beige flex flex-col justify-center min-w-[250px]">
-                <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest mb-3">Mercados de Atuação</label>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {config?.mercados?.map((m) => (
-                    <span key={m} className="bg-bronze/10 text-bronze text-[10px] px-2 py-1 rounded flex items-center gap-1 font-dm-mono">
-                      {m}
-                      <button onClick={() => {
-                        const newMercados = config.mercados?.filter(item => item !== m) || [];
-                        updateConfig({ mercados: newMercados });
-                      }} className="hover:text-red-500">
-                        <X size={10} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <Input 
-                    placeholder="Adicionar cidade..."
-                    className="h-8 border-beige text-[10px] font-dm-mono"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const val = e.currentTarget.value.trim();
-                        if (val && !config?.mercados?.includes(val)) {
-                          updateConfig({ mercados: [...(config?.mercados || []), val] });
-                          e.currentTarget.value = '';
-                        }
-                      }
-                    }}
-                  />
+                
+                <div className="ml-8 pl-8 border-l border-beige text-right">
+                  <p className="text-3xl font-cormorant font-bold text-bronze">
+                    = <CountUp value={calculations.faturableHours} />h
+                  </p>
+                  <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
                 </div>
               </div>
-              
-              <div className="ml-8 pl-8 border-l border-beige text-right">
-                <p className="text-3xl font-cormorant font-bold text-bronze">
-                  = {Math.round(calculations.faturableHours)}h
-                </p>
-                <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
-              </div>
+
+              {config?.meta_custo_hora && config.meta_custo_hora > 0 && (
+                <div className="bg-bronze/5 p-6 rounded-[4px] border border-bronze/20 space-y-4 animate-in fade-in slide-in-from-left-4">
+                  <div className="flex items-center gap-2">
+                    <Target size={14} className="text-bronze" />
+                    <span className="text-[10px] font-dm-mono font-bold text-graphite uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-6">
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-graphite uppercase">A) Reduzir Custos</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Reduzir R$ {(calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês 
+                        ({Math.round(((calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)) / calculations.monthlyCosts) * 100)}% dos custos)
+                      </p>
+                    </div>
+                    <div className="space-y-1 border-x border-bronze/10 px-6">
+                      <p className="text-[10px] font-bold text-bronze uppercase">B) Aumentar Horas (Recomendado)</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Aumentar para {Math.round(calculations.monthlyCosts / config.meta_custo_hora)}h/mês 
+                        (+{Math.round(((calculations.monthlyCosts / config.meta_custo_hora) / calculations.faturableHours - 1) * 100)}%)
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-bold text-graphite uppercase">C) Combinar Estratégias</p>
+                      <p className="text-[10px] text-muted leading-relaxed">
+                        Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 pt-6 border-t border-beige border-dashed">
@@ -695,79 +835,109 @@ Máximo 3 linhas. Sem markdown. Em português.
                 {config?.horas_dia}h × {config?.dias_mes} dias × {config?.percentual_produtivo}% × {config?.num_arquitetos} arquitetos = {Math.round(calculations.faturableHours)}h faturáveis/mês
               </p>
               <p className="text-[10px] font-dm-mono text-muted mt-1">
-                Total de custos R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ÷ {Math.round(calculations.faturableHours)}h = R$ {calculations.costPerHour.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/hora
+                Total de custos R$ <CountUp value={calculations.monthlyCosts} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} /> ÷ {Math.round(calculations.faturableHours)}h = R$ <CountUp value={calculations.costPerHour} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} />/hora
               </p>
             </div>
           </div>
 
-          {/* Categories Accordion */}
-          <div className="space-y-4">
-            {CATEGORIES.map((cat) => {
-              const catCosts = costs.filter(c => c.categoria === cat.id);
-              const totalCat = catCosts.reduce((acc, c) => {
-                if (c.frequencia === 'percentual') return acc;
-                return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
-              }, 0);
-              const isOpen = openAccordion === cat.id;
+          <div className="grid grid-cols-3 gap-8">
+            <div className="col-span-2 space-y-4">
+              {CATEGORIES.map((cat) => {
+                const catCosts = costs.filter(c => c.categoria === cat.id);
+                const totalCat = catCosts.reduce((acc, c) => {
+                  if (c.frequencia === 'percentual') return acc;
+                  return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
+                }, 0);
+                const isOpen = openAccordion === cat.id;
+                const mostExpensive = [...catCosts].sort((a, b) => b.valor - a.valor)[0];
 
-              return (
-                <div key={cat.id} className="border border-beige rounded-[4px] overflow-hidden bg-white">
-                  <button 
-                    onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
-                    className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={cn("p-2 rounded-full", isOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
-                        <cat.icon size={16} />
-                      </div>
-                      <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <span className="text-xs font-dm-mono text-bronze font-bold">
-                        {cat.id === 'impostos' 
-                          ? `${catCosts.reduce((acc, c) => acc + c.valor, 0)}%`
-                          : `R$ ${totalCat.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                        }
-                      </span>
-                      {isOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
-                    </div>
-                  </button>
+                return (
+                  <div key={cat.id} className="border border-beige rounded-[4px] overflow-hidden bg-white group/cat">
+                    <TooltipProvider>
+                      <Tooltip delayDuration={300}>
+                        <TooltipTrigger asChild>
+                          <button 
+                            id={`accordion-trigger-${cat.id}`}
+                            onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
+                            className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div 
+                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}
+                                style={isOpen ? {} : { backgroundColor: `${cat.color}15`, color: cat.color }}
+                              >
+                                <cat.icon size={16} />
+                              </div>
+                              <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
+                            </div>
+                            <div className="flex items-center gap-6">
+                              <span className="text-xs font-dm-mono text-bronze font-bold">
+                                {cat.id === 'impostos' 
+                                  ? `${catCosts.reduce((acc, c) => acc + c.valor, 0)}%`
+                                  : `R$ ${totalCat.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+                                }
+                              </span>
+                              {isOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+                            </div>
+                          </button>
+                        </TooltipTrigger>
+                        {mostExpensive && (
+                          <TooltipContent side="top" className="bg-graphite text-white text-[10px] font-dm-mono border-none py-1.5 px-3 rounded-[4px]">
+                            Item mais caro: {mostExpensive.nome} · R$ {mostExpensive.valor.toLocaleString('pt-BR')}
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
 
                   {isOpen && (
                     <div className="px-5 pb-5 animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="space-y-1 mt-2">
-                        {catCosts.map((item) => (
-                          <div key={item.id} className="group flex items-center justify-between py-3 border-b border-beige/50 last:border-0 hover:bg-beige/5 px-2 -mx-2 transition-colors">
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
-                              <div className="flex items-center gap-2">
-                                <span className={cn(
-                                  "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
-                                  item.frequencia === 'mensal' ? "bg-beige/30 text-muted" : "bg-bronze/10 text-bronze"
-                                )}>
-                                  {item.frequencia}
-                                </span>
-                                {item.frequencia === 'anual' && (
-                                  <span className="text-[10px] text-muted italic">
-                                    (R$ {(item.valor / 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês)
-                                  </span>
+                        {catCosts.map((item) => {
+                          const isNew = new Date(item.criado_em).toDateString() === new Date().toDateString();
+                          return (
+                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-beige/50 last:border-0 hover:bg-beige/5 px-2 -mx-2 transition-colors">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
+                                {isNew && (
+                                  <span className="text-[8px] font-bold text-bronze bg-bronze/10 px-1.5 py-0.5 rounded-[2px] uppercase">Novo hoje</span>
                                 )}
+                                <div className="flex items-center gap-2">
+                                  <span className={cn(
+                                    "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
+                                    item.frequencia === 'mensal' ? "bg-beige/30 text-muted" : "bg-bronze/10 text-bronze"
+                                  )}>
+                                    {item.frequencia}
+                                  </span>
+                                  {item.frequencia === 'anual' && (
+                                    <span className="text-[10px] text-muted italic">
+                                      (R$ {(item.valor / 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês)
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-6">
+                                <span className="text-xs font-dm-mono text-bronze font-medium">
+                                  {item.frequencia === 'percentual' ? `${item.valor}%` : `R$ ${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                                </span>
+                                <button 
+                                  onClick={() => deleteItem(item.id)}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-red-400 hover:text-red-600"
+                                >
+                                  <X size={12} />
+                                </button>
                               </div>
                             </div>
-                            <div className="flex items-center gap-6">
-                              <span className="text-xs font-dm-mono text-bronze font-medium">
-                                {item.frequencia === 'percentual' ? `${item.valor}%` : `R$ ${item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
-                              </span>
-                              <button 
-                                onClick={() => deleteItem(item.id)}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-red-400 hover:text-red-600"
-                              >
-                                <X size={12} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
+
+                      {cat.id !== 'impostos' && (
+                        <div className="mt-4 pt-3 border-t border-beige border-dashed">
+                          <p className="text-[10px] font-dm-mono text-muted italic uppercase tracking-wider">
+                            Impacto anual: R$ {(totalCat * 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+                          </p>
+                        </div>
+                      )}
 
                       <Dialog open={isAddingItem && newItem.categoria === cat.id} onOpenChange={(open) => {
                         setIsAddingItem(open);
@@ -840,9 +1010,163 @@ Máximo 3 linhas. Sem markdown. Em português.
                       </Dialog>
                     </div>
                   )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Column: Donut Chart */}
+            <div className="col-span-1">
+              <DonutChartSection 
+                totalMonthly={calculations.monthlyCosts}
+                onSliceClick={(id) => {
+                  setOpenAccordion(id);
+                  const el = document.getElementById(`accordion-trigger-${id}`);
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                data={CATEGORIES.map(cat => {
+                  const catCosts = costs.filter(c => c.categoria === cat.id);
+                  const total = catCosts.reduce((acc, c) => {
+                    if (c.frequencia === 'percentual') return acc;
+                    return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
+                  }, 0);
+                  return {
+                    id: cat.id,
+                    name: cat.label,
+                    value: total,
+                    color: cat.color
+                  };
+                }).filter(c => c.value > 0)}
+              />
+            </div>
+          </div>
+
+          {/* Evolução do Custo/Hora Section */}
+          <div className="border border-beige rounded-[4px] overflow-hidden bg-white">
+            <button 
+              onClick={() => setIsEvolucaoOpen(!isEvolucaoOpen)}
+              className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
+                  <History size={16} />
                 </div>
-              );
-            })}
+                <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">Evolução do Custo/Hora</span>
+              </div>
+              {isEvolucaoOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+            </button>
+            
+            {isEvolucaoOpen && (
+              <div className="p-8 h-[350px] animate-in fade-in slide-in-from-top-2 duration-300">
+                {aiHistory.length < 2 ? (
+                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-muted">
+                    Histórico disponível após 30 dias de uso (mínimo 2 diagnósticos salvos)
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[...aiHistory].reverse()}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0EBE5" />
+                      <XAxis 
+                        dataKey="criado_em" 
+                        tickFormatter={(val) => new Date(val).toLocaleDateString('pt-BR', { month: 'short' })}
+                        tick={{ fontSize: 10, fill: '#777' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 10, fill: '#777' }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(val) => `R$ ${val}`}
+                      />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#3A3A3A', 
+                          border: 'none', 
+                          borderRadius: '4px',
+                          color: '#fff',
+                          fontSize: '10px',
+                          fontFamily: 'DM Mono'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        labelFormatter={(val) => new Date(val).toLocaleDateString('pt-BR')}
+                      />
+                      <ReferenceLine 
+                        y={120} 
+                        stroke="#777" 
+                        strokeDasharray="5 5" 
+                        label={{ value: 'Benchmark (R$ 120)', position: 'insideBottomRight', fontSize: 8, fill: '#777' }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="custo_hora_momento" 
+                        stroke="#8B7355" 
+                        strokeWidth={2}
+                        dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#8B7355' }}
+                        activeDot={{ r: 6, fill: '#8B7355' }}
+                        name="Custo/Hora"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* AI Suggestions Section */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+              <Sparkles size={12} className="text-bronze" /> Sugestões da IA · Custos Possivelmente Esquecidos
+            </h3>
+            <div className="grid grid-cols-3 gap-6">
+              {isAiSuggestionsLoading ? (
+                Array(3).fill(0).map((_, i) => (
+                  <div key={i} className="h-24 bg-white border border-beige border-dashed rounded-[4px] animate-pulse" />
+                ))
+              ) : aiSuggestions.length > 0 ? (
+                aiSuggestions.map((s, i) => (
+                  <div key={i} className="bg-white p-4 border border-bronze/30 border-dashed rounded-[4px] space-y-3 relative group">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Lightbulb size={12} className="text-bronze" />
+                          <span className="text-[10px] font-bold text-graphite uppercase font-dm-mono">{s.nome}</span>
+                        </div>
+                        <p className="text-[9px] text-muted leading-relaxed">{s.motivo}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-beige/30">
+                      <span className="text-[10px] font-dm-mono font-bold text-bronze">Est. R$ {s.valor_estimado.toLocaleString('pt-BR')}</span>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-6 text-[8px] uppercase font-bold text-muted hover:text-red-500"
+                          onClick={() => setAiSuggestions(prev => prev.filter((_, idx) => idx !== i))}
+                        >
+                          Ignorar
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-6 text-[8px] uppercase font-bold text-bronze hover:bg-bronze/5"
+                          onClick={() => {
+                            setNewItem({ nome: s.nome, valor: s.valor_estimado.toString(), categoria: 'fixo', frequencia: 'mensal' });
+                            setIsAddingItem(true);
+                          }}
+                        >
+                          + Adicionar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-[10px] font-dm-mono text-muted text-center py-4">
+                  Nenhuma sugestão adicional no momento.
+                </div>
+              )}
+            </div>
           </div>
           {/* Simulator Section */}
           <div className="border-t border-beige pt-8 space-y-6">
@@ -936,7 +1260,116 @@ Máximo 3 linhas. Sem markdown. Em português.
         </div>
 
 
-        {/* Footer info */}
+        {/* Comparison Panel */}
+        <Dialog open={isComparingCenários} onOpenChange={setIsComparingCenários}>
+          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-beige bg-white animate-in slide-in-from-right duration-500">
+            <DialogHeader className="border-b border-beige pb-6">
+              <DialogTitle className="font-cormorant text-2xl font-bold text-graphite uppercase tracking-tight">Comparador de Margem</DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-8 space-y-12 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
+              <div className="grid grid-cols-2 gap-8">
+                {/* Cenário A */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-dm-mono text-bronze uppercase font-bold tracking-widest">Cenário A</p>
+                    <div className="flex justify-between items-center text-xs font-dm-mono">
+                      <span className="text-muted">Margem:</span>
+                      <span className="font-bold">{cenarioAMargem}%</span>
+                    </div>
+                    <Slider 
+                      value={[cenarioAMargem]} 
+                      max={100} 
+                      onValueChange={([v]) => setCenarioAMargem(v)}
+                      className="[&_[role=slider]]:bg-bronze [&_[role=slider]]:border-bronze"
+                    />
+                  </div>
+                  
+                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="pt-4 space-y-1">
+                      <p className="text-[9px] text-muted uppercase font-bold text-bronze">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-bronze">R$ {( (calculations.costPerHour * (1 + cenarioAMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => {
+                      updateConfig({ margem_lucro: cenarioAMargem });
+                      setIsComparingCenários(false);
+                      toast.success('Cenário A aplicado');
+                    }}
+                    className="w-full h-10 bg-graphite text-white text-[9px] uppercase tracking-widest font-bold"
+                  >
+                    Aplicar Cenário A
+                  </Button>
+                </div>
+
+                {/* Cenário B */}
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-dm-mono text-graphite uppercase font-bold tracking-widest">Cenário B</p>
+                    <div className="flex justify-between items-center text-xs font-dm-mono">
+                      <span className="text-muted">Margem:</span>
+                      <span className="font-bold">{cenarioBMargem}%</span>
+                    </div>
+                    <Slider 
+                      value={[cenarioBMargem]} 
+                      max={100} 
+                      onValueChange={([v]) => setCenarioBMargem(v)}
+                      className="[&_[role=slider]]:bg-graphite [&_[role=slider]]:border-graphite"
+                    />
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                    <div className="pt-4 space-y-1">
+                      <p className="text-[9px] text-muted uppercase font-bold text-graphite">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-graphite">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={() => {
+                      updateConfig({ margem_lucro: cenarioBMargem });
+                      setIsComparingCenários(false);
+                      toast.success('Cenário B aplicado');
+                    }}
+                    className="w-full h-10 bg-bronze text-white text-[9px] uppercase tracking-widest font-bold"
+                  >
+                    Aplicar Cenário B
+                  </Button>
+                </div>
+              </div>
+
+              <div className="mt-8 p-4 bg-beige/10 border border-beige/30 rounded-[4px]">
+                <p className="text-[9px] text-muted font-dm-mono italic">*Estimado para 2 projetos de 250h/mês totais. O lucro líquido real depende da eficiência produtiva e dos impostos variáveis.</p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
         <div className="flex-shrink-0 bg-white border-t border-beige px-10 py-4 flex justify-between items-center">
           <p className="text-[9px] text-muted uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
           <p className="text-[9px] text-muted uppercase tracking-widest">São José dos Campos SP · 2026</p>

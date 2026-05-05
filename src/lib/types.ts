@@ -84,6 +84,7 @@ export interface ConfigEscritorio {
   num_arquitetos: number;
   margem_lucro: number;
   custo_hora?: number;
+  meta_custo_hora?: number;
   mercados?: string[];
   atualizado_em: string;
 }

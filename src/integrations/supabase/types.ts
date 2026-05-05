@@ -23,6 +23,7 @@ export type Database = {
           id: string
           margem_lucro: number | null
           mercados: string[] | null
+          meta_custo_hora: number | null
           num_arquitetos: number | null
           percentual_produtivo: number | null
         }
@@ -34,6 +35,7 @@ export type Database = {
           id?: string
           margem_lucro?: number | null
           mercados?: string[] | null
+          meta_custo_hora?: number | null
           num_arquitetos?: number | null
           percentual_produtivo?: number | null
         }
@@ -45,6 +47,7 @@ export type Database = {
           id?: string
           margem_lucro?: number | null
           mercados?: string[] | null
+          meta_custo_hora?: number | null
           num_arquitetos?: number | null
           percentual_produtivo?: number | null
         }
