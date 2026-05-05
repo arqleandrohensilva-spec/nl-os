@@ -135,7 +135,7 @@ const Sidebar = ({ user }: { user: string }) => {
             active={location.pathname === '/'} 
             onClick={() => navigate('/')} 
           />
-          <NavItem label="02 · Contatos" disabled />
+          
         </SectionAccordion>
 
         <SectionAccordion 
@@ -149,8 +149,8 @@ const Sidebar = ({ user }: { user: string }) => {
             active={location.pathname === '/financeiro/base'} 
             onClick={() => navigate('/financeiro/base')} 
           />
-          <NavItem label="04 · Fin. de Projetos" disabled />
-          <NavItem label="05 · Dashboard" disabled />
+          <NavItem label="07 · Fin. de Projetos" disabled />
+          <NavItem label="12 · Dashboard" disabled />
         </SectionAccordion>
 
 
