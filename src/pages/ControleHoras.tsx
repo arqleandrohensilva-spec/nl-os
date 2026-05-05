@@ -398,7 +398,55 @@ const ControleHoras = () => {
     setIsPanelOpen(true);
   };
 
-  // Metrics
+  // Metrics & Stats
+  const weeklyStats = useMemo(() => {
+    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
+    
+    const weekSessoes = sessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      return isWithinInterval(d, { start, end });
+    });
+
+    const leandro = weekSessoes.filter(s => s.responsavel === 'Leandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const neandro = weekSessoes.filter(s => s.responsavel === 'Neandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    
+    return { leandro, neandro, total: leandro + neandro };
+  }, [sessoes]);
+
+  const lastWeekSummary = useMemo(() => {
+    const lastMon = startOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
+    const lastSun = endOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
+    
+    const weekSessoes = sessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      return isWithinInterval(d, { start: lastMon, end: lastSun });
+    });
+
+    if (weekSessoes.length === 0) return null;
+
+    const total = weekSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const leandro = weekSessoes.filter(s => s.responsavel === 'Leandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+    const neandro = weekSessoes.filter(s => s.responsavel === 'Neandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+
+    // Find most consumed project
+    const projectHours: Record<string, number> = {};
+    weekSessoes.forEach(s => {
+      projectHours[s.projeto_id] = (projectHours[s.projeto_id] || 0) + (s.duracao_minutos || 0);
+    });
+    const topProjectId = Object.entries(projectHours).sort((a, b) => b[1] - a[1])[0]?.[0];
+    const topProject = projetos.find(p => p.id === topProjectId);
+
+    return { 
+      total, 
+      leandro, 
+      neandro, 
+      topProject: topProject?.nome || 'N/A',
+      topHours: Math.round((projectHours[topProjectId || ''] || 0) / 60),
+      period: `${format(lastMon, 'dd/MM')} a ${format(lastSun, 'dd/MM')}`
+    };
+  }, [sessoes, projetos]);
+
   const metrics = useMemo(() => {
     const totalMes = sessoes.filter(s => {
       const d = parseISO(s.inicio);
