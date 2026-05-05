@@ -676,12 +676,15 @@ Máximo 3 linhas. Sem markdown. Em português.
           {/* Top Result Cards */}
           <div className="grid grid-cols-2 gap-6">
             {/* Card 1: Custo/Hora Real */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group">
+            <div className="bg-white p-8 border border-beige border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
               <div className="space-y-1">
                 <p className="text-[9px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold">CUSTO/HORA REAL</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-cormorant font-bold text-graphite">
-                    R$ {calculations.costPerHour.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-[64px] font-cormorant font-bold text-graphite leading-none">
+                    R$ <CountUp 
+                      value={calculations.costPerHour} 
+                      formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                    />
                   </span>
                 </div>
                 <p className="text-[10px] text-muted">baseado nos seus custos cadastrados</p>
@@ -695,12 +698,25 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
 
             {/* Card 2: Preço Sugerido */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between">
+            <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
-                <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsComparingCenários(true)}
+                    className="h-6 text-[8px] uppercase tracking-widest text-bronze hover:bg-bronze/5 px-2"
+                  >
+                    Comparar Cenários
+                  </Button>
+                </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-cormorant font-bold text-bronze">
-                    R$ {calculations.suggestedPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  <span className="text-[64px] font-cormorant font-bold text-bronze leading-none">
+                    R$ <CountUp 
+                      value={calculations.suggestedPrice} 
+                      formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
+                    />
                   </span>
                 </div>
                 <p className="text-[10px] text-muted">custo + {config?.margem_lucro}% de margem</p>
