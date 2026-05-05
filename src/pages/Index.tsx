@@ -552,7 +552,7 @@ const Index = () => {
         </div>
 
         {/* Kanban Board */}
-        <div className="flex-1 bg-[#FAFAFA] overflow-x-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#FAFAFA] overflow-y-auto p-6 pt-2 scrollbar-custom">
           <DndContext 
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -561,7 +561,7 @@ const Index = () => {
             onDragEnd={handleDragEnd}
             modifiers={[restrictToWindowEdges]}
           >
-            <div className="flex h-full gap-4 min-w-max">
+            <div className="grid grid-cols-6 h-full gap-4">
               {STAGES.map(stage => (
                 <KanbanColumn 
                   key={stage}
