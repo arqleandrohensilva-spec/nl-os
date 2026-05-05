@@ -194,9 +194,10 @@ const BaseFinanceira = () => {
       const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
       const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
       const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
+      const mercados = config?.mercados?.length ? config.mercados.join(', ') : 'São José dos Campos';
 
       const prompt = `
-Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium em São José dos Campos, SP.
+Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium.
 
 Analise os dados financeiros abaixo e gere um diagnóstico direto, técnico e útil em 3 parágrafos curtos.
 
@@ -215,15 +216,22 @@ BREAKDOWN DE CUSTOS:
 - Impostos: ${impostos}%
 - Reservas: R$ ${totalReservas.toFixed(2)}
 
-CONTEXTO DE MERCADO:
-- Arquitetos em SJC cobram entre R$ 120–200/hora
-- Escritórios premium cobram acima de R$ 180/hora
+MERCADOS DE ATUAÇÃO: ${mercados}
+
+CONTEXTO DE BENCHMARK POR MERCADO:
+- São José dos Campos: R$ 120–180/hora (premium local)
+- São Paulo: R$ 180–350/hora (premium capital)
+- Campinas: R$ 130–200/hora
+- Rio de Janeiro: R$ 160–280/hora
+- Outros: usar São Paulo como referência superior
+
+DADOS DE PIPELINE:
 - Ticket médio atual do pipeline: R$ ${ticketMedio}
 
 Gere o diagnóstico com:
-1. Uma avaliação direta do custo/hora atual (está saudável? abaixo do mercado? acima?)
-2. O maior risco financeiro identificado nos dados (qual categoria está pesando mais?)
-3. Uma recomendação concreta e acionável para esta semana
+1. Uma avaliação direta do custo/hora atual comparado aos mercados de atuação cadastrados.
+2. Identifique qual mercado representa a maior oportunidade de reajuste de preço para a NL.
+3. Uma recomendação concreta e acionável para esta semana visando aumentar a lucratividade.
 
 Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
 Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
