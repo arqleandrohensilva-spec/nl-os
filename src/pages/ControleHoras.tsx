@@ -21,7 +21,8 @@ import {
   Plus,
   Pencil,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Download
 } from 'lucide-react';
 import { format, differenceInMinutes, parseISO, subMinutes, startOfWeek, endOfWeek, isWithinInterval, isMonday, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -33,6 +34,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface Projeto {
   id: string;
