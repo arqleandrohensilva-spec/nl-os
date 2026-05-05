@@ -86,7 +86,43 @@ const BaseFinanceira = () => {
   const [isSimLoading, setIsSimLoading] = useState(false);
 
 
+  // Calculations
+  const calculations = useMemo(() => {
+    if (!config) return { monthlyCosts: 0, faturableHours: 0, costPerHour: 0, suggestedPrice: 0 };
+
+    // 1. Calculate base monthly costs (excluding percentual taxes for now)
+    let baseMonthlyCosts = costs.reduce((acc, cost) => {
+      if (cost.frequencia === 'percentual') return acc;
+      const value = cost.frequencia === 'anual' ? cost.valor / 12 : cost.valor;
+      return acc + value;
+    }, 0);
+
+    // 2. Faturable hours
+    const faturableHours = config.horas_dia * config.dias_mes * (config.percentual_produtivo / 100) * config.num_arquitetos;
+
+    // 3. Handle percentual costs (impostos)
+    const totalTaxPercent = costs
+      .filter(c => c.frequencia === 'percentual')
+      .reduce((acc, c) => acc + (c.valor / 100), 0);
+    
+    const monthlyRevenueNeeded = totalTaxPercent < 1 
+      ? baseMonthlyCosts / (1 - totalTaxPercent) 
+      : baseMonthlyCosts;
+
+    const monthlyCosts = monthlyRevenueNeeded;
+    const costPerHour = faturableHours > 0 ? monthlyRevenueNeeded / faturableHours : 0;
+    const suggestedPrice = costPerHour * (1 + config.margem_lucro / 100);
+
+    return { 
+      monthlyCosts, 
+      faturableHours, 
+      costPerHour, 
+      suggestedPrice 
+    };
+  }, [config, costs]);
+
   useEffect(() => {
+
     const savedUser = sessionStorage.getItem('nl_user');
     if (savedUser) setUser(savedUser);
     
