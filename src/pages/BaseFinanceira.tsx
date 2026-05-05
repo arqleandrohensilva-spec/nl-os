@@ -99,6 +99,15 @@ const BaseFinanceira = () => {
   const [simAnalysis, setSimAnalysis] = useState<string>('');
   const [isSimLoading, setIsSimLoading] = useState(false);
 
+  // Premium Features State
+  const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
+  const [isAiSuggestionsLoading, setIsAiSuggestionsLoading] = useState(false);
+  const [isComparingCenários, setIsComparingCenários] = useState(false);
+  const [cenarioAMargem, setCenarioAMargem] = useState(30);
+  const [cenarioBMargem, setCenarioBMargem] = useState(50);
+  const [isEvolucaoOpen, setIsEvolucaoOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
 
   // Calculations
   const calculations = useMemo(() => {
