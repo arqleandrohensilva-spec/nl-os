@@ -395,6 +395,54 @@ const Index = () => {
     }
   };
 
+  const handleCreateLead = async () => {
+    if (!newLead.nome || !newLead.whats || !newLead.cidade) {
+      toast.error("Preencha o nome, WhatsApp e cidade");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .insert({
+          nome: newLead.nome,
+          whats: newLead.whats,
+          cidade: newLead.cidade,
+          tipo: newLead.tipo,
+          area: Number(newLead.area),
+          orcamento: Number(newLead.orcamento),
+          origem: newLead.origem,
+          temp: newLead.temp,
+          obs: newLead.obs,
+          stage: 'Novo Lead',
+          etapa_desde: new Date().toISOString(),
+          criado_por: user || 'Sócio'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(prev => [data as any, ...prev]);
+      setIsNewLeadDialogOpen(false);
+      setNewLead({
+        nome: '',
+        whats: '',
+        cidade: '',
+        tipo: 'Arq+Int',
+        area: 0,
+        orcamento: 0,
+        origem: 'Instagram',
+        temp: 'Morno',
+        obs: ''
+      });
+      toast.success("Lead criado com sucesso");
+    } catch (err) {
+      console.error('Error creating lead:', err);
+      toast.error('Erro ao criar lead');
+    }
+  };
+
   const filteredLeads = leads.filter(l => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
