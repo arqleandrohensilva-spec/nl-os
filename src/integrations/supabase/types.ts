@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      config_escritorio: {
+        Row: {
+          atualizado_em: string | null
+          dias_mes: number | null
+          horas_dia: number | null
+          id: string
+          margem_lucro: number | null
+          num_arquitetos: number | null
+          percentual_produtivo: number | null
+        }
+        Insert: {
+          atualizado_em?: string | null
+          dias_mes?: number | null
+          horas_dia?: number | null
+          id?: string
+          margem_lucro?: number | null
+          num_arquitetos?: number | null
+          percentual_produtivo?: number | null
+        }
+        Update: {
+          atualizado_em?: string | null
+          dias_mes?: number | null
+          horas_dia?: number | null
+          id?: string
+          margem_lucro?: number | null
+          num_arquitetos?: number | null
+          percentual_produtivo?: number | null
+        }
+        Relationships: []
+      }
+      custos_escritorio: {
+        Row: {
+          ativo: boolean | null
+          categoria: string | null
+          criado_em: string | null
+          frequencia: string | null
+          id: string
+          nome: string
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean | null
+          categoria?: string | null
+          criado_em?: string | null
+          frequencia?: string | null
+          id?: string
+          nome: string
+          valor: number
+        }
+        Update: {
+          ativo?: boolean | null
+          categoria?: string | null
+          criado_em?: string | null
+          frequencia?: string | null
+          id?: string
+          nome?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       lead_logs: {
         Row: {
           autor: string

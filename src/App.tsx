@@ -6,7 +6,9 @@ import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import BaseFinanceira from "./pages/BaseFinanceira.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
+
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,8 @@ const App = () => (
         <Route path="/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/financeiro/base" element={<ProtectedRoute><BaseFinanceira /></ProtectedRoute>} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

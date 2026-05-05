@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3 } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface NavItemProps {
   label: string;
   active?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
-const NavItem = ({ label, active, disabled }: NavItemProps) => (
-  <div className={cn(
+const NavItem = ({ label, active, disabled, onClick }: NavItemProps) => (
+  <div 
+    onClick={!disabled ? onClick : undefined}
+    className={cn(
+
     "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
     active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
     disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
@@ -73,7 +79,10 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
 );
 
 const Sidebar = ({ user }: { user: string }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
+
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
       try {
@@ -106,8 +115,11 @@ const Sidebar = ({ user }: { user: string }) => {
             <div className="flex items-baseline gap-1">
               <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
             </div>
-            <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">Módulo Pipeline</p>
+            <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">
+              {location.pathname === '/financeiro/base' ? 'Módulo Financeiro' : 'Módulo Pipeline'}
+            </p>
           </div>
+
         </div>
       </div>
 
@@ -118,7 +130,11 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={!!openSections['LEADS']}
           onToggle={() => toggleSection('LEADS')}
         >
-          <NavItem label="01 · Pipeline de Leads" active />
+          <NavItem 
+            label="01 · Pipeline de Leads" 
+            active={location.pathname === '/'} 
+            onClick={() => navigate('/')} 
+          />
           <NavItem label="02 · Contatos" disabled />
         </SectionAccordion>
 
@@ -128,10 +144,15 @@ const Sidebar = ({ user }: { user: string }) => {
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
-          <NavItem label="03 · Base Financeira" disabled />
+          <NavItem 
+            label="02 · Base Financeira" 
+            active={location.pathname === '/financeiro/base'} 
+            onClick={() => navigate('/financeiro/base')} 
+          />
           <NavItem label="04 · Fin. de Projetos" disabled />
           <NavItem label="05 · Dashboard" disabled />
         </SectionAccordion>
+
 
         <SectionAccordion 
           label="PROJETOS" 
