@@ -174,6 +174,19 @@ const BaseFinanceira = () => {
     setIsAiLoading(true);
     
     try {
+      // Fetch average ticket from leads
+      const { data: leadsData } = await supabase
+        .from('leads')
+        .select('orcamento');
+      
+      const ticketMedioVal = leadsData && leadsData.length > 0
+        ? leadsData.reduce((acc, l) => acc + (Number(l.orcamento) || 0), 0) / leadsData.length
+        : 0;
+      
+      const ticketMedio = ticketMedioVal > 0 
+        ? ticketMedioVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) 
+        : "85.000 (estimado)"; 
+
       const totalMensal = calculations.monthlyCosts;
       const totalFixo = costs.filter(c => c.categoria === 'fixo').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
       const totalProlabore = costs.filter(c => c.categoria === 'prolabore').reduce((acc, c) => acc + c.valor, 0);
@@ -181,10 +194,6 @@ const BaseFinanceira = () => {
       const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
       const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
       const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
-
-      // We don't have ticket_medio here easily, but we can mock or fetch from leads. 
-      // For now, let's assume a healthy ticket for premium SJC
-      const ticketMedio = "85.000"; 
 
       const prompt = `
 Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium em São José dos Campos, SP.
@@ -220,6 +229,7 @@ Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
 Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
 Responda em português.
 `;
+
 
       const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
