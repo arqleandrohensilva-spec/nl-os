@@ -473,8 +473,8 @@ const ControleHoras = () => {
   const exportWeeklySummaryPDF = async () => {
     if (!lastWeekSummary) return;
     const doc = new jsPDF();
-    const graphite = [26, 26, 26];
-    const bronze = [139, 115, 85];
+    const graphite: [number, number, number] = [26, 26, 26];
+    const bronze: [number, number, number] = [139, 115, 85];
 
     // Logo & Header
     doc.setFillColor(graphite[0], graphite[1], graphite[2]);
