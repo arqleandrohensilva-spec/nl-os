@@ -108,6 +108,124 @@ const BaseFinanceira = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (calculations.costPerHour > 0) {
+      // Trigger automatic diagnosis on first load or >10% change
+      const diff = Math.abs(calculations.costPerHour - lastCustoHoraRef.current);
+      const percentChange = lastCustoHoraRef.current > 0 ? (diff / lastCustoHoraRef.current) * 100 : 100;
+      
+      if (percentChange > 10) {
+        getAIDiagnostic();
+        lastCustoHoraRef.current = calculations.costPerHour;
+      }
+    }
+  }, [calculations.costPerHour]);
+
+  const getAIDiagnostic = async () => {
+    if (isAiLoading) return;
+    setIsAiLoading(true);
+    
+    try {
+      const totalMensal = calculations.monthlyCosts;
+      const totalFixo = costs.filter(c => c.categoria === 'fixo').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
+      const totalProlabore = costs.filter(c => c.categoria === 'prolabore').reduce((acc, c) => acc + c.valor, 0);
+      const totalSoftwares = costs.filter(c => c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
+      const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
+      const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
+      const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
+
+      // We don't have ticket_medio here easily, but we can mock or fetch from leads. 
+      // For now, let's assume a healthy ticket for premium SJC
+      const ticketMedio = "85.000"; 
+
+      const prompt = `
+Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium em São José dos Campos, SP.
+
+Analise os dados financeiros abaixo e gere um diagnóstico direto, técnico e útil em 3 parágrafos curtos.
+
+DADOS ATUAIS:
+- Custo/hora real: R$ ${calculations.costPerHour.toFixed(2)}
+- Preço sugerido/hora (com ${config?.margem_lucro}% de margem): R$ ${calculations.suggestedPrice.toFixed(2)}
+- Horas faturáveis/mês: ${Math.round(calculations.faturableHours)}h
+- Número de arquitetos: ${config?.num_arquitetos}
+- Total de custos mensais: R$ ${totalMensal.toFixed(2)}
+
+BREAKDOWN DE CUSTOS:
+- Custo Fixo: R$ ${totalFixo.toFixed(2)} (${((totalFixo/totalMensal)*100).toFixed(1)}% do total)
+- Pró-labore: R$ ${totalProlabore.toFixed(2)} (${((totalProlabore/totalMensal)*100).toFixed(1)}% do total)
+- Softwares: R$ ${totalSoftwares.toFixed(2)} (${((totalSoftwares/totalMensal)*100).toFixed(1)}% do total)
+- Custo Variável: R$ ${totalVariavel.toFixed(2)} (${((totalVariavel/totalMensal)*100).toFixed(1)}% do total)
+- Impostos: ${impostos}%
+- Reservas: R$ ${totalReservas.toFixed(2)}
+
+CONTEXTO DE MERCADO:
+- Arquitetos em SJC cobram entre R$ 120–200/hora
+- Escritórios premium cobram acima de R$ 180/hora
+- Ticket médio atual do pipeline: R$ ${ticketMedio}
+
+Gere o diagnóstico com:
+1. Uma avaliação direta do custo/hora atual (está saudável? abaixo do mercado? acima?)
+2. O maior risco financeiro identificado nos dados (qual categoria está pesando mais?)
+3. Uma recomendação concreta e acionável para esta semana
+
+Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
+Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
+Responda em português.
+`;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt,
+          systemPrompt: "Você é um consultor financeiro sênior especializado em escritórios de arquitetura."
+        }
+      });
+
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+
+      setAiDiagnostic(data.content[0].text);
+      setLastAiAnalysis(new Date());
+    } catch (error) {
+      console.error('Error getting AI diagnostic:', error);
+      setAiDiagnostic('Desculpe, não foi possível gerar o diagnóstico no momento. Verifique sua conexão ou tente novamente mais tarde.');
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const getSimulatorAnalysis = async () => {
+    if (isSimLoading) return;
+    setIsSimLoading(true);
+    
+    try {
+      const receita = simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice;
+      const lucro = receita - calculations.monthlyCosts;
+
+      const prompt = `
+Em uma frase direta: é realista para um escritório de 2 arquitetos em São José dos Campos 
+fechar ${simNumProjetos} projetos de ${simHorasPorProjeto} horas em um mês, gerando receita de R$ ${receita.toFixed(2)} e lucro de R$ ${lucro.toFixed(2)}?
+Se sim, diga por quê. Se não, sugira um cenário mais realista.
+Máximo 3 linhas. Sem markdown. Em português.
+`;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt,
+          systemPrompt: "Você é um consultor financeiro sênior especializado em escritórios de arquitetura."
+        }
+      });
+
+      if (error) throw error;
+      setSimAnalysis(data.content[0].text);
+    } catch (error) {
+      console.error('Error getting simulator analysis:', error);
+      toast.error('Erro ao analisar cenário');
+    } finally {
+      setIsSimLoading(false);
+    }
+  };
+
+
   const fetchData = async () => {
     try {
       const [configRes, costsRes] = await Promise.all([
