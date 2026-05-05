@@ -4,7 +4,6 @@ import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
 import KanbanColumn from '@/components/KanbanColumn';
 import LeadDetailPanel from '@/components/LeadDetailPanel';
-import Login from '@/components/Login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -22,7 +21,6 @@ import { cn } from '@/lib/utils';
 import { 
   DndContext, 
   DragOverlay, 
-  closestCorners, 
   KeyboardSensor, 
   PointerSensor, 
   useSensor, 
@@ -30,15 +28,11 @@ import {
   DragStartEvent, 
   DragEndEvent,
   DragOverEvent,
-  defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
 import { 
   arrayMove, 
-  SortableContext, 
   sortableKeyboardCoordinates, 
-  verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
 import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
@@ -56,7 +50,6 @@ const STAGES: Stage[] = [
 const Index = () => {
   const [user, setUser] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
@@ -91,8 +84,6 @@ const Index = () => {
         }
       } catch (error) {
         console.error("Auth check error:", error);
-      } finally {
-        setIsAuthLoading(false);
       }
     };
 
@@ -107,81 +98,10 @@ const Index = () => {
       } else {
         setUser(null);
       }
-      setIsAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  useEffect(() => {
-    if (!session) return;
-    fetchLeads();
-
-    // Realtime subscriptions
-    const leadsChannel = supabase
-      .channel('leads-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
-        fetchLeads();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'lead_logs' }, () => {
-        fetchLeads();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(leadsChannel);
-    };
-  }, [session]);
-
-  const fetchLeads = async () => {
-    setIsLoading(true);
-    try {
-      const { data: leadsData, error: leadsError } = await supabase
-        .from('leads')
-        .select(`
-          *,
-          logs:lead_logs(*)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (leadsError) throw leadsError;
-
-      // Map Supabase data to our Lead type
-      const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
-        ...l,
-        logs: (l.logs || []).sort((a: any, b: any) => 
-          new Date(b.data).getTime() - new Date(a.data).getTime()
-        )
-      }));
-
-      setLeads(mappedLeads);
-    } catch (error: any) {
-      console.error('Error fetching leads:', error);
-      toast.error('Erro ao carregar leads');
-      setLeads([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogin = (username: string) => {
-    // Session is handled by supabase.auth.onAuthStateChange
-  };
-
-  if (isAuthLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-bronze/20 border-t-bronze rounded-full animate-spin" />
-          <p className="text-[10px] uppercase tracking-widest text-muted">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
-  }
 
   const toggleTempFilter = (temp: Temp) => {
     setFilterTemp(prev => 
