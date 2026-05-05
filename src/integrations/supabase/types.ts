@@ -80,6 +80,36 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnosticos_ia: {
+        Row: {
+          conteudo: string
+          criado_em: string | null
+          criado_por: string | null
+          custo_hora_momento: number | null
+          id: string
+          modulo: string | null
+          status: string | null
+        }
+        Insert: {
+          conteudo: string
+          criado_em?: string | null
+          criado_por?: string | null
+          custo_hora_momento?: number | null
+          id?: string
+          modulo?: string | null
+          status?: string | null
+        }
+        Update: {
+          conteudo?: string
+          criado_em?: string | null
+          criado_por?: string | null
+          custo_hora_momento?: number | null
+          id?: string
+          modulo?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       lead_logs: {
         Row: {
           autor: string

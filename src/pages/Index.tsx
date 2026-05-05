@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Lead, Stage, Temp, TipoProjeto } from '@/lib/types';
+import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
 import KanbanColumn from '@/components/KanbanColumn';
@@ -13,7 +13,8 @@ import {
   Settings2,
   Eye,
   Download,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -40,6 +41,20 @@ import { toast } from "sonner";
 import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const STAGES: Stage[] = [
   'Novo Lead', 
@@ -61,6 +76,19 @@ const Index = () => {
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
+  const [isNewLeadDialogOpen, setIsNewLeadDialogOpen] = useState(false);
+  const [config, setConfig] = useState<ConfigEscritorio | null>(null);
+  const [newLead, setNewLead] = useState({
+    nome: '',
+    whats: '',
+    cidade: '',
+    tipo: 'Arq+Int' as TipoProjeto,
+    area: 0,
+    orcamento: 0,
+    origem: 'Instagram' as Origem,
+    temp: 'Morno' as Temp,
+    obs: ''
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -74,6 +102,14 @@ const Index = () => {
   );
 
   const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase.from('config_escritorio').select('*').single();
+      if (data) setConfig(data as ConfigEscritorio);
+    };
+    fetchConfig();
+  }, []);
 
   useEffect(() => {
     // Check current session
@@ -359,6 +395,54 @@ const Index = () => {
     }
   };
 
+  const handleCreateLead = async () => {
+    if (!newLead.nome || !newLead.whats || !newLead.cidade) {
+      toast.error("Preencha o nome, WhatsApp e cidade");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .insert({
+          nome: newLead.nome,
+          whats: newLead.whats,
+          cidade: newLead.cidade,
+          tipo: newLead.tipo,
+          area: Number(newLead.area),
+          orcamento: Number(newLead.orcamento),
+          origem: newLead.origem,
+          temp: newLead.temp,
+          obs: newLead.obs,
+          stage: 'Novo Lead',
+          etapa_desde: new Date().toISOString(),
+          criado_por: user || 'Sócio'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(prev => [data as any, ...prev]);
+      setIsNewLeadDialogOpen(false);
+      setNewLead({
+        nome: '',
+        whats: '',
+        cidade: '',
+        tipo: 'Arq+Int',
+        area: 0,
+        orcamento: 0,
+        origem: 'Instagram',
+        temp: 'Morno',
+        obs: ''
+      });
+      toast.success("Lead criado com sucesso");
+    } catch (err) {
+      console.error('Error creating lead:', err);
+      toast.error('Erro ao criar lead');
+    }
+  };
+
   const filteredLeads = leads.filter(l => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
@@ -500,9 +584,159 @@ const Index = () => {
                 >
                   <Download size={18} />
                 </button>
-                <Button className="h-10 bg-[#1A1A1A] hover:bg-bronze transition-all duration-300 rounded-[2px] text-[10px] uppercase tracking-[0.2em] px-8 gap-3 font-bold font-mono">
-                  + Novo Lead
-                </Button>
+                <Dialog open={isNewLeadDialogOpen} onOpenChange={setIsNewLeadDialogOpen}>
+                  <DialogTrigger asChild>
+                    <button className="h-10 px-8 bg-graphite hover:bg-bronze text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-[2px] flex items-center gap-3 group">
+                      <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                      Novo Lead
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[550px] bg-white border-none rounded-[4px] p-0 overflow-hidden">
+                    <div className="bg-graphite p-6">
+                      <DialogTitle className="font-cormorant text-2xl font-bold text-white uppercase tracking-tight">Captação de Novo Lead</DialogTitle>
+                      <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] mt-1">Módulo 01 · Registro inicial no ecossistema NL</p>
+                    </div>
+                    
+                    <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-custom">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Nome do Cliente</label>
+                          <Input 
+                            value={newLead.nome} 
+                            onChange={(e) => setNewLead({ ...newLead, nome: e.target.value })}
+                            placeholder="Ex: João Silva"
+                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">WhatsApp</label>
+                          <Input 
+                            value={newLead.whats} 
+                            onChange={(e) => setNewLead({ ...newLead, whats: e.target.value })}
+                            placeholder="(00) 00000-0000"
+                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Cidade</label>
+                          <Select 
+                            value={newLead.cidade} 
+                            onValueChange={(val) => setNewLead({ ...newLead, cidade: val })}
+                          >
+                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                              <SelectValue placeholder="Selecione a cidade" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border border-beige">
+                              {config?.mercados?.map(m => (
+                                <SelectItem key={m} value={m}>{m}</SelectItem>
+                              ))}
+                              <SelectItem value="Outra cidade">Outra cidade</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Tipo de Projeto</label>
+                          <Select 
+                            value={newLead.tipo} 
+                            onValueChange={(val: TipoProjeto) => setNewLead({ ...newLead, tipo: val })}
+                          >
+                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border border-beige">
+                              <SelectItem value="Arq+Int">Arquitetura + Interiores</SelectItem>
+                              <SelectItem value="Interiores">Somente Interiores</SelectItem>
+                              <SelectItem value="Comercial">Comercial</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Área Estimada (m²)</label>
+                          <Input 
+                            type="number"
+                            value={newLead.area || ''} 
+                            onChange={(e) => setNewLead({ ...newLead, area: Number(e.target.value) })}
+                            placeholder="0"
+                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Orçamento (R$)</label>
+                          <Input 
+                            type="number"
+                            value={newLead.orcamento || ''} 
+                            onChange={(e) => setNewLead({ ...newLead, orcamento: Number(e.target.value) })}
+                            placeholder="0"
+                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Origem</label>
+                          <Select 
+                            value={newLead.origem} 
+                            onValueChange={(val: Origem) => setNewLead({ ...newLead, origem: val })}
+                          >
+                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border border-beige">
+                              <SelectItem value="Instagram">Instagram</SelectItem>
+                              <SelectItem value="Indicação">Indicação</SelectItem>
+                              <SelectItem value="Site">Site</SelectItem>
+                              <SelectItem value="Google">Google Ads</SelectItem>
+                              <SelectItem value="Outro">Outro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Temperatura</label>
+                          <div className="flex gap-2">
+                            {(['Quente', 'Morno', 'Frio'] as Temp[]).map(t => (
+                              <button
+                                key={t}
+                                onClick={() => setNewLead({ ...newLead, temp: t })}
+                                className={cn(
+                                  "flex-1 h-10 border text-[9px] font-bold uppercase tracking-widest rounded-[2px] transition-all",
+                                  newLead.temp === t 
+                                    ? (t === 'Quente' ? "bg-red text-white border-red" : t === 'Morno' ? "bg-amber text-white border-amber" : "bg-graphite text-white border-graphite")
+                                    : "border-beige text-muted hover:border-bronze"
+                                )}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Observações Iniciais</label>
+                        <textarea 
+                          value={newLead.obs}
+                          onChange={(e) => setNewLead({ ...newLead, obs: e.target.value })}
+                          className="w-full min-h-[100px] p-4 border border-beige text-xs font-dm-mono focus:border-bronze outline-none rounded-[2px] resize-none"
+                          placeholder="Notas sobre o primeiro contato..."
+                        />
+                      </div>
+
+                      <Button 
+                        onClick={handleCreateLead}
+                        className="w-full h-14 bg-graphite hover:bg-bronze text-white text-[11px] tracking-[0.3em] uppercase font-bold transition-all duration-300 rounded-[2px]"
+                      >
+                        Criar Lead no Pipeline
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
