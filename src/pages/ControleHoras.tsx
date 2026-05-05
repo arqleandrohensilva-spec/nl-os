@@ -59,9 +59,92 @@ const ControleHoras = () => {
   const [timerDisplay, setTimerDisplay] = useState('00:00:00');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProjeto, setSelectedProjeto] = useState<Projeto | null>(null);
+  const [newSession, setNewSession] = useState({ etapa: '', responsavel: 'Leandro', obs: '' });
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelProjeto, setPanelProjeto] = useState<Projeto | null>(null);
   const [isReportExpanded, setIsReportExpanded] = useState(false);
+
+  const handleActivity = useCallback(() => {
+    setLastActivity(Date.now());
+  }, []);
+
+  useEffect(() => {
+    if (activeTimer && !showInactivityModal) {
+      window.addEventListener('mousemove', handleActivity);
+      window.addEventListener('keypress', handleActivity);
+      window.addEventListener('scroll', handleActivity);
+      
+      const checkInactivity = setInterval(() => {
+        if (Date.now() - lastActivity > INACTIVITY_THRESHOLD) {
+          setShowInactivityModal(true);
+        }
+      }, 30000); // Check every 30 seconds
+
+      return () => {
+        window.removeEventListener('mousemove', handleActivity);
+        window.removeEventListener('keypress', handleActivity);
+        window.removeEventListener('scroll', handleActivity);
+        clearInterval(checkInactivity);
+      };
+    }
+  }, [activeTimer, lastActivity, showInactivityModal, handleActivity]);
+
+  const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
+    if (loadingPredictions[projeto.id]) return;
+    
+    setLoadingPredictions(prev => ({ ...prev, [projeto.id]: true }));
+    
+    try {
+      const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
+      const totalHoras = projetoSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
+      
+      // Simple logic to feed prompt: avg hours/day based on last 7 days of activity
+      const last7DaysSessoes = projetoSessoes.filter(s => {
+        const d = parseISO(s.inicio);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return d > weekAgo;
+      });
+      const ritmoSemana = (last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) / 7;
+      
+      const prompt = `
+        Analise o status deste projeto de arquitetura:
+        - Nome: ${projeto.nome}
+        - Horas Estimadas: ${projeto.horas_estimadas}h
+        - Horas Realizadas até agora: ${totalHoras.toFixed(1)}h
+        - Ritmo atual (últimos 7 dias): ${ritmoSemana.toFixed(2)}h/dia
+        
+        Com base no ritmo, responda em no máximo 2 linhas:
+        1. Se vai estourar as horas, quantas horas extras e em quantos dias?
+        2. Ou se está no prazo, quando deve concluir?
+        
+        Responda apenas o texto, sem markdown. No final da resposta, inclua obrigatoriamente STATUS: OK se estiver no prazo ou STATUS: ALERT se for estourar.
+      `;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { prompt, systemPrompt: "Você é um assistente de gestão de projetos de arquitetura." }
+      });
+
+      if (error) throw error;
+      
+      const content = data.choices[0].message.content;
+      const statusMatch = content.match(/STATUS:\s*(OK|ALERT)/i);
+      const status = statusMatch ? (statusMatch[1].toUpperCase() === 'ALERT' ? 'alert' : 'ok') : 'ok';
+      const cleanContent = content.replace(/STATUS:\s*(OK|ALERT)/i, '').trim();
+      
+      setAiPredictions(prev => ({ ...prev, [projeto.id]: { text: cleanContent, status } }));
+    } catch (err) {
+      console.error('Prediction error:', err);
+    } finally {
+      setLoadingPredictions(prev => ({ ...prev, [projeto.id]: false }));
+    }
+  };
+
+  const pauseInactivity = async (discount: boolean = false) => {
+    if (!activeTimer) return;
+    stopTimer(discount);
+    setShowInactivityModal(false);
+  };
 
   useEffect(() => {
     fetchData();
