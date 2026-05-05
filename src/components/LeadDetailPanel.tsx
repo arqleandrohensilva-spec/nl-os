@@ -22,6 +22,19 @@ const STAGES: Stage[] = ['Novo Lead', 'Reunião Agendada', 'Proposta Enviada', '
 const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: LeadDetailPanelProps) => {
   const [newLog, setNewLog] = useState({ tipo: 'N' as LogTipo, nota: '' });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [custoHora, setCustoHora] = useState<number>(0);
+  const [horasEstimadas, setHorasEstimadas] = useState<number>(Math.round(lead.area * 0.8)); // Heurística inicial
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase.from('config_escritorio').select('custo_hora').single();
+      if (data) setCustoHora(data.custo_hora);
+    };
+    fetchConfig();
+  }, []);
+
+  const viability = verificarViabilidade(lead.orcamento, horasEstimadas, custoHora);
+
 
   const formatCurrency = (val: number) => val > 0 ? `R$ ${(val / 1000).toFixed(0)}k` : "—";
 
