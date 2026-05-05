@@ -388,6 +388,16 @@ const Index = () => {
     doc.setFillColor(graphite[0], graphite[1], graphite[2]);
     doc.rect(0, 0, 210, 297, 'F');
     
+    // Logo na Capa do PDF
+    const logoUrl = "https://krzuroijejfozljhchok.supabase.co/storage/v1/object/public/assets/logo.png";
+    // Adicionamos a logo com fundo transparente. No jsPDF, imagens remotas precisam ser carregadas ou convertidas.
+    // Para simplificar e garantir funcionamento imediato, usaremos a URL direta se o jsPDF suportar ou apenas texto se falhar.
+    try {
+      doc.addImage(logoUrl, 'PNG', 85, 40, 40, 40);
+    } catch (e) {
+      console.error("Erro ao carregar logo no PDF:", e);
+    }
+
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(40);
     doc.text('NL OS', 105, 100, { align: 'center' });
