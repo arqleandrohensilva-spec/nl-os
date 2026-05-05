@@ -12,7 +12,7 @@ interface Projeto {
   valor_proposta: number;
   horas_estimadas: number;
   etapa_atual: string;
-  status: 'ativo' | 'concluido' | 'pausado';
+  status: string;
 }
 
 const ControleHoras = () => {
