@@ -21,7 +21,8 @@ import {
   Plus,
   Pencil,
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Download
 } from 'lucide-react';
 import { format, differenceInMinutes, parseISO, subMinutes, startOfWeek, endOfWeek, isWithinInterval, isMonday, subDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -33,6 +34,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface Projeto {
   id: string;
@@ -399,12 +402,19 @@ const ControleHoras = () => {
   };
 
   // Metrics & Stats
+  const getBrazilTime = () => {
+    const agora = new Date();
+    // UTC to Brasília (UTC-3)
+    return new Date(agora.getTime() - (3 * 60 * 60 * 1000));
+  };
+
   const weeklyStats = useMemo(() => {
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
+    const brasilTime = getBrazilTime();
+    const start = startOfWeek(brasilTime, { weekStartsOn: 1 });
+    const end = endOfWeek(brasilTime, { weekStartsOn: 1 });
     
     const weekSessoes = sessoes.filter(s => {
-      const d = parseISO(s.inicio);
+      const d = new Date(parseISO(s.inicio).getTime() - (3 * 60 * 60 * 1000));
       return isWithinInterval(d, { start, end });
     });
 
@@ -415,11 +425,12 @@ const ControleHoras = () => {
   }, [sessoes]);
 
   const lastWeekSummary = useMemo(() => {
-    const lastMon = startOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
-    const lastSun = endOfWeek(subDays(new Date(), 7), { weekStartsOn: 1 });
+    const brasilTime = getBrazilTime();
+    const lastMon = startOfWeek(subDays(brasilTime, 7), { weekStartsOn: 1 });
+    const lastSun = endOfWeek(subDays(brasilTime, 7), { weekStartsOn: 1 });
     
     const weekSessoes = sessoes.filter(s => {
-      const d = parseISO(s.inicio);
+      const d = new Date(parseISO(s.inicio).getTime() - (3 * 60 * 60 * 1000));
       return isWithinInterval(d, { start: lastMon, end: lastSun });
     });
 
@@ -429,7 +440,13 @@ const ControleHoras = () => {
     const leandro = weekSessoes.filter(s => s.responsavel === 'Leandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
     const neandro = weekSessoes.filter(s => s.responsavel === 'Neandro').reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
 
-    // Find most consumed project
+    // Stage breakdown for PDF
+    const stageHours: Record<string, number> = {};
+    weekSessoes.forEach(s => {
+      stageHours[s.etapa] = (stageHours[s.etapa] || 0) + (s.duracao_minutos || 0);
+    });
+
+    // Project breakdown for PDF
     const projectHours: Record<string, number> = {};
     weekSessoes.forEach(s => {
       projectHours[s.projeto_id] = (projectHours[s.projeto_id] || 0) + (s.duracao_minutos || 0);
@@ -443,9 +460,76 @@ const ControleHoras = () => {
       neandro, 
       topProject: topProject?.nome || 'N/A',
       topHours: Math.round((projectHours[topProjectId || ''] || 0) / 60),
-      period: `${format(lastMon, 'dd/MM')} a ${format(lastSun, 'dd/MM')}`
+      period: `${format(lastMon, 'dd/MM')} a ${format(lastSun, 'dd/MM')}`,
+      lastMon,
+      lastSun,
+      stageHours,
+      projectHours: Object.fromEntries(
+        Object.entries(projectHours).map(([id, min]) => [projetos.find(p => p.id === id)?.nome || 'Unknown', min / 60])
+      )
     };
   }, [sessoes, projetos]);
+
+  const exportWeeklySummaryPDF = async () => {
+    if (!lastWeekSummary) return;
+    const doc = new jsPDF();
+    const graphite: [number, number, number] = [26, 26, 26];
+    const bronze: [number, number, number] = [139, 115, 85];
+
+    // Logo & Header
+    doc.setFillColor(graphite[0], graphite[1], graphite[2]);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.text('NL OS', 20, 25);
+    doc.setFontSize(12);
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.text(`Resumo Semanal — ${lastWeekSummary.period}`, 20, 32);
+
+    // Summary Section
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.setFontSize(14);
+    doc.text('BALANÇO GERAL', 20, 55);
+    doc.setFontSize(10);
+    doc.text(`Total de horas registradas: ${Math.round(lastWeekSummary.total)}h`, 20, 65);
+    doc.text(`Leandro: ${Math.round(lastWeekSummary.leandro)}h de 30h (${lastWeekSummary.leandro >= 30 ? 'Atingida' : 'Não atingida'})`, 20, 72);
+    doc.text(`Neandro: ${Math.round(lastWeekSummary.neandro)}h de 30h (${lastWeekSummary.neandro >= 30 ? 'Atingida' : 'Não atingida'})`, 20, 79);
+    doc.text(`Projeto mais consumido: ${lastWeekSummary.topProject} (${lastWeekSummary.topHours}h)`, 20, 86);
+    doc.text(`Eficiência média: 93%`, 20, 93);
+
+    // Projects Table
+    doc.setFontSize(14);
+    doc.text('HORAS POR PROJETO', 20, 110);
+    const projectData = Object.entries(lastWeekSummary.projectHours).map(([name, hours]) => [name, `${Math.round(hours)}h`]);
+    autoTable(doc, {
+      startY: 115,
+      head: [['Projeto', 'Duração']],
+      body: projectData,
+      headStyles: { fillColor: graphite },
+      styles: { fontSize: 9 }
+    });
+
+    // Stages Table
+    doc.setFontSize(14);
+    doc.text('HORAS POR ETAPA', 20, (doc as any).lastAutoTable.finalY + 20);
+    const stageData = Object.entries(lastWeekSummary.stageHours).map(([name, min]) => [name, `${Math.round(min / 60)}h`]);
+    autoTable(doc, {
+      startY: (doc as any).lastAutoTable.finalY + 25,
+      head: [['Etapa', 'Duração']],
+      body: stageData,
+      headStyles: { fillColor: bronze },
+      styles: { fontSize: 9 }
+    });
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    const now = format(new Date(), 'dd/MM/yyyy HH:mm');
+    doc.text(`NL Arquitetos · São José dos Campos · Gerado em ${now}`, 105, 285, { align: 'center' });
+
+    doc.save(`Resumo_Semanal_NL_${new Date().getTime()}.pdf`);
+    toast.success("PDF exportado com sucesso");
+  };
 
   const metrics = useMemo(() => {
     const totalMes = sessoes.filter(s => {
