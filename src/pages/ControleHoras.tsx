@@ -357,7 +357,7 @@ const ControleHoras = () => {
                 <div className="flex gap-2 pt-4 border-t border-[#F5F2EF]">
                   {isRunning ? (
                     <Button 
-                      onClick={stopTimer}
+                      onClick={() => stopTimer()}
                       className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
                     >
                       <Square size={10} className="mr-2 fill-white" />
