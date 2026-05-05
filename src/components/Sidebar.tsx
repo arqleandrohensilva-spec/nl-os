@@ -93,7 +93,7 @@ const Sidebar = ({ user }: { user: string }) => {
     });
   };
 
-  const initials = user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  const initials = user ? user.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
 
   return (
     <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">

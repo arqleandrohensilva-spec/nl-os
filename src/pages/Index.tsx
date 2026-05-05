@@ -84,6 +84,7 @@ const Index = () => {
         if (session?.user) {
           const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
           setUser(name.charAt(0).toUpperCase() + name.slice(1));
+          sessionStorage.setItem('nl_user', name.charAt(0).toUpperCase() + name.slice(1));
         }
       } catch (error) {
         console.error("Auth check error:", error);
@@ -97,9 +98,12 @@ const Index = () => {
       setSession(session);
       if (session?.user) {
         const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
-        setUser(name.charAt(0).toUpperCase() + name.slice(1));
+        const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+        setUser(formattedName);
+        sessionStorage.setItem('nl_user', formattedName);
       } else {
         setUser(null);
+        sessionStorage.removeItem('nl_user');
       }
     });
 
