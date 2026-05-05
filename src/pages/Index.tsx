@@ -4,7 +4,6 @@ import Sidebar from '@/components/Sidebar';
 import MetricsBar from '@/components/MetricsBar';
 import KanbanColumn from '@/components/KanbanColumn';
 import LeadDetailPanel from '@/components/LeadDetailPanel';
-import Login from '@/components/Login';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -22,7 +21,6 @@ import { cn } from '@/lib/utils';
 import { 
   DndContext, 
   DragOverlay, 
-  closestCorners, 
   KeyboardSensor, 
   PointerSensor, 
   useSensor, 
@@ -30,13 +28,12 @@ import {
   DragStartEvent, 
   DragEndEvent,
   DragOverEvent,
+  closestCorners,
   defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
 import { 
   arrayMove, 
-  SortableContext, 
   sortableKeyboardCoordinates, 
-  verticalListSortingStrategy 
 } from '@dnd-kit/sortable';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
@@ -56,7 +53,6 @@ const STAGES: Stage[] = [
 const Index = () => {
   const [user, setUser] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
-  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeLead, setActiveLead] = useState<Lead | null>(null);
@@ -91,8 +87,6 @@ const Index = () => {
         }
       } catch (error) {
         console.error("Auth check error:", error);
-      } finally {
-        setIsAuthLoading(false);
       }
     };
 
@@ -107,7 +101,6 @@ const Index = () => {
       } else {
         setUser(null);
       }
-      setIsAuthLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -163,25 +156,6 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
-  const handleLogin = (username: string) => {
-    // Session is handled by supabase.auth.onAuthStateChange
-  };
-
-  if (isAuthLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-bronze/20 border-t-bronze rounded-full animate-spin" />
-          <p className="text-[10px] uppercase tracking-widest text-muted">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Login onLogin={handleLogin} />;
-  }
 
   const toggleTempFilter = (temp: Temp) => {
     setFilterTemp(prev => 
