@@ -194,9 +194,10 @@ const BaseFinanceira = () => {
       const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
       const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
       const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
+      const mercados = config?.mercados?.length ? config.mercados.join(', ') : 'São José dos Campos';
 
       const prompt = `
-Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium em São José dos Campos, SP.
+Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium.
 
 Analise os dados financeiros abaixo e gere um diagnóstico direto, técnico e útil em 3 parágrafos curtos.
 
@@ -215,15 +216,22 @@ BREAKDOWN DE CUSTOS:
 - Impostos: ${impostos}%
 - Reservas: R$ ${totalReservas.toFixed(2)}
 
-CONTEXTO DE MERCADO:
-- Arquitetos em SJC cobram entre R$ 120–200/hora
-- Escritórios premium cobram acima de R$ 180/hora
+MERCADOS DE ATUAÇÃO: ${mercados}
+
+CONTEXTO DE BENCHMARK POR MERCADO:
+- São José dos Campos: R$ 120–180/hora (premium local)
+- São Paulo: R$ 180–350/hora (premium capital)
+- Campinas: R$ 130–200/hora
+- Rio de Janeiro: R$ 160–280/hora
+- Outros: usar São Paulo como referência superior
+
+DADOS DE PIPELINE:
 - Ticket médio atual do pipeline: R$ ${ticketMedio}
 
 Gere o diagnóstico com:
-1. Uma avaliação direta do custo/hora atual (está saudável? abaixo do mercado? acima?)
-2. O maior risco financeiro identificado nos dados (qual categoria está pesando mais?)
-3. Uma recomendação concreta e acionável para esta semana
+1. Uma avaliação direta do custo/hora atual comparado aos mercados de atuação cadastrados.
+2. Identifique qual mercado representa a maior oportunidade de reajuste de preço para a NL.
+3. Uma recomendação concreta e acionável para esta semana visando aumentar a lucratividade.
 
 Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
 Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
@@ -520,7 +528,39 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               </div>
               
-              <div className="ml-12 pl-12 border-l border-beige text-right">
+              <div className="px-8 border-l border-beige flex flex-col justify-center min-w-[250px]">
+                <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest mb-3">Mercados de Atuação</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {config?.mercados?.map((m) => (
+                    <span key={m} className="bg-bronze/10 text-bronze text-[10px] px-2 py-1 rounded flex items-center gap-1 font-dm-mono">
+                      {m}
+                      <button onClick={() => {
+                        const newMercados = config.mercados?.filter(item => item !== m) || [];
+                        updateConfig({ mercados: newMercados });
+                      }} className="hover:text-red-500">
+                        <X size={10} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Adicionar cidade..."
+                    className="h-8 border-beige text-[10px] font-dm-mono"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const val = e.currentTarget.value.trim();
+                        if (val && !config?.mercados?.includes(val)) {
+                          updateConfig({ mercados: [...(config?.mercados || []), val] });
+                          e.currentTarget.value = '';
+                        }
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              
+              <div className="ml-8 pl-8 border-l border-beige text-right">
                 <p className="text-3xl font-cormorant font-bold text-bronze">
                   = {Math.round(calculations.faturableHours)}h
                 </p>
