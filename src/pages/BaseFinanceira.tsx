@@ -71,6 +71,20 @@ const BaseFinanceira = () => {
   });
 
   const [user, setUser] = useState<string | null>(null);
+  
+  // AI State
+  const [aiDiagnostic, setAiDiagnostic] = useState<string>('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [lastAiAnalysis, setLastAiAnalysis] = useState<Date | null>(null);
+  const lastCustoHoraRef = useRef<number>(0);
+
+  // Simulator State
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
+  const [simNumProjetos, setSimNumProjetos] = useState(2);
+  const [simHorasPorProjeto, setSimHorasPorProjeto] = useState(200);
+  const [simAnalysis, setSimAnalysis] = useState<string>('');
+  const [isSimLoading, setIsSimLoading] = useState(false);
+
 
   useEffect(() => {
     const savedUser = sessionStorage.getItem('nl_user');
