@@ -1010,9 +1010,163 @@ Máximo 3 linhas. Sem markdown. Em português.
                       </Dialog>
                     </div>
                   )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Right Column: Donut Chart */}
+            <div className="col-span-1">
+              <DonutChartSection 
+                totalMonthly={calculations.monthlyCosts}
+                onSliceClick={(id) => {
+                  setOpenAccordion(id);
+                  const el = document.getElementById(`accordion-trigger-${id}`);
+                  el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+                data={CATEGORIES.map(cat => {
+                  const catCosts = costs.filter(c => c.categoria === cat.id);
+                  const total = catCosts.reduce((acc, c) => {
+                    if (c.frequencia === 'percentual') return acc;
+                    return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
+                  }, 0);
+                  return {
+                    id: cat.id,
+                    name: cat.label,
+                    value: total,
+                    color: cat.color
+                  };
+                }).filter(c => c.value > 0)}
+              />
+            </div>
+          </div>
+
+          {/* Evolução do Custo/Hora Section */}
+          <div className="border border-beige rounded-[4px] overflow-hidden bg-white">
+            <button 
+              onClick={() => setIsEvolucaoOpen(!isEvolucaoOpen)}
+              className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
+                  <History size={16} />
                 </div>
-              );
-            })}
+                <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">Evolução do Custo/Hora</span>
+              </div>
+              {isEvolucaoOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+            </button>
+            
+            {isEvolucaoOpen && (
+              <div className="p-8 h-[350px] animate-in fade-in slide-in-from-top-2 duration-300">
+                {aiHistory.length < 2 ? (
+                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-muted">
+                    Histórico disponível após 30 dias de uso (mínimo 2 diagnósticos salvos)
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[...aiHistory].reverse()}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0EBE5" />
+                      <XAxis 
+                        dataKey="criado_em" 
+                        tickFormatter={(val) => new Date(val).toLocaleDateString('pt-BR', { month: 'short' })}
+                        tick={{ fontSize: 10, fill: '#777' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 10, fill: '#777' }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(val) => `R$ ${val}`}
+                      />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#3A3A3A', 
+                          border: 'none', 
+                          borderRadius: '4px',
+                          color: '#fff',
+                          fontSize: '10px',
+                          fontFamily: 'DM Mono'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        labelFormatter={(val) => new Date(val).toLocaleDateString('pt-BR')}
+                      />
+                      <ReferenceLine 
+                        y={120} 
+                        stroke="#777" 
+                        strokeDasharray="5 5" 
+                        label={{ value: 'Benchmark (R$ 120)', position: 'insideBottomRight', fontSize: 8, fill: '#777' }} 
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="custo_hora_momento" 
+                        stroke="#8B7355" 
+                        strokeWidth={2}
+                        dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#8B7355' }}
+                        activeDot={{ r: 6, fill: '#8B7355' }}
+                        name="Custo/Hora"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* AI Suggestions Section */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+              <Sparkles size={12} className="text-bronze" /> Sugestões da IA · Custos Possivelmente Esquecidos
+            </h3>
+            <div className="grid grid-cols-3 gap-6">
+              {isAiSuggestionsLoading ? (
+                Array(3).fill(0).map((_, i) => (
+                  <div key={i} className="h-24 bg-white border border-beige border-dashed rounded-[4px] animate-pulse" />
+                ))
+              ) : aiSuggestions.length > 0 ? (
+                aiSuggestions.map((s, i) => (
+                  <div key={i} className="bg-white p-4 border border-bronze/30 border-dashed rounded-[4px] space-y-3 relative group">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Lightbulb size={12} className="text-bronze" />
+                          <span className="text-[10px] font-bold text-graphite uppercase font-dm-mono">{s.nome}</span>
+                        </div>
+                        <p className="text-[9px] text-muted leading-relaxed">{s.motivo}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-beige/30">
+                      <span className="text-[10px] font-dm-mono font-bold text-bronze">Est. R$ {s.valor_estimado.toLocaleString('pt-BR')}</span>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-6 text-[8px] uppercase font-bold text-muted hover:text-red-500"
+                          onClick={() => setAiSuggestions(prev => prev.filter((_, idx) => idx !== i))}
+                        >
+                          Ignorar
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="h-6 text-[8px] uppercase font-bold text-bronze hover:bg-bronze/5"
+                          onClick={() => {
+                            setNewItem({ nome: s.nome, valor: s.valor_estimado.toString(), categoria: 'fixo', frequencia: 'mensal' });
+                            setIsAddingItem(true);
+                          }}
+                        >
+                          + Adicionar
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-[10px] font-dm-mono text-muted text-center py-4">
+                  Nenhuma sugestão adicional no momento.
+                </div>
+              )}
+            </div>
           </div>
           {/* Simulator Section */}
           <div className="border-t border-beige pt-8 space-y-6">
