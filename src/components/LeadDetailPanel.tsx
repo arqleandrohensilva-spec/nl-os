@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check } from 'lucide-react';
+import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2 } from 'lucide-react';
 import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
+import { verificarViabilidade } from '@/lib/finance-utils';
+import { supabase } from '@/integrations/supabase/client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
@@ -19,6 +22,19 @@ const STAGES: Stage[] = ['Novo Lead', 'Reunião Agendada', 'Proposta Enviada', '
 const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: LeadDetailPanelProps) => {
   const [newLog, setNewLog] = useState({ tipo: 'N' as LogTipo, nota: '' });
   const [isDeleting, setIsDeleting] = useState(false);
+  const [custoHora, setCustoHora] = useState<number>(0);
+  const [horasEstimadas, setHorasEstimadas] = useState<number>(Math.round(lead.area * 0.8)); // Heurística inicial
+
+  useEffect(() => {
+    const fetchConfig = async () => {
+      const { data } = await supabase.from('config_escritorio').select('custo_hora').single();
+      if (data) setCustoHora(data.custo_hora);
+    };
+    fetchConfig();
+  }, []);
+
+  const viability = verificarViabilidade(lead.orcamento, horasEstimadas, custoHora);
+
 
   const formatCurrency = (val: number) => val > 0 ? `R$ ${(val / 1000).toFixed(0)}k` : "—";
 
@@ -99,6 +115,68 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               ))}
             </div>
           </section>
+
+          <section className={cn(
+            "p-6 rounded-[2px] border space-y-4",
+            viability.status === 'prejuizo' ? "bg-red-50 border-red-200" :
+            viability.status === 'alerta' ? "bg-amber-50 border-amber-200" :
+            "bg-green-50 border-green-200"
+          )}>
+            <div className="flex items-start gap-3">
+              {viability.status === 'prejuizo' ? <AlertCircle size={18} className="text-red-600 shrink-0" /> :
+               viability.status === 'alerta' ? <AlertCircle size={18} className="text-amber-600 shrink-0" /> :
+               <CheckCircle2 size={18} className="text-green-600 shrink-0" />}
+              
+              <div className="space-y-1">
+                <p className={cn(
+                  "text-[10px] font-bold uppercase tracking-widest",
+                  viability.status === 'prejuizo' ? "text-red-800" :
+                  viability.status === 'alerta' ? "text-amber-800" :
+                  "text-green-800"
+                )}>
+                  {viability.status === 'prejuizo' ? "ATENÇÃO: Este projeto está abaixo do custo interno" :
+                   viability.status === 'alerta' ? "Margem baixa recomendada" :
+                   "Projeto Viável"}
+                </p>
+                <p className={cn(
+                  "text-[11px] leading-relaxed",
+                  viability.status === 'prejuizo' ? "text-red-700" :
+                  viability.status === 'alerta' ? "text-amber-700" :
+                  "text-green-700"
+                )}>
+                  {viability.mensagem}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-black/5 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-tighter">Horas Est.</p>
+                  <input 
+                    type="number" 
+                    value={horasEstimadas} 
+                    onChange={(e) => setHorasEstimadas(parseInt(e.target.value) || 0)}
+                    className="w-16 bg-transparent border-none p-0 text-xs font-bold text-graphite focus:ring-0"
+                  />
+                </div>
+                <div>
+                  <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-tighter">Custo Real</p>
+                  <p className="text-xs font-bold text-graphite">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[8px] text-muted-foreground uppercase font-bold tracking-tighter">Margem Real</p>
+                <p className={cn(
+                  "text-sm font-bold",
+                  viability.status === 'prejuizo' ? "text-red-600" : "text-graphite"
+                )}>
+                  {((viability as any).margemReal || 0).toFixed(0)}%
+                </p>
+              </div>
+            </div>
+          </section>
+
 
           <section>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Ações Rápidas</h4>
