@@ -352,6 +352,82 @@ Máximo 3 linhas. Sem markdown. Em português.
   };
 
 
+  const getAiSuggestions = async () => {
+    if (isAiSuggestionsLoading || !config) return;
+    setIsAiSuggestionsLoading(true);
+    
+    try {
+      const lista_de_custos = costs.map(c => `- ${c.nome}: R$ ${c.valor}`).join('\n');
+      const prompt = `
+        Analise os custos cadastrados deste escritório de arquitetura e identifique até 3 custos 
+        que provavelmente existem mas não foram cadastrados.
+
+        CUSTOS CADASTRADOS:
+        ${lista_de_custos}
+
+        PERFIL: Escritório de arquitetura com ${config.num_arquitetos} arquitetos em ${config.mercados?.[0] || 'São José dos Campos'}, SP.
+
+        Para cada custo esquecido potencial, retorne:
+        - Nome do custo
+        - Valor médio estimado para escritórios similares
+        - Por que é importante cadastrar
+
+        Responda em JSON no formato:
+        [{"nome": "...", "valor_estimado": 000, "motivo": "..."}]
+
+        Máximo 3 sugestões. Apenas custos realmente prováveis para este perfil.
+        Responda apenas o JSON, sem markdown, sem explicação adicional.
+      `;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt,
+          systemPrompt: "Você é um assistente financeiro que retorna apenas JSON."
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = data.choices[0].message.content;
+      const suggestions = JSON.parse(content.replace(/```json|```/g, '').trim());
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error getting AI suggestions:', error);
+    } finally {
+      setIsAiSuggestionsLoading(false);
+    }
+  };
+
+  const exportReport = async () => {
+    setIsExporting(true);
+    try {
+      const element = document.getElementById('base-financeira-content');
+      if (!element) return;
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#FDFDFD'
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Relatorio_Financeiro_NL_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.pdf`);
+      toast.success('Relatório exportado com sucesso');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast.error('Erro ao exportar relatório');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const fetchData = async () => {
     try {
       const [configRes, costsRes] = await Promise.all([
@@ -364,6 +440,11 @@ Máximo 3 linhas. Sem markdown. Em português.
 
       setConfig(configRes.data as ConfigEscritorio);
       setCosts(costsRes.data as CustoEscritorio[]);
+      
+      // Auto trigger suggestions if we have data
+      if (costsRes.data.length > 0 && aiSuggestions.length === 0) {
+        // We'll call this after setting state in useEffect
+      }
     } catch (error) {
       console.error('Error fetching financial data:', error);
       toast.error('Erro ao carregar dados financeiros');
@@ -371,6 +452,12 @@ Máximo 3 linhas. Sem markdown. Em português.
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (costs.length > 5 && !isAiSuggestionsLoading && aiSuggestions.length === 0) {
+      getAiSuggestions();
+    }
+  }, [costs.length]);
 
   const updateConfig = async (updates: Partial<ConfigEscritorio>) => {
     if (!config) return;
