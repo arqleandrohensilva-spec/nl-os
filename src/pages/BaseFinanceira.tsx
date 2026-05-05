@@ -188,7 +188,14 @@ const BaseFinanceira = () => {
         : "85.000 (estimado)"; 
 
       const totalMensal = calculations.monthlyCosts;
+      const totalFixo = costs.filter(c => c.categoria === 'fixo').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
+      const totalProlabore = costs.filter(c => c.categoria === 'prolabore').reduce((acc, c) => acc + c.valor, 0);
+      const totalSoftwares = costs.filter(c => c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
+      const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
+      const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
+      const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
 
+      const prompt = `
 Você é o consultor financeiro interno da NL Arquitetos, escritório de arquitetura premium em São José dos Campos, SP.
 
 Analise os dados financeiros abaixo e gere um diagnóstico direto, técnico e útil em 3 parágrafos curtos.
@@ -222,6 +229,7 @@ Tom: direto, técnico, sem rodeios. Máximo 5 linhas por parágrafo.
 Não use markdown, não use bullets, não use títulos. Só texto corrido em 3 parágrafos.
 Responda em português.
 `;
+
 
       const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
