@@ -87,6 +87,9 @@ const BibliotecaServicos = () => {
       setServicos((sRes.data || []) as Servico[]);
       setTemplates(tRes.data || []);
       setConfig(cRes.data);
+      if (cRes.data?.custo_hora) {
+        prevCustoHora.current = cRes.data.custo_hora;
+      }
     } catch (error) {
       console.error('Error fetching library data:', error);
       toast.error('Erro ao carregar biblioteca');
