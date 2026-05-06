@@ -209,26 +209,14 @@ const ControleHoras = () => {
     }
   }, [activeTimer, lastActivity, showInactivityModal, handleActivity]);
 
-  const calculateProjectRhythm = (projetoSessoes: Sessao[]) => {
-    const last7DaysSessoes = projetoSessoes.filter(s => {
-      const d = parseISO(s.inicio);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return d > weekAgo;
-    });
-    
-    const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
-    return (totalMinutosSemana / 60) / 7;
-  };
-
-  const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
+    const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
     if (loadingPredictions[projeto.id]) return;
     
     const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
     const ritmoSemana = calculateProjectRhythm(projetoSessoes);
 
     // Threshold: at least 3 sessions and rhythm > 0
-    if (projetoSessoes.length < 3 || ritmoSemana <= 0) {
+    if (!shouldRunAIPrediction(projetoSessoes, ritmoSemana)) {
       setAiPredictions(prev => ({ 
         ...prev, 
         [projeto.id]: { 
