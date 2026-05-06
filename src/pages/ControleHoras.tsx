@@ -1,4 +1,50 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { parseISO } from 'date-fns';
+
+export interface Projeto {
+  id: string;
+  nome: string;
+  cliente_nome: string;
+  tipo: string;
+  area_m2: number;
+  valor_proposta: number;
+  horas_estimadas: number;
+  horas_briefing: number;
+  horas_anteprojeto: number;
+  horas_executivo: number;
+  horas_acompanhamento: number;
+  etapa_atual: string;
+  status: string;
+}
+
+export interface Sessao {
+  id: string;
+  projeto_id: string;
+  etapa: string;
+  responsavel: string;
+  inicio: string;
+  fim: string | null;
+  duracao_minutos: number | null;
+  observacao: string | null;
+  is_manual?: boolean;
+}
+
+export const calculateProjectRhythm = (projetoSessoes: Sessao[]) => {
+  const last7DaysSessoes = projetoSessoes.filter(s => {
+    const d = parseISO(s.inicio);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d > weekAgo;
+  });
+  
+  const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
+  return (totalMinutosSemana / 60) / 7;
+};
+
+export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: number) => {
+  return !(projetoSessoes.length < 3 || ritmoSemana <= 0);
+};
+
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
