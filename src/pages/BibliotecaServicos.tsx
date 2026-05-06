@@ -118,8 +118,8 @@ const BibliotecaServicos = () => {
 
   const filteredServicos = useMemo(() => {
     return servicos.filter(s => {
-      const matchesSearch = s.nome.toLowerCase().includes(search.toLowerCase()) || 
-                          s.descricao.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = (s.nome?.toLowerCase() || '').includes(search.toLowerCase()) || 
+                          (s.descricao?.toLowerCase() || '').includes(search.toLowerCase());
       const matchesType = filterType === 'all' || s.tipo === filterType;
       return matchesSearch && matchesType;
     });
