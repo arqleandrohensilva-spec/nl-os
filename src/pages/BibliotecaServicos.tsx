@@ -52,9 +52,28 @@ const BibliotecaServicos = () => {
   const [filterType, setFilterType] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingServico, setEditingServico] = useState<Partial<Servico> | null>(null);
+  const prevCustoHora = useRef<number | null>(null);
 
   useEffect(() => {
     fetchData();
+    
+    // Listen for real-time config changes to warn about pricing updates
+    const channel = supabase
+      .channel('config-updates')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'config_escritorio' }, (payload) => {
+        if (payload.new.custo_hora !== prevCustoHora.current) {
+          toast.info("Valores atualizados — custo/hora alterado na Base Financeira.", {
+            icon: <Info size={14} className="text-bronze" />,
+          });
+          setConfig(payload.new);
+          prevCustoHora.current = payload.new.custo_hora;
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchData = async () => {
