@@ -37,7 +37,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-interface Projeto {
+export interface Projeto {
   id: string;
   nome: string;
   cliente_nome: string;
@@ -53,7 +53,7 @@ interface Projeto {
   status: string;
 }
 
-interface Sessao {
+export interface Sessao {
   id: string;
   projeto_id: string;
   etapa: string;
@@ -64,6 +64,23 @@ interface Sessao {
   observacao: string | null;
   is_manual?: boolean;
 }
+
+export const calculateProjectRhythm = (projetoSessoes: Sessao[]) => {
+  const last7DaysSessoes = projetoSessoes.filter(s => {
+    const d = parseISO(s.inicio);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d > weekAgo;
+  });
+  
+  const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
+  return (totalMinutosSemana / 60) / 7;
+};
+
+export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: number) => {
+  return !(projetoSessoes.length < 3 || ritmoSemana <= 0);
+};
+
 
 const StageBadge = ({ stage }: { stage: string }) => {
   const configs: Record<string, { bg: string, text: string }> = {
@@ -192,24 +209,14 @@ const ControleHoras = () => {
     }
   }, [activeTimer, lastActivity, showInactivityModal, handleActivity]);
 
-  const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
+    const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
     if (loadingPredictions[projeto.id]) return;
     
     const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
-    
-    // Simple logic to calculate rhythm
-    const last7DaysSessoes = projetoSessoes.filter(s => {
-      const d = parseISO(s.inicio);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return d > weekAgo;
-    });
-    
-    const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
-    const ritmoSemana = (totalMinutosSemana / 60) / 7;
+    const ritmoSemana = calculateProjectRhythm(projetoSessoes);
 
     // Threshold: at least 3 sessions and rhythm > 0
-    if (projetoSessoes.length < 3 || ritmoSemana <= 0) {
+    if (!shouldRunAIPrediction(projetoSessoes, ritmoSemana)) {
       setAiPredictions(prev => ({ 
         ...prev, 
         [projeto.id]: { 
