@@ -933,7 +933,7 @@ const ControleHoras = () => {
                   </div>
                   <div>
                     <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1 font-bold">Custo Interno</p>
-                    <p className="text-xl font-cormorant">R$ {Math.round((sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) * (config?.custo_hora || 150)).toLocaleString()}</p>
+                    <p className="text-xl font-cormorant">R$ {Math.round((sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) * (config?.custo_hora || 67.37)).toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1 font-bold">Margem Real</p>
