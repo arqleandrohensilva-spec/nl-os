@@ -94,7 +94,7 @@ const ControleHoras = () => {
   const [loading, setLoading] = useState(true);
   
   // IA Predictions State
-  const [aiPredictions, setAiPredictions] = useState<Record<string, { text: string; status: 'ok' | 'alert' }>>({});
+  const [aiPredictions, setAiPredictions] = useState<Record<string, { text: string; status: 'ok' | 'alert' | 'info' }>>({});
   const [loadingPredictions, setLoadingPredictions] = useState<Record<string, boolean>>({});
 
   // Inactivity State
