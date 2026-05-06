@@ -343,8 +343,9 @@ const BibliotecaServicos = () => {
                 );
               })}
             </div>
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* New/Edit Service Modal */}
