@@ -810,7 +810,7 @@ const ControleHoras = () => {
                   {projetos.map(p => {
                     const pSessoes = sessoes.filter(s => s.projeto_id === p.id);
                     const horas = pSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                    const custo = horas * (config?.custo_hora || 150);
+                    const custo = horas * (config?.custo_hora || 67.37);
                     const margem = p.valor_proposta > 0 ? ((p.valor_proposta - custo) / p.valor_proposta) * 100 : 0;
                     
                     return (
