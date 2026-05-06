@@ -363,7 +363,14 @@ const Index = () => {
         supabase.from('leads').update(updateData).eq('id', leadId),
         supabase.from('lead_logs').insert({ ...newLog, lead_id: leadId })
       ]);
+      
       toast.success(`Lead movido para ${newStage}`);
+
+      // Se foi fechado, abre o modal de conversão
+      if (newStage === 'Fechado') {
+        setConversionLead(lead);
+        setShowProjectConversion(true);
+      }
     } catch (err) {
       console.error('Error updating stage:', err);
       toast.error('Erro ao atualizar estágio');
