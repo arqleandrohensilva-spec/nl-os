@@ -554,7 +554,7 @@ const ControleHoras = () => {
     }).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
 
     const ativos = projetos.filter(p => p.status === 'ativo').length;
-    const custoHora = config?.custo_hora || 150;
+    const custoHora = config?.custo_hora || 67.37;
     const custoInterno = totalMes * custoHora;
 
     return { totalMes, ativos, custoInterno, custoHora };
