@@ -65,7 +65,7 @@ const BibliotecaServicos = () => {
         supabase.from('config_escritorio').select('*').single()
       ]);
 
-      setServicos(sRes.data || []);
+      setServicos((sRes.data || []) as Servico[]);
       setTemplates(tRes.data || []);
       setConfig(cRes.data);
     } catch (error) {
