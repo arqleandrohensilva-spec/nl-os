@@ -16,7 +16,8 @@ import {
   Clock,
   ExternalLink,
   ChevronRight,
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -201,7 +202,13 @@ const BibliotecaServicos = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-10 gap-12">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <Loader2 className="w-10 h-10 text-bronze animate-spin" />
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono animate-pulse">Carregando catálogo...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-10 gap-12 animate-in fade-in duration-700">
           {/* Main Services Panel */}
           <div className="col-span-6 space-y-8">
             <div className="flex items-center justify-between">
@@ -336,8 +343,9 @@ const BibliotecaServicos = () => {
                 );
               })}
             </div>
+            </div>
           </div>
-        </div>
+        )}
       </main>
 
       {/* New/Edit Service Modal */}
