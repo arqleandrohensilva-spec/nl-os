@@ -196,7 +196,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('PROPOSTAS')}
         >
           <NavItem label="04 · Tracking" disabled />
-          <NavItem label="05 · Biblioteca" disabled />
+          <NavItem 
+            label="05 · Biblioteca" 
+            active={location.pathname === '/propostas/biblioteca'} 
+            onClick={() => navigate('/propostas/biblioteca')} 
+          />
           <NavItem label="08 · Documentos" disabled />
         </SectionAccordion>
 
