@@ -99,7 +99,8 @@ const BibliotecaServicos = () => {
     }
   };
 
-  const calcularValor = (servico: Servico) => {
+  const calcularValor = (servico: Servico | null | undefined) => {
+    if (!servico) return 0;
     const custoHora = config?.custo_hora || 67.37;
     const margem = config?.margem_lucro || 40;
     const multiplicador = 1 + (margem / 100);
