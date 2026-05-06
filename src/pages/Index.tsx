@@ -263,7 +263,12 @@ const Index = () => {
         Promise.all([
           supabase.from('leads').update(updateData).eq('id', activeId),
           supabase.from('lead_logs').insert({ ...newLog, lead_id: activeId })
-        ]).catch(err => {
+        ]).then(() => {
+          if (overStage === 'Fechado') {
+            setConversionLead(lead);
+            setShowProjectConversion(true);
+          }
+        }).catch(err => {
           console.error('Error updating stage:', err);
           toast.error('Erro ao salvar no banco');
           fetchLeads(); // Revert on error
