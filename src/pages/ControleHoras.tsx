@@ -195,20 +195,35 @@ const ControleHoras = () => {
   const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
     if (loadingPredictions[projeto.id]) return;
     
+    const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
+    
+    // Simple logic to calculate rhythm
+    const last7DaysSessoes = projetoSessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return d > weekAgo;
+    });
+    
+    const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
+    const ritmoSemana = (totalMinutosSemana / 60) / 7;
+
+    // Threshold: at least 3 sessions and rhythm > 0
+    if (projetoSessoes.length < 3 || ritmoSemana <= 0) {
+      setAiPredictions(prev => ({ 
+        ...prev, 
+        [projeto.id]: { 
+          text: "Registre pelo menos 3 sessões para ativar a previsão.", 
+          status: 'info' as any 
+        } 
+      }));
+      return;
+    }
+
     setLoadingPredictions(prev => ({ ...prev, [projeto.id]: true }));
     
     try {
-      const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
       const totalHoras = projetoSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-      
-      // Simple logic to feed prompt: avg hours/day based on last 7 days of activity
-      const last7DaysSessoes = projetoSessoes.filter(s => {
-        const d = parseISO(s.inicio);
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        return d > weekAgo;
-      });
-      const ritmoSemana = (last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) / 7;
       
       const prompt = `
         Analise o status deste projeto de arquitetura:
