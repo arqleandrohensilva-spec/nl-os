@@ -94,7 +94,7 @@ const ControleHoras = () => {
   const [loading, setLoading] = useState(true);
   
   // IA Predictions State
-  const [aiPredictions, setAiPredictions] = useState<Record<string, { text: string; status: 'ok' | 'alert' }>>({});
+  const [aiPredictions, setAiPredictions] = useState<Record<string, { text: string; status: 'ok' | 'alert' | 'info' }>>({});
   const [loadingPredictions, setLoadingPredictions] = useState<Record<string, boolean>>({});
 
   // Inactivity State
@@ -195,20 +195,35 @@ const ControleHoras = () => {
   const getAIPrediction = async (projeto: Projeto, allSessoes: Sessao[]) => {
     if (loadingPredictions[projeto.id]) return;
     
+    const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
+    
+    // Simple logic to calculate rhythm
+    const last7DaysSessoes = projetoSessoes.filter(s => {
+      const d = parseISO(s.inicio);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return d > weekAgo;
+    });
+    
+    const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
+    const ritmoSemana = (totalMinutosSemana / 60) / 7;
+
+    // Threshold: at least 3 sessions and rhythm > 0
+    if (projetoSessoes.length < 3 || ritmoSemana <= 0) {
+      setAiPredictions(prev => ({ 
+        ...prev, 
+        [projeto.id]: { 
+          text: "Registre pelo menos 3 sessões para ativar a previsão.", 
+          status: 'info' as any 
+        } 
+      }));
+      return;
+    }
+
     setLoadingPredictions(prev => ({ ...prev, [projeto.id]: true }));
     
     try {
-      const projetoSessoes = allSessoes.filter(s => s.projeto_id === projeto.id);
       const totalHoras = projetoSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-      
-      // Simple logic to feed prompt: avg hours/day based on last 7 days of activity
-      const last7DaysSessoes = projetoSessoes.filter(s => {
-        const d = parseISO(s.inicio);
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        return d > weekAgo;
-      });
-      const ritmoSemana = (last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) / 7;
       
       const prompt = `
         Analise o status deste projeto de arquitetura:
@@ -539,7 +554,7 @@ const ControleHoras = () => {
     }).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
 
     const ativos = projetos.filter(p => p.status === 'ativo').length;
-    const custoHora = config?.custo_hora || 150;
+    const custoHora = config?.custo_hora || 67.37;
     const custoInterno = totalMes * custoHora;
 
     return { totalMes, ativos, custoInterno, custoHora };
@@ -710,14 +725,18 @@ const ControleHoras = () => {
                 {/* AI Prediction */}
                 {p.status === 'ativo' && aiPredictions[p.id] && (
                   <div className={cn(
-                    "mb-6 p-2.5 border-l-2 text-[10px] font-mono leading-relaxed",
+                    "mb-6 p-2.5 border-l-2 text-[10px] leading-relaxed",
                     aiPredictions[p.id].status === 'alert' 
-                      ? "border-rose-500 bg-rose-50/50" 
-                      : "border-emerald-500 bg-emerald-50/50"
+                      ? "border-rose-500 bg-rose-50/50 font-mono" 
+                      : aiPredictions[p.id].status === 'info'
+                        ? "border-muted-foreground/20 bg-muted/10 font-mono text-muted-foreground"
+                        : "border-emerald-500 bg-emerald-50/50 font-mono"
                   )}>
                     <div className="flex items-start gap-2">
-                      <TrendingUp size={12} className={cn("shrink-0 mt-0.5", aiPredictions[p.id].status === 'alert' ? "text-rose-500" : "text-emerald-500")} />
-                      <p className="text-muted-foreground">{aiPredictions[p.id].text}</p>
+                      {aiPredictions[p.id].status !== 'info' && (
+                        <TrendingUp size={12} className={cn("shrink-0 mt-0.5", aiPredictions[p.id].status === 'alert' ? "text-rose-500" : "text-emerald-500")} />
+                      )}
+                      <p>{aiPredictions[p.id].text}</p>
                     </div>
                   </div>
                 )}
@@ -791,7 +810,7 @@ const ControleHoras = () => {
                   {projetos.map(p => {
                     const pSessoes = sessoes.filter(s => s.projeto_id === p.id);
                     const horas = pSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                    const custo = horas * (config?.custo_hora || 150);
+                    const custo = horas * (config?.custo_hora || 67.37);
                     const margem = p.valor_proposta > 0 ? ((p.valor_proposta - custo) / p.valor_proposta) * 100 : 0;
                     
                     return (
@@ -914,13 +933,13 @@ const ControleHoras = () => {
                   </div>
                   <div>
                     <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1 font-bold">Custo Interno</p>
-                    <p className="text-xl font-cormorant">R$ {Math.round((sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) * (config?.custo_hora || 150)).toLocaleString()}</p>
+                    <p className="text-xl font-cormorant">R$ {Math.round((sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60) * (config?.custo_hora || 67.37)).toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1 font-bold">Margem Real</p>
                     {(() => {
                       const horas = sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                      const custo = horas * (config?.custo_hora || 150);
+                      const custo = horas * (config?.custo_hora || 67.37);
                       const margem = panelProjeto.valor_proposta > 0 ? ((panelProjeto.valor_proposta - custo) / panelProjeto.valor_proposta) * 100 : 0;
                       return (
                         <p className={cn(
