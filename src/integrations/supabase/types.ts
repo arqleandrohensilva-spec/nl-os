@@ -288,6 +288,39 @@ export type Database = {
           },
         ]
       }
+      servicos: {
+        Row: {
+          ativo: boolean | null
+          criado_em: string | null
+          descricao: string | null
+          horas_estimadas: number
+          id: string
+          nome: string
+          tipo: string | null
+          vezes_usado: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          criado_em?: string | null
+          descricao?: string | null
+          horas_estimadas: number
+          id?: string
+          nome: string
+          tipo?: string | null
+          vezes_usado?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          criado_em?: string | null
+          descricao?: string | null
+          horas_estimadas?: number
+          id?: string
+          nome?: string
+          tipo?: string | null
+          vezes_usado?: number | null
+        }
+        Relationships: []
+      }
       sessoes_horas: {
         Row: {
           criado_em: string | null
@@ -334,6 +367,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      templates_escopo: {
+        Row: {
+          ajuste_area: boolean | null
+          ativo: boolean | null
+          criado_em: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          servicos_ids: string[]
+        }
+        Insert: {
+          ajuste_area?: boolean | null
+          ativo?: boolean | null
+          criado_em?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          servicos_ids: string[]
+        }
+        Update: {
+          ajuste_area?: boolean | null
+          ativo?: boolean | null
+          criado_em?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          servicos_ids?: string[]
+        }
+        Relationships: []
       }
     }
     Views: {
