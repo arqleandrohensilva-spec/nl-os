@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage.tsx";
 import BaseFinanceira from "./pages/BaseFinanceira.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import ControleHoras from "./pages/ControleHoras.tsx";
+import BibliotecaServicos from "./pages/BibliotecaServicos.tsx";
+
 
 
 const queryClient = new QueryClient();
