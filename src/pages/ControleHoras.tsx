@@ -725,14 +725,18 @@ const ControleHoras = () => {
                 {/* AI Prediction */}
                 {p.status === 'ativo' && aiPredictions[p.id] && (
                   <div className={cn(
-                    "mb-6 p-2.5 border-l-2 text-[10px] font-mono leading-relaxed",
+                    "mb-6 p-2.5 border-l-2 text-[10px] leading-relaxed",
                     aiPredictions[p.id].status === 'alert' 
-                      ? "border-rose-500 bg-rose-50/50" 
-                      : "border-emerald-500 bg-emerald-50/50"
+                      ? "border-rose-500 bg-rose-50/50 font-mono" 
+                      : aiPredictions[p.id].status === 'info'
+                        ? "border-muted-foreground/20 bg-muted/10 font-mono text-muted-foreground"
+                        : "border-emerald-500 bg-emerald-50/50 font-mono"
                   )}>
                     <div className="flex items-start gap-2">
-                      <TrendingUp size={12} className={cn("shrink-0 mt-0.5", aiPredictions[p.id].status === 'alert' ? "text-rose-500" : "text-emerald-500")} />
-                      <p className="text-muted-foreground">{aiPredictions[p.id].text}</p>
+                      {aiPredictions[p.id].status !== 'info' && (
+                        <TrendingUp size={12} className={cn("shrink-0 mt-0.5", aiPredictions[p.id].status === 'alert' ? "text-rose-500" : "text-emerald-500")} />
+                      )}
+                      <p>{aiPredictions[p.id].text}</p>
                     </div>
                   </div>
                 )}
