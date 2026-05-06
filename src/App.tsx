@@ -9,6 +9,8 @@ import LoginPage from "./pages/LoginPage.tsx";
 import BaseFinanceira from "./pages/BaseFinanceira.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import ControleHoras from "./pages/ControleHoras.tsx";
+import BibliotecaServicos from "./pages/BibliotecaServicos.tsx";
+
 
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/financeiro/base" element={<ProtectedRoute><BaseFinanceira /></ProtectedRoute>} />
         <Route path="/projetos/horas" element={<ProtectedRoute><ControleHoras /></ProtectedRoute>} />
+        <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
+
 
         <Route path="*" element={<NotFound />} />
       </Routes>
