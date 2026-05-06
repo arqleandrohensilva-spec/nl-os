@@ -939,7 +939,7 @@ const ControleHoras = () => {
                     <p className="text-[8px] uppercase tracking-widest text-white/30 mb-1 font-bold">Margem Real</p>
                     {(() => {
                       const horas = sessoes.filter(s => s.projeto_id === panelProjeto.id).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
-                      const custo = horas * (config?.custo_hora || 150);
+                      const custo = horas * (config?.custo_hora || 67.37);
                       const margem = panelProjeto.valor_proposta > 0 ? ((panelProjeto.valor_proposta - custo) / panelProjeto.valor_proposta) * 100 : 0;
                       return (
                         <p className={cn(
