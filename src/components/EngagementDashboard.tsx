@@ -68,13 +68,14 @@ const EngagementDashboard = ({ proposal, onAnalyze, onGenerateFollowup }: Engage
     { name: 'Fechamento', time: engagements.reduce((acc, curr) => acc + (curr.secao_fechamento_tempo || 0), 0), color: '#71717A' },
   ].filter(s => s.time > 0);
 
-  const deviceCounts = engagements.reduce((acc: any, curr) => {
+  const deviceCounts = engagements.reduce((acc: Record<string, number>, curr) => {
     const dev = curr.dispositivo?.toLowerCase().includes('mobile') ? 'Mobile' : 'Desktop';
     acc[dev] = (acc[dev] || 0) + 1;
     return acc;
   }, {});
 
-  const deviceData = Object.entries(deviceCounts).map(([name, value]) => ({ name, value }));
+  const deviceData = Object.entries(deviceCounts).map(([name, value]) => ({ name, value: value as number }));
+
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
