@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
   Search, 
@@ -16,7 +17,11 @@ import {
   ExternalLink,
   ChevronRight,
   Info,
-  Loader2
+  Loader2,
+  Sparkles,
+  Layers,
+  Zap,
+  Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -158,264 +163,388 @@ const BibliotecaServicos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#FDFDFD] text-[#111111] selection:bg-bronze/20">
       <Sidebar user="Sócio" />
-      <main className="ml-[230px] p-12 pb-24">
-        <header className="flex justify-between items-end mb-12">
-          <div>
-            <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Biblioteca de Serviços</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 05 · Catálogo de serviços e precificação</p>
-          </div>
-          <Button 
-            onClick={() => {
-              setEditingServico({ tipo: 'por_projeto', horas_estimadas: 0 });
-              setIsModalOpen(true);
-            }}
-            className="bg-graphite hover:bg-bronze text-white rounded-[2px] h-10 px-8 text-[10px] uppercase font-bold tracking-widest"
+      <main className="ml-[230px] p-16 pb-32">
+        <header className="mb-20 text-center max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-3 mb-4"
           >
-            <Plus size={14} className="mr-2" />
-            Novo Serviço
-          </Button>
+            <Sparkles size={14} className="text-bronze" />
+            <p className="text-[10px] uppercase tracking-[0.4em] text-bronze font-bold">Módulo 05 · Gestão de Portfólio</p>
+            <Sparkles size={14} className="text-bronze" />
+          </motion.div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-6xl font-cormorant font-bold text-[#111111] mb-6 italic"
+          >
+            Biblioteca de Serviços
+          </motion.h1>
+          
+          <motion.div 
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 1, scaleX: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="h-[1px] w-24 bg-bronze/30 mx-auto mb-10"
+          />
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Button 
+              onClick={() => {
+                setEditingServico({ tipo: 'por_projeto', horas_estimadas: 0 });
+                setIsModalOpen(true);
+              }}
+              className="bg-[#111111] hover:bg-bronze text-white rounded-none h-12 px-10 text-[10px] uppercase font-bold tracking-[0.2em] transition-all duration-500 hover:shadow-2xl hover:shadow-bronze/20"
+            >
+              <Plus size={16} className="mr-3" />
+              Cadastrar Novo Serviço
+            </Button>
+          </motion.div>
         </header>
 
-        {/* Metrics Bar */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
+        {/* Premium Metrics Bar */}
+        <div className="grid grid-cols-3 gap-8 mb-24">
           {[
-            { label: 'SERVIÇOS CADASTRADOS', value: stats.total, sub: 'Itens no catálogo' },
-            { label: 'TICKET MÉDIO', value: `R$ ${Math.round(stats.ticketMedio).toLocaleString()}`, sub: 'Valor base por item', bronze: true },
-            { label: 'CUSTO/HORA BASE', value: `R$ ${stats.custoHora.toFixed(2)}`, sub: 'atualizado da Base Financeira' },
+            { label: 'CATÁLOGO ATIVO', value: stats.total, sub: 'Itens de Alta Performance', icon: Briefcase },
+            { label: 'TICKET MÉDIO BASE', value: `R$ ${Math.round(stats.ticketMedio).toLocaleString()}`, sub: 'Precificação Estratégica', bronze: true, icon: TrendingUp },
+            { label: 'VALOR HORA/ESC', value: `R$ ${stats.custoHora.toFixed(2)}`, sub: 'Eficiência Operacional', icon: Zap },
           ].map((m, i) => (
-            <div key={i} className="bg-white border border-[#E8E4DF] p-8 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-3 font-bold">{m.label}</p>
-              <h2 className={cn("text-4xl font-cormorant font-bold mb-1", m.bronze ? "text-bronze" : "text-[#1A1A1A]")}>{m.value}</h2>
-              <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-bold">{m.sub}</p>
-            </div>
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + (i * 0.1) }}
+              className="bg-[#111111] text-white p-10 rounded-none border border-white/5 relative group overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                <m.icon size={60} />
+              </div>
+              <div className="relative z-10">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mb-4 font-bold">{m.label}</p>
+                <h2 className={cn("text-5xl font-cormorant font-light mb-2", m.bronze ? "text-bronze" : "text-white")}>{m.value}</h2>
+                <p className="text-[10px] uppercase tracking-wider text-white/20 font-bold">{m.sub}</p>
+              </div>
+              <div className="absolute bottom-0 left-0 h-[2px] bg-bronze w-0 group-hover:w-full transition-all duration-700" />
+            </motion.div>
           ))}
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-            <Loader2 className="w-10 h-10 text-bronze animate-spin" />
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono animate-pulse">Carregando catálogo...</p>
+          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+            <Loader2 className="w-12 h-12 text-bronze animate-spin stroke-[1px]" />
+            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-mono animate-pulse">Sincronizando Biblioteca...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-10 gap-12 animate-in fade-in duration-700">
-          {/* Main Services Panel */}
-          <div className="col-span-6 space-y-8">
-            <div className="flex items-center justify-between">
-              <div className="flex gap-2">
-                {['all', 'por_projeto', 'por_m2', 'por_hora'].map(type => (
-                  <button 
-                    key={type}
-                    onClick={() => setFilterType(type)}
-                    className={cn(
-                      "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all rounded-[1px] border",
-                      filterType === type ? "bg-graphite text-white border-graphite" : "bg-white text-muted-foreground border-[#E8E4DF] hover:border-bronze"
-                    )}
-                  >
-                    {type === 'all' ? 'Todos' : type.replace('por_', 'Por ')}
-                  </button>
-                ))}
+          <div className="grid grid-cols-12 gap-16">
+            {/* Main Services Panel */}
+            <div className="col-span-8 space-y-12">
+              <div className="flex items-center justify-between pb-8 border-b border-[#E8E4DF]">
+                <div className="flex gap-6">
+                  {['all', 'por_projeto', 'por_m2', 'por_hora'].map(type => (
+                    <button 
+                      key={type}
+                      onClick={() => setFilterType(type)}
+                      className={cn(
+                        "text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2",
+                        filterType === type ? "text-[#111111]" : "text-muted-foreground hover:text-bronze"
+                      )}
+                    >
+                      {type === 'all' ? 'Tudo' : type.replace('por_', 'Por ')}
+                      {filterType === type && (
+                        <motion.div layoutId="activeFilter" className="absolute bottom-0 left-0 right-0 h-[2px] bg-bronze" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <div className="relative group">
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-bronze transition-colors" />
+                  <Input 
+                    placeholder="PESQUISAR NO CATÁLOGO..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="h-12 pl-12 w-80 border-[#E8E4DF] rounded-none text-[11px] font-mono tracking-widest placeholder:text-muted-foreground/30 bg-transparent focus-visible:ring-bronze/20 focus-visible:border-bronze"
+                  />
+                </div>
               </div>
-              <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
-                <Input 
-                  placeholder="BUSCAR SERVIÇO..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] font-mono tracking-widest placeholder:text-muted-foreground/30"
-                />
+
+              <div className="grid grid-cols-1 gap-10">
+                <AnimatePresence mode="popLayout">
+                  {filteredServicos.map((s, idx) => (
+                    <motion.div 
+                      key={s.id}
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="group relative"
+                    >
+                      <div className="absolute -inset-4 bg-[#F5F2EF]/50 rounded-none opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
+                      
+                      <div className="flex flex-col md:flex-row gap-10">
+                        <div className="flex-1 space-y-4">
+                          <div className="flex items-center gap-4">
+                            <span className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold">
+                              {s.tipo.replace('_', ' ')}
+                            </span>
+                            <div className="h-[1px] w-8 bg-bronze/20" />
+                          </div>
+                          
+                          <h3 className="text-3xl font-cormorant font-bold text-[#111111] group-hover:text-bronze transition-colors leading-tight">
+                            {s.nome}
+                          </h3>
+                          
+                          <p className="text-[12px] text-muted-foreground font-mono leading-relaxed max-w-2xl">
+                            {s.descricao}
+                          </p>
+
+                          <div className="flex items-center gap-6 pt-2">
+                            <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider text-[#111111]/60">
+                              <Clock size={14} className="text-bronze" />
+                              <span>{s.nome === 'Acompanhamento de Obra' ? 'VARIÁVEL' : `${s.horas_estimadas}H ESTIMADAS`}</span>
+                            </div>
+                            <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                            <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">
+                              Eficiência: {idx < 3 ? 'Premium' : 'Standard'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-end justify-between min-w-[240px]">
+                          <div className="text-right">
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1 font-bold">Valor Base</p>
+                            <h4 className="text-4xl font-cormorant font-bold text-[#111111]">
+                              R$ {Math.round(calcularValor(s)).toLocaleString()}
+                              <span className="text-sm font-sans font-light text-muted-foreground ml-1">
+                                {s.tipo === 'por_m2' ? '/m²' : s.tipo === 'por_hora' ? '/h' : ''}
+                              </span>
+                            </h4>
+                          </div>
+
+                          <div className="flex gap-4 mt-6">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => {
+                                setEditingServico(s);
+                                setIsModalOpen(true);
+                              }}
+                              className="h-10 text-[10px] uppercase font-bold tracking-[0.2em] text-[#111111]/40 hover:text-bronze hover:bg-transparent px-0"
+                            >
+                              <Pencil size={12} className="mr-2" />
+                              Edit Item
+                            </Button>
+                            <Button 
+                              className="h-11 bg-transparent border border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white rounded-none text-[10px] uppercase font-bold tracking-[0.2em] px-8 transition-all duration-300"
+                            >
+                              Usar em Proposta
+                              <ArrowRight size={12} className="ml-2" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-10 h-[1px] w-full bg-[#E8E4DF]/40" />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {filteredServicos.map((s, idx) => (
-                <div 
-                  key={s.id} 
-                  className={cn(
-                    "bg-white border border-[#E8E4DF] p-6 rounded-[4px] transition-all duration-300 hover:border-bronze/50 group flex flex-col justify-between",
-                    idx < 3 && "border-l-2 border-l-bronze"
-                  )}
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="space-y-1">
-                      <span className="text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-bronze/10 text-bronze font-bold">
-                        {s.tipo.replace('_', ' ')}
-                      </span>
-                      <h3 className="text-xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors">{s.nome}</h3>
+            {/* Right Panel - Premium Document Templates */}
+            <div className="col-span-4">
+              <div className="sticky top-12 space-y-12">
+                <div className="p-10 bg-[#111111] text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-bronze/10 blur-2xl rounded-full -mr-12 -mt-12" />
+                  
+                  <div className="flex items-center gap-4 mb-10 relative z-10">
+                    <div className="p-2 bg-bronze/10 rounded-none border border-bronze/20">
+                      <FileText size={18} className="text-bronze" />
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-cormorant font-bold text-bronze">R$ {Math.round(calcularValor(s)).toLocaleString()}{s.tipo === 'por_m2' ? '/m²' : s.tipo === 'por_hora' ? '/h' : ''}</p>
+                    <div>
+                      <h3 className="text-[12px] font-bold uppercase tracking-[0.3em] mb-1">Templates</h3>
+                      <p className="text-[9px] text-white/30 uppercase tracking-widest">Ativos de Marca NL</p>
                     </div>
                   </div>
-                  
-                  <p className="text-[11px] text-muted-foreground font-mono leading-relaxed mb-6 line-clamp-2">{s.descricao}</p>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-[#F5F2EF]">
-                    <div className="flex items-center gap-4 text-[9px] font-mono text-muted-foreground/60">
-                      <div className="flex items-center gap-1.5">
-                        <Clock size={12} />
-                        <span>{s.nome === 'Acompanhamento de Obra' ? 'Variável' : `${s.horas_estimadas}h estimadas`}</span>
+
+                  <div className="space-y-10 relative z-10">
+                    {[
+                      {
+                        title: "Apresentações",
+                        items: [
+                          { name: "Apresentação ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/arqint" },
+                          { name: "Apresentação Interiores", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/int" },
+                          { name: "Apresentação Comercial", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/comercial" },
+                        ]
+                      },
+                      {
+                        title: "Propostas Técnicas",
+                        items: [
+                          { name: "Proposta ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/proposta/arqint" },
+                          { name: "Proposta Interiores", url: "https://nlarquitetosapresentacao.lovable.app/proposta/int" },
+                          { name: "Proposta Comercial", url: "https://nlarquitetosapresentacao.lovable.app/proposta/comercial" },
+                        ]
+                      }
+                    ].map((group, idx) => (
+                      <div key={idx} className="space-y-5">
+                        <div className="flex items-center gap-3">
+                          <div className="h-[1px] w-4 bg-bronze" />
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-bronze font-bold">{group.title}</p>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          {group.items.map((doc, docIdx) => (
+                            <motion.div 
+                              key={docIdx} 
+                              whileHover={{ x: 5 }}
+                              className="group cursor-pointer"
+                              onClick={() => window.open(doc.url, '_blank')}
+                            >
+                              <div className="flex items-center justify-between py-1">
+                                <span className="text-[13px] font-cormorant font-bold text-white/80 group-hover:text-bronze transition-colors tracking-wide">
+                                  {doc.name}
+                                </span>
+                                <ExternalLink size={12} className="text-white/20 group-hover:text-bronze transition-colors" />
+                              </div>
+                              <div className="h-[1px] w-full bg-white/5 group-hover:bg-bronze/30 transition-colors" />
+                            </motion.div>
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-muted-foreground/20">|</span>
-                      <span>R$ {config?.custo_hora?.toFixed(2)}/h × {config?.margem_lucro}% margem</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => {
-                          setEditingServico(s);
-                          setIsModalOpen(true);
-                        }}
-                        className="h-8 text-[9px] uppercase font-bold tracking-widest text-muted-foreground hover:text-bronze hover:bg-transparent"
-                      >
-                        <Pencil size={12} className="mr-1.5" />
-                        Editar
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="h-8 border-graphite text-graphite hover:bg-graphite hover:text-white rounded-[2px] text-[9px] uppercase font-bold tracking-widest px-4"
-                      >
-                        Usar em Proposta
-                        <ChevronRight size={12} className="ml-1" />
-                      </Button>
+                    ))}
+                  </div>
+
+                  <div className="mt-12 p-6 border border-white/10 bg-white/5 flex items-center justify-between">
+                    <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold">Standard Branding</p>
+                    <div className="flex gap-1">
+                      {[1,2,3].map(i => <div key={i} className="h-1 w-1 rounded-full bg-bronze/50" />)}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Right Panel - Document Templates */}
-          <div className="col-span-4 space-y-6">
-            <div>
-
-              <div className="flex items-center gap-3 mb-8">
-                <FileText size={18} className="text-bronze" />
-                <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Templates de Documento</h3>
-              </div>
-
-              <div className="space-y-8">
-                {[
-                  {
-                    title: "Apresentações",
-                    items: [
-                      { name: "Apresentação ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/arqint" },
-                      { name: "Apresentação Interiores", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/int" },
-                      { name: "Apresentação Comercial", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/comercial" },
-                    ]
-                  },
-                  {
-                    title: "Propostas",
-                    items: [
-                      { name: "Proposta ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/proposta/arqint" },
-                      { name: "Proposta Interiores", url: "https://nlarquitetosapresentacao.lovable.app/proposta/int" },
-                      { name: "Proposta Comercial", url: "https://nlarquitetosapresentacao.lovable.app/proposta/comercial" },
-                    ]
-                  }
-                ].map((group, idx) => (
-                  <div key={idx} className="space-y-4">
-                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">{group.title}</p>
-                    <div className="space-y-3">
-                      {group.items.map((doc, docIdx) => (
-                        <div key={docIdx} className="bg-[#1A1A1A] text-white p-4 rounded-[4px] border border-white/5 flex items-center justify-between group hover:border-bronze/50 transition-colors">
-                          <div className="flex items-center gap-3">
-                            <FileText size={14} className="text-bronze" />
-                            <span className="text-[11px] font-cormorant font-bold tracking-wide">{doc.name}</span>
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => window.open(doc.url, '_blank')}
-                            className="h-7 text-[8px] uppercase font-bold tracking-widest text-bronze hover:text-white hover:bg-bronze rounded-[2px]"
-                          >
-                            Visualizar
-                            <ExternalLink size={10} className="ml-1.5" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="p-8 border border-[#E8E4DF] bg-white text-center">
+                  <Layers size={20} className="text-bronze mx-auto mb-4" />
+                  <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2">Padronização NL</h4>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed mb-6">
+                    A consistência visual em todos os pontos de contato eleva a percepção de valor do escritório.
+                  </p>
+                  <Button variant="outline" className="w-full rounded-none border-bronze text-bronze hover:bg-bronze hover:text-white text-[9px] uppercase font-bold tracking-[0.2em] h-10">
+                    Ver Guia de Marca
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
           </div>
         )}
       </main>
 
       {/* New/Edit Service Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
-          <div className="p-8">
-            <h2 className="text-2xl font-cormorant font-bold mb-1">{editingServico?.id ? 'Editar Serviço' : 'Novo Serviço'}</h2>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Defina os parâmetros técnicos e precificação</p>
+        <DialogContent className="bg-[#0A0A0A] border-white/5 text-white rounded-none p-0 max-w-lg overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-bronze/50" />
+          <div className="p-12">
+            <header className="mb-10">
+              <h2 className="text-3xl font-cormorant font-bold mb-2 italic">
+                {editingServico?.id ? 'Refinar Serviço' : 'Novo Ativo Estratégico'}
+              </h2>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-mono">
+                Parâmetros Técnicos e Inteligência de Precificação
+              </p>
+            </header>
             
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Nome do Serviço</label>
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Designação do Serviço</label>
                 <Input 
                   value={editingServico?.nome || ''} 
                   onChange={(e) => setEditingServico({...editingServico, nome: e.target.value})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                  placeholder="Ex: Consultoria Executiva"
+                  className="bg-white/5 border-white/10 text-white rounded-none h-12 placeholder:text-white/10 focus-visible:ring-bronze/20 focus-visible:border-bronze"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Descrição</label>
+              <div className="space-y-3">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Escopo Resumido</label>
                 <textarea 
                   value={editingServico?.descricao || ''}
                   onChange={(e) => setEditingServico({...editingServico, descricao: e.target.value})}
-                  className="w-full h-24 bg-white/5 border border-white/10 text-white rounded-none p-4 text-[11px] font-mono focus:border-bronze outline-none resize-none"
+                  placeholder="Descreva a entrega de alto valor..."
+                  className="w-full h-32 bg-white/5 border border-white/10 text-white rounded-none p-4 text-[11px] font-mono focus:border-bronze outline-none resize-none placeholder:text-white/10 transition-all"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Tipo de cobrança</label>
-                <Select 
-                  value={editingServico?.tipo} 
-                  onValueChange={(val: any) => setEditingServico({...editingServico, tipo: val})}
-                >
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                    <SelectItem value="por_projeto">Por Projeto (Valor Fixo)</SelectItem>
-                    <SelectItem value="por_hora">Por Hora (Valor/h)</SelectItem>
-                    <SelectItem value="por_m2">Por m² (Valor/m²)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Modelo de Negócio</label>
+                  <Select 
+                    value={editingServico?.tipo} 
+                    onValueChange={(val: any) => setEditingServico({...editingServico, tipo: val})}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-12 focus:ring-bronze/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0A0A0A] border-white/10 text-white">
+                      <SelectItem value="por_projeto" className="focus:bg-bronze/20 focus:text-white">Por Projeto</SelectItem>
+                      <SelectItem value="por_hora" className="focus:bg-bronze/20 focus:text-white">Por Hora</SelectItem>
+                      <SelectItem value="por_m2" className="focus:bg-bronze/20 focus:text-white">Por m²</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">
-                  {editingServico?.tipo === 'por_m2' ? 'Horas por m²' : editingServico?.tipo === 'por_hora' ? 'Horas base' : 'Horas estimadas'}
-                </label>
-                <Input 
-                  type="number"
-                  value={editingServico?.horas_estimadas || ''} 
-                  onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11"
-                />
-              </div>
-
-              <div className="p-4 bg-bronze/5 border border-bronze/10 rounded-none space-y-2">
-                <p className="text-[9px] uppercase tracking-widest text-bronze font-bold">Valor calculado em tempo real</p>
-                <div className="flex items-end gap-2">
-                  <h3 className="text-3xl font-cormorant font-bold text-white">
-                    R$ {Math.round(calcularValor(editingServico as Servico)).toLocaleString()}
-                  </h3>
-                  <span className="text-[10px] text-white/40 font-mono mb-1.5">
-                    ({editingServico?.horas_estimadas || 0}h × R$ {config?.custo_hora?.toFixed(2)} × {1 + (config?.margem_lucro || 40)/100})
-                  </span>
+                <div className="space-y-3">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">
+                    {editingServico?.tipo === 'por_m2' ? 'Esforço (h/m²)' : editingServico?.tipo === 'por_hora' ? 'Base (h)' : 'Esforço Estimado (h)'}
+                  </label>
+                  <Input 
+                    type="number"
+                    value={editingServico?.horas_estimadas || ''} 
+                    onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
+                    className="bg-white/5 border-white/10 text-white rounded-none h-12 focus-visible:ring-bronze/20"
+                  />
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
-                <Button onClick={handleSaveServico} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">Salvar Serviço</Button>
+              <motion.div 
+                layout
+                className="p-8 bg-bronze/5 border border-bronze/10 rounded-none relative group"
+              >
+                <div className="absolute top-2 right-4">
+                  <TrendingUp size={14} className="text-bronze/30" />
+                </div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold mb-3">Valor de Mercado Sugerido</p>
+                <div className="flex items-baseline gap-3">
+                  <h3 className="text-4xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors">
+                    R$ {Math.round(calcularValor(editingServico as Servico)).toLocaleString()}
+                  </h3>
+                  <span className="text-[10px] text-white/20 font-mono italic">
+                    {editingServico?.tipo === 'por_m2' ? '/m²' : editingServico?.tipo === 'por_hora' ? '/h' : ''}
+                  </span>
+                </div>
+              </motion.div>
+
+              <div className="pt-6 flex gap-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="flex-1 rounded-none text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 h-12"
+                >
+                  Descartar
+                </Button>
+                <Button 
+                  onClick={handleSaveServico} 
+                  className="flex-[2] bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-[0.3em] shadow-xl shadow-bronze/10"
+                >
+                  Confirmar Ativo
+                </Button>
               </div>
             </div>
           </div>
