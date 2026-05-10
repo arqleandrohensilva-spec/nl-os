@@ -307,7 +307,7 @@ Gere a mensagem de WhatsApp.`;
           "Content-Type": "application/json",
           "x-api-key": apiKey,
           "anthropic-version": "2023-06-01",
-          "dangerouslyAllowBrowser": "true"
+          "anthropic-dangerous-direct-browser-access": "true"
         },
         body: JSON.stringify({
           model: "claude-3-5-haiku-20241022",
