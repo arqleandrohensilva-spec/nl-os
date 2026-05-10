@@ -124,8 +124,8 @@ const GestaoProjetos = () => {
       
       <main className="flex-1 ml-[230px] p-12">
         <header className="mb-12">
-          <h1 className="text-4xl font-cormorant font-light tracking-tight mb-2">06 · Gestão de Projetos</h1>
-          <p className="text-[10px] tracking-[0.4em] text-[#8B7355] font-bold uppercase">Projetos Ativos · Etapas e Entregas</p>
+          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Atelier de Projetos</h1>
+          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">Curadoria · Gestão de Ativos · Alta Performance</p>
         </header>
 
         {/* Metric Cards */}
@@ -166,14 +166,16 @@ const GestaoProjetos = () => {
             return (
               <div 
                 key={projeto.id} 
-                className="bg-white/[0.03] border border-white/10 p-8 flex flex-col md:flex-row items-center gap-8 group hover:bg-white/[0.05] transition-all duration-300"
+                className="bg-white/[0.02] border border-white/5 p-10 flex flex-col md:flex-row items-center gap-12 group hover:bg-white/[0.04] hover:border-[#8B7355]/30 transition-all duration-500 relative overflow-hidden"
               >
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-bold truncate">{projeto.nome_cliente}</h3>
-                    <Badge variant="outline" className="text-[9px] uppercase tracking-widest bg-white/5 border-white/10">
+                  <div className="flex items-center gap-4 mb-2">
+                    <h3 className="text-2xl font-cormorant font-medium truncate group-hover:text-[#8B7355] transition-colors">{projeto.nome_cliente}</h3>
+                    <div className="h-px w-8 bg-[#8B7355]/30 group-hover:w-12 transition-all duration-500" />
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-[#8B7355] font-bold">
                       {projeto.tipo}
-                    </Badge>
+                    </span>
                   </div>
                   <div className="flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">
                     <span>{projeto.cidade || 'N/A'}</span>
