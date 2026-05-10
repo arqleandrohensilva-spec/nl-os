@@ -941,48 +941,6 @@ Gere a mensagem de WhatsApp.`;
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Dialog open={isAnalysisModalOpen} onOpenChange={setIsAnalysisModalOpen}>
-        <DialogContent className="max-w-md bg-white rounded-[2px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold font-cormorant text-graphite uppercase tracking-wider">Análise de Interesse (IA)</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-6">
-            {isAnalyzing ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 size={32} className="text-bronze animate-spin mb-4" />
-                <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">O Claude está analisando os dados...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="bg-bronze/5 border border-bronze/10 p-4 rounded-[2px]">
-                  <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap">
-                    {analysisText}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="border-t border-[#E8E4DF] pt-6 flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsAnalysisModalOpen(false)}
-              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-1 border-[#E8E4DF]"
-            >
-              Fechar
-            </Button>
-            <Button 
-              onClick={handleGenerateFollowupFromAnalysis}
-              disabled={isAnalyzing || !analysisText || analysisText.includes('Não foi possível') || analysisText.includes('Erro')}
-              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2] disabled:opacity-50"
-            >
-              <MessageSquare size={16} className="mr-2" />
-              Gerar Follow-up
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
       <Dialog open={isDashboardModalOpen} onOpenChange={setIsDashboardModalOpen}>
         <DialogContent className="max-w-4xl bg-[#FDFDFD] border-none rounded-[2px] p-0 overflow-hidden shadow-2xl">
           <div className="bg-graphite px-8 py-10 flex justify-between items-end relative overflow-hidden">
@@ -1008,7 +966,6 @@ Gere a mensagem de WhatsApp.`;
             {selectedProposal && (
               <EngagementDashboard 
                 proposal={selectedProposal} 
-                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
