@@ -113,7 +113,10 @@ const ProjetoDetalhe = () => {
       // Fetch real hours
       const { data: hData } = await supabase.from('sessoes_horas').select('duracao_minutos').eq('projeto_id', id);
       if (hData) {
-        const total = hData.reduce((acc, curr) => acc + (curr.duracao_minutos || 0), 0);
+        const total = hData.reduce((acc, curr) => {
+          const val = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
+          return acc + (Number.isNaN(val) ? 0 : (val || 0));
+        }, 0);
         setHorasReais(Math.round(total / 60));
       }
 
