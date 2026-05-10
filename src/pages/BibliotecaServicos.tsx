@@ -265,7 +265,7 @@ const BibliotecaServicos = () => {
                     <div className="flex items-center gap-4 text-[9px] font-mono text-muted-foreground/60">
                       <div className="flex items-center gap-1.5">
                         <Clock size={12} />
-                        <span>{s.horas_estimadas}h estimadas</span>
+                        <span>{s.nome === 'Acompanhamento de Obra' ? 'Variável' : `${s.horas_estimadas}h estimadas`}</span>
                       </div>
                       <span className="text-muted-foreground/20">|</span>
                       <span>R$ {config?.custo_hora?.toFixed(2)}/h × {config?.margem_lucro}% margem</span>
