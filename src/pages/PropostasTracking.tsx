@@ -302,42 +302,54 @@ const PropostasTracking = () => {
         </header>
 
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm">
-            <div className="flex gap-4">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-9 w-40 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
-                  <SelectValue placeholder="STATUS" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos Status</SelectItem>
-                  <SelectItem value="Enviada">Enviada</SelectItem>
-                  <SelectItem value="Vista">Vista</SelectItem>
-                  <SelectItem value="Aprovada">Aprovada</SelectItem>
-                  <SelectItem value="Recusada">Recusada</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="h-9 w-40 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
-                  <SelectValue placeholder="TIPO" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos Tipos</SelectItem>
-                  <SelectItem value="ArqInt">ArqInt</SelectItem>
-                  <SelectItem value="Interiores">Interiores</SelectItem>
-                  <SelectItem value="Comercial">Comercial</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 border-b border-[#E8E4DF] pb-1">
+              {[
+                { id: 'all', label: 'Todas' },
+                { id: 'Enviada', label: 'Aguardando' },
+                { id: 'Vista', label: 'Vistas' },
+                { id: 'Aprovada', label: 'Aprovadas' },
+                { id: 'Recusada', label: 'Recusadas' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setStatusFilter(tab.id)}
+                  className={cn(
+                    "px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 -mb-[2px]",
+                    statusFilter === tab.id 
+                      ? "border-bronze text-bronze" 
+                      : "border-transparent text-muted-foreground hover:text-graphite hover:border-[#E8E4DF]"
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input 
-                placeholder="BUSCAR CLIENTE..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#FDFDFD]"
-              />
+            <div className="flex items-center justify-between bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm">
+              <div className="flex gap-4">
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="h-9 w-40 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
+                    <SelectValue placeholder="TIPO" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos Tipos</SelectItem>
+                    <SelectItem value="ArqInt">ArqInt</SelectItem>
+                    <SelectItem value="Interiores">Interiores</SelectItem>
+                    <SelectItem value="Comercial">Comercial</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="relative">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input 
+                  placeholder="BUSCAR CLIENTE..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#FDFDFD]"
+                />
+              </div>
             </div>
           </div>
 
