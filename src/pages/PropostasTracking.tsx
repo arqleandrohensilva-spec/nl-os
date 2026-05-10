@@ -252,18 +252,76 @@ const PropostasTracking = () => {
       setFollowupMessage('');
       setIsFollowupModalOpen(true);
 
-      const { data, error } = await supabase.functions.invoke('generate-followup', {
-        body: { proposal, analysisContext }
+      const { 
+        cliente, 
+        tipo, 
+        status, 
+        views_count = 0, 
+        data: sentDate, 
+        validade = 30 
+      } = proposal;
+
+      const now = new Date();
+      const sentAt = new Date(sentDate);
+      const daysSinceSent = Math.floor((now.getTime() - sentAt.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const expiryDate = new Date(sentAt);
+      expiryDate.setDate(expiryDate.getDate() + validade);
+      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      let specificInstruction = "";
+      if (views_count === 1) {
+        specificInstruction = "A proposta foi vista 1 vez. Verifique suavemente se surgiu alguma dúvida.";
+      } else if (views_count >= 3) {
+        specificInstruction = "A proposta foi vista 3 ou mais vezes. Reconheça o interesse e ofereça uma conversa para alinhar detalhes.";
+      } else if (views_count === 0 && daysSinceSent >= 3) {
+        specificInstruction = "A proposta ainda não foi aberta e já se passaram 3 dias. Verifique se o link chegou corretamente.";
+      } else if (daysUntilExpiry <= 2 && daysUntilExpiry >= 0) {
+        specificInstruction = "A proposta vence em 2 dias. Informe sobre a validade de forma suave, sem pressão.";
+      } else {
+        specificInstruction = "Faça um follow-up padrão, mantendo o tom da NL Arquitetos.";
+      }
+
+      const prompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta. 
+Tom: condutor, técnico, sem pressão, sem urgência artificial. 
+Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz. 
+Máximo 3 linhas. Termine com uma pergunta aberta simples.
+
+Contexto da proposta:
+Cliente: ${cliente}
+Tipo de proposta: ${tipo}
+Status atual: ${status}
+Vezes aberta: ${views_count}
+Dias desde o envio: ${daysSinceSent}
+Dias para o vencimento: ${daysUntilExpiry}
+
+${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
+
+Instrução específica: ${specificInstruction}
+
+Gere a mensagem de WhatsApp.`;
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 500,
+          messages: [{ role: "user", content: prompt }]
+        })
       });
 
-      if (error) throw error;
-      
-      const text = data?.message || data?.analysis || data?.content?.[0]?.text;
+      const data = await response.json();
+      const text = data?.content?.[0]?.text;
       
       if (text) {
         setFollowupMessage(text);
       } else if (data?.error) {
-        setFollowupMessage(`Erro: ${data.error}`);
+        setFollowupMessage(`Erro: ${data.error.message || JSON.stringify(data.error)}`);
       } else {
         setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
       }
@@ -316,31 +374,43 @@ const PropostasTracking = () => {
 
       const stats = getEngagementStats(proposal.proposta_engajamento);
       
-      const { data, error } = await supabase.functions.invoke('analyze-engagement', {
-        body: { 
-          proposal,
-          engagement: {
-            tempo_total: stats?.totalSeconds,
-            dispositivo: stats?.dispositivo,
-            secao_capa_tempo: stats?.sections.find(s => s.id === 'capa')?.time,
-            secao_manifesto_tempo: stats?.sections.find(s => s.id === 'manifesto')?.time,
-            secao_diagnostico_tempo: stats?.sections.find(s => s.id === 'diagnostico')?.time,
-            secao_escopo_tempo: stats?.sections.find(s => s.id === 'escopo')?.time,
-            secao_investimento_tempo: stats?.sections.find(s => s.id === 'investimento')?.time,
-            secao_fechamento_tempo: stats?.sections.find(s => s.id === 'fechamento')?.time,
-          }
-        }
+      const prompt = `Você é o assistente da NL Arquitetos. Com base nos dados de engajamento desta proposta, analise o nível de interesse do cliente e sugira a melhor ação de follow-up. Seja direto e objetivo. Máximo 3 parágrafos.
+
+Proposta: ${proposal.cliente || 'Cliente não identificado'} (${proposal.tipo || 'Tipo não informado'})
+Status: ${proposal.status || 'Pendente'}
+
+Dados de Engajamento:
+- Tempo Total: ${Math.floor((stats?.totalSeconds || 0) / 60)} min ${(stats?.totalSeconds || 0) % 60} seg
+- Dispositivo: ${stats?.dispositivo || 'Não identificado'}
+- Tempos por Seção:
+  * Capa: ${stats?.sections.find(s => s.id === 'capa')?.time || 0}s
+  * Manifesto: ${stats?.sections.find(s => s.id === 'manifesto')?.time || 0}s
+  * Diagnóstico: ${stats?.sections.find(s => s.id === 'diagnostico')?.time || 0}s
+  * Escopo: ${stats?.sections.find(s => s.id === 'escopo')?.time || 0}s
+  * Investimento: ${stats?.sections.find(s => s.id === 'investimento')?.time || 0}s
+  * Fechamento: ${stats?.sections.find(s => s.id === 'fechamento')?.time || 0}s`;
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 500,
+          messages: [{ role: "user", content: prompt }]
+        })
       });
 
-      if (error) throw error;
-      
-      // Handle both { analysis: "..." } and { message: "..." } or direct { content: [...] }
-      const text = data?.analysis || data?.message || data?.content?.[0]?.text;
+      const data = await response.json();
+      const text = data?.content?.[0]?.text;
       
       if (text) {
         setAnalysisText(text);
       } else if (data?.error) {
-        setAnalysisText(`Erro da IA: ${data.error}`);
+        setAnalysisText(`Erro da IA: ${data.error.message || JSON.stringify(data.error)}`);
       } else {
         setAnalysisText("Não foi possível gerar a análise. Resposta inesperada.");
       }
