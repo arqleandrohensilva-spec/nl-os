@@ -302,7 +302,7 @@ Gere a mensagem de WhatsApp.`;
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
           "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
