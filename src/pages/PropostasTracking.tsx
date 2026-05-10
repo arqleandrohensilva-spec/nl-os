@@ -303,7 +303,7 @@ Vezes aberta: ${views_count}
 Dias desde o envio: ${daysSinceSent}
 Dias para o vencimento: ${daysUntilExpiry}
 
-${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
+${localContext ? `Análise de Engajamento Adicional: ${localContext}\n` : ''}
 
 Instrução específica: ${specificInstruction}
 
