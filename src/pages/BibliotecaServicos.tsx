@@ -79,14 +79,12 @@ const BibliotecaServicos = () => {
 
   const fetchData = async () => {
     try {
-      const [sRes, tRes, cRes] = await Promise.all([
+      const [sRes, cRes] = await Promise.all([
         supabase.from('servicos').select('*').order('nome'),
-        supabase.from('templates_escopo').select('*').order('nome'),
         supabase.from('config_escritorio').select('*').single()
       ]);
 
       setServicos((sRes.data || []) as Servico[]);
-      setTemplates(tRes.data || []);
       setConfig(cRes.data);
       if (cRes.data?.custo_hora) {
         prevCustoHora.current = cRes.data.custo_hora;
