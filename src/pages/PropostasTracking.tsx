@@ -314,10 +314,12 @@ Gere a mensagem de WhatsApp.`;
 
       if (invokeError) throw invokeError;
       
-      const text = invokeData?.text || invokeData?.message;
+      const text = invokeData?.message || invokeData?.text;
       
       if (text) {
         setFollowupMessage(text);
+      } else if (invokeData?.error) {
+        setFollowupMessage(`Erro na IA: ${invokeData.error}`);
       } else {
         setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
       }
