@@ -148,7 +148,7 @@ const PropostasTracking = () => {
   };
 
   const generateLink = (proposal: Proposal) => {
-    const baseUrl = `${window.location.origin}/proposta/`;
+    let baseUrl = "https://nlarquitetosapresentacao.lovable.app/proposta/";
     const typeSlug = proposal.tipo === 'ArqInt' ? 'arqint' : proposal.tipo === 'Interiores' ? 'int' : 'comercial';
     
     const params = new URLSearchParams({
