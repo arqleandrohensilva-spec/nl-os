@@ -14,7 +14,8 @@ import {
   Filter,
   Calendar,
   ExternalLink,
-  History
+  History,
+  Clock
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -104,7 +105,7 @@ const PropostasTracking = () => {
       setIsSaving(true);
       const { data, error } = await supabase
         .from('proposals')
-        .insert([newProposal])
+        .insert([newProposal as any])
         .select()
         .single();
 
