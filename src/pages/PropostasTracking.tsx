@@ -43,8 +43,17 @@ interface Proposal {
   last_view_at?: string;
 }
 
+interface Lead {
+  id: string;
+  nome: string;
+  cidade: string;
+  tipo: string;
+  area: number;
+}
+
 const PropostasTracking = () => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -61,7 +70,22 @@ const PropostasTracking = () => {
 
   useEffect(() => {
     fetchProposals();
+    fetchLeads();
   }, []);
+
+  const fetchLeads = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .select('id, nome, cidade, tipo, area')
+        .order('nome');
+      
+      if (error) throw error;
+      setLeads(data || []);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+    }
+  };
 
   const fetchProposals = async () => {
     try {
@@ -127,6 +151,19 @@ const PropostasTracking = () => {
       toast.error('Erro ao criar proposta');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleLeadSelect = (leadId: string) => {
+    const selectedLead = leads.find(l => l.id === leadId);
+    if (selectedLead) {
+      setNewProposal(prev => ({
+        ...prev,
+        cliente: selectedLead.nome,
+        cidade: selectedLead.cidade || prev.cidade,
+        area: selectedLead.area || prev.area,
+        tipo: (['ArqInt', 'Interiores', 'Comercial'].includes(selectedLead.tipo) ? selectedLead.tipo : prev.tipo) as Proposal['tipo']
+      }));
     }
   };
 
@@ -364,11 +401,20 @@ const PropostasTracking = () => {
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Cliente</label>
-                <Input 
-                  value={newProposal.cliente || ''}
-                  onChange={(e) => setNewProposal({...newProposal, cliente: e.target.value})}
-                  className="rounded-[2px] border-[#E8E4DF] h-10"
-                />
+                <Select 
+                  onValueChange={handleLeadSelect}
+                >
+                  <SelectTrigger className="rounded-[2px] border-[#E8E4DF] h-10">
+                    <SelectValue placeholder="Selecione um lead" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {leads.map(lead => (
+                      <SelectItem key={lead.id} value={lead.id}>
+                        {lead.nome}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
