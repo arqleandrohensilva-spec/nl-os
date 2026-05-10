@@ -539,15 +539,27 @@ const PropostasTracking = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-[#E8E4DF] mb-4">
+                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-[#E8E4DF] mb-4 relative overflow-hidden group/view">
                       <div className="flex items-center gap-2">
                         <Eye size={12} className="text-bronze" />
-                        <span className="text-[10px] font-medium">Aberta {p.views_count} vezes</span>
+                        <span className="text-[10px] font-medium tracking-tight">Aberta {p.views_count} vezes</span>
                       </div>
                       {p.last_view_at && (
                         <div className="flex items-center gap-2 border-l border-[#E8E4DF] pl-4">
-                          <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold">Último acesso:</span>
-                          <span className="text-[10px] font-medium">{format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
+                          <div className={cn(
+                            "w-1.5 h-1.5 rounded-full",
+                            new Date().getTime() - new Date(p.last_view_at).getTime() < 1000 * 60 * 60 * 24 
+                              ? "bg-green-500 animate-pulse" 
+                              : "bg-muted-foreground/30"
+                          )} />
+                          <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold whitespace-nowrap">Visto em {format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
+                        </div>
+                      )}
+                      
+                      {p.views_count !== undefined && p.views_count >= 3 && (
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2 py-0.5 bg-bronze/10 text-bronze text-[8px] font-bold uppercase tracking-widest rounded-l-full border-l border-y border-bronze/20">
+                          <Activity size={10} className="animate-pulse" />
+                          <span>Hot</span>
                         </div>
                       )}
                     </div>
