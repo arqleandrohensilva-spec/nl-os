@@ -921,7 +921,7 @@ const PropostasTracking = () => {
             >
               Fechar
             </Button>
-            {!isGeneratingFollowup && (
+            {!isGeneratingFollowup && followupMessage && !followupMessage.includes('Erro') && (
               <div className="flex gap-2">
                 <Button 
                   onClick={copyFollowupMessage}
