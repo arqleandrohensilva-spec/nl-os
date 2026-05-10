@@ -967,25 +967,38 @@ const PropostasTracking = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isDashboardModalOpen} onOpenChange={setIsDashboardModalOpen}>
-        <DialogContent className="max-w-4xl bg-[#F8F9FA] border-none rounded-[2px] p-0 overflow-hidden">
-          <div className="bg-graphite p-6 flex justify-between items-center">
-            <div>
-              <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">
-                Dashboard de Engajamento
+        <DialogContent className="max-w-4xl bg-[#FDFDFD] border-none rounded-[2px] p-0 overflow-hidden shadow-2xl">
+          <div className="bg-graphite px-8 py-10 flex justify-between items-end relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+              <Activity size={200} />
+            </div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="px-2 py-0.5 bg-bronze/20 border border-bronze/30 rounded-full">
+                  <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em]">Relatório Premium</span>
+                </div>
+              </div>
+              <DialogTitle className="text-4xl font-bold font-cormorant text-white tracking-tight mb-1">
+                Análise de Engajamento
               </DialogTitle>
-              <p className="text-bronze text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
-                {selectedProposal?.cliente} · {selectedProposal?.tipo}
+              <p className="text-white/50 text-[11px] uppercase tracking-[0.3em] font-bold">
+                {selectedProposal?.cliente} <span className="text-bronze mx-2">|</span> {selectedProposal?.tipo}
               </p>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDashboardModalOpen(false)}
-              className="rounded-[2px] uppercase tracking-widest text-[9px] font-bold h-8 border-white/20 text-white hover:bg-white/10"
-            >
-              Fechar
-            </Button>
           </div>
-          
+          <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            {selectedProposal && (
+              <EngagementDashboard 
+                proposal={selectedProposal} 
+                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
+                onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
           <div className="p-8 max-h-[85vh] overflow-y-auto">
             {selectedProposal && (
               <EngagementDashboard 
