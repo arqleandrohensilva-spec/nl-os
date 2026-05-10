@@ -29,7 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-interface Engagement {
+export interface Engagement {
   id: string;
   proposta_id: string;
   secao_capa_tempo: number;
@@ -42,7 +42,7 @@ interface Engagement {
   tempo_total: number;
 }
 
-interface Proposal {
+export interface Proposal {
   id: string;
   cliente: string;
   tipo: 'ArqInt' | 'Interiores' | 'Comercial';
