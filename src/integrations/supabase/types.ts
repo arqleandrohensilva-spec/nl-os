@@ -226,12 +226,102 @@ export type Database = {
         }
         Relationships: []
       }
+      projeto_checklist: {
+        Row: {
+          concluido: boolean | null
+          concluido_em: string | null
+          concluido_por: string | null
+          criado_em: string
+          etapa: string
+          id: string
+          item: string
+          projeto_id: string | null
+        }
+        Insert: {
+          concluido?: boolean | null
+          concluido_em?: string | null
+          concluido_por?: string | null
+          criado_em?: string
+          etapa: string
+          id?: string
+          item: string
+          projeto_id?: string | null
+        }
+        Update: {
+          concluido?: boolean | null
+          concluido_em?: string | null
+          concluido_por?: string | null
+          criado_em?: string
+          etapa?: string
+          id?: string
+          item?: string
+          projeto_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_checklist_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projeto_etapas: {
+        Row: {
+          criado_em: string
+          data_aprovacao: string | null
+          data_entrega: string | null
+          data_inicio: string | null
+          etapa: string
+          id: string
+          notas: string | null
+          projeto_id: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          criado_em?: string
+          data_aprovacao?: string | null
+          data_entrega?: string | null
+          data_inicio?: string | null
+          etapa: string
+          id?: string
+          notas?: string | null
+          projeto_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          criado_em?: string
+          data_aprovacao?: string | null
+          data_entrega?: string | null
+          data_inicio?: string | null
+          etapa?: string
+          id?: string
+          notas?: string | null
+          projeto_id?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_etapas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projetos: {
         Row: {
           area_m2: number | null
-          cliente_nome: string | null
+          cidade: string | null
+          cliente_id: string | null
           criado_em: string | null
           criado_por: string | null
+          data_inicio: string | null
           etapa_atual: string | null
           horas_acompanhamento: number | null
           horas_anteprojeto: number | null
@@ -239,17 +329,21 @@ export type Database = {
           horas_estimadas: number | null
           horas_executivo: number | null
           id: string
-          lead_id: string | null
           nome: string
-          status: string | null
+          nome_cliente: string | null
+          prazo_final: string | null
+          status_geral: string | null
           tipo: string | null
+          updated_at: string | null
           valor_proposta: number | null
         }
         Insert: {
           area_m2?: number | null
-          cliente_nome?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
           criado_em?: string | null
           criado_por?: string | null
+          data_inicio?: string | null
           etapa_atual?: string | null
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null
@@ -257,17 +351,21 @@ export type Database = {
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
-          lead_id?: string | null
           nome: string
-          status?: string | null
+          nome_cliente?: string | null
+          prazo_final?: string | null
+          status_geral?: string | null
           tipo?: string | null
+          updated_at?: string | null
           valor_proposta?: number | null
         }
         Update: {
           area_m2?: number | null
-          cliente_nome?: string | null
+          cidade?: string | null
+          cliente_id?: string | null
           criado_em?: string | null
           criado_por?: string | null
+          data_inicio?: string | null
           etapa_atual?: string | null
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null
@@ -275,16 +373,18 @@ export type Database = {
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
-          lead_id?: string | null
           nome?: string
-          status?: string | null
+          nome_cliente?: string | null
+          prazo_final?: string | null
+          status_geral?: string | null
           tipo?: string | null
+          updated_at?: string | null
           valor_proposta?: number | null
         }
         Relationships: [
           {
             foreignKeyName: "projetos_lead_id_fkey"
-            columns: ["lead_id"]
+            columns: ["cliente_id"]
             isOneToOne: false
             referencedRelation: "leads"
             referencedColumns: ["id"]
