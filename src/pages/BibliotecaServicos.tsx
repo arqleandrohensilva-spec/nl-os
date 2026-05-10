@@ -36,13 +36,6 @@ interface Servico {
   horas_reais_medias?: number;
 }
 
-interface Template {
-  id: string;
-  nome: string;
-  descricao: string;
-  servicos_ids: string[];
-  ajuste_area: boolean;
-}
 
 const BibliotecaServicos = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
