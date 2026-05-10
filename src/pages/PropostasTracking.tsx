@@ -319,15 +319,30 @@ Gere a mensagem de WhatsApp.`;
       const stats = proposta_engajamento.length > 0 ? getEngagementStats(proposta_engajamento) : null;
       const mostViewedLabel = stats?.mostViewed?.label || "";
       
-      // Análise de motivos baseada nos dados
+      // Análise detalhada de motivos baseada nos dados por seção
       let reasonInsight = "";
       if (stats) {
-        if (stats.mostViewed?.id === 'investimento') {
-          reasonInsight = " Notei que você analisou bastante a parte de investimento, talvez tenha surgido alguma dúvida sobre os valores ou formas de pagamento?";
-        } else if (stats.mostViewed?.id === 'escopo' || stats.mostViewed?.id === 'diagnostico') {
-          reasonInsight = ` Notei que você focou bastante no ${stats.mostViewed.label.toLowerCase()}, o escopo está alinhado com o que você imaginava para o projeto?`;
+        const sections = [
+          { id: 'diagnostico', label: 'Diagnóstico', time: stats.sections.find(s => s.id === 'diagnostico')?.time || 0 },
+          { id: 'escopo', label: 'Escopo', time: stats.sections.find(s => s.id === 'escopo')?.time || 0 },
+          { id: 'investimento', label: 'Investimento', time: stats.sections.find(s => s.id === 'investimento')?.time || 0 }
+        ].sort((a, b) => b.time - a.time);
+
+        const primarySection = sections[0];
+        const formattedTime = Math.floor(primarySection.time / 60) > 0 
+          ? `${Math.floor(primarySection.time / 60)}m ${primarySection.time % 60}s`
+          : `${primarySection.time}s`;
+
+        if (primarySection.time > 20) {
+          if (primarySection.id === 'investimento') {
+            reasonInsight = ` Notei que você analisou detalhadamente a seção de Investimento (por cerca de ${formattedTime}). Surgiu alguma dúvida sobre os valores ou as condições que apresentamos?`;
+          } else if (primarySection.id === 'escopo') {
+            reasonInsight = ` Vi que você dedicou um bom tempo revisando o Escopo do projeto (foram ${formattedTime} de atenção). O que achou da nossa proposta de entrega, está alinhada com o que conversamos?`;
+          } else if (primarySection.id === 'diagnostico') {
+            reasonInsight = ` Percebi que você revisitou bastante o nosso Diagnóstico (por ${formattedTime}). Faz sentido para você os pontos que levantamos sobre o seu espaço?`;
+          }
         } else if (stats.totalSeconds > 300) {
-          reasonInsight = " Vi que você analisou a proposta detalhadamente, o que é ótimo! Surgiu algum ponto específico que você gostaria de aprofundar?";
+          reasonInsight = ` Vi que você analisou a proposta detalhadamente por mais de ${Math.floor(stats.totalSeconds / 60)} minutos, o que é ótimo! Surgiu algum ponto específico que você gostaria de aprofundar?`;
         }
       }
 
