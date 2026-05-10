@@ -81,7 +81,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "openai/gpt-5", // Using a high-performance model available in the current environment (2026)
+        model: "anthropic/claude-3.5-sonnet",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
