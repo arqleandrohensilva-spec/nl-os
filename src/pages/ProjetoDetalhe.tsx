@@ -253,12 +253,30 @@ const ProjetoDetalhe = () => {
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
-        <button 
-          onClick={() => navigate('/projetos/gestao')}
-          className="flex items-center gap-2 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-8 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={14} /> Voltar para lista
-        </button>
+        <div className="flex justify-between items-center mb-8">
+          <button 
+            onClick={() => navigate('/projetos/gestao')}
+            className="flex items-center gap-2 text-[10px] text-white/40 uppercase tracking-widest font-bold hover:text-white transition-colors"
+          >
+            <ArrowLeft size={14} /> Voltar para lista
+          </button>
+
+          <Button 
+            onClick={() => setClientMode(!clientMode)}
+            className={cn(
+              "rounded-none text-[9px] uppercase font-bold tracking-[0.2em] px-6 h-10 border transition-all duration-500",
+              clientMode 
+                ? "bg-[#8B7355] text-white border-[#8B7355]" 
+                : "bg-white/5 text-white/40 border-white/10 hover:border-[#8B7355]/40 hover:text-white"
+            )}
+          >
+            {clientMode ? (
+              <span className="flex items-center gap-2 italic"><EyeOff size={14} /> Modo Atelier (Interno)</span>
+            ) : (
+              <span className="flex items-center gap-2 italic"><Eye size={14} /> Modo Concierge (Cliente)</span>
+            )}
+          </Button>
+        </div>
 
         {/* Header do Projeto */}
         <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 pb-16 border-b border-white/5 relative">
