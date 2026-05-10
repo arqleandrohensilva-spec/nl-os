@@ -12,7 +12,9 @@ import {
   Calendar,
   LayoutGrid,
   List,
-  MoreVertical
+  MoreVertical,
+  Share2,
+  ExternalLink
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
