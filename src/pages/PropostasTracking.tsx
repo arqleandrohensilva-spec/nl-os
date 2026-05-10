@@ -252,18 +252,76 @@ const PropostasTracking = () => {
       setFollowupMessage('');
       setIsFollowupModalOpen(true);
 
-      const { data, error } = await supabase.functions.invoke('generate-followup', {
-        body: { proposal, analysisContext }
+      const { 
+        cliente, 
+        tipo, 
+        status, 
+        views_count = 0, 
+        data: sentDate, 
+        validade = 30 
+      } = proposal;
+
+      const now = new Date();
+      const sentAt = new Date(sentDate);
+      const daysSinceSent = Math.floor((now.getTime() - sentAt.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const expiryDate = new Date(sentAt);
+      expiryDate.setDate(expiryDate.getDate() + validade);
+      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+      let specificInstruction = "";
+      if (views_count === 1) {
+        specificInstruction = "A proposta foi vista 1 vez. Verifique suavemente se surgiu alguma dúvida.";
+      } else if (views_count >= 3) {
+        specificInstruction = "A proposta foi vista 3 ou mais vezes. Reconheça o interesse e ofereça uma conversa para alinhar detalhes.";
+      } else if (views_count === 0 && daysSinceSent >= 3) {
+        specificInstruction = "A proposta ainda não foi aberta e já se passaram 3 dias. Verifique se o link chegou corretamente.";
+      } else if (daysUntilExpiry <= 2 && daysUntilExpiry >= 0) {
+        specificInstruction = "A proposta vence em 2 dias. Informe sobre a validade de forma suave, sem pressão.";
+      } else {
+        specificInstruction = "Faça um follow-up padrão, mantendo o tom da NL Arquitetos.";
+      }
+
+      const prompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta. 
+Tom: condutor, técnico, sem pressão, sem urgência artificial. 
+Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz. 
+Máximo 3 linhas. Termine com uma pergunta aberta simples.
+
+Contexto da proposta:
+Cliente: ${cliente}
+Tipo de proposta: ${tipo}
+Status atual: ${status}
+Vezes aberta: ${views_count}
+Dias desde o envio: ${daysSinceSent}
+Dias para o vencimento: ${daysUntilExpiry}
+
+${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
+
+Instrução específica: ${specificInstruction}
+
+Gere a mensagem de WhatsApp.`;
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 500,
+          messages: [{ role: "user", content: prompt }]
+        })
       });
 
-      if (error) throw error;
-      
-      const text = data?.message || data?.analysis || data?.content?.[0]?.text;
+      const data = await response.json();
+      const text = data?.content?.[0]?.text;
       
       if (text) {
         setFollowupMessage(text);
       } else if (data?.error) {
-        setFollowupMessage(`Erro: ${data.error}`);
+        setFollowupMessage(`Erro: ${data.error.message || JSON.stringify(data.error)}`);
       } else {
         setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
       }
