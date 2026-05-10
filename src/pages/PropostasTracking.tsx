@@ -222,6 +222,7 @@ const PropostasTracking = () => {
 
   const handleGenerateFollowup = async (proposal: Proposal) => {
     try {
+      setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
       setFollowupMessage('');
       setIsFollowupModalOpen(true);
