@@ -253,18 +253,21 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, icon, accent, warning }: { label: string, value: string | number, icon: React.ReactNode, accent?: boolean, warning?: boolean }) => (
-  <div className="bg-white/[0.03] border border-white/10 p-6 flex items-center gap-6">
+  <div className="bg-white/[0.02] border border-white/5 p-8 flex flex-col gap-4 relative overflow-hidden group hover:border-[#8B7355]/20 transition-all duration-500">
+    <div className="absolute -right-4 -top-4 text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+      {React.cloneElement(icon as React.ReactElement, { size: 64 })}
+    </div>
     <div className={cn(
-      "w-12 h-12 flex items-center justify-center border",
+      "w-10 h-10 flex items-center justify-center border",
       accent ? "border-[#8B7355]/40 text-[#8B7355] bg-[#8B7355]/5" : 
-      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/10 text-white/20 bg-white/5"
+      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/10 text-white/30 bg-white/5"
     )}>
       {icon}
     </div>
     <div>
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-1 font-bold">{label}</p>
+      <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 mb-2 font-bold">{label}</p>
       <p className={cn(
-        "text-2xl font-bold font-cormorant leading-none",
+        "text-4xl font-cormorant leading-none",
         accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
       )}>
         {value}
