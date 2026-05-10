@@ -89,9 +89,15 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    console.log('AI Gateway Response:', JSON.stringify(data));
     
     if (data.error) {
-        throw new Error(data.error.message || "AI Gateway Error");
+        throw new Error(data.error.message || JSON.stringify(data.error) || "AI Gateway Error");
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Unexpected response format:', data);
+      throw new Error("Invalid response format from AI Gateway");
     }
 
     return new Response(
