@@ -114,4 +114,6 @@ export const handler = async (req: Request) => {
   }
 }
 
-serve(handler);
+if (import.meta.main) {
+  serve(handler);
+}
