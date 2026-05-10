@@ -238,7 +238,7 @@ const PropostasTracking = () => {
     toast.success('Link copiado para a área de transferência');
   };
 
-  const handleGenerateFollowup = async (proposal: Proposal) => {
+  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string) => {
     try {
       setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
@@ -246,7 +246,7 @@ const PropostasTracking = () => {
       setIsFollowupModalOpen(true);
 
       const { data, error } = await supabase.functions.invoke('generate-followup', {
-        body: { proposal }
+        body: { proposal, analysisContext }
       });
 
       if (error) throw error;
@@ -258,6 +258,79 @@ const PropostasTracking = () => {
     } finally {
       setIsGeneratingFollowup(false);
     }
+  };
+
+  const getEngagementStats = (engagement: Engagement[]) => {
+    if (!engagement || engagement.length === 0) return null;
+    
+    const totalSeconds = engagement.reduce((acc, curr) => acc + (curr.tempo_total || 0), 0);
+    const dispositivo = engagement[engagement.length - 1].dispositivo;
+    
+    const sections = [
+      { id: 'capa', label: 'Capa', time: engagement.reduce((acc, curr) => acc + (curr.secao_capa_tempo || 0), 0) },
+      { id: 'manifesto', label: 'Manifesto', time: engagement.reduce((acc, curr) => acc + (curr.secao_manifesto_tempo || 0), 0) },
+      { id: 'diagnostico', label: 'Diagnóstico', time: engagement.reduce((acc, curr) => acc + (curr.secao_diagnostico_tempo || 0), 0) },
+      { id: 'escopo', label: 'Escopo', time: engagement.reduce((acc, curr) => acc + (curr.secao_escopo_tempo || 0), 0) },
+      { id: 'investimento', label: 'Investimento', time: engagement.reduce((acc, curr) => acc + (curr.secao_investimento_tempo || 0), 0) },
+      { id: 'fechamento', label: 'Fechamento', time: engagement.reduce((acc, curr) => acc + (curr.secao_fechamento_tempo || 0), 0) },
+    ];
+    
+    const mostViewed = [...sections].sort((a, b) => b.time - a.time)[0];
+    const maxTime = Math.max(...sections.map(s => s.time));
+    
+    return {
+      totalSeconds,
+      dispositivo,
+      sections: sections.map(s => ({ ...s, percentage: maxTime > 0 ? (s.time / maxTime) * 100 : 0 })),
+      mostViewed
+    };
+  };
+
+  const handleAnalyzeEngagement = async (proposal: Proposal) => {
+    try {
+      if (!proposal.proposta_engajamento || proposal.proposta_engajamento.length === 0) {
+        toast.error('Nenhum dado de engajamento disponível para análise');
+        return;
+      }
+
+      setSelectedProposal(proposal);
+      setIsAnalyzing(true);
+      setAnalysisText('');
+      setIsAnalysisModalOpen(true);
+
+      const stats = getEngagementStats(proposal.proposta_engajamento);
+      
+      const { data, error } = await supabase.functions.invoke('analyze-engagement', {
+        body: { 
+          proposal,
+          engagement: {
+            tempo_total: stats?.totalSeconds,
+            dispositivo: stats?.dispositivo,
+            secao_capa_tempo: stats?.sections.find(s => s.id === 'capa')?.time,
+            secao_manifesto_tempo: stats?.sections.find(s => s.id === 'manifesto')?.time,
+            secao_diagnostico_tempo: stats?.sections.find(s => s.id === 'diagnostico')?.time,
+            secao_escopo_tempo: stats?.sections.find(s => s.id === 'escopo')?.time,
+            secao_investimento_tempo: stats?.sections.find(s => s.id === 'investimento')?.time,
+            secao_fechamento_tempo: stats?.sections.find(s => s.id === 'fechamento')?.time,
+          }
+        }
+      });
+
+      if (error) throw error;
+      setAnalysisText(data.analysis);
+    } catch (error) {
+      console.error('Error analyzing engagement:', error);
+      toast.error('Erro ao analisar engajamento');
+      setIsAnalysisModalOpen(false);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleGenerateFollowupFromAnalysis = () => {
+    if (!selectedProposal) return;
+    setIsAnalysisModalOpen(false);
+    handleGenerateFollowup(selectedProposal, analysisText);
   };
 
   const copyFollowupMessage = () => {
