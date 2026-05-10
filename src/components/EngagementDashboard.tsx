@@ -237,6 +237,8 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                 {totalSeconds > 180 
                   ? "Lead demonstrou altíssimo interesse. Ele passou um tempo considerável revisando a proposta. Recomendamos um follow-up focado no fechamento e em tirar dúvidas técnicas sobre o escopo."
                   : "O engajamento foi inicial. O cliente deu uma olhada geral mas ainda não se aprofundou. Recomendamos enviar uma mensagem perguntando se ele conseguiu visualizar os detalhes do projeto."}
+                {mostViewed && mostViewed.time > 60 && ` O foco principal foi na seção "${mostViewed.name}", o que indica uma atenção especial a este ponto.`}
+                {deviceCounts['Mobile'] > deviceCounts['Desktop'] && " O cliente está acessando majoritariamente via celular."}
               </p>
             </div>
 
