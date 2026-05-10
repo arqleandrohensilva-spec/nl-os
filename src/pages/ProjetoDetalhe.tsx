@@ -290,8 +290,9 @@ const ProjetoDetalhe = () => {
                   <AccordionItem 
                     key={config.id} 
                     value={config.id} 
-                    className="border border-white/10 bg-white/[0.02] px-8 py-2 rounded-none data-[state=open]:bg-white/[0.05] transition-all"
+                    className="border border-white/5 bg-white/[0.01] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
                   >
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-data-[state=open]:scale-y-100 transition-transform duration-500 origin-top" />
                     <AccordionTrigger className="hover:no-underline py-6">
                       <div className="flex flex-1 items-center justify-between text-left pr-8">
                         <div>
