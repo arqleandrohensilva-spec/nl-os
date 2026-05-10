@@ -60,6 +60,7 @@ const PropostasTracking = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [showLeads, setShowLeads] = useState(false);
   
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
