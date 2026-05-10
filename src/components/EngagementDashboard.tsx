@@ -37,7 +37,7 @@ interface EngagementDashboardProps {
   onGenerateFollowup: (analysisText?: string) => void;
 }
 
-const EngagementDashboard = ({ proposal, onAnalyze, onGenerateFollowup }: EngagementDashboardProps) => {
+const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboardProps) => {
   const engagements = proposal.proposta_engajamento || [];
   
   if (engagements.length === 0) {
