@@ -563,7 +563,7 @@ const ControleHoras = () => {
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
 
-    const ativos = projetos.filter(p => p.status === 'ativo').length;
+    const ativos = projetos.filter(p => p.status_geral === 'ativo').length;
     const custoHora = config?.custo_hora || 67.37;
     const custoInterno = totalMes * custoHora;
 
@@ -714,7 +714,7 @@ const ControleHoras = () => {
                     )}
                   </div>
                   <p className="text-[9px] text-muted-foreground uppercase tracking-wider mb-6 font-bold truncate">
-                    {p.cliente_nome} · {p.tipo} · {p.area_m2}m²
+                    {p.nome_cliente} · {p.tipo} · {p.area_m2}m²
                   </p>
 
                   <div className="mb-8">
@@ -733,7 +733,7 @@ const ControleHoras = () => {
                 </div>
 
                 {/* AI Prediction */}
-                {p.status === 'ativo' && aiPredictions[p.id] && (
+                {p.status_geral === 'ativo' && aiPredictions[p.id] && (
                   <div className={cn(
                     "mb-6 p-2.5 border-l-2 text-[10px] leading-relaxed",
                     aiPredictions[p.id].status === 'alert' 
@@ -751,7 +751,7 @@ const ControleHoras = () => {
                   </div>
                 )}
                 
-                {p.status === 'ativo' && !aiPredictions[p.id] && loadingPredictions[p.id] && (
+                {p.status_geral === 'ativo' && !aiPredictions[p.id] && loadingPredictions[p.id] && (
                   <div className="mb-6 p-2.5 border-l-2 border-bronze/20 bg-muted/20 animate-pulse flex items-center gap-2">
                     <Clock size={12} className="text-bronze/30" />
                     <span className="text-[10px] text-muted-foreground font-mono">Analisando ritmo...</span>
@@ -837,9 +837,9 @@ const ControleHoras = () => {
                         <td className="py-4 text-right">
                           <span className={cn(
                             "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
-                            p.status === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-muted-foreground"
+                            p.status_geral === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-muted-foreground"
                           )}>
-                            {p.status}
+                            {p.status_geral}
                           </span>
                         </td>
                       </tr>
@@ -925,7 +925,7 @@ const ControleHoras = () => {
           <div className="p-10">
             <div className="mb-10">
               <h2 className="text-3xl font-cormorant font-bold mb-1">{panelProjeto?.nome}</h2>
-              <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">{panelProjeto?.cliente_nome} · {panelProjeto?.tipo}</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">{panelProjeto?.nome_cliente} · {panelProjeto?.tipo}</p>
             </div>
 
             {panelProjeto && (
@@ -1051,7 +1051,7 @@ const ControleHoras = () => {
                     <SelectValue placeholder="Selecione o projeto" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                    {projetos.filter(p => p.status === 'ativo').map(p => (
+                    {projetos.filter(p => p.status_geral === 'ativo').map(p => (
                       <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
                     ))}
                   </SelectContent>
