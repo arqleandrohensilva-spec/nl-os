@@ -67,6 +67,7 @@ const PropostasTracking = () => {
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
