@@ -247,7 +247,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                 className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
               >
                 <MessageSquare size={16} className="mr-2 text-bronze" />
-                Script de Venda (Follow-up)
+                Script de Venda
               </Button>
             </div>
           </div>
