@@ -275,6 +275,7 @@ export type Database = {
           data_inicio: string | null
           etapa: string
           id: string
+          moodboard_url: string | null
           notas: string | null
           projeto_id: string | null
           status: string | null
@@ -287,6 +288,7 @@ export type Database = {
           data_inicio?: string | null
           etapa: string
           id?: string
+          moodboard_url?: string | null
           notas?: string | null
           projeto_id?: string | null
           status?: string | null
@@ -299,6 +301,7 @@ export type Database = {
           data_inicio?: string | null
           etapa?: string
           id?: string
+          moodboard_url?: string | null
           notas?: string | null
           projeto_id?: string | null
           status?: string | null
@@ -329,6 +332,7 @@ export type Database = {
           horas_estimadas: number | null
           horas_executivo: number | null
           id: string
+          link_apresentacao: string | null
           nome: string
           nome_cliente: string | null
           prazo_final: string | null
@@ -351,6 +355,7 @@ export type Database = {
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
+          link_apresentacao?: string | null
           nome: string
           nome_cliente?: string | null
           prazo_final?: string | null
@@ -373,6 +378,7 @@ export type Database = {
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
+          link_apresentacao?: string | null
           nome?: string
           nome_cliente?: string | null
           prazo_final?: string | null
