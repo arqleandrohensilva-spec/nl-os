@@ -387,6 +387,17 @@ const ProjetoDetalhe = () => {
                         <div className="space-y-6">
                           <div>
                             <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold mb-4 flex items-center gap-2">
+                              <ImageIcon size={12} /> Conceito Visual (URL)
+                            </h4>
+                            <input 
+                              type="text"
+                              defaultValue={etapaData?.moodboard_url || ''}
+                              onBlur={(e) => updateMoodboard(etapaData?.id || '', e.target.value)}
+                              placeholder="Link do Pinterest, Drive ou Imagem..."
+                              className="w-full bg-white/5 border border-white/10 rounded-none text-xs p-3 focus:outline-none focus:border-[#8B7355] placeholder:text-white/10 mb-6"
+                            />
+
+                            <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold mb-4 flex items-center gap-2">
                               <History size={12} /> Notas Internas
                             </h4>
                             <div className="relative">
