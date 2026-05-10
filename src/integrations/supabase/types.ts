@@ -158,6 +158,7 @@ export type Database = {
           created_at: string
           criado: string
           criado_por: string | null
+          estado: string | null
           etapa_desde: string
           fechado_em: string | null
           id: string
@@ -181,6 +182,7 @@ export type Database = {
           created_at?: string
           criado?: string
           criado_por?: string | null
+          estado?: string | null
           etapa_desde?: string
           fechado_em?: string | null
           id?: string
@@ -204,6 +206,7 @@ export type Database = {
           created_at?: string
           criado?: string
           criado_por?: string | null
+          estado?: string | null
           etapa_desde?: string
           fechado_em?: string | null
           id?: string
