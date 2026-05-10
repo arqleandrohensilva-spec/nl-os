@@ -145,13 +145,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
         <SectionAccordion 
-          label="LEADS" 
+          label="RELACIONAMENTO" 
           icon={<LayoutGrid size={14} />}
           isOpen={!!openSections['LEADS']}
           onToggle={() => toggleSection('LEADS')}
         >
           <NavItem 
-            label="01 · Pipeline de Leads" 
+            label="01 · Pipeline de Ativos" 
             active={location.pathname === '/'} 
             onClick={() => navigate('/')} 
           />
@@ -159,13 +159,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         </SectionAccordion>
 
         <SectionAccordion 
-          label="FINANCEIRO" 
+          label="PATRIMÔNIO" 
           icon={<DollarSign size={14} />}
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
           <NavItem 
-            label="02 · Base Financeira" 
+            label="02 · Base de Ativos" 
             active={location.pathname === '/financeiro/base'} 
             onClick={() => navigate('/financeiro/base')} 
           />
