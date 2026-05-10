@@ -412,19 +412,28 @@ const PropostasTracking = () => {
             {[
               { label: 'Total Enviadas', value: proposals.length, icon: Send },
               { label: 'Aguardando', value: proposals.filter(p => p.status === 'Enviada' || p.status === 'Vista').length, icon: Clock },
-              { label: 'Alto Interesse', value: proposals.filter(p => (p.views_count || 0) > 3).length, icon: Activity },
+              { label: 'Alto Interesse', value: proposals.filter(p => (p.views_count || 0) >= 3).length, icon: Activity, highlight: true },
               { label: 'Aprovadas', value: proposals.filter(p => p.status === 'Aprovada').length, icon: CheckCircle2 },
               { label: 'Taxa de Conversão', value: `${proposals.length > 0 ? Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100) : 0}%`, icon: History },
             ].map((m, i) => (
               <div 
                 key={i}
-                className="bg-white p-6 rounded-[2px] border border-[#E8E4DF] shadow-sm relative overflow-hidden group"
+                className={cn(
+                  "bg-white p-6 rounded-[2px] border shadow-sm relative overflow-hidden group transition-all",
+                  m.highlight ? "border-bronze/50 bg-bronze/[0.02]" : "border-[#E8E4DF]"
+                )}
               >
                 <div className="relative z-10">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1 font-bold">{m.label}</p>
+                  <p className={cn(
+                    "text-[10px] uppercase tracking-[0.2em] mb-1 font-bold",
+                    m.highlight ? "text-bronze" : "text-muted-foreground"
+                  )}>{m.label}</p>
                   <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
                 </div>
-                <m.icon size={40} className="absolute right-[-10px] bottom-[-10px] text-bronze/5 group-hover:text-bronze/10 transition-colors" />
+                <m.icon size={40} className={cn(
+                  "absolute right-[-10px] bottom-[-10px] transition-colors",
+                  m.highlight ? "text-bronze/20" : "text-bronze/5 group-hover:text-bronze/10"
+                )} />
               </div>
             ))}
           </div>
