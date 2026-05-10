@@ -19,17 +19,19 @@ import {
   Clock,
   MessageSquare,
   ChevronDown,
-  Activity
+  Activity,
+  LayoutDashboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
+import EngagementDashboard from '@/components/EngagementDashboard';
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-interface Engagement {
+export interface Engagement {
   id: string;
   proposta_id: string;
   secao_capa_tempo: number;
@@ -42,7 +44,7 @@ interface Engagement {
   tempo_total: number;
 }
 
-interface Proposal {
+export interface Proposal {
   id: string;
   cliente: string;
   tipo: 'ArqInt' | 'Interiores' | 'Comercial';
@@ -88,6 +90,7 @@ const PropostasTracking = () => {
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
   const [analysisText, setAnalysisText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
@@ -331,9 +334,15 @@ const PropostasTracking = () => {
     }
   };
 
+  const handleOpenDashboard = (proposal: Proposal) => {
+    setSelectedProposal(proposal);
+    setIsDashboardModalOpen(true);
+  };
+
   const handleGenerateFollowupFromAnalysis = () => {
     if (!selectedProposal) return;
     setIsAnalysisModalOpen(false);
+    setIsDashboardModalOpen(false);
     handleGenerateFollowup(selectedProposal, analysisText);
   };
 
@@ -613,11 +622,11 @@ const PropostasTracking = () => {
                   <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-3">
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
-                        onClick={() => handleAnalyzeEngagement(p)}
+                        onClick={() => handleOpenDashboard(p)}
                         className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
                       >
-                        <Activity size={12} className="mr-2" />
-                        Analisar Interesse
+                        <LayoutDashboard size={12} className="mr-2" />
+                        Ver Dashboard
                       </Button>
                       
                       <Button 
@@ -938,6 +947,37 @@ const PropostasTracking = () => {
               Gerar Follow-up
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isDashboardModalOpen} onOpenChange={setIsDashboardModalOpen}>
+        <DialogContent className="max-w-4xl bg-[#F8F9FA] border-none rounded-[2px] p-0 overflow-hidden">
+          <div className="bg-graphite p-6 flex justify-between items-center">
+            <div>
+              <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">
+                Dashboard de Engajamento
+              </DialogTitle>
+              <p className="text-bronze text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
+                {selectedProposal?.cliente} · {selectedProposal?.tipo}
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDashboardModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[9px] font-bold h-8 border-white/20 text-white hover:bg-white/10"
+            >
+              Fechar
+            </Button>
+          </div>
+          
+          <div className="p-8 max-h-[85vh] overflow-y-auto">
+            {selectedProposal && (
+              <EngagementDashboard 
+                proposal={selectedProposal} 
+                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
+                onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
