@@ -340,7 +340,10 @@ const ControleHoras = () => {
         supabase.from('config_escritorio').select('*').single()
       ]);
       setProjetos(pData || []);
-      setSessoes(sData || []);
+      setSessoes((sData || []).map(s => ({
+        ...s,
+        duracao_minutos: typeof s.duracao_minutos === 'string' ? parseFloat(s.duracao_minutos) : (s.duracao_minutos || 0)
+      })));
       setConfig(cData);
       
       // Calculate predictions after data load

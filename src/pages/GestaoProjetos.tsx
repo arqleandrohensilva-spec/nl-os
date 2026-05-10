@@ -88,7 +88,10 @@ const GestaoProjetos = () => {
         .gte('inicio', startOfMonth.toISOString());
 
       if (hData) {
-        const total = hData.reduce((acc, curr) => acc + (curr.duracao_minutos || 0), 0);
+        const total = hData.reduce((acc, curr) => {
+          const val = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
+          return acc + (Number.isNaN(val) ? 0 : (val || 0));
+        }, 0);
         setTotalHorasMes(Math.round(total / 60));
       }
 
