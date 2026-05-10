@@ -11,7 +11,6 @@ import {
   FileText, 
   TrendingUp,
   Package,
-  Layers,
   ArrowRight,
   Clock,
   ExternalLink,
