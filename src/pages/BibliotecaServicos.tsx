@@ -164,7 +164,7 @@ const BibliotecaServicos = () => {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-[#1A1A1A]">Biblioteca de Serviços</h1>
-              <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Gestão de Portfólio</p>
+              <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Catálogo de Serviços e Precificação</p>
             </div>
             <Button 
               onClick={() => {
@@ -255,7 +255,7 @@ const BibliotecaServicos = () => {
                             </span>
                             <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
                               <Clock size={12} className="text-bronze/40" />
-                              {s.nome === 'Acompanhamento de Obra' ? 'Variável' : `${s.horas_estimadas}h estimadas`}
+                              {(s.nome === 'Acompanhamento de Obra' || s.nome === 'EVF — Viabilidade Financeira') ? 'Variável' : `${s.horas_estimadas}h estimadas`}
                             </div>
                           </div>
                           
