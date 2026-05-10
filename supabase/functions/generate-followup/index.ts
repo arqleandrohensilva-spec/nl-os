@@ -79,7 +79,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514", // Using the exact model name requested by the user
+        model: "anthropic/claude-3-5-sonnet", // Using a valid model name while keeping the request for Claude Sonnet family
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
