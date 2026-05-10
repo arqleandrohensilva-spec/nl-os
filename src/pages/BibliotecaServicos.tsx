@@ -344,7 +344,59 @@ const BibliotecaServicos = () => {
                 );
               })}
             </div>
+
+            {/* Templates de Documento */}
+            <div className="pt-12 border-t border-[#E8E4DF] mt-12">
+              <div className="flex items-center gap-3 mb-8">
+                <FileText size={18} className="text-bronze" />
+                <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Templates de Documento</h3>
+              </div>
+
+              <div className="space-y-8">
+                {[
+                  {
+                    title: "Apresentações",
+                    items: [
+                      { name: "Apresentação ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/arqint" },
+                      { name: "Apresentação Interiores", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/int" },
+                      { name: "Apresentação Comercial", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/comercial" },
+                    ]
+                  },
+                  {
+                    title: "Propostas",
+                    items: [
+                      { name: "Proposta ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/proposta/arqint" },
+                      { name: "Proposta Interiores", url: "https://nlarquitetosapresentacao.lovable.app/proposta/int" },
+                      { name: "Proposta Comercial", url: "https://nlarquitetosapresentacao.lovable.app/proposta/comercial" },
+                    ]
+                  }
+                ].map((group, idx) => (
+                  <div key={idx} className="space-y-4">
+                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">{group.title}</p>
+                    <div className="space-y-3">
+                      {group.items.map((doc, docIdx) => (
+                        <div key={docIdx} className="bg-[#1A1A1A] text-white p-4 rounded-[4px] border border-white/5 flex items-center justify-between group hover:border-bronze/50 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <FileText size={14} className="text-bronze" />
+                            <span className="text-[11px] font-cormorant font-bold tracking-wide">{doc.name}</span>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => window.open(doc.url, '_blank')}
+                            className="h-7 text-[8px] uppercase font-bold tracking-widest text-bronze hover:text-white hover:bg-bronze rounded-[2px]"
+                          >
+                            Visualizar
+                            <ExternalLink size={10} className="ml-1.5" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
+          </div>
           </div>
         )}
       </main>
