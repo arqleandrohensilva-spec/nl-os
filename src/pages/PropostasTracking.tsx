@@ -86,6 +86,8 @@ const PropostasTracking = () => {
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
+  const [followupTone, setFollowupTone] = useState<'formal' | 'direto'>('direto');
+  const [followupLang, setFollowupLang] = useState<'pt' | 'en' | 'es'>('pt');
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
@@ -242,7 +244,9 @@ const PropostasTracking = () => {
     toast.success('Link copiado para a área de transferência');
   };
 
-  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string) => {
+  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string, toneOverride?: 'formal' | 'direto', langOverride?: 'pt' | 'en' | 'es') => {
+    const tone = toneOverride || followupTone;
+    const lang = langOverride || followupLang;
     try {
       setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
@@ -295,7 +299,9 @@ const PropostasTracking = () => {
       }
 
       const prompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta. 
-Tom: condutor, técnico, sem pressão, sem urgência artificial. 
+Tom: ${tone === 'formal' ? 'Polido, elegante, respeitoso e profissional.' : 'Direto, amigável, ágil e focado no próximo passo.'}
+Idioma: ${lang === 'pt' ? 'Português' : lang === 'en' ? 'Inglês' : 'Espanhol'}
+Estilo NL Arquitetos: condutor, técnico, sem pressão, sem urgência artificial. 
 Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz. 
 Máximo 3 linhas. Termine com uma pergunta aberta simples.
 
