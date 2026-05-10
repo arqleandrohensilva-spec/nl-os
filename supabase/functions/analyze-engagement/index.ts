@@ -13,19 +13,31 @@ serve(async (req) => {
   try {
     const { engagement, proposal } = await req.json()
 
-    if (!engagement || !proposal) {
+    // Null safety: check if data exists and is valid
+    if (!engagement || !proposal || (Array.isArray(engagement) && engagement.length === 0)) {
       return new Response(
-        JSON.stringify({ analysis: "Dados insuficientes para realizar a análise de engajamento no momento. Por favor, aguarde o cliente interagir com a proposta." }),
+        JSON.stringify({ analysis: "Sem dados de engajamento registrados para esta proposta ainda." }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
+    // Support both single object or array (common when fetching from Supabase)
+    const engagementData = Array.isArray(engagement) ? engagement[0] : engagement;
 
-    if (!LOVABLE_API_KEY) {
+    if (!engagementData) {
       return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY not set' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ analysis: "Sem dados de engajamento registrados para esta proposta ainda." }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+
+    if (!ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY not set');
+      return new Response(
+        JSON.stringify({ analysis: "Configuração de API pendente. Contate o administrador." }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -36,28 +48,29 @@ serve(async (req) => {
     Status: ${proposal.status || 'Pendente'}
     
     Dados de Engajamento:
-    - Tempo Total: ${Math.floor((engagement.tempo_total || 0) / 60)} min ${(engagement.tempo_total || 0) % 60} seg
-    - Dispositivo: ${engagement.dispositivo || 'Não identificado'}
+    - Tempo Total: ${Math.floor((engagementData.tempo_total || 0) / 60)} min ${(engagementData.tempo_total || 0) % 60} seg
+    - Dispositivo: ${engagementData.dispositivo || 'Não identificado'}
     - Tempos por Seção:
-      * Capa: ${engagement.secao_capa_tempo || 0}s
-      * Manifesto: ${engagement.secao_manifesto_tempo || 0}s
-      * Diagnóstico: ${engagement.secao_diagnostico_tempo || 0}s
-      * Escopo: ${engagement.secao_escopo_tempo || 0}s
-      * Investimento: ${engagement.secao_investimento_tempo || 0}s
-      * Fechamento: ${engagement.secao_fechamento_tempo || 0}s
+      * Capa: ${engagementData.secao_capa_tempo || 0}s
+      * Manifesto: ${engagementData.secao_manifesto_tempo || 0}s
+      * Diagnóstico: ${engagementData.secao_diagnostico_tempo || 0}s
+      * Escopo: ${engagementData.secao_escopo_tempo || 0}s
+      * Investimento: ${engagementData.secao_investimento_tempo || 0}s
+      * Fechamento: ${engagementData.secao_fechamento_tempo || 0}s
     `
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3.5-sonnet",
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 1024,
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "user", content: `${systemPrompt}\n\n${userPrompt}` }
         ]
       })
     });
@@ -65,10 +78,11 @@ serve(async (req) => {
     const data = await response.json();
     
     if (data.error) {
-      throw new Error(data.error.message || JSON.stringify(data.error) || "AI Gateway Error");
+      console.error("Anthropic API Error:", data.error);
+      throw new Error(data.error.message || "Anthropic API Error");
     }
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    if (!data.content || !data.content[0] || !data.content[0].text) {
       return new Response(
         JSON.stringify({ analysis: "Não foi possível gerar a análise no momento. Tente novamente em instantes." }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -76,7 +90,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ analysis: data.choices[0].message.content }),
+      JSON.stringify({ analysis: data.content[0].text }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
