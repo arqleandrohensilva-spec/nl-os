@@ -449,74 +449,102 @@ const BibliotecaServicos = () => {
 
       {/* New/Edit Service Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
-          <div className="p-8">
-            <h2 className="text-2xl font-cormorant font-bold mb-1">{editingServico?.id ? 'Editar Serviço' : 'Novo Serviço'}</h2>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Defina os parâmetros técnicos e precificação</p>
+        <DialogContent className="bg-[#0A0A0A] border-white/5 text-white rounded-none p-0 max-w-lg overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-bronze/50" />
+          <div className="p-12">
+            <header className="mb-10">
+              <h2 className="text-3xl font-cormorant font-bold mb-2 italic">
+                {editingServico?.id ? 'Refinar Serviço' : 'Novo Ativo Estratégico'}
+              </h2>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-mono">
+                Parâmetros Técnicos e Inteligência de Precificação
+              </p>
+            </header>
             
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Nome do Serviço</label>
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Designação do Serviço</label>
                 <Input 
                   value={editingServico?.nome || ''} 
                   onChange={(e) => setEditingServico({...editingServico, nome: e.target.value})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                  placeholder="Ex: Consultoria Executiva"
+                  className="bg-white/5 border-white/10 text-white rounded-none h-12 placeholder:text-white/10 focus-visible:ring-bronze/20 focus-visible:border-bronze"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Descrição</label>
+              <div className="space-y-3">
+                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Escopo Resumido</label>
                 <textarea 
                   value={editingServico?.descricao || ''}
                   onChange={(e) => setEditingServico({...editingServico, descricao: e.target.value})}
-                  className="w-full h-24 bg-white/5 border border-white/10 text-white rounded-none p-4 text-[11px] font-mono focus:border-bronze outline-none resize-none"
+                  placeholder="Descreva a entrega de alto valor..."
+                  className="w-full h-32 bg-white/5 border border-white/10 text-white rounded-none p-4 text-[11px] font-mono focus:border-bronze outline-none resize-none placeholder:text-white/10 transition-all"
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">Tipo de cobrança</label>
-                <Select 
-                  value={editingServico?.tipo} 
-                  onValueChange={(val: any) => setEditingServico({...editingServico, tipo: val})}
-                >
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                    <SelectItem value="por_projeto">Por Projeto (Valor Fixo)</SelectItem>
-                    <SelectItem value="por_hora">Por Hora (Valor/h)</SelectItem>
-                    <SelectItem value="por_m2">Por m² (Valor/m²)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Modelo de Negócio</label>
+                  <Select 
+                    value={editingServico?.tipo} 
+                    onValueChange={(val: any) => setEditingServico({...editingServico, tipo: val})}
+                  >
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-12 focus:ring-bronze/20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0A0A0A] border-white/10 text-white">
+                      <SelectItem value="por_projeto" className="focus:bg-bronze/20 focus:text-white">Por Projeto</SelectItem>
+                      <SelectItem value="por_hora" className="focus:bg-bronze/20 focus:text-white">Por Hora</SelectItem>
+                      <SelectItem value="por_m2" className="focus:bg-bronze/20 focus:text-white">Por m²</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block">
-                  {editingServico?.tipo === 'por_m2' ? 'Horas por m²' : editingServico?.tipo === 'por_hora' ? 'Horas base' : 'Horas estimadas'}
-                </label>
-                <Input 
-                  type="number"
-                  value={editingServico?.horas_estimadas || ''} 
-                  onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11"
-                />
-              </div>
-
-              <div className="p-4 bg-bronze/5 border border-bronze/10 rounded-none space-y-2">
-                <p className="text-[9px] uppercase tracking-widest text-bronze font-bold">Valor calculado em tempo real</p>
-                <div className="flex items-end gap-2">
-                  <h3 className="text-3xl font-cormorant font-bold text-white">
-                    R$ {Math.round(calcularValor(editingServico as Servico)).toLocaleString()}
-                  </h3>
-                  <span className="text-[10px] text-white/40 font-mono mb-1.5">
-                    ({editingServico?.horas_estimadas || 0}h × R$ {config?.custo_hora?.toFixed(2)} × {1 + (config?.margem_lucro || 40)/100})
-                  </span>
+                <div className="space-y-3">
+                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">
+                    {editingServico?.tipo === 'por_m2' ? 'Esforço (h/m²)' : editingServico?.tipo === 'por_hora' ? 'Base (h)' : 'Esforço Estimado (h)'}
+                  </label>
+                  <Input 
+                    type="number"
+                    value={editingServico?.horas_estimadas || ''} 
+                    onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
+                    className="bg-white/5 border-white/10 text-white rounded-none h-12 focus-visible:ring-bronze/20"
+                  />
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
-                <Button onClick={handleSaveServico} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">Salvar Serviço</Button>
+              <motion.div 
+                layout
+                className="p-8 bg-bronze/5 border border-bronze/10 rounded-none relative group"
+              >
+                <div className="absolute top-2 right-4">
+                  <TrendingUp size={14} className="text-bronze/30" />
+                </div>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold mb-3">Valor de Mercado Sugerido</p>
+                <div className="flex items-baseline gap-3">
+                  <h3 className="text-4xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors">
+                    R$ {Math.round(calcularValor(editingServico as Servico)).toLocaleString()}
+                  </h3>
+                  <span className="text-[10px] text-white/20 font-mono italic">
+                    {editingServico?.tipo === 'por_m2' ? '/m²' : editingServico?.tipo === 'por_hora' ? '/h' : ''}
+                  </span>
+                </div>
+              </motion.div>
+
+              <div className="pt-6 flex gap-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsModalOpen(false)} 
+                  className="flex-1 rounded-none text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 h-12"
+                >
+                  Descartar
+                </Button>
+                <Button 
+                  onClick={handleSaveServico} 
+                  className="flex-[2] bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-[0.3em] shadow-xl shadow-bronze/10"
+                >
+                  Confirmar Ativo
+                </Button>
               </div>
             </div>
           </div>
