@@ -919,14 +919,15 @@ Gere a mensagem de WhatsApp.`;
                   <Copy size={14} className="mr-2" />
                   Copiar
                 </Button>
-                <Button 
-                  onClick={handleSendWhatsApp}
-                  disabled={!selectedProposal || !leads.find(l => l.nome === selectedProposal.cliente)?.whats}
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <MessageSquare size={14} className="mr-2" />
-                  Enviar no WhatsApp
-                </Button>
+                {selectedProposal && leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
+                  <Button 
+                    onClick={handleSendWhatsApp}
+                    className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
+                  >
+                    <MessageSquare size={14} className="mr-2" />
+                    Enviar no WhatsApp
+                  </Button>
+                )}
               </div>
             )}
           </DialogFooter>
