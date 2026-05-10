@@ -85,7 +85,7 @@ const PropostasTracking = () => {
     try {
       const { data, error } = await (supabase
         .from('leads') as any)
-        .select('id, nome, cidade, estado, tipo, area')
+        .select('id, nome, whats, cidade, estado, tipo, area')
         .order('nome');
       
       if (error) throw error;
