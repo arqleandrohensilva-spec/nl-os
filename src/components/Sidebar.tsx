@@ -195,7 +195,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROPOSTAS']}
           onToggle={() => toggleSection('PROPOSTAS')}
         >
-          <NavItem label="04 · Tracking" disabled />
+          <NavItem 
+            label="04 · Tracking" 
+            active={location.pathname === '/propostas/tracking'} 
+            onClick={() => navigate('/propostas/tracking')} 
+          />
           <NavItem 
             label="05 · Biblioteca" 
             active={location.pathname === '/propostas/biblioteca'} 

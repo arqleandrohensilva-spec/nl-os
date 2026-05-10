@@ -10,6 +10,8 @@ import BaseFinanceira from "./pages/BaseFinanceira.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import ControleHoras from "./pages/ControleHoras.tsx";
 import BibliotecaServicos from "./pages/BibliotecaServicos.tsx";
+import PropostasTracking from "./pages/PropostasTracking.tsx";
+import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 
 
 
@@ -29,7 +31,8 @@ const App = () => (
         <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
 
 
-        <Route path="*" element={<NotFound />} />
+        <Route path="/propostas/tracking" element={<ProtectedRoute><PropostasTracking /></ProtectedRoute>} />
+        <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>
