@@ -79,19 +79,23 @@ serve(async (req) => {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514", // Using the exact model name requested by the user
+        model: "openai/gpt-5", // Using a high-performance model available in the current environment (2026)
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.7
+        // temperature: 0.7 // Removed as it might not be supported by some models in this environment
       })
     });
 
     const data = await response.json();
     
     if (data.error) {
-        throw new Error(data.error.message || "AI Gateway Error");
+        throw new Error(data.error.message || JSON.stringify(data.error) || "AI Gateway Error");
+    }
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error("Invalid response format from AI Gateway");
     }
 
     return new Response(
