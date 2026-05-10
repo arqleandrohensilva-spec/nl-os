@@ -298,27 +298,28 @@ Instrução específica: ${specificInstruction}
 
 Gere a mensagem de WhatsApp.`;
 
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01"
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 500,
-          messages: [{ role: "user", content: prompt }]
-        })
+      const { data: invokeData, error: invokeError } = await supabase.functions.invoke('generate-followup', {
+        body: { 
+          prompt,
+          proposal: {
+            cliente,
+            tipo,
+            status,
+            views_count,
+            daysSinceSent,
+            daysUntilExpiry
+          }
+        }
       });
 
-      const data = await response.json();
-      const text = data?.content?.[0]?.text;
+      if (invokeError) throw invokeError;
+      
+      const text = invokeData?.message || invokeData?.text;
       
       if (text) {
         setFollowupMessage(text);
-      } else if (data?.error) {
-        setFollowupMessage(`Erro: ${data.error.message || JSON.stringify(data.error)}`);
+      } else if (invokeData?.error) {
+        setFollowupMessage(`Erro na IA: ${invokeData.error}`);
       } else {
         setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
       }
