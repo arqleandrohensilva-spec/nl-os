@@ -118,7 +118,8 @@ const PropostasTracking = () => {
           *,
           proposal_views (
             viewed_at
-          )
+          ),
+          proposta_engajamento (*)
         `)
         .order('created_at', { ascending: false });
 
