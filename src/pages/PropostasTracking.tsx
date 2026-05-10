@@ -298,35 +298,40 @@ Instrução específica: ${specificInstruction}
 
 Gere a mensagem de WhatsApp.`;
 
-      const { data: invokeData, error: invokeError } = await supabase.functions.invoke('generate-followup', {
-        body: { 
-          prompt,
-          proposal: {
-            cliente,
-            tipo,
-            status,
-            views_count,
-            daysSinceSent,
-            daysUntilExpiry
-          }
-        }
-      });
+      // Fallback message based on context if AI fails or is not used
+      const fallbackMessage = `Olá, ${cliente}! Tudo bem? Gostaria de saber se você conseguiu visualizar a proposta de ${tipo} que enviamos há ${daysSinceSent} dias. Ficou alguma dúvida sobre o escopo ou os próximos passos?`;
 
-      if (invokeError) throw invokeError;
-      
-      const text = invokeData?.message || invokeData?.text;
-      
-      if (text) {
-        setFollowupMessage(text);
-      } else if (invokeData?.error) {
-        setFollowupMessage(`Erro na IA: ${invokeData.error}`);
-      } else {
-        setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
+      try {
+        const { data: invokeData, error: invokeError } = await supabase.functions.invoke('generate-followup', {
+          body: { 
+            prompt,
+            proposal: {
+              cliente,
+              tipo,
+              status,
+              views_count,
+              daysSinceSent,
+              daysUntilExpiry
+            }
+          }
+        });
+
+        if (invokeError) throw invokeError;
+        
+        const text = invokeData?.message || invokeData?.text;
+        
+        if (text) {
+          setFollowupMessage(text);
+        } else {
+          setFollowupMessage(fallbackMessage);
+        }
+      } catch (error) {
+        console.error('Error calling AI:', error);
+        setFollowupMessage(fallbackMessage);
       }
     } catch (error: any) {
       console.error('Error generating follow-up:', error);
-      setFollowupMessage("Erro ao gerar follow-up. Verifique sua conexão ou se a IA está disponível.");
-      toast.error('Erro ao gerar follow-up');
+      toast.error('Erro ao preparar follow-up');
     } finally {
       setIsGeneratingFollowup(false);
     }
