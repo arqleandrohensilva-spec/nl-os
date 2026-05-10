@@ -233,7 +233,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           
           <div className="space-y-4 relative z-10">
             <div className="p-4 bg-white/5 border border-white/10 rounded-[2px] backdrop-blur-sm">
-              <p className="text-xs leading-relaxed font-medium">
+              <p id="recommended-strategy-text" className="text-xs leading-relaxed font-medium">
                 {totalSeconds > 180 
                   ? "Lead demonstrou altíssimo interesse. Ele passou um tempo considerável revisando a proposta. Recomendamos um follow-up focado no fechamento e em tirar dúvidas técnicas sobre o escopo."
                   : "O engajamento foi inicial. O cliente deu uma olhada geral mas ainda não se aprofundou. Recomendamos enviar uma mensagem perguntando se ele conseguiu visualizar os detalhes do projeto."}
@@ -244,7 +244,10 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
 
             <div className="flex gap-3">
               <Button 
-                onClick={() => onGenerateFollowup()}
+                onClick={() => {
+                  const strategyText = document.getElementById('recommended-strategy-text')?.innerText;
+                  onGenerateFollowup(strategyText);
+                }}
                 variant="outline"
                 className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
               >
