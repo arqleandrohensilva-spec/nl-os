@@ -47,6 +47,7 @@ interface Lead {
   id: string;
   nome: string;
   cidade: string;
+  estado: string;
   tipo: string;
   area: number;
 }
@@ -78,7 +79,7 @@ const PropostasTracking = () => {
     try {
       const { data, error } = await supabase
         .from('leads')
-        .select('id, nome, cidade, tipo, area')
+        .select('id, nome, cidade, estado, tipo, area')
         .order('nome');
       
       if (error) throw error;
@@ -162,6 +163,7 @@ const PropostasTracking = () => {
         ...prev,
         cliente: selectedLead.nome,
         cidade: selectedLead.cidade || prev.cidade,
+        estado: selectedLead.estado || prev.estado,
         area: selectedLead.area || prev.area,
         tipo: (['ArqInt', 'Interiores', 'Comercial'].includes(selectedLead.tipo) ? selectedLead.tipo : prev.tipo) as Proposal['tipo']
       }));
