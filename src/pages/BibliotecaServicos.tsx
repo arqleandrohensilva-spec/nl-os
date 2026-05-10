@@ -255,7 +255,7 @@ const BibliotecaServicos = () => {
                             </span>
                             <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
                               <Clock size={12} className="text-bronze/40" />
-                              {(s.nome === 'Acompanhamento de Obra' || s.nome === 'EVF — Viabilidade Financeira') ? 'Variável' : `${s.horas_estimadas}h estimadas`}
+                              {(s.nome === 'Acompanhamento de Obra' || s.nome === 'EVF — Viabilidade Financeira' || s.horas_estimadas === 0) ? 'Variável' : `${s.horas_estimadas}h estimadas`}
                             </div>
                           </div>
                           
