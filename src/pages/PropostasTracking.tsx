@@ -257,11 +257,20 @@ const PropostasTracking = () => {
       });
 
       if (error) throw error;
-      setFollowupMessage(data.message);
-    } catch (error) {
+      
+      const text = data?.message || data?.analysis || data?.content?.[0]?.text;
+      
+      if (text) {
+        setFollowupMessage(text);
+      } else if (data?.error) {
+        setFollowupMessage(`Erro: ${data.error}`);
+      } else {
+        setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
+      }
+    } catch (error: any) {
       console.error('Error generating follow-up:', error);
-      toast.error('Erro ao gerar follow-up. Verifique se a função está implantada.');
-      setIsFollowupModalOpen(false);
+      setFollowupMessage("Erro ao gerar follow-up. Verifique sua conexão ou se a IA está disponível.");
+      toast.error('Erro ao gerar follow-up');
     } finally {
       setIsGeneratingFollowup(false);
     }
@@ -324,11 +333,21 @@ const PropostasTracking = () => {
       });
 
       if (error) throw error;
-      setAnalysisText(data.analysis);
-    } catch (error) {
+      
+      // Handle both { analysis: "..." } and { message: "..." } or direct { content: [...] }
+      const text = data?.analysis || data?.message || data?.content?.[0]?.text;
+      
+      if (text) {
+        setAnalysisText(text);
+      } else if (data?.error) {
+        setAnalysisText(`Erro da IA: ${data.error}`);
+      } else {
+        setAnalysisText("Não foi possível gerar a análise. Resposta inesperada.");
+      }
+    } catch (error: any) {
       console.error('Error analyzing engagement:', error);
+      setAnalysisText("Não foi possível gerar a análise. Tente novamente.");
       toast.error('Erro ao analisar engajamento');
-      setIsAnalysisModalOpen(false);
     } finally {
       setIsAnalyzing(false);
     }
@@ -902,7 +921,7 @@ const PropostasTracking = () => {
             >
               Fechar
             </Button>
-            {!isGeneratingFollowup && (
+            {!isGeneratingFollowup && followupMessage && !followupMessage.includes('Erro') && (
               <div className="flex gap-2">
                 <Button 
                   onClick={copyFollowupMessage}
@@ -958,7 +977,8 @@ const PropostasTracking = () => {
             </Button>
             <Button 
               onClick={handleGenerateFollowupFromAnalysis}
-              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2]"
+              disabled={isAnalyzing || !analysisText || analysisText.includes('Não foi possível') || analysisText.includes('Erro')}
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2] disabled:opacity-50"
             >
               <MessageSquare size={16} className="mr-2" />
               Gerar Follow-up
