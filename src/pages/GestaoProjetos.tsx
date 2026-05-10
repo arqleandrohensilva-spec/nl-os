@@ -233,12 +233,24 @@ const GestaoProjetos = () => {
                   </span>
                 </div>
 
-                <Button 
-                  onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                  className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300"
-                >
-                  Abrir projeto
-                </Button>
+                <div className="w-full md:w-auto flex flex-col md:flex-row gap-3">
+                  <Button 
+                    onClick={() => {
+                      toast.success("Link da Experiência Concierge copiado!", {
+                        description: "O cliente receberá o acesso ao Atelier Visual."
+                      });
+                    }}
+                    className="bg-white/5 hover:bg-white/10 text-[#8B7355] border border-[#8B7355]/20 rounded-none px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
+                  >
+                    <Share2 size={12} className="mr-2" /> Compartilhar
+                  </Button>
+                  <Button 
+                    onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
+                    className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300"
+                  >
+                    Abrir projeto
+                  </Button>
+                </div>
               </div>
             );
           })}
