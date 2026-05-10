@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2 } from 'lucide-react';
+import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2, LayoutGrid } from 'lucide-react';
 import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { verificarViabilidade } from '@/lib/finance-utils';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,6 +22,8 @@ interface LeadDetailPanelProps {
 const STAGES: Stage[] = ['Novo Lead', 'Reunião Agendada', 'Proposta Enviada', 'Negociação', 'Fechado', 'Perdido'];
 
 const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: LeadDetailPanelProps) => {
+  const navigate = useNavigate();
+  const [isConverting, setIsConverting] = useState(false);
   const [newLog, setNewLog] = useState({ tipo: 'N' as LogTipo, nota: '' });
   const [isDeleting, setIsDeleting] = useState(false);
   const [custoHora, setCustoHora] = useState<number>(0);
@@ -46,6 +50,51 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
       autor: sessionStorage.getItem('nl_user') || 'Sócio'
     });
     setNewLog({ tipo: 'N', nota: '' });
+  };
+
+  const handleConvertToProject = async () => {
+    try {
+      setIsConverting(true);
+      
+      // Check if project already exists
+      const { data: existing } = await supabase
+        .from('projetos')
+        .select('id')
+        .eq('cliente_id', lead.id)
+        .maybeSingle();
+
+      if (existing) {
+        toast.info("Este lead já possui um projeto associado.");
+        navigate(`/projetos/detalhe/${existing.id}`);
+        return;
+      }
+
+      const { data: newProject, error } = await supabase
+        .from('projetos')
+        .insert({
+          nome: `PROJETO - ${lead.nome}`,
+          nome_cliente: lead.nome,
+          cliente_id: lead.id,
+          tipo: lead.tipo,
+          cidade: lead.cidade,
+          area_m2: lead.area,
+          etapa_atual: 'BRIEFING',
+          status_geral: 'Em andamento',
+          horas_estimadas: horasEstimadas
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success("Lead convertido em projeto com sucesso!");
+      navigate(`/projetos/detalhe/${newProject.id}`);
+    } catch (error) {
+      console.error('Error converting lead to project:', error);
+      toast.error("Erro ao converter lead em projeto.");
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   return (
@@ -180,9 +229,22 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
           <section>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted mb-6">Ações Rápidas</h4>
-            <div className="flex gap-3">
-              <Button className="flex-1 bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
-              <Button variant="outline" className="flex-1 border-beige text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]">Agendar Próxima Ação</Button>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-3">
+                <Button className="flex-1 bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
+                <Button variant="outline" className="flex-1 border-beige text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]">Agendar Próxima Ação</Button>
+              </div>
+              
+              {lead.stage === 'Fechado' && (
+                <Button 
+                  onClick={handleConvertToProject}
+                  disabled={isConverting}
+                  className="w-full bg-bronze hover:bg-bronze/90 text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-[2px] shadow-lg shadow-bronze/20"
+                >
+                  <LayoutGrid size={14} className="mr-2" />
+                  {isConverting ? "Convertendo..." : "Converter em Projeto"}
+                </Button>
+              )}
             </div>
           </section>
 
