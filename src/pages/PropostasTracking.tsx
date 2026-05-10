@@ -255,8 +255,19 @@ const PropostasTracking = () => {
         status, 
         views_count = 0, 
         data: sentDate, 
-        validade = 30 
+        validade = 30,
+        proposta_engajamento = []
       } = proposal;
+
+      // Local analysis if context is not provided
+      let localContext = analysisContext || "";
+      if (!localContext && proposta_engajamento.length > 0) {
+        const stats = getEngagementStats(proposta_engajamento);
+        if (stats) {
+          const totalMins = Math.floor(stats.totalSeconds / 60);
+          localContext = `O cliente viu a proposta ${views_count} vezes, totalizando ${totalMins}m ${stats.totalSeconds % 60}s. A seção mais vista foi "${stats.mostViewed?.label}". Acesso via ${stats.dispositivo}.`;
+        }
+      }
 
       const now = new Date();
       const sentAt = new Date(sentDate);
