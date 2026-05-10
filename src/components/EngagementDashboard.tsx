@@ -234,9 +234,14 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           <div className="space-y-4 relative z-10">
             <div className="p-4 bg-white/5 border border-white/10 rounded-[2px] backdrop-blur-sm">
               <p id="recommended-strategy-text" className="text-xs leading-relaxed font-medium">
-                {totalSeconds > 180 
+                {proposal.status === 'Aprovada' 
+                  ? "A proposta já foi aprovada! O foco agora deve ser no envio do contrato e início do projeto. A análise mostra o que mais interessou o cliente para servir de base para o briefing."
+                  : proposal.status === 'Recusada'
+                  ? "A proposta foi recusada. Analise o engajamento para entender se o motivo foi preço (tempo alto em Investimento) ou escopo. Isso ajuda a ajustar futuras abordagens."
+                  : totalSeconds > 180 
                   ? "Lead demonstrou altíssimo interesse. Ele passou um tempo considerável revisando a proposta. Recomendamos um follow-up focado no fechamento e em tirar dúvidas técnicas sobre o escopo."
-                  : "O engajamento foi inicial. O cliente deu uma olhada geral mas ainda não se aprofundou. Recomendamos enviar uma mensagem perguntando se ele conseguiu visualizar os detalhes do projeto."}
+                  : "O engajamento foi inicial. O cliente deu uma olhada geral mas ainda não se aprofundou. Recomendamos enviar uma mensagem perguntando se ele conseguiu visualizar os detalhes do projeto."
+                }
                 {mostViewed && mostViewed.time > 60 && ` O foco principal foi na seção "${mostViewed.name}", o que indica uma atenção especial a este ponto.`}
                 {deviceCounts['Mobile'] > deviceCounts['Desktop'] && " O cliente está acessando majoritariamente via celular."}
               </p>

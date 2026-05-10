@@ -278,7 +278,11 @@ const PropostasTracking = () => {
       const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
       let specificInstruction = "";
-      if (views_count === 1) {
+      if (status === 'Aprovada') {
+        specificInstruction = "A proposta já foi aprovada. Gere uma mensagem de boas-vindas e próximos passos (contrato/briefing).";
+      } else if (status === 'Recusada') {
+        specificInstruction = "A proposta foi recusada. Gere uma mensagem agradecendo o tempo e deixando as portas abertas para o futuro.";
+      } else if (views_count === 1) {
         specificInstruction = "A proposta foi vista 1 vez. Verifique suavemente se surgiu alguma dúvida.";
       } else if (views_count >= 3) {
         specificInstruction = "A proposta foi vista 3 ou mais vezes. Reconheça o interesse e ofereça uma conversa para alinhar detalhes.";
@@ -314,7 +318,11 @@ Gere a mensagem de WhatsApp.`;
       
       const firstName = cliente.split(' ')[0];
       
-      if (views_count === 0) {
+      if (status === 'Aprovada') {
+        fallbackMessage = `Olá, ${firstName}! Que notícia excelente a aprovação da proposta de ${tipo}. Já estamos preparando os próximos passos e o contrato para darmos início ao seu projeto!`;
+      } else if (status === 'Recusada') {
+        fallbackMessage = `Olá, ${firstName}! Agradeço pelo retorno sobre a proposta de ${tipo}. Entendo perfeitamente e fico à disposição caso precise de algo no futuro ou queira retomar o projeto em outro momento.`;
+      } else if (views_count === 0) {
         if (daysSinceSent >= 3) {
           fallbackMessage = `Olá, ${firstName}! Tudo bem? Gostaria de confirmar se você recebeu o link da proposta de ${tipo} que enviamos há alguns dias. Às vezes o link pode se perder, então me avise se precisar que eu reenvie!`;
         } else {
