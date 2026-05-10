@@ -671,7 +671,7 @@ const PropostasTracking = () => {
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button 
               variant="outline" 
               onClick={() => setIsFollowupModalOpen(false)}
@@ -680,13 +680,23 @@ const PropostasTracking = () => {
               Fechar
             </Button>
             {!isGeneratingFollowup && (
-              <Button 
-                onClick={copyFollowupMessage}
-                className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
-              >
-                <Copy size={14} className="mr-2" />
-                Copiar Mensagem
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={copyFollowupMessage}
+                  variant="outline"
+                  className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 border-bronze text-bronze hover:bg-bronze hover:text-white"
+                >
+                  <Copy size={14} className="mr-2" />
+                  Copiar
+                </Button>
+                <Button 
+                  onClick={handleSendWhatsApp}
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
+                >
+                  <MessageSquare size={14} className="mr-2" />
+                  Enviar no WhatsApp
+                </Button>
+              </div>
             )}
           </DialogFooter>
         </DialogContent>
