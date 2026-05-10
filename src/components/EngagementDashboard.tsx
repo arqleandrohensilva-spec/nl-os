@@ -33,7 +33,7 @@ import { ptBR } from 'date-fns/locale';
 
 interface EngagementDashboardProps {
   proposal: Proposal;
-  onAnalyze: () => void;
+  // onAnalyze removed as requested
   onGenerateFollowup: (analysisText?: string) => void;
 }
 
