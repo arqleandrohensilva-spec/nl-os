@@ -6,27 +6,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
   Search, 
-  Filter, 
-  Copy, 
   Pencil, 
   FileText, 
   TrendingUp,
-  Package,
-  ArrowRight,
   Clock,
   ExternalLink,
-  ChevronRight,
-  Info,
   Loader2,
-  Sparkles,
-  Layers,
   Zap,
-  Briefcase
+  Briefcase,
+  ArrowRight,
+  Info
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Servico {
@@ -163,174 +157,128 @@ const BibliotecaServicos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-[#111111] selection:bg-bronze/20">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A]">
       <Sidebar user="Sócio" />
-      <main className="ml-[230px] p-16 pb-32">
-        <header className="mb-20 text-center max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 mb-4"
-          >
-            <Sparkles size={14} className="text-bronze" />
-            <p className="text-[10px] uppercase tracking-[0.4em] text-bronze font-bold">Módulo 05 · Gestão de Portfólio</p>
-            <Sparkles size={14} className="text-bronze" />
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-6xl font-cormorant font-bold text-[#111111] mb-6 italic"
-          >
-            Biblioteca de Serviços
-          </motion.h1>
-          
-          <motion.div 
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="h-[1px] w-24 bg-bronze/30 mx-auto mb-10"
-          />
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-          >
+      <main className="ml-[230px] p-12">
+        <header className="mb-12">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-[#1A1A1A]">Biblioteca de Serviços</h1>
+              <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Gestão de Portfólio</p>
+            </div>
             <Button 
               onClick={() => {
                 setEditingServico({ tipo: 'por_projeto', horas_estimadas: 0 });
                 setIsModalOpen(true);
               }}
-              className="bg-[#111111] hover:bg-bronze text-white rounded-none h-12 px-10 text-[10px] uppercase font-bold tracking-[0.2em] transition-all duration-500 hover:shadow-2xl hover:shadow-bronze/20"
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-11 px-6 font-bold uppercase tracking-wider text-[11px] transition-all"
             >
-              <Plus size={16} className="mr-3" />
-              Cadastrar Novo Serviço
+              <Plus size={16} className="mr-2" />
+              Novo Serviço
             </Button>
-          </motion.div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-6">
+            {[
+              { label: 'Catálogo Ativo', value: stats.total, sub: 'Itens cadastrados', icon: Briefcase },
+              { label: 'Ticket Médio', value: `R$ ${Math.round(stats.ticketMedio).toLocaleString()}`, sub: 'Base de cálculo', icon: TrendingUp },
+              { label: 'Valor Hora', value: `R$ ${stats.custoHora.toFixed(2)}`, sub: 'Eficiência operacional', icon: Zap },
+            ].map((m, i) => (
+              <div 
+                key={i}
+                className="bg-white p-6 rounded-[2px] border border-[#E8E4DF] shadow-sm relative overflow-hidden group"
+              >
+                <div className="relative z-10">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1 font-bold">{m.label}</p>
+                  <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
+                  <p className="text-[10px] text-muted-foreground/60 mt-1 uppercase tracking-wider">{m.sub}</p>
+                </div>
+                <m.icon size={40} className="absolute right-[-10px] bottom-[-10px] text-bronze/5 group-hover:text-bronze/10 transition-colors" />
+              </div>
+            ))}
+          </div>
         </header>
 
-        {/* Premium Metrics Bar */}
-        <div className="grid grid-cols-3 gap-8 mb-24">
-          {[
-            { label: 'CATÁLOGO ATIVO', value: stats.total, sub: 'Itens de Alta Performance', icon: Briefcase },
-            { label: 'TICKET MÉDIO BASE', value: `R$ ${Math.round(stats.ticketMedio).toLocaleString()}`, sub: 'Precificação Estratégica', bronze: true, icon: TrendingUp },
-            { label: 'VALOR HORA/ESC', value: `R$ ${stats.custoHora.toFixed(2)}`, sub: 'Eficiência Operacional', icon: Zap },
-          ].map((m, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 + (i * 0.1) }}
-              className="bg-[#111111] text-white p-10 rounded-none border border-white/5 relative group overflow-hidden"
-            >
-              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                <m.icon size={60} />
-              </div>
-              <div className="relative z-10">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mb-4 font-bold">{m.label}</p>
-                <h2 className={cn("text-5xl font-cormorant font-light mb-2", m.bronze ? "text-bronze" : "text-white")}>{m.value}</h2>
-                <p className="text-[10px] uppercase tracking-wider text-white/20 font-bold">{m.sub}</p>
-              </div>
-              <div className="absolute bottom-0 left-0 h-[2px] bg-bronze w-0 group-hover:w-full transition-all duration-700" />
-            </motion.div>
-          ))}
-        </div>
-
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
-            <Loader2 className="w-12 h-12 text-bronze animate-spin stroke-[1px]" />
-            <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground font-mono animate-pulse">Sincronizando Biblioteca...</p>
+          <div className="flex flex-col items-center justify-center min-h-[400px]">
+            <Loader2 className="w-10 h-10 text-bronze animate-spin mb-4" />
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">Carregando biblioteca...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-12 gap-16">
-            {/* Main Services Panel */}
-            <div className="col-span-8 space-y-12">
-              <div className="flex items-center justify-between pb-8 border-b border-[#E8E4DF]">
-                <div className="flex gap-6">
+          <div className="grid grid-cols-12 gap-10">
+            {/* Main Content */}
+            <div className="col-span-8 space-y-8">
+              <div className="flex items-center justify-between bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm">
+                <div className="flex gap-4">
                   {['all', 'por_projeto', 'por_m2', 'por_hora'].map(type => (
                     <button 
                       key={type}
                       onClick={() => setFilterType(type)}
                       className={cn(
-                        "text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2",
-                        filterType === type ? "text-[#111111]" : "text-muted-foreground hover:text-bronze"
+                        "text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-[2px] transition-all",
+                        filterType === type 
+                          ? "bg-[#1A1A1A] text-white" 
+                          : "text-muted-foreground hover:bg-[#F5F2EF] hover:text-[#1A1A1A]"
                       )}
                     >
                       {type === 'all' ? 'Tudo' : type.replace('por_', 'Por ')}
-                      {filterType === type && (
-                        <motion.div layoutId="activeFilter" className="absolute bottom-0 left-0 right-0 h-[2px] bg-bronze" />
-                      )}
                     </button>
                   ))}
                 </div>
-                <div className="relative group">
-                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-bronze transition-colors" />
+                <div className="relative">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input 
-                    placeholder="PESQUISAR NO CATÁLOGO..."
+                    placeholder="BUSCAR SERVIÇO..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-12 pl-12 w-80 border-[#E8E4DF] rounded-none text-[11px] font-mono tracking-widest placeholder:text-muted-foreground/30 bg-transparent focus-visible:ring-bronze/20 focus-visible:border-bronze"
+                    className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#FDFDFD]"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-10">
+              <div className="space-y-4">
                 <AnimatePresence mode="popLayout">
                   {filteredServicos.map((s, idx) => (
                     <motion.div 
                       key={s.id}
                       layout
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="group relative"
+                      className="bg-white p-8 border border-[#E8E4DF] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group"
                     >
-                      <div className="absolute -inset-4 bg-[#F5F2EF]/50 rounded-none opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10" />
-                      
-                      <div className="flex flex-col md:flex-row gap-10">
-                        <div className="flex-1 space-y-4">
-                          <div className="flex items-center gap-4">
-                            <span className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold">
+                      <div className="flex items-start justify-between gap-8">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 bg-bronze/10 text-bronze rounded-[1px]">
                               {s.tipo.replace('_', ' ')}
                             </span>
-                            <div className="h-[1px] w-8 bg-bronze/20" />
+                            <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
+                              <Clock size={12} className="text-bronze/40" />
+                              {s.nome === 'Acompanhamento de Obra' ? 'Variável' : `${s.horas_estimadas}h estimadas`}
+                            </div>
                           </div>
                           
-                          <h3 className="text-3xl font-cormorant font-bold text-[#111111] group-hover:text-bronze transition-colors leading-tight">
+                          <h3 className="text-xl font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors mb-2">
                             {s.nome}
                           </h3>
                           
-                          <p className="text-[12px] text-muted-foreground font-mono leading-relaxed max-w-2xl">
+                          <p className="text-[12px] text-muted-foreground leading-relaxed max-w-xl">
                             {s.descricao}
                           </p>
-
-                          <div className="flex items-center gap-6 pt-2">
-                            <div className="flex items-center gap-2 text-[10px] font-bold tracking-wider text-[#111111]/60">
-                              <Clock size={14} className="text-bronze" />
-                              <span>{s.nome === 'Acompanhamento de Obra' ? 'VARIÁVEL' : `${s.horas_estimadas}H ESTIMADAS`}</span>
-                            </div>
-                            <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                            <p className="text-[10px] font-mono text-muted-foreground/60 uppercase">
-                              Eficiência: {idx < 3 ? 'Premium' : 'Standard'}
-                            </p>
-                          </div>
                         </div>
 
-                        <div className="flex flex-col items-end justify-between min-w-[240px]">
-                          <div className="text-right">
-                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1 font-bold">Valor Base</p>
-                            <h4 className="text-4xl font-cormorant font-bold text-[#111111]">
+                        <div className="text-right flex flex-col items-end justify-between min-h-[100px]">
+                          <div>
+                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Valor sugerido</p>
+                            <h4 className="text-2xl font-bold text-[#1A1A1A]">
                               R$ {Math.round(calcularValor(s)).toLocaleString()}
-                              <span className="text-sm font-sans font-light text-muted-foreground ml-1">
-                                {s.tipo === 'por_m2' ? '/m²' : s.tipo === 'por_hora' ? '/h' : ''}
-                              </span>
+                              {s.tipo === 'por_m2' && <span className="text-xs font-normal text-muted-foreground ml-1">/m²</span>}
+                              {s.tipo === 'por_hora' && <span className="text-xs font-normal text-muted-foreground ml-1">/h</span>}
                             </h4>
                           </div>
 
-                          <div className="flex gap-4 mt-6">
+                          <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button 
                               variant="ghost" 
                               size="sm" 
@@ -338,45 +286,44 @@ const BibliotecaServicos = () => {
                                 setEditingServico(s);
                                 setIsModalOpen(true);
                               }}
-                              className="h-10 text-[10px] uppercase font-bold tracking-[0.2em] text-[#111111]/40 hover:text-bronze hover:bg-transparent px-0"
+                              className="h-8 text-[9px] uppercase font-bold tracking-widest text-muted-foreground hover:text-bronze hover:bg-bronze/5"
                             >
                               <Pencil size={12} className="mr-2" />
-                              Edit Item
+                              Editar
                             </Button>
                             <Button 
-                              className="h-11 bg-transparent border border-[#111111] text-[#111111] hover:bg-[#111111] hover:text-white rounded-none text-[10px] uppercase font-bold tracking-[0.2em] px-8 transition-all duration-300"
+                              size="sm"
+                              className="h-8 bg-[#1A1A1A] hover:bg-bronze text-white rounded-[1px] text-[9px] uppercase font-bold tracking-widest px-4 transition-all"
                             >
-                              Usar em Proposta
+                              Usar
                               <ArrowRight size={12} className="ml-2" />
                             </Button>
                           </div>
                         </div>
                       </div>
-                      
-                      <div className="mt-10 h-[1px] w-full bg-[#E8E4DF]/40" />
                     </motion.div>
                   ))}
                 </AnimatePresence>
               </div>
             </div>
 
-            {/* Right Panel - Premium Document Templates */}
+            {/* Sidebar Content */}
             <div className="col-span-4">
-              <div className="sticky top-12 space-y-12">
-                <div className="p-10 bg-[#111111] text-white relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-bronze/10 blur-2xl rounded-full -mr-12 -mt-12" />
+              <div className="sticky top-8 space-y-6">
+                <div className="bg-[#1A1A1A] text-white p-8 rounded-[2px] shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-bronze/10 blur-[60px] rounded-full -mr-16 -mt-16" />
                   
-                  <div className="flex items-center gap-4 mb-10 relative z-10">
-                    <div className="p-2 bg-bronze/10 rounded-none border border-bronze/20">
-                      <FileText size={18} className="text-bronze" />
+                  <div className="flex items-center gap-3 mb-8 relative z-10">
+                    <div className="p-2 bg-bronze rounded-[1px]">
+                      <FileText size={16} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="text-[12px] font-bold uppercase tracking-[0.3em] mb-1">Templates</h3>
-                      <p className="text-[9px] text-white/30 uppercase tracking-widest">Ativos de Marca NL</p>
+                      <h3 className="text-[11px] font-bold uppercase tracking-[0.2em]">Ativos Digitais</h3>
+                      <p className="text-[8px] text-white/40 uppercase tracking-[0.1em]">Templates Oficiais NL</p>
                     </div>
                   </div>
 
-                  <div className="space-y-10 relative z-10">
+                  <div className="space-y-8 relative z-10">
                     {[
                       {
                         title: "Apresentações",
@@ -387,7 +334,7 @@ const BibliotecaServicos = () => {
                         ]
                       },
                       {
-                        title: "Propostas Técnicas",
+                        title: "Propostas",
                         items: [
                           { name: "Proposta ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/proposta/arqint" },
                           { name: "Proposta Interiores", url: "https://nlarquitetosapresentacao.lovable.app/proposta/int" },
@@ -395,51 +342,40 @@ const BibliotecaServicos = () => {
                         ]
                       }
                     ].map((group, idx) => (
-                      <div key={idx} className="space-y-5">
-                        <div className="flex items-center gap-3">
-                          <div className="h-[1px] w-4 bg-bronze" />
-                          <p className="text-[10px] uppercase tracking-[0.3em] text-bronze font-bold">{group.title}</p>
-                        </div>
-                        
-                        <div className="space-y-4">
-                          {group.items.map((doc, docIdx) => (
-                            <motion.div 
-                              key={docIdx} 
-                              whileHover={{ x: 5 }}
-                              className="group cursor-pointer"
-                              onClick={() => window.open(doc.url, '_blank')}
+                      <div key={idx}>
+                        <h4 className="text-[9px] font-bold uppercase tracking-[0.25em] text-bronze mb-4 flex items-center gap-2">
+                          <div className="h-[1px] w-4 bg-bronze/30" />
+                          {group.title}
+                        </h4>
+                        <div className="space-y-2">
+                          {group.items.map((item, i) => (
+                            <a 
+                              key={i}
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between group/link p-3 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-bronze/30 transition-all rounded-[1px]"
                             >
-                              <div className="flex items-center justify-between py-1">
-                                <span className="text-[13px] font-cormorant font-bold text-white/80 group-hover:text-bronze transition-colors tracking-wide">
-                                  {doc.name}
-                                </span>
-                                <ExternalLink size={12} className="text-white/20 group-hover:text-bronze transition-colors" />
-                              </div>
-                              <div className="h-[1px] w-full bg-white/5 group-hover:bg-bronze/30 transition-colors" />
-                            </motion.div>
+                              <span className="text-[10px] font-medium tracking-wide text-white/80 group-hover/link:text-white transition-colors">
+                                {item.name}
+                              </span>
+                              <ExternalLink size={12} className="text-white/20 group-hover/link:text-bronze transition-colors" />
+                            </a>
                           ))}
                         </div>
                       </div>
                     ))}
                   </div>
-
-                  <div className="mt-12 p-6 border border-white/10 bg-white/5 flex items-center justify-between">
-                    <p className="text-[9px] text-white/40 uppercase tracking-widest font-bold">Standard Branding</p>
-                    <div className="flex gap-1">
-                      {[1,2,3].map(i => <div key={i} className="h-1 w-1 rounded-full bg-bronze/50" />)}
-                    </div>
-                  </div>
                 </div>
 
-                <div className="p-8 border border-[#E8E4DF] bg-white text-center">
-                  <Layers size={20} className="text-bronze mx-auto mb-4" />
-                  <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2">Padronização NL</h4>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed mb-6">
-                    A consistência visual em todos os pontos de contato eleva a percepção de valor do escritório.
+                <div className="p-6 border border-[#E8E4DF] rounded-[2px] bg-[#F5F2EF]/30">
+                  <div className="flex items-center gap-2 mb-3 text-bronze">
+                    <Info size={14} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Aviso</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed uppercase tracking-wider font-medium">
+                    Os valores sugeridos são calculados com base no custo/hora e margem de lucro definidos na <span className="text-bronze font-bold">Base Financeira</span>.
                   </p>
-                  <Button variant="outline" className="w-full rounded-none border-bronze text-bronze hover:bg-bronze hover:text-white text-[9px] uppercase font-bold tracking-[0.2em] h-10">
-                    Ver Guia de Marca
-                  </Button>
                 </div>
               </div>
             </div>
@@ -449,101 +385,83 @@ const BibliotecaServicos = () => {
 
       {/* New/Edit Service Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#0A0A0A] border-white/5 text-white rounded-none p-0 max-w-lg overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-bronze/50" />
-          <div className="p-12">
-            <header className="mb-10">
-              <h2 className="text-3xl font-cormorant font-bold mb-2 italic">
-                {editingServico?.id ? 'Refinar Serviço' : 'Novo Ativo Estratégico'}
+        <DialogContent className="bg-white border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] p-0 max-w-lg overflow-hidden shadow-2xl">
+          <div className="p-10">
+            <header className="mb-8">
+              <h2 className="text-2xl font-bold mb-1">
+                {editingServico?.id ? 'Editar Serviço' : 'Novo Serviço'}
               </h2>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-mono">
-                Parâmetros Técnicos e Inteligência de Precificação
+              <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
+                Cadastre ou atualize um item do seu catálogo
               </p>
             </header>
             
-            <div className="space-y-8">
-              <div className="space-y-3">
-                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Designação do Serviço</label>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Nome do Serviço</label>
                 <Input 
                   value={editingServico?.nome || ''} 
                   onChange={(e) => setEditingServico({...editingServico, nome: e.target.value})}
-                  placeholder="Ex: Consultoria Executiva"
-                  className="bg-white/5 border-white/10 text-white rounded-none h-12 placeholder:text-white/10 focus-visible:ring-bronze/20 focus-visible:border-bronze"
+                  placeholder="Ex: Projeto Executivo"
+                  className="bg-[#F8F9FA] border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] h-11"
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Escopo Resumido</label>
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Descrição / Escopo</label>
                 <textarea 
                   value={editingServico?.descricao || ''}
                   onChange={(e) => setEditingServico({...editingServico, descricao: e.target.value})}
-                  placeholder="Descreva a entrega de alto valor..."
-                  className="w-full h-32 bg-white/5 border border-white/10 text-white rounded-none p-4 text-[11px] font-mono focus:border-bronze outline-none resize-none placeholder:text-white/10 transition-all"
+                  placeholder="Descreva o que está incluso..."
+                  className="w-full h-28 bg-[#F8F9FA] border border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] p-3 text-xs focus:ring-1 focus:ring-bronze outline-none resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">Modelo de Negócio</label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Tipo de Cobrança</label>
                   <Select 
                     value={editingServico?.tipo} 
-                    onValueChange={(val: any) => setEditingServico({...editingServico, tipo: val})}
+                    onValueChange={(v: any) => setEditingServico({...editingServico, tipo: v})}
                   >
-                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-12 focus:ring-bronze/20">
-                      <SelectValue />
+                    <SelectTrigger className="bg-[#F8F9FA] border-[#E8E4DF] rounded-[2px] h-11 text-xs">
+                      <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0A0A0A] border-white/10 text-white">
-                      <SelectItem value="por_projeto" className="focus:bg-bronze/20 focus:text-white">Por Projeto</SelectItem>
-                      <SelectItem value="por_hora" className="focus:bg-bronze/20 focus:text-white">Por Hora</SelectItem>
-                      <SelectItem value="por_m2" className="focus:bg-bronze/20 focus:text-white">Por m²</SelectItem>
+                    <SelectContent>
+                      <SelectItem value="por_projeto">Por Projeto</SelectItem>
+                      <SelectItem value="por_m2">Por m²</SelectItem>
+                      <SelectItem value="por_hora">Por Hora</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block">
-                    {editingServico?.tipo === 'por_m2' ? 'Esforço (h/m²)' : editingServico?.tipo === 'por_hora' ? 'Base (h)' : 'Esforço Estimado (h)'}
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">
+                    {editingServico?.tipo === 'por_hora' ? 'Horas Base' : 'Horas Estimadas'}
                   </label>
                   <Input 
                     type="number"
                     value={editingServico?.horas_estimadas || ''} 
                     onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
-                    className="bg-white/5 border-white/10 text-white rounded-none h-12 focus-visible:ring-bronze/20"
+                    placeholder="0"
+                    className="bg-[#F8F9FA] border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] h-11"
                   />
                 </div>
               </div>
 
-              <motion.div 
-                layout
-                className="p-8 bg-bronze/5 border border-bronze/10 rounded-none relative group"
-              >
-                <div className="absolute top-2 right-4">
-                  <TrendingUp size={14} className="text-bronze/30" />
-                </div>
-                <p className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold mb-3">Valor de Mercado Sugerido</p>
-                <div className="flex items-baseline gap-3">
-                  <h3 className="text-4xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors">
-                    R$ {Math.round(calcularValor(editingServico as Servico)).toLocaleString()}
-                  </h3>
-                  <span className="text-[10px] text-white/20 font-mono italic">
-                    {editingServico?.tipo === 'por_m2' ? '/m²' : editingServico?.tipo === 'por_hora' ? '/h' : ''}
-                  </span>
-                </div>
-              </motion.div>
-
-              <div className="pt-6 flex gap-4">
+              <div className="pt-6 flex gap-3">
                 <Button 
-                  variant="ghost" 
-                  onClick={() => setIsModalOpen(false)} 
-                  className="flex-1 rounded-none text-[10px] uppercase font-bold tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 h-12"
+                  variant="outline" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="flex-1 rounded-[2px] h-11 text-[11px] uppercase tracking-widest font-bold border-[#E8E4DF]"
                 >
-                  Descartar
+                  Cancelar
                 </Button>
                 <Button 
-                  onClick={handleSaveServico} 
-                  className="flex-[2] bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-[0.3em] shadow-xl shadow-bronze/10"
+                  onClick={handleSaveServico}
+                  className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-11 text-[11px] uppercase tracking-widest font-bold"
                 >
-                  Confirmar Ativo
+                  Salvar Serviço
                 </Button>
               </div>
             </div>
