@@ -87,9 +87,6 @@ const PropostasTracking = () => {
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-  const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
-  const [analysisText, setAnalysisText] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
 
