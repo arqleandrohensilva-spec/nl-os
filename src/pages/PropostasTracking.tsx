@@ -47,6 +47,7 @@ interface Proposal {
 interface Lead {
   id: string;
   nome: string;
+  whats?: string;
   cidade: string;
   estado: string;
   tipo: string;
@@ -66,6 +67,7 @@ const PropostasTracking = () => {
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
@@ -83,7 +85,7 @@ const PropostasTracking = () => {
     try {
       const { data, error } = await (supabase
         .from('leads') as any)
-        .select('id, nome, cidade, estado, tipo, area')
+        .select('id, nome, whats, cidade, estado, tipo, area')
         .order('nome');
       
       if (error) throw error;
@@ -220,6 +222,7 @@ const PropostasTracking = () => {
 
   const handleGenerateFollowup = async (proposal: Proposal) => {
     try {
+      setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
       setFollowupMessage('');
       setIsFollowupModalOpen(true);
@@ -242,6 +245,27 @@ const PropostasTracking = () => {
   const copyFollowupMessage = () => {
     navigator.clipboard.writeText(followupMessage);
     toast.success('Mensagem copiada!');
+  };
+
+  const handleSendWhatsApp = () => {
+    if (!selectedProposal || !followupMessage) return;
+    
+    const lead = leads.find(l => l.nome === selectedProposal.cliente);
+    if (!lead || !lead.whats) {
+      toast.error('Número de WhatsApp não encontrado para este lead');
+      return;
+    }
+
+    // Remover caracteres não numéricos
+    let number = lead.whats.replace(/\D/g, '');
+    
+    // Adicionar 55 se não tiver código do país
+    if (number.length <= 11) {
+      number = '55' + number;
+    }
+
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(followupMessage)}`;
+    window.open(url, '_blank');
   };
 
   const filteredProposals = proposals.filter(p => {
@@ -647,7 +671,7 @@ const PropostasTracking = () => {
             )}
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button 
               variant="outline" 
               onClick={() => setIsFollowupModalOpen(false)}
@@ -656,13 +680,23 @@ const PropostasTracking = () => {
               Fechar
             </Button>
             {!isGeneratingFollowup && (
-              <Button 
-                onClick={copyFollowupMessage}
-                className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
-              >
-                <Copy size={14} className="mr-2" />
-                Copiar Mensagem
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={copyFollowupMessage}
+                  variant="outline"
+                  className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 border-bronze text-bronze hover:bg-bronze hover:text-white"
+                >
+                  <Copy size={14} className="mr-2" />
+                  Copiar
+                </Button>
+                <Button 
+                  onClick={handleSendWhatsApp}
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
+                >
+                  <MessageSquare size={14} className="mr-2" />
+                  Enviar no WhatsApp
+                </Button>
+              </div>
             )}
           </DialogFooter>
         </DialogContent>
