@@ -19,10 +19,12 @@ import {
   Clock,
   MessageSquare,
   ChevronDown,
-  Activity
+  Activity,
+  LayoutDashboard
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
+import EngagementDashboard from '@/components/EngagementDashboard';
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
