@@ -46,7 +46,7 @@ interface Template {
 
 const BibliotecaServicos = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
+  
   const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
