@@ -110,7 +110,11 @@ export const handler = async (req: Request) => {
     }
 
     if (data?.error) {
-      return new Response(JSON.stringify({ error: `IA Error: ${data.error.message || JSON.stringify(data.error)}` }), { 
+      let errorMessage = data.error.message || JSON.stringify(data.error);
+      if (errorMessage.includes("credit balance is too low")) {
+        errorMessage = "O saldo da sua conta Anthropic acabou. Por favor, adicione créditos no console da Anthropic (Plans & Billing) para continuar usando a IA.";
+      }
+      return new Response(JSON.stringify({ error: errorMessage }), { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });

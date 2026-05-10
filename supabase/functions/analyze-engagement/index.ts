@@ -97,8 +97,12 @@ export const handler = async (req: Request) => {
 
     // Check for API error in response
     if (data.error) {
+      let errorMessage = data.error.message || JSON.stringify(data.error);
+      if (errorMessage.includes("credit balance is too low")) {
+        errorMessage = "O saldo da sua conta Anthropic acabou. Por favor, adicione créditos no console da Anthropic (Plans & Billing) para continuar usando a IA.";
+      }
       return new Response(JSON.stringify({ 
-        analysis: `Erro na API: ${data.error.message || JSON.stringify(data.error)}` 
+        analysis: errorMessage
       }), { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
