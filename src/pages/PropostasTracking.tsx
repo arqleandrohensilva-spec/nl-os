@@ -77,8 +77,8 @@ const PropostasTracking = () => {
 
   const fetchLeads = async () => {
     try {
-      const { data, error } = await supabase
-        .from('leads')
+      const { data, error } = await (supabase
+        .from('leads') as any)
         .select('id, nome, cidade, estado, tipo, area')
         .order('nome');
       
