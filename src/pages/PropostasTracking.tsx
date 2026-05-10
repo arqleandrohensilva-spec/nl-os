@@ -498,17 +498,11 @@ const PropostasTracking = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              <AnimatePresence mode="popLayout">
-                {filteredProposals.map((p, idx) => (
-                  <motion.div 
-                    key={p.id}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.3, delay: idx * 0.05 }}
-                    className="bg-white border border-[#E8E4DF] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-xl hover:shadow-bronze/5"
-                  >
+              {filteredProposals.map((p) => (
+                <div 
+                  key={p.id}
+                  className="bg-white border border-[#E8E4DF] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-lg"
+                >
                   <div className="p-6 flex-1">
                     <div className="flex justify-between items-start mb-4">
                       <span className={cn(
@@ -575,83 +569,80 @@ const PropostasTracking = () => {
                           )}
                         </button>
 
-                        <AnimatePresence>
-                          {expandedEngagements[p.id] && (
-                            <motion.div 
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.3, ease: "easeInOut" }}
-                              className="overflow-hidden"
-                            >
-                              <div className="mt-4 space-y-4 pb-2">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
-                                    {getEngagementStats(p.proposta_engajamento)?.dispositivo}
-                                  </span>
-                                  <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
-                                    {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
-                                  </span>
-                                </div>
+                        {expandedEngagements[p.id] && (
+                          <div className="mt-4 space-y-4 pb-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
+                                {getEngagementStats(p.proposta_engajamento)?.dispositivo}
+                              </span>
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
+                                {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
+                              </span>
+                            </div>
 
-                                <div className="space-y-2">
-                                  {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
-                                    <div key={section.id} className="space-y-1">
-                                      <div className="flex justify-between items-center text-[8px]">
-                                        <span className={cn(
-                                          "uppercase tracking-widest font-bold",
-                                          getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
-                                        )}>
-                                          {section.label}
-                                        </span>
-                                        <span className="font-medium text-muted-foreground">{section.time}s</span>
-                                      </div>
-                                      <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
-                                        <motion.div 
-                                          initial={{ width: 0 }}
-                                          animate={{ width: `${section.percentage}%` }}
-                                          className={cn(
-                                            "h-full",
-                                            getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
-                                          )}
-                                        />
-                                      </div>
-                                    </div>
-                                  ))}
+                            <div className="space-y-2">
+                              {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
+                                <div key={section.id} className="space-y-1">
+                                  <div className="flex justify-between items-center text-[8px]">
+                                    <span className={cn(
+                                      "uppercase tracking-widest font-bold",
+                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
+                                    )}>
+                                      {section.label}
+                                    </span>
+                                    <span className="font-medium text-muted-foreground">{section.time}s</span>
+                                  </div>
+                                  <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
+                                    <div 
+                                      className={cn(
+                                        "h-full transition-all duration-500",
+                                        getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
+                                      )}
+                                      style={{ width: `${section.percentage}%` }}
+                                    />
+                                  </div>
                                 </div>
-
-                                <Button 
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleAnalyzeEngagement(p)}
-                                  className="w-full h-7 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border-bronze/30 text-bronze hover:bg-bronze hover:text-white transition-all shadow-sm shadow-bronze/10"
-                                >
-                                  <Activity size={10} className="mr-2" />
-                                  IA: Analisar Comportamento
-                                </Button>
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
 
-                  <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-2">
+                  <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        onClick={() => handleAnalyzeEngagement(p)}
+                        className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                      >
+                        <Activity size={12} className="mr-2" />
+                        Analisar Interesse
+                      </Button>
+                      
+                      <Button 
+                        onClick={() => handleGenerateFollowup(p)}
+                        className="bg-graphite hover:bg-graphite/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                      >
+                        <MessageSquare size={12} className="mr-2" />
+                        Gerar Follow-up
+                      </Button>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
                         variant="outline"
                         size="sm"
                         onClick={() => copyLink(p)}
-                        className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF]"
+                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] text-muted-foreground hover:text-graphite"
                       >
-                        <Copy size={12} className="mr-2" />
+                        <Copy size={11} className="mr-2" />
                         Link
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                        <SelectTrigger className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white">
-                          <SelectValue placeholder="Status" />
+                        <SelectTrigger className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
+                          <SelectValue placeholder="STATUS" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Enviada">Enviada</SelectItem>
@@ -661,20 +652,9 @@ const PropostasTracking = () => {
                         </SelectContent>
                       </Select>
                     </div>
-
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleGenerateFollowup(p)}
-                      className="w-full rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] hover:bg-bronze hover:text-white hover:border-bronze transition-colors"
-                    >
-                      <MessageSquare size={12} className="mr-2" />
-                      Gerar Follow-up
-                    </Button>
                   </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                </div>
+              ))}
             </div>
           )}
         </div>
