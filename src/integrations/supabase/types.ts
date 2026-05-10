@@ -288,6 +288,83 @@ export type Database = {
           },
         ]
       }
+      proposal_views: {
+        Row: {
+          id: string
+          proposal_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          proposal_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          proposal_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_views_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          area: number | null
+          cidade: string | null
+          cliente: string
+          created_at: string
+          data: string | null
+          estado: string | null
+          id: string
+          objetivo: string | null
+          status: string | null
+          tipo: string
+          updated_at: string
+          validade: number | null
+          valor_completo: number | null
+          valor_executivo: number | null
+        }
+        Insert: {
+          area?: number | null
+          cidade?: string | null
+          cliente: string
+          created_at?: string
+          data?: string | null
+          estado?: string | null
+          id?: string
+          objetivo?: string | null
+          status?: string | null
+          tipo: string
+          updated_at?: string
+          validade?: number | null
+          valor_completo?: number | null
+          valor_executivo?: number | null
+        }
+        Update: {
+          area?: number | null
+          cidade?: string | null
+          cliente?: string
+          created_at?: string
+          data?: string | null
+          estado?: string | null
+          id?: string
+          objetivo?: string | null
+          status?: string | null
+          tipo?: string
+          updated_at?: string
+          validade?: number | null
+          valor_completo?: number | null
+          valor_executivo?: number | null
+        }
+        Relationships: []
+      }
       servicos: {
         Row: {
           ativo: boolean | null
