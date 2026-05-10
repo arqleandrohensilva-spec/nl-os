@@ -47,6 +47,7 @@ interface Proposal {
 interface Lead {
   id: string;
   nome: string;
+  whats?: string;
   cidade: string;
   estado: string;
   tipo: string;
