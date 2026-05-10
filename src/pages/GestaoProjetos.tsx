@@ -124,8 +124,8 @@ const GestaoProjetos = () => {
       
       <main className="flex-1 ml-[230px] p-12">
         <header className="mb-12">
-          <h1 className="text-4xl font-cormorant font-light tracking-tight mb-2">06 · Gestão de Projetos</h1>
-          <p className="text-[10px] tracking-[0.4em] text-[#8B7355] font-bold uppercase">Projetos Ativos · Etapas e Entregas</p>
+          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Atelier de Projetos</h1>
+          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">Curadoria · Gestão de Ativos · Alta Performance</p>
         </header>
 
         {/* Metric Cards */}
@@ -166,14 +166,16 @@ const GestaoProjetos = () => {
             return (
               <div 
                 key={projeto.id} 
-                className="bg-white/[0.03] border border-white/10 p-8 flex flex-col md:flex-row items-center gap-8 group hover:bg-white/[0.05] transition-all duration-300"
+                className="bg-white/[0.02] border border-white/5 p-10 flex flex-col md:flex-row items-center gap-12 group hover:bg-white/[0.04] hover:border-[#8B7355]/30 transition-all duration-500 relative overflow-hidden"
               >
+                <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-bold truncate">{projeto.nome_cliente}</h3>
-                    <Badge variant="outline" className="text-[9px] uppercase tracking-widest bg-white/5 border-white/10">
+                  <div className="flex items-center gap-4 mb-2">
+                    <h3 className="text-2xl font-cormorant font-medium truncate group-hover:text-[#8B7355] transition-colors">{projeto.nome_cliente}</h3>
+                    <div className="h-px w-8 bg-[#8B7355]/30 group-hover:w-12 transition-all duration-500" />
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-[#8B7355] font-bold">
                       {projeto.tipo}
-                    </Badge>
+                    </span>
                   </div>
                   <div className="flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">
                     <span>{projeto.cidade || 'N/A'}</span>
@@ -190,15 +192,15 @@ const GestaoProjetos = () => {
                       {Math.round(getProgress(projeto.etapa_atual))}%
                     </span>
                   </div>
-                  <Progress value={getProgress(projeto.etapa_atual)} className="h-1 bg-white/10" />
+                  <Progress value={getProgress(projeto.etapa_atual)} className="h-[2px] bg-white/5" />
                   <div className="flex gap-1 mt-2">
                     {['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'].map(e => (
                       <div 
                         key={e} 
                         className={cn(
-                          "flex-1 h-1", 
+                          "flex-1 h-[1px]", 
                           projeto.etapa_atual.toUpperCase() === e ? "bg-[#8B7355]" : 
-                          getProgress(e) < getProgress(projeto.etapa_atual) ? "bg-[#8B7355]/40" : "bg-white/5"
+                          getProgress(e) < getProgress(projeto.etapa_atual) ? "bg-[#8B7355]/30" : "bg-white/5"
                         )} 
                       />
                     ))}
@@ -251,18 +253,21 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, icon, accent, warning }: { label: string, value: string | number, icon: React.ReactNode, accent?: boolean, warning?: boolean }) => (
-  <div className="bg-white/[0.03] border border-white/10 p-6 flex items-center gap-6">
+  <div className="bg-white/[0.02] border border-white/5 p-8 flex flex-col gap-4 relative overflow-hidden group hover:border-[#8B7355]/20 transition-all duration-500">
+    <div className="absolute -right-4 -top-4 text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
+      {React.cloneElement(icon as React.ReactElement, { size: 64 })}
+    </div>
     <div className={cn(
-      "w-12 h-12 flex items-center justify-center border",
+      "w-10 h-10 flex items-center justify-center border",
       accent ? "border-[#8B7355]/40 text-[#8B7355] bg-[#8B7355]/5" : 
-      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/10 text-white/20 bg-white/5"
+      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/10 text-white/30 bg-white/5"
     )}>
       {icon}
     </div>
     <div>
-      <p className="text-[9px] uppercase tracking-[0.3em] text-white/30 mb-1 font-bold">{label}</p>
+      <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 mb-2 font-bold">{label}</p>
       <p className={cn(
-        "text-2xl font-bold font-cormorant leading-none",
+        "text-4xl font-cormorant leading-none",
         accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
       )}>
         {value}

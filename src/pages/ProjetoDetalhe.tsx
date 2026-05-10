@@ -239,34 +239,38 @@ const ProjetoDetalhe = () => {
         </button>
 
         {/* Header do Projeto */}
-        <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pb-12 border-b border-white/5">
-          <div>
-            <div className="flex items-center gap-4 mb-3">
-              <h1 className="text-5xl font-cormorant font-light tracking-tight">{projeto.nome_cliente}</h1>
-              <Badge className="bg-[#8B7355]/10 text-[#8B7355] border-[#8B7355]/20 uppercase tracking-widest text-[9px] h-6">
+        <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 pb-16 border-b border-white/5 relative">
+          <div className="absolute -top-10 -left-10 text-[120px] font-cormorant text-white/[0.02] select-none pointer-events-none italic">
+            Atelier
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-6 mb-4">
+              <h1 className="text-6xl font-cormorant font-light tracking-tight italic">{projeto.nome_cliente}</h1>
+              <div className="h-px w-12 bg-[#8B7355]/40" />
+              <span className="text-[#8B7355] uppercase tracking-[0.3em] text-[10px] font-bold">
                 {projeto.tipo}
-              </Badge>
+              </span>
             </div>
             
-            <div className="flex flex-wrap gap-6 text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">
-              <div className="flex items-center gap-2">
-                <MapPin size={12} className="text-[#8B7355]" /> {projeto.cidade || 'CIDADE NÃO INFORMADA'}
+            <div className="flex flex-wrap gap-8 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
-              <div className="flex items-center gap-2">
-                <Maximize2 size={12} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2}m²` : 'ÁREA NÃO INFORMADA'}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Maximize2 size={14} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2} m²` : 'Área não definida'}
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={12} className="text-[#8B7355]" /> INÍCIO: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Calendar size={14} className="text-[#8B7355]" /> Início: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
               </div>
-              <div className="flex items-center gap-2">
-                <Clock size={12} className="text-[#8B7355]" /> PRAZO: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'NÃO DEFINIDO'}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Clock size={14} className="text-[#8B7355]" /> Prazo: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'Sob consulta'}
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <p className="text-[9px] text-white/20 uppercase tracking-[0.3em] mb-2 font-bold">Status Geral</p>
-            <span className="text-xl font-bold uppercase tracking-widest text-emerald-500">
+            <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-3 font-bold">Status do Ativo</p>
+            <span className="text-3xl font-cormorant italic text-white leading-none">
               {projeto.status_geral}
             </span>
           </div>
@@ -286,8 +290,9 @@ const ProjetoDetalhe = () => {
                   <AccordionItem 
                     key={config.id} 
                     value={config.id} 
-                    className="border border-white/10 bg-white/[0.02] px-8 py-2 rounded-none data-[state=open]:bg-white/[0.05] transition-all"
+                    className="border border-white/5 bg-white/[0.01] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
                   >
+                    <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-data-[state=open]:scale-y-100 transition-transform duration-500 origin-top" />
                     <AccordionTrigger className="hover:no-underline py-6">
                       <div className="flex flex-1 items-center justify-between text-left pr-8">
                         <div>
@@ -383,12 +388,16 @@ const ProjetoDetalhe = () => {
           <div className="space-y-8">
             <h2 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-6">Eficiência</h2>
             
-            <div className="bg-white/[0.03] border border-white/10 p-8 space-y-8">
+            <div className="bg-white/[0.01] border border-white/5 p-10 space-y-10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
               <div>
-                <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">Controle de Horas</p>
-                <div className="flex justify-between items-end mb-2">
-                  <span className="text-2xl font-bold font-cormorant">{horasReais}h <span className="text-[10px] uppercase font-mono text-white/20">reais</span></span>
-                  <span className="text-white/40 text-[10px] font-bold">{projeto.horas_estimadas || 0}h estimadas</span>
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-6 font-bold">Investimento Temporal</p>
+                <div className="flex justify-between items-end mb-4">
+                  <span className="text-5xl font-cormorant italic">{horasReais}h</span>
+                  <div className="text-right">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Estimativa</p>
+                    <p className="text-sm font-mono text-white/60">{projeto.horas_estimadas || 0}h</p>
+                  </div>
                 </div>
                 
                 {projeto.horas_estimadas ? (
