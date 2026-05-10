@@ -90,6 +90,7 @@ const PropostasTracking = () => {
   const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
   const [analysisText, setAnalysisText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
