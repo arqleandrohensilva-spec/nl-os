@@ -13,8 +13,9 @@ serve(async (req) => {
   try {
     const { proposal, analysisContext } = await req.json()
     const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+    const MOCK_AI = Deno.env.get('MOCK_AI') === 'true'
 
-    if (!ANTHROPIC_API_KEY) {
+    if (!ANTHROPIC_API_KEY && !MOCK_AI) {
       return new Response(
         JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -76,21 +77,32 @@ serve(async (req) => {
 
     const prompt = `${systemPrompt}\n\n${userPrompt}`;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    const data = await response.json();
+    let data;
+    if (MOCK_AI) {
+      console.log("Running in MOCK_AI mode");
+      data = {
+        content: [
+          {
+            text: `[MOCK] Baseado no contexto (${cliente}, ${views_count} views), aqui está o follow-up sugerido.`
+          }
+        ]
+      };
+    } else {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": ANTHROPIC_API_KEY!,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      data = await response.json();
+    }
     const message = data?.content?.[0]?.text;
 
     if (!message) {
