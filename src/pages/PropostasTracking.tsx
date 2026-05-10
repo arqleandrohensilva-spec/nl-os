@@ -15,7 +15,8 @@ import {
   Calendar,
   ExternalLink,
   History,
-  Clock
+  Clock,
+  MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,9 @@ const PropostasTracking = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showLeads, setShowLeads] = useState(false);
+  const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
+  const [followupMessage, setFollowupMessage] = useState('');
+  const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
   
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
@@ -214,6 +218,32 @@ const PropostasTracking = () => {
     toast.success('Link copiado para a área de transferência');
   };
 
+  const handleGenerateFollowup = async (proposal: Proposal) => {
+    try {
+      setIsGeneratingFollowup(true);
+      setFollowupMessage('');
+      setIsFollowupModalOpen(true);
+
+      const { data, error } = await supabase.functions.invoke('generate-followup', {
+        body: { proposal }
+      });
+
+      if (error) throw error;
+      setFollowupMessage(data.message);
+    } catch (error) {
+      console.error('Error generating follow-up:', error);
+      toast.error('Erro ao gerar follow-up. Verifique se a função está implantada.');
+      setIsFollowupModalOpen(false);
+    } finally {
+      setIsGeneratingFollowup(false);
+    }
+  };
+
+  const copyFollowupMessage = () => {
+    navigator.clipboard.writeText(followupMessage);
+    toast.success('Mensagem copiada!');
+  };
+
   const filteredProposals = proposals.filter(p => {
     const matchesSearch = p.cliente.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
@@ -364,28 +394,40 @@ const PropostasTracking = () => {
                     </div>
                   </div>
 
-                  <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] grid grid-cols-2 gap-2">
+                  <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyLink(p)}
+                        className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF]"
+                      >
+                        <Copy size={12} className="mr-2" />
+                        Link
+                      </Button>
+                      
+                      <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
+                        <SelectTrigger className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white">
+                          <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Enviada">Enviada</SelectItem>
+                          <SelectItem value="Vista">Vista</SelectItem>
+                          <SelectItem value="Aprovada">Aprovada</SelectItem>
+                          <SelectItem value="Recusada">Recusada</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
                     <Button 
                       variant="outline"
                       size="sm"
-                      onClick={() => copyLink(p)}
-                      className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF]"
+                      onClick={() => handleGenerateFollowup(p)}
+                      className="w-full rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] hover:bg-bronze hover:text-white hover:border-bronze transition-colors"
                     >
-                      <Copy size={12} className="mr-2" />
-                      Link
+                      <MessageSquare size={12} className="mr-2" />
+                      Gerar Follow-up
                     </Button>
-                    
-                    <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                      <SelectTrigger className="rounded-[2px] text-[9px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white">
-                        <SelectValue placeholder="Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Enviada">Enviada</SelectItem>
-                        <SelectItem value="Vista">Vista</SelectItem>
-                        <SelectItem value="Aprovada">Aprovada</SelectItem>
-                        <SelectItem value="Recusada">Recusada</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
               ))}
@@ -564,6 +606,52 @@ const PropostasTracking = () => {
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : 'Criar Proposta'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isFollowupModalOpen} onOpenChange={setIsFollowupModalOpen}>
+        <DialogContent className="max-w-md bg-white rounded-[2px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-cormorant text-graphite uppercase tracking-wider">Follow-up Personalizado</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6">
+            {isGeneratingFollowup ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Loader2 size={32} className="text-bronze animate-spin mb-4" />
+                <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">O Claude está redigindo a mensagem...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-[#F8F9FA] p-4 border border-[#E8E4DF] rounded-[2px]">
+                  <p className="text-sm leading-relaxed text-graphite whitespace-pre-wrap font-medium italic">
+                    "{followupMessage}"
+                  </p>
+                </div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider text-center">
+                  Essa mensagem foi gerada considerando o status e interesse do cliente.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsFollowupModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+            >
+              Fechar
+            </Button>
+            {!isGeneratingFollowup && (
+              <Button 
+                onClick={copyFollowupMessage}
+                className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+              >
+                <Copy size={14} className="mr-2" />
+                Copiar Mensagem
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
