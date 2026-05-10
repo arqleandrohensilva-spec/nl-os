@@ -209,17 +209,18 @@ const ProjetoDetalhe = () => {
     }
   };
 
-  const saveNotas = async (etapaId: string, notas: string) => {
+  const updateMoodboard = async (etapaId: string, url: string) => {
     try {
       const { error } = await supabase
         .from('projeto_etapas')
-        .update({ notas })
+        .update({ moodboard_url: url })
         .eq('id', etapaId);
 
       if (error) throw error;
-      toast.success('Notas salvas');
+      toast.success('Conceito visual atualizado');
+      fetchData();
     } catch (error) {
-      toast.error('Erro ao salvar notas');
+      toast.error('Erro ao atualizar conceito');
     }
   };
 
