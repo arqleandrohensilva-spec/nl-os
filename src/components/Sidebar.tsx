@@ -186,7 +186,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/projetos/horas')} 
           />
           <NavItem 
-            label="06 · Gestão de Projetos" 
+            label="06 · Atelier de Projetos" 
             active={location.pathname === '/projetos/gestao' || location.pathname.startsWith('/projetos/detalhe/')} 
             onClick={() => navigate('/projetos/gestao')} 
           />
