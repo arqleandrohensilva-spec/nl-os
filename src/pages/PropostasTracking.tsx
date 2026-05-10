@@ -257,11 +257,20 @@ const PropostasTracking = () => {
       });
 
       if (error) throw error;
-      setFollowupMessage(data.message);
-    } catch (error) {
+      
+      const text = data?.message || data?.analysis || data?.content?.[0]?.text;
+      
+      if (text) {
+        setFollowupMessage(text);
+      } else if (data?.error) {
+        setFollowupMessage(`Erro: ${data.error}`);
+      } else {
+        setFollowupMessage("Não foi possível gerar a mensagem. Tente novamente.");
+      }
+    } catch (error: any) {
       console.error('Error generating follow-up:', error);
-      toast.error('Erro ao gerar follow-up. Verifique se a função está implantada.');
-      setIsFollowupModalOpen(false);
+      setFollowupMessage("Erro ao gerar follow-up. Verifique sua conexão ou se a IA está disponível.");
+      toast.error('Erro ao gerar follow-up');
     } finally {
       setIsGeneratingFollowup(false);
     }
