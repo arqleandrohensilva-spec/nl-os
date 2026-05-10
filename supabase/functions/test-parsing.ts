@@ -9,7 +9,7 @@ async function testFunctions() {
   // 1. Teste Generate Followup
   console.log("\n--- Testando generate-followup ---");
   try {
-    const { default: handler } = await import("./generate-followup/index.ts");
+    const { handler } = await import("./generate-followup/index.ts");
     const req = new Request("http://localhost/generate-followup", {
       method: "POST",
       body: JSON.stringify({
@@ -40,7 +40,7 @@ async function testFunctions() {
   // 2. Teste Analyze Engagement
   console.log("\n--- Testando analyze-engagement ---");
   try {
-    const { default: handler } = await import("./analyze-engagement/index.ts");
+    const { handler } = await import("./analyze-engagement/index.ts");
     const req = new Request("http://localhost/analyze-engagement", {
       method: "POST",
       body: JSON.stringify({
