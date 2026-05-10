@@ -334,9 +334,15 @@ const PropostasTracking = () => {
     }
   };
 
+  const handleOpenDashboard = (proposal: Proposal) => {
+    setSelectedProposal(proposal);
+    setIsDashboardModalOpen(true);
+  };
+
   const handleGenerateFollowupFromAnalysis = () => {
     if (!selectedProposal) return;
     setIsAnalysisModalOpen(false);
+    setIsDashboardModalOpen(false);
     handleGenerateFollowup(selectedProposal, analysisText);
   };
 
