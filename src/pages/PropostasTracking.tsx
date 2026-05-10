@@ -622,11 +622,11 @@ const PropostasTracking = () => {
                   <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-3">
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
-                        onClick={() => handleAnalyzeEngagement(p)}
+                        onClick={() => handleOpenDashboard(p)}
                         className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
                       >
-                        <Activity size={12} className="mr-2" />
-                        Analisar Interesse
+                        <LayoutDashboard size={12} className="mr-2" />
+                        Ver Dashboard
                       </Button>
                       
                       <Button 
