@@ -84,7 +84,7 @@ serve(async (req) => {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        temperature: 0.7
+        // temperature: 0.7 // Removed as it might not be supported by some models in this environment
       })
     });
 
