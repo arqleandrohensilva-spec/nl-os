@@ -659,6 +659,15 @@ const PropostasTracking = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                {selectedProposal && !leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
+                  <div className="bg-red-50 border border-red-200 p-3 rounded-[2px] flex items-start gap-3">
+                    <XCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-red-700 font-medium leading-tight">
+                      Atenção: Este lead não possui número de WhatsApp cadastrado. 
+                      O botão de envio direto não funcionará.
+                    </p>
+                  </div>
+                )}
                 <div className="bg-[#F8F9FA] p-4 border border-[#E8E4DF] rounded-[2px]">
                   <p className="text-sm leading-relaxed text-graphite whitespace-pre-wrap font-medium italic">
                     "{followupMessage}"
