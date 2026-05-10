@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { 
   Plus, 
   Search, 
