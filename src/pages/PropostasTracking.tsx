@@ -313,11 +313,11 @@ const PropostasTracking = () => {
                     <div className="flex items-center gap-4 py-3 border-y border-dashed border-[#E8E4DF] mb-4">
                       <div className="flex items-center gap-2">
                         <Eye size={12} className="text-bronze" />
-                        <span className="text-[10px] font-medium">{p.views_count} acessos</span>
+                        <span className="text-[10px] font-medium">Aberta {p.views_count} vezes</span>
                       </div>
                       {p.last_view_at && (
                         <div className="flex items-center gap-2 border-l border-[#E8E4DF] pl-4">
-                          <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold">Último:</span>
+                          <span className="text-[9px] text-muted-foreground uppercase tracking-wider font-bold">Último acesso:</span>
                           <span className="text-[10px] font-medium">{format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
                         </div>
                       )}
