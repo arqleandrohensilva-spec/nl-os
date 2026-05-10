@@ -388,12 +388,16 @@ const ProjetoDetalhe = () => {
           <div className="space-y-8">
             <h2 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-6">Eficiência</h2>
             
-            <div className="bg-white/[0.03] border border-white/10 p-8 space-y-8">
+            <div className="bg-white/[0.01] border border-white/5 p-10 space-y-10 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
               <div>
-                <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">Controle de Horas</p>
-                <div className="flex justify-between items-end mb-2">
-                  <span className="text-2xl font-bold font-cormorant">{horasReais}h <span className="text-[10px] uppercase font-mono text-white/20">reais</span></span>
-                  <span className="text-white/40 text-[10px] font-bold">{projeto.horas_estimadas || 0}h estimadas</span>
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-6 font-bold">Investimento Temporal</p>
+                <div className="flex justify-between items-end mb-4">
+                  <span className="text-5xl font-cormorant italic">{horasReais}h</span>
+                  <div className="text-right">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Estimativa</p>
+                    <p className="text-sm font-mono text-white/60">{projeto.horas_estimadas || 0}h</p>
+                  </div>
                 </div>
                 
                 {projeto.horas_estimadas ? (
