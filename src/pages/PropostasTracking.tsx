@@ -405,6 +405,11 @@ const PropostasTracking = () => {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold tracking-tight text-graphite font-cormorant text-gradient">04 · Tracking de Propostas</h1>
+                <div className="flex items-center gap-2 px-2 py-0.5 bg-bronze/5 border border-bronze/20 rounded-full h-fit">
+                  <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-pulse" />
+                  <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em]">Premium Tracking</span>
+                </div>
+
               </div>
               <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
             </div>
