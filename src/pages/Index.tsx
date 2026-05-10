@@ -928,8 +928,8 @@ const Index = () => {
                     try {
                       const { error } = await supabase.from('projetos').insert({
                         nome: conversionLead.nome,
-                        cliente_nome: conversionLead.nome,
-                        lead_id: conversionLead.id,
+                        nome_cliente: conversionLead.nome,
+                        cliente_id: conversionLead.id,
                         tipo: conversionLead.tipo,
                         area_m2: conversionLead.area,
                         valor_proposta: conversionLead.orcamento,
@@ -938,7 +938,7 @@ const Index = () => {
                         horas_anteprojeto: conversionHours.anteprojeto,
                         horas_executivo: conversionHours.executivo,
                         horas_acompanhamento: conversionHours.acompanhamento,
-                        status: 'ativo'
+                        status_geral: 'ativo'
                       });
                       if (error) throw error;
                       toast.success("Projeto criado no Controle de Horas!");

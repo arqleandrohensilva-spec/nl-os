@@ -185,7 +185,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             active={location.pathname === '/projetos/horas'} 
             onClick={() => navigate('/projetos/horas')} 
           />
-          <NavItem label="06 · Gestão de Projetos" disabled />
+          <NavItem 
+            label="06 · Gestão de Projetos" 
+            active={location.pathname === '/projetos/gestao' || location.pathname.startsWith('/projetos/detalhe/')} 
+            onClick={() => navigate('/projetos/gestao')} 
+          />
           <NavItem label="10 · Modo Cliente" disabled />
         </SectionAccordion>
 
