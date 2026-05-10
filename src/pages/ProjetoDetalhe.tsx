@@ -55,6 +55,7 @@ interface Etapa {
   data_inicio: string;
   data_entrega: string;
   data_aprovacao: string;
+  aprovado_por: string;
   notas: string;
   moodboard_url?: string;
 }
@@ -166,11 +167,17 @@ const ProjetoDetalhe = () => {
     if (cData) setChecklist(cData);
   };
 
-  const updateEtapaStatus = async (etapaId: string, newStatus: string) => {
+  const updateEtapaStatus = async (etapaId: string, newStatus: string, approverName?: string) => {
     try {
       const updateData: any = { status: newStatus };
       if (newStatus === 'Aprovado') {
         updateData.data_aprovacao = new Date().toISOString();
+        if (approverName) {
+          updateData.aprovado_por = approverName;
+        } else {
+          const { data: { user } } = await supabase.auth.getUser();
+          updateData.aprovado_por = user?.email?.includes('leandro') ? 'Leandro' : 'Neandro';
+        }
       }
 
       const { error } = await supabase
@@ -419,7 +426,7 @@ const ProjetoDetalhe = () => {
                           {isWaiting && (
                             <div className="pt-4 animate-pulse">
                               <Button 
-                                onClick={() => updateEtapaStatus(etapaData?.id || '', 'Aprovado')}
+                                onClick={() => updateEtapaStatus(etapaData?.id || '', 'Aprovado', 'Cliente')}
                                 className="w-full bg-[#8B7355] hover:bg-[#8B7355]/90 text-white rounded-none text-[9px] uppercase font-bold tracking-[0.3em] h-12"
                               >
                                 Aprovar esta etapa
@@ -429,7 +436,8 @@ const ProjetoDetalhe = () => {
                           
                           {isDone && etapaData?.data_aprovacao && (
                             <p className="text-[9px] text-emerald-500/60 font-bold uppercase tracking-widest">
-                              Aprovado em {format(parseISO(etapaData.data_aprovacao), 'dd/MM/yyyy')}
+                              Aprovado em {format(parseISO(etapaData.data_aprovacao), 'dd/MM/yyyy')} 
+                              {etapaData.aprovado_por && ` por ${etapaData.aprovado_por}`}
                             </p>
                           )}
                         </div>
