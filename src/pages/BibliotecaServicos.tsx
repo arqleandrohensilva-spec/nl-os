@@ -298,55 +298,10 @@ const BibliotecaServicos = () => {
             </div>
           </div>
 
-          {/* Right Panel - Scope Templates */}
+          {/* Right Panel - Document Templates */}
           <div className="col-span-4 space-y-6">
-            <div className="flex items-center gap-3 mb-8">
-              <Layers size={18} className="text-bronze" />
-              <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Templates de Escopo</h3>
-            </div>
+            <div>
 
-            <div className="space-y-4">
-              {templates.map(t => {
-                const templateServicos = servicos.filter(s => t.servicos_ids.includes(s.id));
-                const totalValor = templateServicos.reduce((acc, s) => acc + calcularValor(s), 0);
-                const totalHoras = templateServicos.reduce((acc, s) => acc + s.horas_estimadas, 0);
-
-                return (
-                  <div key={t.id} className="bg-[#1A1A1A] text-white p-6 rounded-[4px] border border-white/5 space-y-6">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <p className="text-[8px] uppercase tracking-widest text-bronze font-bold">TEMPLATE</p>
-                        <h4 className="text-lg font-cormorant font-bold">{t.nome}</h4>
-                      </div>
-                      <p className="text-lg font-cormorant text-bronze font-bold">R$ {Math.round(totalValor).toLocaleString()}</p>
-                    </div>
-
-                    <div className="space-y-3">
-                      <p className="text-[9px] uppercase tracking-widest text-white/30 font-bold">Inclui:</p>
-                      {templateServicos.map(s => (
-                        <div key={s.id} className="flex justify-between text-[10px] font-mono border-b border-white/5 pb-2">
-                          <span className="text-white/70">✓ {s.nome}</span>
-                          <span className="text-white/40">R$ {Math.round(calcularValor(s)).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="flex justify-between items-end pt-2">
-                      <div className="text-[10px] font-mono text-white/40">
-                        <p>Total: R$ {Math.round(totalValor).toLocaleString()}</p>
-                        <p>Horas estimadas: {totalHoras}h</p>
-                      </div>
-                      <Button className="h-9 bg-bronze hover:bg-bronze/90 text-white rounded-[2px] text-[9px] uppercase font-bold tracking-widest px-4">
-                        Usar Template
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Templates de Documento */}
-            <div className="pt-12 border-t border-[#E8E4DF] mt-12">
               <div className="flex items-center gap-3 mb-8">
                 <FileText size={18} className="text-bronze" />
                 <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Templates de Documento</h3>
