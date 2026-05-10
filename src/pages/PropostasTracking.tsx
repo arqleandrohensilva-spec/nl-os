@@ -255,8 +255,19 @@ const PropostasTracking = () => {
         status, 
         views_count = 0, 
         data: sentDate, 
-        validade = 30 
+        validade = 30,
+        proposta_engajamento = []
       } = proposal;
+
+      // Local analysis if context is not provided
+      let localContext = analysisContext || "";
+      if (!localContext && proposta_engajamento.length > 0) {
+        const stats = getEngagementStats(proposta_engajamento);
+        if (stats) {
+          const totalMins = Math.floor(stats.totalSeconds / 60);
+          localContext = `O cliente viu a proposta ${views_count} vezes, totalizando ${totalMins}m ${stats.totalSeconds % 60}s. A seção mais vista foi "${stats.mostViewed?.label}". Acesso via ${stats.dispositivo}.`;
+        }
+      }
 
       const now = new Date();
       const sentAt = new Date(sentDate);
@@ -292,14 +303,32 @@ Vezes aberta: ${views_count}
 Dias desde o envio: ${daysSinceSent}
 Dias para o vencimento: ${daysUntilExpiry}
 
-${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
+${localContext ? `Análise de Engajamento Adicional: ${localContext}\n` : ''}
 
 Instrução específica: ${specificInstruction}
 
 Gere a mensagem de WhatsApp.`;
 
-      // Fallback message based on context if AI fails or is not used
-      const fallbackMessage = `Olá, ${cliente}! Tudo bem? Gostaria de saber se você conseguiu visualizar a proposta de ${tipo} que enviamos há ${daysSinceSent} dias. Ficou alguma dúvida sobre o escopo ou os próximos passos?`;
+      // Improved fallback message based on context if AI fails
+      let fallbackMessage = "";
+      
+      const firstName = cliente.split(' ')[0];
+      
+      if (views_count === 0) {
+        if (daysSinceSent >= 3) {
+          fallbackMessage = `Olá, ${firstName}! Tudo bem? Gostaria de confirmar se você recebeu o link da proposta de ${tipo} que enviamos há alguns dias. Às vezes o link pode se perder, então me avise se precisar que eu reenvie!`;
+        } else {
+          fallbackMessage = `Olá, ${firstName}! Tudo bem? Acabamos de te enviar a proposta de ${tipo}. Quando tiver um tempinho para olhar, fico à disposição para conversarmos sobre o projeto.`;
+        }
+      } else if (views_count >= 3) {
+        fallbackMessage = `Olá, ${firstName}! Notei que você revisitou nossa proposta de ${tipo}. Fico muito feliz com o interesse! Teria disponibilidade para uma breve conversa para alinharmos os detalhes ou tirar alguma dúvida pontual?`;
+      } else if (analysisContext?.includes("Investimento") || analysisContext?.includes("Preço")) {
+        fallbackMessage = `Olá, ${firstName}! Tudo bem? Vi que você estava analisando os detalhes da nossa proposta de ${tipo}. Ficou alguma dúvida específica sobre os valores ou as formas de investimento que apresentamos?`;
+      } else if (analysisContext?.includes("altíssimo interesse")) {
+        fallbackMessage = `Olá, ${firstName}! Tudo bem? Vi que você dedicou um tempo para analisar nossa proposta de ${tipo}. O que achou do escopo que desenhamos para o seu projeto? Se quiser, podemos marcar um call rápido para fechar os detalhes.`;
+      } else {
+        fallbackMessage = `Olá, ${firstName}! Tudo bem? Gostaria de saber se você conseguiu visualizar a proposta de ${tipo} com calma. Ficou alguma dúvida sobre o escopo ou os próximos passos?`;
+      }
 
       try {
         const { data: invokeData, error: invokeError } = await supabase.functions.invoke('generate-followup', {
@@ -311,7 +340,8 @@ Gere a mensagem de WhatsApp.`;
               status,
               views_count,
               daysSinceSent,
-              daysUntilExpiry
+              daysUntilExpiry,
+              analysisContext: localContext
             }
           }
         });
@@ -320,7 +350,7 @@ Gere a mensagem de WhatsApp.`;
         
         const text = invokeData?.message || invokeData?.text;
         
-        if (text) {
+        if (text && !text.includes("Empty response from AI") && !text.includes("insuficientes")) {
           setFollowupMessage(text);
         } else {
           setFollowupMessage(fallbackMessage);
