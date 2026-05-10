@@ -209,6 +209,20 @@ const ProjetoDetalhe = () => {
     }
   };
 
+  const saveNotas = async (etapaId: string, notas: string) => {
+    try {
+      const { error } = await supabase
+        .from('projeto_etapas')
+        .update({ notas })
+        .eq('id', etapaId);
+
+      if (error) throw error;
+      toast.success('Notas salvas');
+    } catch (error) {
+      toast.error('Erro ao salvar notas');
+    }
+  };
+
   const updateMoodboard = async (etapaId: string, url: string) => {
     try {
       const { error } = await supabase
