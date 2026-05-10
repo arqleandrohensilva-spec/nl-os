@@ -519,6 +519,60 @@ const PropostasTracking = () => {
                         </div>
                       )}
                     </div>
+
+                    {p.proposta_engajamento && p.proposta_engajamento.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-[#E8E4DF] space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite flex items-center gap-2">
+                            <History size={12} className="text-bronze" />
+                            Engajamento
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
+                              {getEngagementStats(p.proposta_engajamento)?.dispositivo}
+                            </span>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
+                              {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
+                            <div key={section.id} className="space-y-1">
+                              <div className="flex justify-between items-center text-[8px]">
+                                <span className={cn(
+                                  "uppercase tracking-widest font-bold",
+                                  getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
+                                )}>
+                                  {section.label}
+                                </span>
+                                <span className="font-medium text-muted-foreground">{section.time}s</span>
+                              </div>
+                              <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
+                                <div 
+                                  className={cn(
+                                    "h-full transition-all duration-500",
+                                    getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
+                                  )}
+                                  style={{ width: `${section.percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAnalyzeEngagement(p)}
+                          className="w-full h-7 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border-bronze/30 text-bronze hover:bg-bronze hover:text-white transition-all"
+                        >
+                          <Eye size={10} className="mr-2" />
+                          Analisar Interesse
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-2">
