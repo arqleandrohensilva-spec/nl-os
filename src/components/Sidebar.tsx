@@ -58,7 +58,7 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
         <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/20")}>
           {icon}
         </div>
-        <span className="text-[9px] uppercase tracking-[0.2em] font-bold">
+        <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
           {label}
         </span>
       </div>
