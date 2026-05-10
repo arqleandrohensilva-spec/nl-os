@@ -192,15 +192,15 @@ const GestaoProjetos = () => {
                       {Math.round(getProgress(projeto.etapa_atual))}%
                     </span>
                   </div>
-                  <Progress value={getProgress(projeto.etapa_atual)} className="h-1 bg-white/10" />
+                  <Progress value={getProgress(projeto.etapa_atual)} className="h-[2px] bg-white/5" />
                   <div className="flex gap-1 mt-2">
                     {['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'].map(e => (
                       <div 
                         key={e} 
                         className={cn(
-                          "flex-1 h-1", 
+                          "flex-1 h-[1px]", 
                           projeto.etapa_atual.toUpperCase() === e ? "bg-[#8B7355]" : 
-                          getProgress(e) < getProgress(projeto.etapa_atual) ? "bg-[#8B7355]/40" : "bg-white/5"
+                          getProgress(e) < getProgress(projeto.etapa_atual) ? "bg-[#8B7355]/30" : "bg-white/5"
                         )} 
                       />
                     ))}
