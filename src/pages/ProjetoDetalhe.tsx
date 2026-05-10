@@ -478,6 +478,12 @@ const ProjetoDetalhe = () => {
                             <h3 className="text-xs font-bold tracking-[0.2em] uppercase">{config.label}</h3>
                             <p className={cn("text-[9px] mt-1 font-bold uppercase tracking-widest", getEtapaColor(etapaData?.status || ''))}>
                               {etapaData?.status || 'Pendente'}
+                              {etapaData?.status === 'Aprovado' && etapaData?.data_aprovacao && (
+                                <span className="block text-[8px] opacity-60">
+                                  {format(parseISO(etapaData.data_aprovacao), 'dd/MM/yyyy')} 
+                                  {etapaData.aprovado_por && ` • ${etapaData.aprovado_por}`}
+                                </span>
+                              )}
                             </p>
                           </div>
                           <div className="text-right">
