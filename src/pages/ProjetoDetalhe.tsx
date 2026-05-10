@@ -99,6 +99,7 @@ const ProjetoDetalhe = () => {
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [horasReais, setHorasReais] = useState(0);
+  const [clientMode, setClientMode] = useState(false);
 
   useEffect(() => {
     if (id) fetchData();
