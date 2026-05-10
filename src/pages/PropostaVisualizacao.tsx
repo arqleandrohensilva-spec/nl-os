@@ -39,24 +39,11 @@ const PropostaVisualizacao = () => {
     const recordView = async () => {
       if (proposalData.id && !recorded) {
         try {
+          // Only record the view
           await supabase
             .from('proposal_views')
             .insert([{ proposal_id: proposalData.id }]);
           setRecorded(true);
-          
-          // Also update status to 'Vista' if it was 'Enviada'
-          const { data: proposal } = await supabase
-            .from('proposals')
-            .select('status')
-            .eq('id', proposalData.id)
-            .single();
-            
-          if (proposal && proposal.status === 'Enviada') {
-            await supabase
-              .from('proposals')
-              .update({ status: 'Vista' })
-              .eq('id', proposalData.id);
-          }
         } catch (error) {
           console.error('Error recording view:', error);
         }
