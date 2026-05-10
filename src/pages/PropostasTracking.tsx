@@ -315,9 +315,22 @@ Gere a mensagem de WhatsApp.`;
 
       // Improved fallback message based on context if AI fails
       let fallbackMessage = "";
-      
       const firstName = cliente.split(' ')[0];
+      const stats = proposta_engajamento.length > 0 ? getEngagementStats(proposta_engajamento) : null;
+      const mostViewedLabel = stats?.mostViewed?.label || "";
       
+      // Análise de motivos baseada nos dados
+      let reasonInsight = "";
+      if (stats) {
+        if (stats.mostViewed?.id === 'investimento') {
+          reasonInsight = " Notei que você analisou bastante a parte de investimento, talvez tenha surgido alguma dúvida sobre os valores ou formas de pagamento?";
+        } else if (stats.mostViewed?.id === 'escopo' || stats.mostViewed?.id === 'diagnostico') {
+          reasonInsight = ` Notei que você focou bastante no ${stats.mostViewed.label.toLowerCase()}, o escopo está alinhado com o que você imaginava para o projeto?`;
+        } else if (stats.totalSeconds > 300) {
+          reasonInsight = " Vi que você analisou a proposta detalhadamente, o que é ótimo! Surgiu algum ponto específico que você gostaria de aprofundar?";
+        }
+      }
+
       if (status === 'Aprovada') {
         fallbackMessage = `Olá, ${firstName}! Que notícia excelente a aprovação da proposta de ${tipo}. Já estamos preparando os próximos passos e o contrato para darmos início ao seu projeto!`;
       } else if (status === 'Recusada') {
@@ -328,14 +341,10 @@ Gere a mensagem de WhatsApp.`;
         } else {
           fallbackMessage = `Olá, ${firstName}! Tudo bem? Acabamos de te enviar a proposta de ${tipo}. Quando tiver um tempinho para olhar, fico à disposição para conversarmos sobre o projeto.`;
         }
-      } else if (views_count >= 3) {
-        fallbackMessage = `Olá, ${firstName}! Notei que você revisitou nossa proposta de ${tipo}. Fico muito feliz com o interesse! Teria disponibilidade para uma breve conversa para alinharmos os detalhes ou tirar alguma dúvida pontual?`;
-      } else if (analysisContext?.includes("Investimento") || analysisContext?.includes("Preço")) {
-        fallbackMessage = `Olá, ${firstName}! Tudo bem? Vi que você estava analisando os detalhes da nossa proposta de ${tipo}. Ficou alguma dúvida específica sobre os valores ou as formas de investimento que apresentamos?`;
-      } else if (analysisContext?.includes("altíssimo interesse")) {
-        fallbackMessage = `Olá, ${firstName}! Tudo bem? Vi que você dedicou um tempo para analisar nossa proposta de ${tipo}. O que achou do escopo que desenhamos para o seu projeto? Se quiser, podemos marcar um call rápido para fechar os detalhes.`;
       } else {
-        fallbackMessage = `Olá, ${firstName}! Tudo bem? Gostaria de saber se você conseguiu visualizar a proposta de ${tipo} com calma. Ficou alguma dúvida sobre o escopo ou os próximos passos?`;
+        // Mensagem baseada em engajamento real
+        const baseMsg = `Olá, ${firstName}! Tudo bem? Gostaria de saber se você conseguiu visualizar a proposta de ${tipo} com calma.`;
+        fallbackMessage = `${baseMsg}${reasonInsight || " Ficou alguma dúvida sobre o escopo ou os próximos passos?"}`;
       }
 
       try {
