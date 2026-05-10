@@ -88,6 +88,13 @@ export const handler = async (req: Request) => {
         ]
       };
     } else {
+      const body = {
+        model: "claude-3-5-haiku-20241022",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }]
+      };
+      console.log("Sending to Anthropic:", JSON.stringify(body));
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -95,14 +102,20 @@ export const handler = async (req: Request) => {
           "x-api-key": ANTHROPIC_API_KEY!,
           "anthropic-version": "2023-06-01"
         },
-        body: JSON.stringify({
-          model: "claude-3-5-haiku-20241022",
-          max_tokens: 1024,
-          messages: [{ role: "user", content: prompt }]
-        })
+        body: JSON.stringify(body)
       });
+      
       data = await response.json();
+      console.log("Anthropic response:", JSON.stringify(data));
     }
+
+    if (data?.error) {
+      return new Response(JSON.stringify({ error: `IA Error: ${data.error.message || JSON.stringify(data.error)}` }), { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+
     const message = data?.content?.[0]?.text;
 
     if (!message) {
