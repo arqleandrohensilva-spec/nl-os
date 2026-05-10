@@ -26,6 +26,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+interface Engagement {
+  id: string;
+  proposta_id: string;
+  secao_capa_tempo: number;
+  secao_manifesto_tempo: number;
+  secao_diagnostico_tempo: number;
+  secao_escopo_tempo: number;
+  secao_investimento_tempo: number;
+  secao_fechamento_tempo: number;
+  dispositivo: string;
+  tempo_total: number;
+}
+
 interface Proposal {
   id: string;
   cliente: string;
@@ -42,6 +55,7 @@ interface Proposal {
   created_at: string;
   views_count?: number;
   last_view_at?: string;
+  proposta_engajamento?: Engagement[];
 }
 
 interface Lead {
@@ -68,7 +82,10 @@ const PropostasTracking = () => {
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-  
+  const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
+  const [analysisText, setAnalysisText] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
     validade: 30,
@@ -104,7 +121,8 @@ const PropostasTracking = () => {
           *,
           proposal_views (
             viewed_at
-          )
+          ),
+          proposta_engajamento (*)
         `)
         .order('created_at', { ascending: false });
 
@@ -220,7 +238,7 @@ const PropostasTracking = () => {
     toast.success('Link copiado para a área de transferência');
   };
 
-  const handleGenerateFollowup = async (proposal: Proposal) => {
+  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string) => {
     try {
       setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
@@ -228,7 +246,7 @@ const PropostasTracking = () => {
       setIsFollowupModalOpen(true);
 
       const { data, error } = await supabase.functions.invoke('generate-followup', {
-        body: { proposal }
+        body: { proposal, analysisContext }
       });
 
       if (error) throw error;
@@ -240,6 +258,79 @@ const PropostasTracking = () => {
     } finally {
       setIsGeneratingFollowup(false);
     }
+  };
+
+  const getEngagementStats = (engagement: Engagement[]) => {
+    if (!engagement || engagement.length === 0) return null;
+    
+    const totalSeconds = engagement.reduce((acc, curr) => acc + (curr.tempo_total || 0), 0);
+    const dispositivo = engagement[engagement.length - 1].dispositivo;
+    
+    const sections = [
+      { id: 'capa', label: 'Capa', time: engagement.reduce((acc, curr) => acc + (curr.secao_capa_tempo || 0), 0) },
+      { id: 'manifesto', label: 'Manifesto', time: engagement.reduce((acc, curr) => acc + (curr.secao_manifesto_tempo || 0), 0) },
+      { id: 'diagnostico', label: 'Diagnóstico', time: engagement.reduce((acc, curr) => acc + (curr.secao_diagnostico_tempo || 0), 0) },
+      { id: 'escopo', label: 'Escopo', time: engagement.reduce((acc, curr) => acc + (curr.secao_escopo_tempo || 0), 0) },
+      { id: 'investimento', label: 'Investimento', time: engagement.reduce((acc, curr) => acc + (curr.secao_investimento_tempo || 0), 0) },
+      { id: 'fechamento', label: 'Fechamento', time: engagement.reduce((acc, curr) => acc + (curr.secao_fechamento_tempo || 0), 0) },
+    ];
+    
+    const mostViewed = [...sections].sort((a, b) => b.time - a.time)[0];
+    const maxTime = Math.max(...sections.map(s => s.time));
+    
+    return {
+      totalSeconds,
+      dispositivo,
+      sections: sections.map(s => ({ ...s, percentage: maxTime > 0 ? (s.time / maxTime) * 100 : 0 })),
+      mostViewed
+    };
+  };
+
+  const handleAnalyzeEngagement = async (proposal: Proposal) => {
+    try {
+      if (!proposal.proposta_engajamento || proposal.proposta_engajamento.length === 0) {
+        toast.error('Nenhum dado de engajamento disponível para análise');
+        return;
+      }
+
+      setSelectedProposal(proposal);
+      setIsAnalyzing(true);
+      setAnalysisText('');
+      setIsAnalysisModalOpen(true);
+
+      const stats = getEngagementStats(proposal.proposta_engajamento);
+      
+      const { data, error } = await supabase.functions.invoke('analyze-engagement', {
+        body: { 
+          proposal,
+          engagement: {
+            tempo_total: stats?.totalSeconds,
+            dispositivo: stats?.dispositivo,
+            secao_capa_tempo: stats?.sections.find(s => s.id === 'capa')?.time,
+            secao_manifesto_tempo: stats?.sections.find(s => s.id === 'manifesto')?.time,
+            secao_diagnostico_tempo: stats?.sections.find(s => s.id === 'diagnostico')?.time,
+            secao_escopo_tempo: stats?.sections.find(s => s.id === 'escopo')?.time,
+            secao_investimento_tempo: stats?.sections.find(s => s.id === 'investimento')?.time,
+            secao_fechamento_tempo: stats?.sections.find(s => s.id === 'fechamento')?.time,
+          }
+        }
+      });
+
+      if (error) throw error;
+      setAnalysisText(data.analysis);
+    } catch (error) {
+      console.error('Error analyzing engagement:', error);
+      toast.error('Erro ao analisar engajamento');
+      setIsAnalysisModalOpen(false);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleGenerateFollowupFromAnalysis = () => {
+    if (!selectedProposal) return;
+    setIsAnalysisModalOpen(false);
+    handleGenerateFollowup(selectedProposal, analysisText);
   };
 
   const copyFollowupMessage = () => {
@@ -428,6 +519,60 @@ const PropostasTracking = () => {
                         </div>
                       )}
                     </div>
+
+                    {p.proposta_engajamento && p.proposta_engajamento.length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-[#E8E4DF] space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite flex items-center gap-2">
+                            <History size={12} className="text-bronze" />
+                            Engajamento
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
+                              {getEngagementStats(p.proposta_engajamento)?.dispositivo}
+                            </span>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
+                              {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
+                            <div key={section.id} className="space-y-1">
+                              <div className="flex justify-between items-center text-[8px]">
+                                <span className={cn(
+                                  "uppercase tracking-widest font-bold",
+                                  getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
+                                )}>
+                                  {section.label}
+                                </span>
+                                <span className="font-medium text-muted-foreground">{section.time}s</span>
+                              </div>
+                              <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
+                                <div 
+                                  className={cn(
+                                    "h-full transition-all duration-500",
+                                    getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
+                                  )}
+                                  style={{ width: `${section.percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleAnalyzeEngagement(p)}
+                          className="w-full h-7 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border-bronze/30 text-bronze hover:bg-bronze hover:text-white transition-all"
+                        >
+                          <Eye size={10} className="mr-2" />
+                          Analisar Interesse
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-2">
@@ -708,6 +853,47 @@ const PropostasTracking = () => {
                 </Button>
               </div>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isAnalysisModalOpen} onOpenChange={setIsAnalysisModalOpen}>
+        <DialogContent className="max-w-md bg-white rounded-[2px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold font-cormorant text-graphite uppercase tracking-wider">Análise de Interesse (IA)</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6">
+            {isAnalyzing ? (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Loader2 size={32} className="text-bronze animate-spin mb-4" />
+                <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">O Claude está analisando os dados...</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-bronze/5 border border-bronze/10 p-4 rounded-[2px]">
+                  <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap">
+                    {analysisText}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="border-t border-[#E8E4DF] pt-6 flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAnalysisModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-1 border-[#E8E4DF]"
+            >
+              Fechar
+            </Button>
+            <Button 
+              onClick={handleGenerateFollowupFromAnalysis}
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2]"
+            >
+              <MessageSquare size={16} className="mr-2" />
+              Gerar Follow-up
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

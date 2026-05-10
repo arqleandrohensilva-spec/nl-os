@@ -368,6 +368,56 @@ export type Database = {
         }
         Relationships: []
       }
+      proposta_engajamento: {
+        Row: {
+          created_at: string | null
+          dispositivo: string | null
+          id: string
+          proposta_id: string
+          secao_capa_tempo: number | null
+          secao_diagnostico_tempo: number | null
+          secao_escopo_tempo: number | null
+          secao_fechamento_tempo: number | null
+          secao_investimento_tempo: number | null
+          secao_manifesto_tempo: number | null
+          tempo_total: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          dispositivo?: string | null
+          id?: string
+          proposta_id: string
+          secao_capa_tempo?: number | null
+          secao_diagnostico_tempo?: number | null
+          secao_escopo_tempo?: number | null
+          secao_fechamento_tempo?: number | null
+          secao_investimento_tempo?: number | null
+          secao_manifesto_tempo?: number | null
+          tempo_total?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          dispositivo?: string | null
+          id?: string
+          proposta_id?: string
+          secao_capa_tempo?: number | null
+          secao_diagnostico_tempo?: number | null
+          secao_escopo_tempo?: number | null
+          secao_fechamento_tempo?: number | null
+          secao_investimento_tempo?: number | null
+          secao_manifesto_tempo?: number | null
+          tempo_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposta_engajamento_proposta_id_fkey"
+            columns: ["proposta_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       servicos: {
         Row: {
           ativo: boolean | null

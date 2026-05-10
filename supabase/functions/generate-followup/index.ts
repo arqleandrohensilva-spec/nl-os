@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { proposal } = await req.json()
+    const { proposal, analysisContext } = await req.json()
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
 
     if (!LOVABLE_API_KEY) {
@@ -68,6 +68,8 @@ serve(async (req) => {
     const userPrompt = `Contexto da proposta:
     ${context}
     
+    ${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
+    
     Instrução específica: ${specificInstruction}
     
     Gere a mensagem de WhatsApp.`
@@ -79,7 +81,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "openai/gpt-5", // Using a high-performance model available in the current environment (2026)
+        model: "anthropic/claude-3.5-sonnet",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
