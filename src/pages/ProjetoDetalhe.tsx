@@ -239,34 +239,38 @@ const ProjetoDetalhe = () => {
         </button>
 
         {/* Header do Projeto */}
-        <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 pb-12 border-b border-white/5">
-          <div>
-            <div className="flex items-center gap-4 mb-3">
-              <h1 className="text-5xl font-cormorant font-light tracking-tight">{projeto.nome_cliente}</h1>
-              <Badge className="bg-[#8B7355]/10 text-[#8B7355] border-[#8B7355]/20 uppercase tracking-widest text-[9px] h-6">
+        <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 pb-16 border-b border-white/5 relative">
+          <div className="absolute -top-10 -left-10 text-[120px] font-cormorant text-white/[0.02] select-none pointer-events-none italic">
+            Atelier
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-6 mb-4">
+              <h1 className="text-6xl font-cormorant font-light tracking-tight italic">{projeto.nome_cliente}</h1>
+              <div className="h-px w-12 bg-[#8B7355]/40" />
+              <span className="text-[#8B7355] uppercase tracking-[0.3em] text-[10px] font-bold">
                 {projeto.tipo}
-              </Badge>
+              </span>
             </div>
             
-            <div className="flex flex-wrap gap-6 text-[10px] text-white/40 uppercase tracking-[0.2em] font-bold">
-              <div className="flex items-center gap-2">
-                <MapPin size={12} className="text-[#8B7355]" /> {projeto.cidade || 'CIDADE NÃO INFORMADA'}
+            <div className="flex flex-wrap gap-8 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
-              <div className="flex items-center gap-2">
-                <Maximize2 size={12} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2}m²` : 'ÁREA NÃO INFORMADA'}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Maximize2 size={14} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2} m²` : 'Área não definida'}
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={12} className="text-[#8B7355]" /> INÍCIO: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Calendar size={14} className="text-[#8B7355]" /> Início: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
               </div>
-              <div className="flex items-center gap-2">
-                <Clock size={12} className="text-[#8B7355]" /> PRAZO: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'NÃO DEFINIDO'}
+              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+                <Clock size={14} className="text-[#8B7355]" /> Prazo: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'Sob consulta'}
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <p className="text-[9px] text-white/20 uppercase tracking-[0.3em] mb-2 font-bold">Status Geral</p>
-            <span className="text-xl font-bold uppercase tracking-widest text-emerald-500">
+            <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-3 font-bold">Status do Ativo</p>
+            <span className="text-3xl font-cormorant italic text-white leading-none">
               {projeto.status_geral}
             </span>
           </div>
