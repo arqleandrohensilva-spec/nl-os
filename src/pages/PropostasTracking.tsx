@@ -400,22 +400,50 @@ const PropostasTracking = () => {
           
           <div className="grid grid-cols-2 gap-6 py-6">
             <div className="space-y-4">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative">
                 <label className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Cliente</label>
-                <Select 
-                  onValueChange={handleLeadSelect}
-                >
-                  <SelectTrigger className="rounded-[2px] border-[#E8E4DF] h-10">
-                    <SelectValue placeholder="Selecione um lead" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {leads.map(lead => (
-                      <SelectItem key={lead.id} value={lead.id}>
-                        {lead.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="relative">
+                  <Input 
+                    placeholder="Buscar lead ou digitar nome..."
+                    value={newProposal.cliente || ''}
+                    onChange={(e) => {
+                      setNewProposal(prev => ({ ...prev, cliente: e.target.value }));
+                      setShowLeads(true);
+                    }}
+                    onFocus={() => setShowLeads(true)}
+                    onBlur={() => setTimeout(() => setShowLeads(false), 200)}
+                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                  />
+                  {showLeads && leads.length > 0 && (
+                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-[#E8E4DF] rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
+                      {leads
+                        .filter(lead => 
+                          !newProposal.cliente || 
+                          lead.nome.toLowerCase().includes(newProposal.cliente.toLowerCase())
+                        )
+                        .map(lead => (
+                          <div 
+                            key={lead.id}
+                            className="p-3 hover:bg-bronze/5 cursor-pointer text-sm border-b border-[#F8F9FA] last:border-0"
+                            onClick={() => {
+                              handleLeadSelect(lead.id);
+                              setShowLeads(false);
+                            }}
+                          >
+                            <div className="font-medium text-graphite">{lead.nome}</div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
+                          </div>
+                        ))
+                      }
+                      {leads.filter(lead => 
+                        !newProposal.cliente || 
+                        lead.nome.toLowerCase().includes(newProposal.cliente.toLowerCase())
+                      ).length === 0 && (
+                        <div className="p-3 text-xs text-muted-foreground italic">Nenhum lead encontrado</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
