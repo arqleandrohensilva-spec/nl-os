@@ -335,6 +335,13 @@ const PropostasTracking = () => {
     handleGenerateFollowup(selectedProposal, analysisText);
   };
 
+  const toggleEngagement = (id: string) => {
+    setExpandedEngagements(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   const copyFollowupMessage = () => {
     navigator.clipboard.writeText(followupMessage);
     toast.success('Mensagem copiada!');
