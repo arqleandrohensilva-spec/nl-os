@@ -269,6 +269,7 @@ export type Database = {
       }
       projeto_etapas: {
         Row: {
+          aprovado_por: string | null
           criado_em: string
           data_aprovacao: string | null
           data_entrega: string | null
@@ -282,6 +283,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          aprovado_por?: string | null
           criado_em?: string
           data_aprovacao?: string | null
           data_entrega?: string | null
@@ -295,6 +297,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          aprovado_por?: string | null
           criado_em?: string
           data_aprovacao?: string | null
           data_entrega?: string | null
