@@ -977,7 +977,8 @@ const PropostasTracking = () => {
             </Button>
             <Button 
               onClick={handleGenerateFollowupFromAnalysis}
-              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2]"
+              disabled={isAnalyzing || !analysisText || analysisText.includes('Não foi possível') || analysisText.includes('Erro')}
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2] disabled:opacity-50"
             >
               <MessageSquare size={16} className="mr-2" />
               Gerar Follow-up
