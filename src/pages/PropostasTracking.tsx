@@ -341,7 +341,7 @@ Gere a mensagem de WhatsApp.`;
               views_count,
               daysSinceSent,
               daysUntilExpiry,
-              analysisContext
+              analysisContext: localContext
             }
           }
         });
