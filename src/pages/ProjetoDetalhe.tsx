@@ -56,6 +56,7 @@ interface Etapa {
   data_entrega: string;
   data_aprovacao: string;
   notas: string;
+  moodboard_url?: string;
 }
 
 interface ChecklistItem {
