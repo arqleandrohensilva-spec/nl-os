@@ -640,7 +640,7 @@ const ControleHoras = () => {
               </div>
             </div>
             <p className="text-[11px] text-bronze/80 font-mono italic">
-              <span className="font-bold">Próxima semana:</span> Anteprojeto Mendonça precisa de 35h para concluir no prazo estimado.
+              <span className="font-bold">Próxima semana:</span> Anteprojeto precisa de 35h para concluir no prazo estimado.
             </p>
           </div>
         )}
