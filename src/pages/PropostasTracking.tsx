@@ -998,18 +998,6 @@ const PropostasTracking = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-          <div className="p-8 max-h-[85vh] overflow-y-auto">
-            {selectedProposal && (
-              <EngagementDashboard 
-                proposal={selectedProposal} 
-                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
-                onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
