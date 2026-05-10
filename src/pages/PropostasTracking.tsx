@@ -26,6 +26,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+interface Engagement {
+  id: string;
+  proposta_id: string;
+  secao_capa_tempo: number;
+  secao_manifesto_tempo: number;
+  secao_diagnostico_tempo: number;
+  secao_escopo_tempo: number;
+  secao_investimento_tempo: number;
+  secao_fechamento_tempo: number;
+  dispositivo: string;
+  tempo_total: number;
+}
+
 interface Proposal {
   id: string;
   cliente: string;
@@ -42,6 +55,7 @@ interface Proposal {
   created_at: string;
   views_count?: number;
   last_view_at?: string;
+  proposta_engajamento?: Engagement[];
 }
 
 interface Lead {
