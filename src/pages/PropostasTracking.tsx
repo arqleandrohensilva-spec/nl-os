@@ -324,11 +324,21 @@ const PropostasTracking = () => {
       });
 
       if (error) throw error;
-      setAnalysisText(data.analysis);
-    } catch (error) {
+      
+      // Handle both { analysis: "..." } and { message: "..." } or direct { content: [...] }
+      const text = data?.analysis || data?.message || data?.content?.[0]?.text;
+      
+      if (text) {
+        setAnalysisText(text);
+      } else if (data?.error) {
+        setAnalysisText(`Erro da IA: ${data.error}`);
+      } else {
+        setAnalysisText("Não foi possível gerar a análise. Resposta inesperada.");
+      }
+    } catch (error: any) {
       console.error('Error analyzing engagement:', error);
+      setAnalysisText("Não foi possível gerar a análise. Tente novamente.");
       toast.error('Erro ao analisar engajamento');
-      setIsAnalysisModalOpen(false);
     } finally {
       setIsAnalyzing(false);
     }
