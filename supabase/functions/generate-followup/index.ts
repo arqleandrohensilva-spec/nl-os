@@ -123,4 +123,6 @@ export const handler = async (req: Request) => {
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
-})
+}
+
+serve(handler);
