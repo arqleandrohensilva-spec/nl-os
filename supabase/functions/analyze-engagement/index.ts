@@ -59,40 +59,37 @@ serve(async (req) => {
       * Fechamento: ${engagementData.secao_fechamento_tempo || 0}s
     `
 
+    const prompt = `${systemPrompt}\n\n${userPrompt}`;
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
+        "Content-Type": "application/json",
         "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
-        messages: [
-          { role: "user", content: `${systemPrompt}\n\n${userPrompt}` }
-        ]
+        messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await response.json();
-    
-    if (data.error) {
-      console.error("Anthropic API Error:", data.error);
-      throw new Error(data.error.message || "Anthropic API Error");
+    const message = data?.content?.[0]?.text;
+
+    if (!message) {
+      return new Response(JSON.stringify({ error: "Empty response from AI" }), { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
     }
 
-    if (!data.content || !data.content[0] || !data.content[0].text) {
-      return new Response(
-        JSON.stringify({ analysis: "Não foi possível gerar a análise no momento. Tente novamente em instantes." }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    return new Response(JSON.stringify({ analysis: message }), { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    });
 
-    return new Response(
-      JSON.stringify({ analysis: data.content[0].text }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
   } catch (error) {
     console.error("Error in analyze-engagement:", error);
     return new Response(

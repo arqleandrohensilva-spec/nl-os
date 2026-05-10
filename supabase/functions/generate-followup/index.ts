@@ -12,11 +12,11 @@ serve(async (req) => {
 
   try {
     const { proposal, analysisContext } = await req.json()
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
 
-    if (!LOVABLE_API_KEY) {
+    if (!ANTHROPIC_API_KEY) {
       return new Response(
-        JSON.stringify({ error: 'LOVABLE_API_KEY not set' }),
+        JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -74,36 +74,37 @@ serve(async (req) => {
     
     Gere a mensagem de WhatsApp.`
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const prompt = `${systemPrompt}\n\n${userPrompt}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "anthropic/claude-3.5-sonnet",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        // temperature: 0.7 // Removed as it might not be supported by some models in this environment
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await response.json();
-    
-    if (data.error) {
-        throw new Error(data.error.message || JSON.stringify(data.error) || "AI Gateway Error");
+    const message = data?.content?.[0]?.text;
+
+    if (!message) {
+      return new Response(JSON.stringify({ error: "Empty response from AI" }), { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
     }
 
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      throw new Error("Invalid response format from AI Gateway");
-    }
+    return new Response(JSON.stringify({ message }), { 
+      status: 200, 
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    });
 
-    return new Response(
-      JSON.stringify({ message: data.choices[0].message.content }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
   } catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),
