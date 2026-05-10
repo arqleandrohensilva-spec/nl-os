@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
   Search, 
@@ -17,7 +18,8 @@ import {
   History,
   Clock,
   MessageSquare,
-  ChevronDown
+  ChevronDown,
+  Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -392,7 +394,13 @@ const PropostasTracking = () => {
         <header className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-graphite font-cormorant">04 · Tracking de Propostas</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight text-graphite font-cormorant text-gradient">04 · Tracking de Propostas</h1>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-green-500/10 rounded-full border border-green-500/20">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-[8px] font-bold uppercase tracking-widest text-green-600">Live Tracking</span>
+                </div>
+              </div>
               <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
             </div>
             <Button 
@@ -404,10 +412,11 @@ const PropostasTracking = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-5 gap-6">
             {[
               { label: 'Total Enviadas', value: proposals.length, icon: Send },
               { label: 'Aguardando', value: proposals.filter(p => p.status === 'Enviada' || p.status === 'Vista').length, icon: Clock },
+              { label: 'Alto Interesse', value: proposals.filter(p => (p.views_count || 0) > 3).length, icon: Activity },
               { label: 'Aprovadas', value: proposals.filter(p => p.status === 'Aprovada').length, icon: CheckCircle2 },
               { label: 'Taxa de Conversão', value: `${proposals.length > 0 ? Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100) : 0}%`, icon: History },
             ].map((m, i) => (
@@ -484,11 +493,17 @@ const PropostasTracking = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredProposals.map((p) => (
-                <div 
-                  key={p.id}
-                  className="bg-white border border-[#E8E4DF] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col"
-                >
+              <AnimatePresence mode="popLayout">
+                {filteredProposals.map((p, idx) => (
+                  <motion.div 
+                    key={p.id}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3, delay: idx * 0.05 }}
+                    className="bg-white border border-[#E8E4DF] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-xl hover:shadow-bronze/5"
+                  >
                   <div className="p-6 flex-1">
                     <div className="flex justify-between items-start mb-4">
                       <span className={cn(
@@ -555,53 +570,64 @@ const PropostasTracking = () => {
                           )}
                         </button>
 
-                        {expandedEngagements[p.id] && (
-                          <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                            <div className="flex items-center justify-between">
-                              <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
-                                {getEngagementStats(p.proposta_engajamento)?.dispositivo}
-                              </span>
-                              <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
-                                {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
-                              </span>
-                            </div>
-
-                            <div className="space-y-2">
-                              {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
-                                <div key={section.id} className="space-y-1">
-                                  <div className="flex justify-between items-center text-[8px]">
-                                    <span className={cn(
-                                      "uppercase tracking-widest font-bold",
-                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
-                                    )}>
-                                      {section.label}
-                                    </span>
-                                    <span className="font-medium text-muted-foreground">{section.time}s</span>
-                                  </div>
-                                  <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
-                                    <div 
-                                      className={cn(
-                                        "h-full transition-all duration-500",
-                                        getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
-                                      )}
-                                      style={{ width: `${section.percentage}%` }}
-                                    />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            <Button 
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleAnalyzeEngagement(p)}
-                              className="w-full h-7 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border-bronze/30 text-bronze hover:bg-bronze hover:text-white transition-all"
+                        <AnimatePresence>
+                          {expandedEngagements[p.id] && (
+                            <motion.div 
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3, ease: "easeInOut" }}
+                              className="overflow-hidden"
                             >
-                              <Eye size={10} className="mr-2" />
-                              Analisar Interesse
-                            </Button>
-                          </div>
-                        )}
+                              <div className="mt-4 space-y-4 pb-2">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[8px] font-bold uppercase tracking-widest text-muted-foreground px-1 py-0.5 bg-muted rounded-[2px]">
+                                    {getEngagementStats(p.proposta_engajamento)?.dispositivo}
+                                  </span>
+                                  <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
+                                    {Math.floor((getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) / 60)}m {(getEngagementStats(p.proposta_engajamento)?.totalSeconds || 0) % 60}s
+                                  </span>
+                                </div>
+
+                                <div className="space-y-2">
+                                  {getEngagementStats(p.proposta_engajamento)?.sections.map((section) => (
+                                    <div key={section.id} className="space-y-1">
+                                      <div className="flex justify-between items-center text-[8px]">
+                                        <span className={cn(
+                                          "uppercase tracking-widest font-bold",
+                                          getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-muted-foreground"
+                                        )}>
+                                          {section.label}
+                                        </span>
+                                        <span className="font-medium text-muted-foreground">{section.time}s</span>
+                                      </div>
+                                      <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
+                                        <motion.div 
+                                          initial={{ width: 0 }}
+                                          animate={{ width: `${section.percentage}%` }}
+                                          className={cn(
+                                            "h-full",
+                                            getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "bg-bronze" : "bg-muted-foreground/30"
+                                          )}
+                                        />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                <Button 
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleAnalyzeEngagement(p)}
+                                  className="w-full h-7 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border-bronze/30 text-bronze hover:bg-bronze hover:text-white transition-all shadow-sm shadow-bronze/10"
+                                >
+                                  <Activity size={10} className="mr-2" />
+                                  IA: Analisar Comportamento
+                                </Button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     )}
                   </div>
@@ -641,8 +667,9 @@ const PropostasTracking = () => {
                       Gerar Follow-up
                     </Button>
                   </div>
-                </div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
           )}
         </div>
