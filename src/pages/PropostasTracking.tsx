@@ -659,6 +659,15 @@ const PropostasTracking = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                {selectedProposal && !leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
+                  <div className="bg-red-50 border border-red-200 p-3 rounded-[2px] flex items-start gap-3">
+                    <XCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
+                    <p className="text-[11px] text-red-700 font-medium leading-tight">
+                      Atenção: Este lead não possui número de WhatsApp cadastrado. 
+                      O botão de envio direto não funcionará.
+                    </p>
+                  </div>
+                )}
                 <div className="bg-[#F8F9FA] p-4 border border-[#E8E4DF] rounded-[2px]">
                   <p className="text-sm leading-relaxed text-graphite whitespace-pre-wrap font-medium italic">
                     "{followupMessage}"
@@ -691,7 +700,8 @@ const PropostasTracking = () => {
                 </Button>
                 <Button 
                   onClick={handleSendWhatsApp}
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
+                  disabled={!selectedProposal || !leads.find(l => l.nome === selectedProposal.cliente)?.whats}
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <MessageSquare size={14} className="mr-2" />
                   Enviar no WhatsApp
