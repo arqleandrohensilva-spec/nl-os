@@ -73,6 +73,13 @@ export const handler = async (req: Request) => {
         ]
       };
     } else {
+      const body = {
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        messages: [{ role: "user", content: prompt }]
+      };
+      console.log("Sending to Anthropic:", JSON.stringify(body));
+
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: {
@@ -80,24 +87,36 @@ export const handler = async (req: Request) => {
           "x-api-key": ANTHROPIC_API_KEY!,
           "anthropic-version": "2023-06-01"
         },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1024,
-          messages: [{ role: "user", content: prompt }]
-        })
+        body: JSON.stringify(body)
       });
       data = await response.json();
     }
-    const message = data?.content?.[0]?.text;
 
-    if (!message) {
-      return new Response(JSON.stringify({ error: "Empty response from AI" }), { 
+    // Debug: log the full response
+    console.log("Anthropic response:", JSON.stringify(data));
+
+    // Check for API error in response
+    if (data.error) {
+      return new Response(JSON.stringify({ 
+        analysis: `Erro na API: ${data.error.message || JSON.stringify(data.error)}` 
+      }), { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       });
     }
 
-    return new Response(JSON.stringify({ analysis: message }), { 
+    const analysis = data?.content?.[0]?.text;
+
+    if (!analysis) {
+      return new Response(JSON.stringify({ 
+        analysis: "Sem dados suficientes para análise ou resposta vazia da IA." 
+      }), { 
+        status: 200, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      });
+    }
+
+    return new Response(JSON.stringify({ analysis }), { 
       status: 200, 
       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
     });
