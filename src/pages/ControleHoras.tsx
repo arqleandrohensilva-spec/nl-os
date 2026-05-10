@@ -40,7 +40,7 @@ import autoTable from 'jspdf-autotable';
 export interface Projeto {
   id: string;
   nome: string;
-  cliente_nome: string;
+  nome_cliente: string;
   tipo: string;
   area_m2: number;
   valor_proposta: number;
@@ -50,7 +50,10 @@ export interface Projeto {
   horas_executivo: number;
   horas_acompanhamento: number;
   etapa_atual: string;
-  status: string;
+  status_geral: string;
+  cidade?: string;
+  data_inicio?: string;
+  prazo_final?: string;
 }
 
 export interface Sessao {
@@ -343,7 +346,7 @@ const ControleHoras = () => {
       // Calculate predictions after data load
       if (pData) {
         pData.forEach(p => {
-          if (p.status === 'ativo') getAIPrediction(p, sData || []);
+          if (p.status_geral === 'ativo') getAIPrediction(p, sData || []);
         });
       }
     } catch (error) {
