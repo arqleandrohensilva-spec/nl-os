@@ -247,6 +247,27 @@ const PropostasTracking = () => {
     toast.success('Mensagem copiada!');
   };
 
+  const handleSendWhatsApp = () => {
+    if (!selectedProposal || !followupMessage) return;
+    
+    const lead = leads.find(l => l.nome === selectedProposal.cliente);
+    if (!lead || !lead.whats) {
+      toast.error('Número de WhatsApp não encontrado para este lead');
+      return;
+    }
+
+    // Remover caracteres não numéricos
+    let number = lead.whats.replace(/\D/g, '');
+    
+    // Adicionar 55 se não tiver código do país
+    if (number.length <= 11) {
+      number = '55' + number;
+    }
+
+    const url = `https://wa.me/${number}?text=${encodeURIComponent(followupMessage)}`;
+    window.open(url, '_blank');
+  };
+
   const filteredProposals = proposals.filter(p => {
     const matchesSearch = p.cliente.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
