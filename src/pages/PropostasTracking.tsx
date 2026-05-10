@@ -949,6 +949,37 @@ const PropostasTracking = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog open={isDashboardModalOpen} onOpenChange={setIsDashboardModalOpen}>
+        <DialogContent className="max-w-4xl bg-[#F8F9FA] border-none rounded-[2px] p-0 overflow-hidden">
+          <div className="bg-graphite p-6 flex justify-between items-center">
+            <div>
+              <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">
+                Dashboard de Engajamento
+              </DialogTitle>
+              <p className="text-bronze text-[10px] uppercase tracking-[0.2em] font-bold mt-1">
+                {selectedProposal?.cliente} · {selectedProposal?.tipo}
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDashboardModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[9px] font-bold h-8 border-white/20 text-white hover:bg-white/10"
+            >
+              Fechar
+            </Button>
+          </div>
+          
+          <div className="p-8 max-h-[85vh] overflow-y-auto">
+            {selectedProposal && (
+              <EngagementDashboard 
+                proposal={selectedProposal} 
+                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
+                onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
