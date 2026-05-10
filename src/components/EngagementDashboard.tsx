@@ -33,11 +33,11 @@ import { ptBR } from 'date-fns/locale';
 
 interface EngagementDashboardProps {
   proposal: Proposal;
-  onAnalyze: () => void;
+  // onAnalyze removed as requested
   onGenerateFollowup: (analysisText?: string) => void;
 }
 
-const EngagementDashboard = ({ proposal, onAnalyze, onGenerateFollowup }: EngagementDashboardProps) => {
+const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboardProps) => {
   const engagements = proposal.proposta_engajamento || [];
   
   if (engagements.length === 0) {
@@ -242,18 +242,11 @@ const EngagementDashboard = ({ proposal, onAnalyze, onGenerateFollowup }: Engage
 
             <div className="flex gap-3">
               <Button 
-                onClick={onAnalyze}
-                className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-10 text-[9px] font-bold uppercase tracking-widest shadow-md transition-all active:scale-95"
-              >
-                <Zap size={14} className="mr-2" />
-                Análise IA
-              </Button>
-              <Button 
                 onClick={() => onGenerateFollowup()}
                 variant="outline"
-                className="flex-1 border-white/20 text-white hover:bg-white/10 rounded-[2px] h-10 text-[9px] font-bold uppercase tracking-widest transition-all"
+                className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
               >
-                <MessageSquare size={14} className="mr-2" />
+                <MessageSquare size={16} className="mr-2 text-bronze" />
                 Script de Venda
               </Button>
             </div>

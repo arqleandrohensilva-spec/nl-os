@@ -87,9 +87,6 @@ const PropostasTracking = () => {
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
-  const [isAnalysisModalOpen, setIsAnalysisModalOpen] = useState(false);
-  const [analysisText, setAnalysisText] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
 
@@ -305,7 +302,7 @@ Gere a mensagem de WhatsApp.`;
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY,
           "anthropic-version": "2023-06-01"
         },
         body: JSON.stringify({
@@ -360,79 +357,9 @@ Gere a mensagem de WhatsApp.`;
     };
   };
 
-  const handleAnalyzeEngagement = async (proposal: Proposal) => {
-    try {
-      if (!proposal.proposta_engajamento || proposal.proposta_engajamento.length === 0) {
-        toast.error('Nenhum dado de engajamento disponível para análise');
-        return;
-      }
-
-      setSelectedProposal(proposal);
-      setIsAnalyzing(true);
-      setAnalysisText('');
-      setIsAnalysisModalOpen(true);
-
-      const stats = getEngagementStats(proposal.proposta_engajamento);
-      
-      const prompt = `Você é o assistente da NL Arquitetos. Com base nos dados de engajamento desta proposta, analise o nível de interesse do cliente e sugira a melhor ação de follow-up. Seja direto e objetivo. Máximo 3 parágrafos.
-
-Proposta: ${proposal.cliente || 'Cliente não identificado'} (${proposal.tipo || 'Tipo não informado'})
-Status: ${proposal.status || 'Pendente'}
-
-Dados de Engajamento:
-- Tempo Total: ${Math.floor((stats?.totalSeconds || 0) / 60)} min ${(stats?.totalSeconds || 0) % 60} seg
-- Dispositivo: ${stats?.dispositivo || 'Não identificado'}
-- Tempos por Seção:
-  * Capa: ${stats?.sections.find(s => s.id === 'capa')?.time || 0}s
-  * Manifesto: ${stats?.sections.find(s => s.id === 'manifesto')?.time || 0}s
-  * Diagnóstico: ${stats?.sections.find(s => s.id === 'diagnostico')?.time || 0}s
-  * Escopo: ${stats?.sections.find(s => s.id === 'escopo')?.time || 0}s
-  * Investimento: ${stats?.sections.find(s => s.id === 'investimento')?.time || 0}s
-  * Fechamento: ${stats?.sections.find(s => s.id === 'fechamento')?.time || 0}s`;
-
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": (import.meta as any).env.VITE_ANTHROPIC_API_KEY,
-          "anthropic-version": "2023-06-01"
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 500,
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
-
-      const data = await response.json();
-      const text = data?.content?.[0]?.text;
-      
-      if (text) {
-        setAnalysisText(text);
-      } else if (data?.error) {
-        setAnalysisText(`Erro da IA: ${data.error.message || JSON.stringify(data.error)}`);
-      } else {
-        setAnalysisText("Não foi possível gerar a análise. Resposta inesperada.");
-      }
-    } catch (error: any) {
-      console.error('Error analyzing engagement:', error);
-      setAnalysisText("Não foi possível gerar a análise. Tente novamente.");
-      toast.error('Erro ao analisar engajamento');
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   const handleOpenDashboard = (proposal: Proposal) => {
     setSelectedProposal(proposal);
     setIsDashboardModalOpen(true);
-  };
-
-  const handleGenerateFollowupFromAnalysis = () => {
-    if (!selectedProposal) return;
-    setIsAnalysisModalOpen(false);
-    setIsDashboardModalOpen(false);
-    handleGenerateFollowup(selectedProposal, analysisText);
   };
 
   const toggleEngagement = (id: string) => {
@@ -962,15 +889,6 @@ Dados de Engajamento:
               </div>
             ) : (
               <div className="space-y-4">
-                {selectedProposal && !leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
-                  <div className="bg-red-50 border border-red-200 p-3 rounded-[2px] flex items-start gap-3">
-                    <XCircle size={16} className="text-red-500 mt-0.5 shrink-0" />
-                    <p className="text-[11px] text-red-700 font-medium leading-tight">
-                      Atenção: Este lead não possui número de WhatsApp cadastrado. 
-                      O botão de envio direto não funcionará.
-                    </p>
-                  </div>
-                )}
                 <div className="bg-[#F8F9FA] p-4 border border-[#E8E4DF] rounded-[2px]">
                   <p className="text-sm leading-relaxed text-graphite whitespace-pre-wrap font-medium italic">
                     "{followupMessage}"
@@ -1001,58 +919,17 @@ Dados de Engajamento:
                   <Copy size={14} className="mr-2" />
                   Copiar
                 </Button>
-                <Button 
-                  onClick={handleSendWhatsApp}
-                  disabled={!selectedProposal || !leads.find(l => l.nome === selectedProposal.cliente)?.whats}
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <MessageSquare size={14} className="mr-2" />
-                  Enviar no WhatsApp
-                </Button>
+                {selectedProposal && leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
+                  <Button 
+                    onClick={handleSendWhatsApp}
+                    className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
+                  >
+                    <MessageSquare size={14} className="mr-2" />
+                    Enviar no WhatsApp
+                  </Button>
+                )}
               </div>
             )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={isAnalysisModalOpen} onOpenChange={setIsAnalysisModalOpen}>
-        <DialogContent className="max-w-md bg-white rounded-[2px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold font-cormorant text-graphite uppercase tracking-wider">Análise de Interesse (IA)</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-6">
-            {isAnalyzing ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 size={32} className="text-bronze animate-spin mb-4" />
-                <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">O Claude está analisando os dados...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="bg-bronze/5 border border-bronze/10 p-4 rounded-[2px]">
-                  <p className="text-sm text-graphite leading-relaxed whitespace-pre-wrap">
-                    {analysisText}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="border-t border-[#E8E4DF] pt-6 flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsAnalysisModalOpen(false)}
-              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-1 border-[#E8E4DF]"
-            >
-              Fechar
-            </Button>
-            <Button 
-              onClick={handleGenerateFollowupFromAnalysis}
-              disabled={isAnalyzing || !analysisText || analysisText.includes('Não foi possível') || analysisText.includes('Erro')}
-              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 flex-[2] disabled:opacity-50"
-            >
-              <MessageSquare size={16} className="mr-2" />
-              Gerar Follow-up
-            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1081,7 +958,6 @@ Dados de Engajamento:
             {selectedProposal && (
               <EngagementDashboard 
                 proposal={selectedProposal} 
-                onAnalyze={() => handleAnalyzeEngagement(selectedProposal)}
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
