@@ -12,7 +12,8 @@ import ControleHoras from "./pages/ControleHoras.tsx";
 import BibliotecaServicos from "./pages/BibliotecaServicos.tsx";
 import PropostasTracking from "./pages/PropostasTracking.tsx";
 import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
-
+import GestaoProjetos from "./pages/GestaoProjetos.tsx";
+import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 
 
 const queryClient = new QueryClient();
@@ -29,7 +30,8 @@ const App = () => (
         <Route path="/financeiro/base" element={<ProtectedRoute><BaseFinanceira /></ProtectedRoute>} />
         <Route path="/projetos/horas" element={<ProtectedRoute><ControleHoras /></ProtectedRoute>} />
         <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
-
+        <Route path="/projetos/gestao" element={<ProtectedRoute><GestaoProjetos /></ProtectedRoute>} />
+        <Route path="/projetos/detalhe/:id" element={<ProtectedRoute><ProjetoDetalhe /></ProtectedRoute>} />
 
         <Route path="/propostas/tracking" element={<ProtectedRoute><PropostasTracking /></ProtectedRoute>} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
