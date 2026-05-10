@@ -86,6 +86,8 @@ const PropostasTracking = () => {
   const [isFollowupModalOpen, setIsFollowupModalOpen] = useState(false);
   const [followupMessage, setFollowupMessage] = useState('');
   const [isGeneratingFollowup, setIsGeneratingFollowup] = useState(false);
+  const [followupTone, setFollowupTone] = useState<'formal' | 'direto'>('direto');
+  const [followupLang, setFollowupLang] = useState<'pt' | 'en' | 'es'>('pt');
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
@@ -242,7 +244,9 @@ const PropostasTracking = () => {
     toast.success('Link copiado para a área de transferência');
   };
 
-  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string) => {
+  const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string, toneOverride?: 'formal' | 'direto', langOverride?: 'pt' | 'en' | 'es') => {
+    const tone = toneOverride || followupTone;
+    const lang = langOverride || followupLang;
     try {
       setSelectedProposal(proposal);
       setIsGeneratingFollowup(true);
@@ -295,7 +299,9 @@ const PropostasTracking = () => {
       }
 
       const prompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta. 
-Tom: condutor, técnico, sem pressão, sem urgência artificial. 
+Tom: ${tone === 'formal' ? 'Polido, elegante, respeitoso e profissional.' : 'Direto, amigável, ágil e focado no próximo passo.'}
+Idioma: ${lang === 'pt' ? 'Português' : lang === 'en' ? 'Inglês' : 'Espanhol'}
+Estilo NL Arquitetos: condutor, técnico, sem pressão, sem urgência artificial. 
 Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz. 
 Máximo 3 linhas. Termine com uma pergunta aberta simples.
 
@@ -944,61 +950,92 @@ Gere a mensagem de WhatsApp.`;
         </DialogContent>
       </Dialog>
       <Dialog open={isFollowupModalOpen} onOpenChange={setIsFollowupModalOpen}>
-        <DialogContent className="max-w-md bg-white rounded-[2px]">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold font-cormorant text-graphite uppercase tracking-wider">Follow-up Personalizado</DialogTitle>
+        <DialogContent className="sm:max-w-[500px] bg-white rounded-[2px] border-[#E8E4DF] p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
+          <DialogHeader className="p-6 bg-graphite text-white">
+            <DialogTitle className="text-xl font-bold font-cormorant flex items-center gap-2 uppercase tracking-tight">
+              <MessageSquare size={20} className="text-bronze" />
+              Follow-up Inteligente
+            </DialogTitle>
           </DialogHeader>
           
-          <div className="py-6">
-            {isGeneratingFollowup ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 size={32} className="text-bronze animate-spin mb-4" />
-                <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">O Claude está redigindo a mensagem...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="bg-[#F8F9FA] p-4 border border-[#E8E4DF] rounded-[2px]">
-                  <p className="text-sm leading-relaxed text-graphite whitespace-pre-wrap font-medium italic">
-                    "{followupMessage}"
-                  </p>
-                </div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider text-center">
-                  Essa mensagem foi gerada considerando o status e interesse do cliente.
-                </p>
-              </div>
-            )}
-          </div>
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button 
-              variant="outline" 
-              onClick={() => setIsFollowupModalOpen(false)}
-              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
-            >
-              Fechar
-            </Button>
-            {!isGeneratingFollowup && followupMessage && !followupMessage.includes('Erro') && (
-              <div className="flex gap-2">
-                <Button 
-                  onClick={copyFollowupMessage}
-                  variant="outline"
-                  className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6 border-bronze text-bronze hover:bg-bronze hover:text-white"
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tom de Voz</label>
+                <Select 
+                  value={followupTone} 
+                  onValueChange={(v: 'formal' | 'direto') => {
+                    setFollowupTone(v);
+                    if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, v, followupLang);
+                  }}
                 >
-                  <Copy size={14} className="mr-2" />
-                  Copiar
-                </Button>
-                {selectedProposal && leads.find(l => l.nome === selectedProposal.cliente)?.whats && (
-                  <Button 
-                    onClick={handleSendWhatsApp}
-                    className="bg-green-600 hover:bg-green-700 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-6"
-                  >
-                    <MessageSquare size={14} className="mr-2" />
-                    Enviar no WhatsApp
-                  </Button>
-                )}
+                  <SelectTrigger className="h-9 rounded-[2px] border-[#E8E4DF] text-xs font-bold uppercase tracking-wider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#E8E4DF] rounded-[2px]">
+                    <SelectItem value="direto" className="text-xs font-bold uppercase tracking-wider">Direto / Amigável</SelectItem>
+                    <SelectItem value="formal" className="text-xs font-bold uppercase tracking-wider">Formal / Polido</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </DialogFooter>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Idioma</label>
+                <Select 
+                  value={followupLang} 
+                  onValueChange={(v: 'pt' | 'en' | 'es') => {
+                    setFollowupLang(v);
+                    if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, followupTone, v);
+                  }}
+                >
+                  <SelectTrigger className="h-9 rounded-[2px] border-[#E8E4DF] text-xs font-bold uppercase tracking-wider">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#E8E4DF] rounded-[2px]">
+                    <SelectItem value="pt" className="text-xs font-bold uppercase tracking-wider">Português</SelectItem>
+                    <SelectItem value="en" className="text-xs font-bold uppercase tracking-wider">English</SelectItem>
+                    <SelectItem value="es" className="text-xs font-bold uppercase tracking-wider">Español</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute -top-3 left-3 px-2 bg-white text-[9px] font-black uppercase tracking-[0.2em] text-bronze z-10">
+                Script Recomendado
+              </div>
+              {isGeneratingFollowup ? (
+                <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px]">
+                  <Loader2 size={24} className="animate-spin text-bronze mb-2" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Gerando análise...</span>
+                </div>
+              ) : (
+                <textarea
+                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
+                  value={followupMessage}
+                  onChange={(e) => setFollowupMessage(e.target.value)}
+                  placeholder="Aguardando geração do script..."
+                />
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <Button 
+                onClick={copyFollowupMessage}
+                variant="outline"
+                className="border-[#E8E4DF] text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
+              >
+                <Copy size={16} className="mr-2 text-bronze" />
+                Copiar
+              </Button>
+              <Button 
+                onClick={handleSendWhatsApp}
+                className="bg-graphite hover:bg-black text-white rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-graphite/10"
+              >
+                <Send size={16} className="mr-2 text-bronze" />
+                WhatsApp
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       <Dialog open={isDashboardModalOpen} onOpenChange={setIsDashboardModalOpen}>
