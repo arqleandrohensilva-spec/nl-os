@@ -404,21 +404,33 @@ const ProjetoDetalhe = () => {
             <ArrowLeft size={14} /> Voltar para lista
           </button>
 
-          <Button 
-            onClick={() => setClientMode(!clientMode)}
-            className={cn(
-              "rounded-none text-[9px] uppercase font-bold tracking-[0.2em] px-6 h-10 border transition-all duration-500",
-              clientMode 
-                ? "bg-[#8B7355] text-white border-[#8B7355]" 
-                : "bg-white/5 text-white/40 border-white/10 hover:border-[#8B7355]/40 hover:text-white"
+          <div className="flex gap-4">
+            {projeto.etapa_atual === 'ACOMPANHAMENTO' && etapas.every(e => e.status === 'Aprovado') && (
+              <Button
+                onClick={() => generatePDFReport()}
+                disabled={generatingPDF}
+                className="bg-transparent hover:bg-[#8B7355]/10 text-[#8B7355] border border-[#8B7355] rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500"
+              >
+                {generatingPDF ? "GERANDO..." : "GERAR RELATÓRIO DE ENTREGA"}
+              </Button>
             )}
-          >
-            {clientMode ? (
-              <span className="flex items-center gap-2 italic"><EyeOff size={14} /> Modo Atelier (Interno)</span>
-            ) : (
-              <span className="flex items-center gap-2 italic"><Eye size={14} /> Modo Concierge (Cliente)</span>
-            )}
-          </Button>
+
+            <Button 
+              onClick={() => setClientMode(!clientMode)}
+              className={cn(
+                "rounded-none text-[9px] uppercase font-bold tracking-[0.2em] px-6 h-10 border transition-all duration-500",
+                clientMode 
+                  ? "bg-[#8B7355] text-white border-[#8B7355]" 
+                  : "bg-white/5 text-white/40 border-white/10 hover:border-[#8B7355]/40 hover:text-white"
+              )}
+            >
+              {clientMode ? (
+                <span className="flex items-center gap-2 italic"><EyeOff size={14} /> Modo Atelier (Interno)</span>
+              ) : (
+                <span className="flex items-center gap-2 italic"><Eye size={14} /> Modo Concierge (Cliente)</span>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Header do Projeto */}
