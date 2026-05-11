@@ -597,11 +597,82 @@ const ProjetoDetalhe = () => {
                   })}
                 </div>
 
-                <div className="bg-white/[0.02] border border-[#8B7355]/10 p-10 space-y-4">
-                  <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold">Atendimento Prime</h4>
-                  <p className="text-xs text-white/60 leading-relaxed italic font-light">
-                    Sua jornada é única. Se desejar ajustes finos em qualquer uma das etapas acima, contate seu concierge via canal direto.
-                  </p>
+                {/* Atendimento Prime & Moodboard Link */}
+                <div className="space-y-6">
+                  <div className="bg-white/[0.02] border border-[#8B7355]/10 p-10 space-y-4">
+                    <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold">Atendimento Prime</h4>
+                    <p className="text-xs text-white/60 leading-relaxed italic font-light">
+                      Sua jornada é única. Se desejar ajustes finos em qualquer uma das etapas acima, contate seu concierge via canal direto.
+                    </p>
+                  </div>
+
+                  <div className="bg-white/[0.02] border border-white/5 p-10 space-y-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 flex items-center justify-center bg-[#8B7355]/10 border border-[#8B7355]/20 text-[#8B7355]">
+                        <ImageIcon size={18} />
+                      </div>
+                      <div>
+                        <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold">Moodboard Geral</h4>
+                        <p className="text-[9px] text-white/30 uppercase font-bold tracking-widest mt-1">Conceito Criativo Unificado</p>
+                      </div>
+                    </div>
+                    
+                    <p className="text-[11px] text-white/50 leading-relaxed italic">
+                      Acesse a curadoria visual completa do seu projeto através do nosso board exclusivo de referências e inspirações.
+                    </p>
+                    
+                    <Button 
+                      onClick={() => {
+                        const allMoodboards = etapas.filter(e => e.moodboard_url);
+                        if (allMoodboards.length > 0) {
+                          window.open(allMoodboards[0].moodboard_url, '_blank');
+                        } else {
+                          toast.info("A curadoria visual está sendo preparada pelo atelier.");
+                        }
+                      }}
+                      className="w-full bg-transparent hover:bg-[#8B7355] text-[#8B7355] hover:text-white border border-[#8B7355]/30 rounded-none text-[9px] uppercase font-bold tracking-[0.3em] h-12 transition-all duration-500"
+                    >
+                      Acessar Board de Referências
+                    </Button>
+                  </div>
+
+                  {/* Profitability Index Feature */}
+                  <div className="bg-[#1A1816] border border-[#8B7355]/30 p-10 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
+                    
+                    <div className="flex justify-between items-start mb-8">
+                      <div>
+                        <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-2">Índice de Lucratividade</h4>
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Saúde Financeira do Ativo</p>
+                      </div>
+                      <Badge className="bg-[#8B7355]/20 text-[#8B7355] border-none text-[8px] tracking-widest rounded-none">PREMIUM</Badge>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-end">
+                        <span className="text-4xl font-cormorant italic">
+                          {projeto.horas_estimadas && horasReais > 0 
+                            ? `${Math.max(0, Math.round((1 - (horasReais / projeto.horas_estimadas)) * 100))}%` 
+                            : '100%'}
+                        </span>
+                        <div className="text-right">
+                          <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Margem Operacional</p>
+                          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Saudável</p>
+                        </div>
+                      </div>
+
+                      <div className="w-full bg-white/5 h-[2px]">
+                        <div 
+                          className="h-full bg-[#8B7355] transition-all duration-1000"
+                          style={{ width: `${projeto.horas_estimadas ? Math.max(0, (1 - (horasReais / projeto.horas_estimadas)) * 100) : 100}%` }}
+                        />
+                      </div>
+
+                      <p className="text-[9px] text-white/40 leading-relaxed italic">
+                        Este índice reflete a eficiência produtiva em relação ao investimento temporal planejado. Valores acima de 20% indicam alta performance.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
