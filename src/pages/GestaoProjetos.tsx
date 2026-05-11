@@ -42,6 +42,7 @@ interface EtapaInfo {
   etapa: string;
   status: string;
   data_entrega: string;
+  data_inicio?: string;
 }
 
 const GestaoProjetos = () => {
