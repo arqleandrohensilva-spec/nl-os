@@ -125,7 +125,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
                    displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
   return (
-    <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
+    <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 sidebar-font">
       <div className="p-8 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)]">
