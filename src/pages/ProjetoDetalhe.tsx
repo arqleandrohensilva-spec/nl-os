@@ -110,8 +110,8 @@ const ProjetoDetalhe = () => {
     setGeneratingPDF(true);
     try {
       const doc = new jsPDF();
-      const bronze = [139, 115, 85];
-      const graphite = [58, 58, 58];
+      const bronze: [number, number, number] = [139, 115, 85];
+      const graphite: [number, number, number] = [58, 58, 58];
       
       // Header
       doc.setFont("georgia", "bold");
