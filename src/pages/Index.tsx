@@ -584,7 +584,7 @@ const Index = () => {
           <div className="px-10 py-6 border-b border-beige flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none uppercase">Pipeline de Leads</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
+              <p className="text-h3">Captação e conversão de clientes</p>
             </div>
             
             <div className="flex items-center gap-6">
@@ -594,7 +594,7 @@ const Index = () => {
                   placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#FAFAFA] border-beige focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
+                  className="w-72 h-10 pl-10 bg-[#FAFAFA] border-beige focus:border-bronze focus:ring-0 rounded-[2px] text-metadata tracking-widest uppercase"
                 />
               </div>
               <div className="h-8 w-[1px] bg-beige" />
@@ -608,7 +608,7 @@ const Index = () => {
                 </button>
                 <Dialog open={isNewLeadDialogOpen} onOpenChange={setIsNewLeadDialogOpen}>
                   <DialogTrigger asChild>
-                    <button className="h-10 px-8 bg-graphite hover:bg-bronze text-white text-[10px] font-bold uppercase tracking-[0.2em] transition-all duration-300 rounded-[2px] flex items-center gap-3 group">
+                    <button className="h-10 px-8 bg-graphite hover:bg-bronze text-white text-btn-primary transition-all duration-300 rounded-[2px] flex items-center gap-3 group">
                       <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
                       Novo Lead
                     </button>
@@ -616,7 +616,7 @@ const Index = () => {
                   <DialogContent className="sm:max-w-[550px] bg-white border-none rounded-[4px] p-0 overflow-hidden">
                     <div className="bg-graphite p-6">
                       <DialogTitle className="font-cormorant text-2xl font-bold text-white uppercase tracking-tight">Captação de Novo Lead</DialogTitle>
-                      <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] mt-1">Módulo 01 · Registro inicial no ecossistema NL</p>
+                      <p className="text-metadata text-white/50 uppercase tracking-[0.2em] mt-1">Módulo 01 · Registro inicial no ecossistema NL</p>
                     </div>
                     
                     <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-custom">
@@ -947,7 +947,7 @@ const Index = () => {
                       toast.error("Erro ao criar projeto");
                     }
                   }}
-                  className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest"
+                  className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-btn-primary"
                 >
                   Criar Projeto
                 </Button>
