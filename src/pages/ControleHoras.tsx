@@ -98,7 +98,7 @@ const StageBadge = ({ stage }: { stage: string }) => {
 
   return (
     <span className={cn(
-      "px-2.5 py-0.5 rounded-full text-[8px] uppercase font-bold tracking-widest inline-block",
+      "px-2.5 py-0.5 rounded-full text-badge-status inline-block",
       config.bg,
       config.text
     )}>
