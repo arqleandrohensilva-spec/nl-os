@@ -15,18 +15,18 @@ interface MetricCardProps {
 const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }: MetricCardProps) => (
   <div className="flex-1 px-8 py-7 border-r border-beige last:border-r-0 relative group hover:bg-beige/10 transition-colors">
     <div className="flex items-center gap-2 mb-3">
-      <span className="text-[9px] text-muted uppercase tracking-[0.2em] font-bold">{label}</span>
+      <span className="text-h3">{label}</span>
       {pulse && <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse" />}
     </div>
     
     <div className={cn(
-      "text-[36px] font-cormorant leading-none tracking-tight",
+      "text-highlight leading-none tracking-tight",
       isNegative ? "text-red" : "text-graphite"
     )}>
       {value}
     </div>
     
-    {subLabel && <div className="mt-3 text-[11px] font-bold uppercase tracking-wider">{subLabel}</div>}
+    {subLabel && <div className="mt-3 text-btn-primary">{subLabel}</div>}
     
     <div className={cn(
       "absolute bottom-0 left-0 right-0 h-[1px] transition-opacity",
@@ -104,8 +104,8 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
       <div className="flex border-b border-beige/50">
         <div className="flex-1 px-10 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-[9px] font-bold text-muted uppercase tracking-[0.2em]">Meta do Mês:</span>
-            <span className={cn("text-[10px] font-bold uppercase tracking-widest", corTextoMeta)}>
+            <span className="text-h3">Meta do Mês:</span>
+            <span className={cn("text-badge-status", corTextoMeta)}>
               {fechadosMes} de {metaFechamentos} projetos fechados
             </span>
           </div>
