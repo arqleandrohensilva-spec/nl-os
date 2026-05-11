@@ -168,7 +168,7 @@ const GestaoProjetos = () => {
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-4 mb-2">
-                    <h3 className="text-2xl font-cormorant font-medium truncate group-hover:text-[#8B7355] transition-colors">{projeto.nome_cliente}</h3>
+                    <h3 className="text-h2 group-hover:text-bronze transition-colors">{projeto.nome_cliente}</h3>
                     <div className="h-px w-8 bg-[#8B7355]/30 group-hover:w-12 transition-all duration-500" />
                     <span className="text-h3">
                       {projeto.tipo}

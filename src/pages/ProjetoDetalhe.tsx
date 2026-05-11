@@ -392,14 +392,14 @@ const ProjetoDetalhe = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0F0F0F] text-white">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={() => navigate('/projetos/gestao')}
-            className="flex items-center gap-2 text-[10px] text-white/40 uppercase tracking-widest font-bold hover:text-white transition-colors"
+            className="flex items-center gap-2 text-btn-primary text-white/40 hover:text-white transition-colors"
           >
             <ArrowLeft size={14} /> Voltar para lista
           </button>
@@ -409,7 +409,7 @@ const ProjetoDetalhe = () => {
               <Button
                 onClick={() => generatePDFReport()}
                 disabled={generatingPDF}
-                className="bg-transparent hover:bg-[#8B7355]/10 text-[#8B7355] border border-[#8B7355] rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500"
+                className="bg-transparent hover:bg-bronze/10 text-bronze border border-bronze rounded-none px-6 h-10 text-btn-primary transition-all duration-500"
               >
                 {generatingPDF ? "GERANDO..." : "GERAR RELATÓRIO DE ENTREGA"}
               </Button>
@@ -418,7 +418,7 @@ const ProjetoDetalhe = () => {
             <Button 
               onClick={() => setClientMode(!clientMode)}
               className={cn(
-                "rounded-none text-[9px] uppercase font-bold tracking-[0.2em] px-6 h-10 border transition-all duration-500",
+                "rounded-none text-btn-primary px-6 h-10 border transition-all duration-500",
                 clientMode 
                   ? "bg-[#8B7355] text-white border-[#8B7355]" 
                   : "bg-white/5 text-white/40 border-white/10 hover:border-[#8B7355]/40 hover:text-white"
@@ -442,12 +442,12 @@ const ProjetoDetalhe = () => {
             <div className="flex items-center gap-6 mb-4">
               <h1 className="text-6xl font-cormorant font-light tracking-tight italic">{projeto.nome_cliente}</h1>
               <div className="h-px w-12 bg-[#8B7355]/40" />
-              <span className="text-[#8B7355] uppercase tracking-[0.3em] text-[10px] font-bold">
+              <span className="text-h3">
                 {projeto.tipo}
               </span>
             </div>
             
-            <div className="flex flex-wrap gap-8 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
+            <div className="flex flex-wrap gap-8 text-metadata uppercase tracking-[0.3em] font-bold">
               <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
                 <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
@@ -464,8 +464,8 @@ const ProjetoDetalhe = () => {
           </div>
 
           <div className="text-right">
-            <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-3 font-bold">Status do Ativo</p>
-            <span className="text-3xl font-cormorant italic text-white leading-none">
+            <p className="text-h3 mb-3">Status do Ativo</p>
+            <span className="text-highlight leading-none">
               {projeto.status_geral}
             </span>
           </div>
@@ -477,8 +477,8 @@ const ProjetoDetalhe = () => {
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Visual Experience Header */}
             <div className="mb-20 text-center space-y-4">
-              <span className="text-[10px] uppercase tracking-[0.5em] text-[#8B7355] font-bold italic">Experiência do Cliente</span>
-              <h2 className="text-5xl font-cormorant italic font-light">Evolução do seu Patrimônio</h2>
+              <span className="text-h3 italic">Experiência do Cliente</span>
+              <h2 className="text-h2 italic font-light">Evolução do seu Patrimônio</h2>
               <div className="flex justify-center gap-2">
                 {ETAPAS_CONFIG.map((config) => {
                   const etapaData = etapas.find(e => e.etapa === config.id);

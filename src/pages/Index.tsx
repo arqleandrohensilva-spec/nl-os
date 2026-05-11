@@ -320,8 +320,8 @@ const Index = () => {
             <Eye size={18} className="text-bronze" />
           </div>
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest">{randomLead.nome} abriu a proposta agora</p>
-            <p className="text-[9px] text-white/50">Módulo 04 · Tracking em tempo real</p>
+            <p className="text-h3">{randomLead.nome} abriu a proposta agora</p>
+            <p className="text-metadata">Módulo 04 · Tracking em tempo real</p>
           </div>
         </div>
         <button 
@@ -329,7 +329,7 @@ const Index = () => {
             setSelectedLeadId(randomLead.id);
             toast.dismiss(t);
           }}
-          className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
+          className="text-btn-primary text-bronze hover:text-white transition-colors"
         >
           Ver Lead
         </button>
