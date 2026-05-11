@@ -580,7 +580,7 @@ const ControleHoras = () => {
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <p className="text-h3">Módulo 03 · Registro de tempo por projeto</p>
           </div>
           <div className="flex gap-3">
             <Button 
