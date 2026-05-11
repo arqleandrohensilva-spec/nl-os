@@ -218,6 +218,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
         >
+          <div />
         </SectionAccordion>
       </div>
 
