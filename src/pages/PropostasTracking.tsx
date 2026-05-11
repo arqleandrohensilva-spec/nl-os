@@ -497,15 +497,15 @@ Gere a mensagem de WhatsApp.`;
                 <h1 className="text-3xl font-bold tracking-tight text-graphite font-cormorant text-gradient">04 · Tracking de Propostas</h1>
                 <div className="flex items-center gap-2 px-2 py-0.5 bg-bronze/5 border border-bronze/20 rounded-full h-fit">
                   <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-pulse" />
-                  <span className="text-badge-status">Premium Tracking</span>
+                  <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em]">Premium Tracking</span>
                 </div>
 
               </div>
-              <p className="text-h3">Módulo 04 · Gestão e Rastreamento de Propostas</p>
+              <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
             </div>
             <Button 
               onClick={() => setIsModalOpen(true)}
-              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-11 px-6 text-btn-primary transition-all"
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-11 px-6 font-bold uppercase tracking-wider text-[11px] transition-all"
             >
               <Plus size={16} className="mr-2" />
               Nova Proposta
@@ -529,10 +529,10 @@ Gere a mensagem de WhatsApp.`;
               >
                 <div className="relative z-10">
                   <p className={cn(
-                    "text-h3 mb-1",
+                    "text-[10px] uppercase tracking-[0.2em] mb-1 font-bold",
                     m.highlight ? "text-bronze" : "text-muted-foreground"
                   )}>{m.label}</p>
-                  <h2 className="text-highlight leading-none text-[#1A1A1A]">{m.value}</h2>
+                  <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
                 </div>
                 <m.icon size={40} className={cn(
                   "absolute right-[-10px] bottom-[-10px] transition-colors",
@@ -1000,13 +1000,13 @@ Gere a mensagem de WhatsApp.`;
             </div>
 
             <div className="relative group">
-              <div className="absolute -top-3 left-3 px-2 bg-white text-h3 text-bronze z-10">
+              <div className="absolute -top-3 left-3 px-2 bg-white text-[9px] font-black uppercase tracking-[0.2em] text-bronze z-10">
                 Script Recomendado
               </div>
               {isGeneratingFollowup ? (
                 <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px]">
                   <Loader2 size={24} className="animate-spin text-bronze mb-2" />
-                  <span className="text-h3 text-muted-foreground animate-pulse">Gerando análise...</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Gerando análise...</span>
                 </div>
               ) : (
                 <textarea
@@ -1022,14 +1022,14 @@ Gere a mensagem de WhatsApp.`;
               <Button 
                 onClick={copyFollowupMessage}
                 variant="outline"
-                className="border-[#E8E4DF] text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-btn-primary"
+                className="border-[#E8E4DF] text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
               >
                 <Copy size={16} className="mr-2 text-bronze" />
                 Copiar
               </Button>
               <Button 
                 onClick={handleSendWhatsApp}
-                className="bg-graphite hover:bg-black text-white rounded-[2px] h-11 text-btn-primary shadow-lg shadow-graphite/10"
+                className="bg-graphite hover:bg-black text-white rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-graphite/10"
               >
                 <Send size={16} className="mr-2 text-bronze" />
                 WhatsApp
@@ -1048,13 +1048,13 @@ Gere a mensagem de WhatsApp.`;
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-2">
                 <div className="px-2 py-0.5 bg-bronze/20 border border-bronze/30 rounded-full">
-                  <span className="text-badge-status">Relatório Premium</span>
+                  <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em]">Relatório Premium</span>
                 </div>
               </div>
               <DialogTitle className="text-4xl font-bold font-cormorant text-white tracking-tight mb-1">
                 Análise de Engajamento
               </DialogTitle>
-              <p className="text-h3">
+              <p className="text-white/50 text-[11px] uppercase tracking-[0.3em] font-bold">
                 {selectedProposal?.cliente} <span className="text-bronze mx-2">|</span> {selectedProposal?.tipo}
               </p>
             </div>

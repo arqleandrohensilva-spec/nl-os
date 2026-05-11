@@ -1,136 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=DM+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 0 0% 10%; /* #1A1A1A approx, adjusted for dark theme */
-    --foreground: 0 0% 100%;
-    
-    --graphite: 0 0% 10%; /* #1A1A1A */
-    --white: 0 0% 100%;
-    --bronze: 32 23% 44%; /* #8B7355 */
-    --beige: 33 13% 88%; /* #E8E4DF */
-    --muted: 0 0% 60%; /* #999999 */
-    --red: 0 57% 46%; /* #B83232 */
-    --amber: 44% 67% 47%; /* #C49A2A approx */
-
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 100%;
-
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 100%;
-
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 10%;
-
-    --secondary: 33 13% 88%;
-    --secondary-foreground: 0 0% 10%;
-
-    --accent: 32 23% 44%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 57% 46%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 32 23% 44%;
-
-    --radius: 0.25rem;
-
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 32 23% 44%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 32 23% 44%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 32 23% 44%;
-  }
-
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-[#0F0F0F] text-foreground;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 700;
-  }
-
-  /* Typography Hierarchy Classes */
-  .text-h2 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    color: #FFFFFF;
-    text-transform: none;
-  }
-
-  .text-h3 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 11px;
-    color: #8B7355;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-
-  .text-highlight {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 24px;
-    color: #FFFFFF;
-  }
-
-  .text-body-desc {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    color: #AAAAAA;
-  }
-
-  .text-metadata {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 12px;
-    color: #777777;
-  }
-
-  .text-badge-status {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 10px;
-    text-transform: uppercase;
-  }
-
-  .text-btn-primary {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .text-support-note {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    font-size: 13px;
-    color: #777777;
-    font-style: italic;
-  }
-
-  .sidebar-font {
-    font-family: 'DM Mono', monospace;
-  }
-}
 
 @layer utilities {
   .scrollbar-custom::-webkit-scrollbar {
@@ -148,12 +20,73 @@
   }
 }
 
-.mono {
-  font-family: 'DM Mono', monospace;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%; /* #1A1A1A approx */
+    
+    --graphite: 0 0% 10%; /* #1A1A1A */
+    --white: 0 0% 100%;
+    --bronze: 32 23% 44%; /* #8B7355 */
+    --beige: 33 13% 88%; /* #E8E4DF */
+    --muted: 0 0% 60%; /* #999999 */
+    --red: 0 57% 46%; /* #B83232 */
+    --amber: 44% 67% 47%; /* #C49A2A approx */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 33 13% 88%;
+    --secondary-foreground: 0 0% 10%;
+
+    --accent: 32 23% 44%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 57% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 33 13% 88%;
+    --input: 33 13% 88%;
+    --ring: 32 23% 44%;
+
+    --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 32 23% 44%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 32 23% 44%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 32 23% 44%;
+  }
 }
 
-.font-cormorant {
-  font-family: 'Cormorant Garamond', serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Mono', monospace;
+  }
+
+  h1, h2, h3, h4, .font-cormorant {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+  }
+}
+
+.mono {
+  font-family: 'DM Mono', monospace;
 }
 
 /* Custom Scrollbar */
@@ -203,3 +136,4 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+

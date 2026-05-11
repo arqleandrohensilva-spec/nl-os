@@ -116,13 +116,13 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className="flex min-h-screen bg-[#0F0F0F] text-white">
+    <div className="flex min-h-screen bg-[#1A1816] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
         <header className="mb-12">
           <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Gestão de Projetos</h1>
-          <p className="text-h3">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
+          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
         </header>
 
         {/* Metric Cards */}
@@ -168,13 +168,13 @@ const GestaoProjetos = () => {
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-4 mb-2">
-                    <h3 className="text-h2 group-hover:text-bronze transition-colors">{projeto.nome_cliente}</h3>
+                    <h3 className="text-2xl font-cormorant font-medium truncate group-hover:text-[#8B7355] transition-colors">{projeto.nome_cliente}</h3>
                     <div className="h-px w-8 bg-[#8B7355]/30 group-hover:w-12 transition-all duration-500" />
-                    <span className="text-h3">
+                    <span className="text-[8px] uppercase tracking-[0.2em] text-[#8B7355] font-bold">
                       {projeto.tipo}
                     </span>
                   </div>
-                  <div className="flex items-center gap-6 text-metadata uppercase tracking-widest font-bold">
+                  <div className="flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">
                     <span>{projeto.cidade || 'N/A'}</span>
                     <span>{projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'}</span>
                   </div>
@@ -185,9 +185,9 @@ const GestaoProjetos = () => {
                 </div>
 
                 <div className="w-full md:w-48 text-center md:text-left">
-                  <p className="text-h3 mb-1">Próxima entrega</p>
+                  <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1 font-bold">Próxima entrega</p>
                   <p className={cn(
-                    "text-metadata font-bold",
+                    "text-xs font-bold",
                     daysRemaining !== null && daysRemaining <= 5 ? "text-rose-500" : "text-white"
                   )}>
                     {currentEtapaInfo?.data_entrega ? format(parseISO(currentEtapaInfo.data_entrega), "dd 'DE' MMM", { locale: ptBR }) : 'N/A'}
@@ -198,9 +198,9 @@ const GestaoProjetos = () => {
                 </div>
 
                 <div className="w-full md:w-32 flex flex-col items-center md:items-start">
-                  <p className="text-h3 mb-1">Status</p>
+                  <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-1 font-bold">Status</p>
                   <span className={cn(
-                    "text-badge-status font-bold uppercase tracking-widest",
+                    "text-[10px] font-bold uppercase tracking-widest",
                     currentEtapaInfo?.status === 'Aprovado' ? "text-emerald-500" : 
                     currentEtapaInfo?.status === 'Aguardando aprovação' ? "text-amber-500" : "text-white/60"
                   )}>
@@ -215,13 +215,13 @@ const GestaoProjetos = () => {
                         description: "O cliente receberá o acesso ao Atelier Visual."
                       });
                     }}
-                    className="bg-white/5 hover:bg-white/10 text-bronze border border-bronze/20 rounded-none px-4 text-btn-primary transition-all duration-300"
+                    className="bg-white/5 hover:bg-white/10 text-[#8B7355] border border-[#8B7355]/20 rounded-none px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
                   >
                     <Share2 size={12} className="mr-2" /> Compartilhar
                   </Button>
                   <Button 
                     onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                    className="bg-white/5 hover:bg-bronze text-white border border-white/10 rounded-none px-6 text-btn-primary transition-all duration-300"
+                    className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300"
                   >
                     Abrir projeto
                   </Button>
@@ -254,10 +254,10 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
       {icon}
     </div>
     <div>
-      <p className="text-h3 mb-2">{label}</p>
+      <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 mb-2 font-bold">{label}</p>
       <p className={cn(
-        "text-highlight leading-none",
-        accent ? "text-bronze" : warning ? "text-rose-500" : "text-white"
+        "text-4xl font-cormorant leading-none",
+        accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
       )}>
         {value}
       </p>
@@ -271,10 +271,10 @@ const CompactTimeline = ({ projeto, projetoEtapas }: { projeto: Projeto, projeto
   return (
     <div className="space-y-3">
       <div className="flex justify-between items-end">
-        <span className="text-h3">
+        <span className="text-[9px] text-[#8B7355] font-bold uppercase tracking-widest">
           {projeto.etapa_atual}
         </span>
-        <span className="text-metadata font-bold uppercase tracking-widest">
+        <span className="text-[9px] text-white/40 font-bold uppercase tracking-widest">
           Evolução do Ativo
         </span>
       </div>

@@ -98,7 +98,7 @@ const StageBadge = ({ stage }: { stage: string }) => {
 
   return (
     <span className={cn(
-      "px-2.5 py-0.5 rounded-full text-badge-status inline-block",
+      "px-2.5 py-0.5 rounded-full text-[8px] uppercase font-bold tracking-widest inline-block",
       config.bg,
       config.text
     )}>
@@ -580,7 +580,7 @@ const ControleHoras = () => {
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
-            <p className="text-h3">Módulo 03 · Registro de tempo por projeto</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
           <div className="flex gap-3">
             <Button 
@@ -611,26 +611,26 @@ const ControleHoras = () => {
             </button>
             <div className="flex items-center gap-3 mb-6">
               <BarChart3 size={20} className="text-bronze" />
-              <h2 className="text-h3 text-bronze">Resumo da Semana — {lastWeekSummary.period}</h2>
+              <h2 className="text-[12px] font-bold uppercase tracking-[0.3em] font-mono text-bronze">Resumo da Semana — {lastWeekSummary.period}</h2>
             </div>
             <div className="grid grid-cols-4 gap-8 mb-8">
               <div>
-                <p className="text-h3 mb-1 text-muted-foreground">Horas registradas</p>
-                <p className="text-highlight leading-none">{Math.round(lastWeekSummary.total)}h total</p>
-                <p className="text-metadata">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Horas registradas</p>
+                <p className="text-2xl font-cormorant font-bold">{Math.round(lastWeekSummary.total)}h total</p>
+                <p className="text-[9px] text-muted-foreground font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
               </div>
               <div>
-                <p className="text-h3 mb-1 text-muted-foreground">Projeto mais consumido</p>
-                <p className="text-highlight leading-none">{lastWeekSummary.topProject}</p>
-                <p className="text-metadata">{lastWeekSummary.topHours}h investidas</p>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Projeto mais consumido</p>
+                <p className="text-2xl font-cormorant font-bold">{lastWeekSummary.topProject}</p>
+                <p className="text-[9px] text-muted-foreground font-mono">{lastWeekSummary.topHours}h investidas</p>
               </div>
               <div>
-                <p className="text-h3 mb-1 text-muted-foreground">Eficiência Média</p>
-                <p className="text-highlight leading-none">93%</p>
-                <p className="text-badge-status text-emerald-600">ALTA PERFORMANCE</p>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Eficiência Média</p>
+                <p className="text-2xl font-cormorant font-bold">93%</p>
+                <p className="text-[9px] text-emerald-600 font-bold font-mono">ALTA PERFORMANCE</p>
               </div>
               <div>
-                <p className="text-h3 mb-1 text-muted-foreground">Meta atingida</p>
+                <p className="text-[9px] uppercase tracking-widest text-muted-foreground mb-1 font-bold font-mono">Meta atingida</p>
                 <div className="flex items-center gap-2">
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
@@ -642,7 +642,7 @@ const ControleHoras = () => {
                 </div>
               </div>
             </div>
-            <p className="text-support-note">
+            <p className="text-[11px] text-bronze/80 font-mono italic">
               <span className="font-bold">Próxima semana:</span> Anteprojeto precisa de 35h para concluir no prazo estimado.
             </p>
           </div>

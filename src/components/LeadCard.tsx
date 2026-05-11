@@ -87,7 +87,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
                 </span>
               )}
             </div>
-            <h3 className="text-h2 group-hover:text-bronze transition-colors truncate">
+            <h3 className="text-[17px] font-cormorant text-graphite leading-tight group-hover:text-bronze transition-colors truncate">
               {lead.nome}
             </h3>
           </div>
@@ -102,16 +102,16 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
         <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-4">
           <div className="flex items-center gap-2 text-muted">
             <MapPin size={12} className="opacity-50" />
-            <span className="text-metadata truncate">{lead.cidade}</span>
+            <span className="text-[10px] font-medium tracking-tight truncate">{lead.cidade}</span>
           </div>
           <div className="flex items-center gap-2 text-muted">
             <Maximize2 size={12} className="opacity-50" />
-            <span className="text-metadata">{lead.area} m²</span>
+            <span className="text-[10px] font-medium tracking-tight">{lead.area} m²</span>
           </div>
           <div className="flex items-center gap-2 col-span-2">
             <DollarSign size={14} className="text-bronze/60" />
             <span className={cn(
-              "text-highlight",
+              "text-[15px] font-bold tracking-tight",
               lead.orcamento > 0 ? "text-bronze" : "text-muted opacity-40"
             )}>
               {formatCurrency(lead.orcamento)}
@@ -123,10 +123,10 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <div className="mb-4 p-2 bg-bronze/5 border border-bronze/10 rounded-[2px] flex items-start gap-2 animate-in fade-in duration-500">
             <Calendar size={12} className="text-bronze mt-0.5 shrink-0" />
             <div className="space-y-0.5">
-              <p className="text-h3 leading-none">
+              <p className="text-[8px] font-bold text-bronze uppercase tracking-widest leading-none">
                 Próxima: {lead.proxima_acao_tipo} · {lead.proxima_acao_data}
               </p>
-              <p className="text-support-note line-clamp-1 leading-tight">
+              <p className="text-[9px] text-graphite/70 line-clamp-1 leading-tight italic">
                 "{lead.proxima_acao_nota}"
               </p>
             </div>
@@ -134,10 +134,10 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
         )}
 
         <div className="flex flex-wrap gap-1.5 mb-4">
-          <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-badge-status">
+          <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-[8px] font-bold uppercase tracking-widest">
             {lead.tipo}
           </span>
-          <span className="px-2 py-0.5 border border-beige text-muted text-badge-status">
+          <span className="px-2 py-0.5 border border-beige text-muted text-[8px] font-bold uppercase tracking-widest">
             {lead.origem}
           </span>
         </div>
@@ -146,7 +146,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
       <div className="pt-4 border-t border-beige min-h-[40px] relative">
         <div className="flex items-center justify-between transition-opacity duration-150 group-hover:opacity-0">
           <div className={cn(
-            "flex items-center gap-2 text-metadata",
+            "flex items-center gap-2 text-[10px] font-mono",
             daysInStage > 5 ? "text-red font-bold" : "text-muted"
           )}>
             {daysInStage > 5 && <span className="w-1 h-1 bg-red rounded-full animate-ping" />}
@@ -158,7 +158,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
         <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 py-1 bg-white">
           <button 
             onClick={handleWhatsApp}
-            className="flex-1 h-8 bg-[#1A1A1A] hover:bg-bronze text-white text-btn-primary rounded-[2px] transition-all flex items-center justify-center gap-2"
+            className="flex-1 h-8 bg-[#1A1A1A] hover:bg-bronze text-white text-[10px] font-bold uppercase tracking-widest rounded-[2px] transition-all flex items-center justify-center gap-2"
           >
             <Phone size={12} />
             WhatsApp

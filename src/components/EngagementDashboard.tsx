@@ -46,8 +46,8 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
         <div className="w-16 h-16 bg-muted-foreground/5 rounded-full flex items-center justify-center mb-6">
           <AlertCircle size={32} className="text-muted-foreground/30" />
         </div>
-        <h3 className="text-h2 text-graphite mb-3 uppercase tracking-tight">Aguardando Engajamento</h3>
-        <p className="text-h3 max-w-[320px] leading-relaxed">
+        <h3 className="text-xl font-bold font-cormorant text-graphite mb-3 uppercase tracking-tight">Aguardando Engajamento</h3>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] max-w-[320px] leading-relaxed">
           Esta proposta ainda não foi visualizada. Assim que o cliente abrir o link, os dados aparecerão aqui em tempo real.
         </p>
       </div>
@@ -97,7 +97,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
       <div className="flex flex-wrap gap-2">
         {insights.map((insight, idx) => (
           <div key={idx} className={cn(
-            "flex items-center gap-1.5 px-3 py-1 rounded-full border text-badge-status animate-pulse-subtle",
+            "flex items-center gap-1.5 px-3 py-1 rounded-full border text-[9px] font-bold uppercase tracking-widest animate-pulse-subtle",
             insight.type === 'hot' ? "bg-red-50 text-red-600 border-red-100" :
             insight.type === 'revisit' ? "bg-blue-50 text-blue-600 border-blue-100" :
             "bg-amber-50 text-amber-600 border-amber-100"
@@ -117,10 +117,10 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           { label: 'Último Dispositivo', value: lastEngagement.dispositivo || 'Desktop', icon: lastEngagement.dispositivo?.toLowerCase().includes('mobile') ? Smartphone : Monitor, color: 'text-bronze' },
         ].map((card, i) => (
           <div key={i} className="bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group">
-            <p className="text-h3 mb-1 group-hover:text-bronze transition-colors">{card.label}</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-1 font-bold group-hover:text-bronze transition-colors">{card.label}</p>
             <div className="flex items-center gap-2">
               <card.icon size={16} className={card.color} />
-              <h3 className="text-highlight leading-none">{card.value}</h3>
+              <h3 className="text-lg font-bold text-graphite font-cormorant">{card.value}</h3>
             </div>
           </div>
         ))}
@@ -129,7 +129,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Section Retention Chart */}
         <div className="md:col-span-2 bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm">
-          <h4 className="text-h3 text-graphite mb-8 flex items-center justify-between">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-8 flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Activity size={14} className="text-bronze" />
               Retenção por Seção (Tempo Acumulado)
@@ -179,7 +179,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
 
         {/* Device Distribution Pie Chart */}
         <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col">
-          <h4 className="text-h3 text-graphite mb-8 flex items-center gap-2">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-8 flex items-center gap-2">
             <Smartphone size={14} className="text-bronze" />
             Distribuição de Dispositivos
           </h4>
@@ -213,7 +213,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
             {deviceData.map((d, i) => (
               <div key={i} className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: i === 0 ? '#C5A16F' : '#1A1A1A' }} />
-                <span className="text-badge-status text-muted-foreground">{d.name}: {d.value}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{d.name}: {d.value}</span>
               </div>
             ))}
           </div>
@@ -226,14 +226,14 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
             <Zap size={120} />
           </div>
-          <h4 className="text-h3 text-bronze mb-4 flex items-center gap-2">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-bronze mb-4 flex items-center gap-2">
             <Activity size={14} />
             Estratégia Recomendada
           </h4>
           
           <div className="space-y-4 relative z-10">
             <div className="p-4 bg-white/5 border border-white/10 rounded-[2px] backdrop-blur-sm">
-              <p id="recommended-strategy-text" className="text-body-desc leading-relaxed">
+              <p id="recommended-strategy-text" className="text-xs leading-relaxed font-medium">
                 {proposal.status === 'Aprovada' 
                   ? "A proposta já foi aprovada! O foco agora deve ser no envio do contrato e início do projeto. A análise mostra o que mais interessou o cliente para servir de base para o briefing."
                   : proposal.status === 'Recusada'
@@ -262,7 +262,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                   onGenerateFollowup(strategyText);
                 }}
                 variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-btn-primary transition-all shadow-lg"
+                className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
               >
                 <MessageSquare size={16} className="mr-2 text-bronze" />
                 Script de Venda
@@ -273,7 +273,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
 
         {/* Session History */}
         <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm overflow-hidden">
-          <h4 className="text-h3 text-graphite mb-6 flex items-center gap-2">
+          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-6 flex items-center gap-2">
             <History size={14} className="text-bronze" />
             Histórico de Sessões
           </h4>
@@ -285,17 +285,17 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                     {eng.dispositivo?.toLowerCase().includes('mobile') ? <Smartphone size={14} /> : <Monitor size={14} />}
                   </div>
                   <div>
-                    <p className="text-h3 leading-none">
+                    <p className="text-[10px] font-bold text-graphite uppercase tracking-wide">
                       Sessão {engagements.length - idx}
                     </p>
-                    <p className="text-metadata uppercase tracking-wider">
+                    <p className="text-[9px] text-muted-foreground uppercase tracking-wider">
                       {eng.dispositivo || 'Desktop'}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-metadata font-bold text-bronze">{formatTime(eng.tempo_total || 0)}</p>
-                  <p className="text-badge-status text-muted-foreground">Duração</p>
+                  <p className="text-[10px] font-bold text-bronze">{formatTime(eng.tempo_total || 0)}</p>
+                  <p className="text-[8px] text-muted-foreground uppercase">Duração</p>
                 </div>
               </div>
             ))}

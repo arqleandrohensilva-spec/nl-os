@@ -34,9 +34,9 @@ const FinancialHealthBar: React.FC<FinancialHealthBarProps> = ({
   return (
     <div className="w-full mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-h3 text-graphite">Saúde Financeira</h3>
+        <h3 className="text-[10px] font-bold text-graphite uppercase tracking-[0.2em] font-dm-mono">Saúde Financeira</h3>
         <span className={cn(
-          "px-2 py-0.5 rounded-[2px] text-badge-status border",
+          "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border",
           status === 'CRÍTICO' ? "bg-red-50 border-red-200 text-red-800" :
           status === 'ATENÇÃO' ? "bg-amber-50 border-amber-200 text-amber-800" :
           "bg-green-50 border-green-200 text-green-800"
@@ -58,14 +58,14 @@ const FinancialHealthBar: React.FC<FinancialHealthBarProps> = ({
               />
             </div>
           </TooltipTrigger>
-          <TooltipContent side="bottom" className="bg-graphite text-white text-metadata border-none py-2 px-3">
+          <TooltipContent side="bottom" className="bg-graphite text-white text-[10px] font-dm-mono border-none py-2 px-3">
             <p>Seu custo/hora representa {percentage}% do piso de mercado em {marketName} (R$ {benchmark}/hora)</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
       
       <div className="mt-1">
-        <span className="text-metadata">{percentage}% do mercado premium {marketName}</span>
+        <span className="text-[10px] font-dm-mono text-muted">{percentage}% do mercado premium {marketName}</span>
       </div>
     </div>
   );

@@ -535,14 +535,14 @@ Máximo 3 linhas. Sem markdown. Em português.
             <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">
                 <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
-                <p className="text-h3">Módulo 02 · Fundação da precificação</p>
+                <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={exportReport}
                 disabled={isExporting}
-                className="h-8 border-beige text-btn-primary text-graphite hover:bg-beige/10 flex items-center gap-2"
+                className="h-8 border-beige text-[9px] uppercase tracking-widest text-graphite hover:bg-beige/10 flex items-center gap-2"
               >
                 {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
                 Exportar Relatório
@@ -573,11 +573,11 @@ Máximo 3 linhas. Sem markdown. Em português.
                   "text-green-700"
                 )}>
                   <Brain size={16} />
-                  <span className="text-h3">DIAGNÓSTICO FINANCEIRO · IA</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest font-dm-mono">DIAGNÓSTICO FINANCEIRO · IA</span>
                 </div>
                 
                 <span className={cn(
-                  "px-2 py-0.5 rounded-[2px] text-badge-status border",
+                  "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border",
                   aiStatus === 'critico' ? "bg-red-100 border-red-300 text-red-800" :
                   aiStatus === 'atencao' ? "bg-amber-100 border-amber-300 text-amber-800" :
                   "bg-green-100 border-green-300 text-green-800"
@@ -588,7 +588,7 @@ Máximo 3 linhas. Sem markdown. Em português.
 
               <div className="flex items-center gap-4">
                 {lastAiAnalysis && (
-                  <p className="text-metadata italic">
+                  <p className="text-[9px] text-muted font-dm-mono italic">
                     Última análise: {lastAiAnalysis.toLocaleTimeString()}
                   </p>
                 )}
@@ -701,28 +701,28 @@ Máximo 3 linhas. Sem markdown. Em português.
             <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-h3">PREÇO SUGERIDO/HORA</p>
+                  <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => setIsComparingCenários(true)}
-                    className="h-6 text-btn-primary text-bronze hover:bg-bronze/5 px-2"
+                    className="h-6 text-[8px] uppercase tracking-widest text-bronze hover:bg-bronze/5 px-2"
                   >
                     Comparar Cenários
                   </Button>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-highlight leading-none">
+                  <span className="text-[64px] font-cormorant font-bold text-bronze leading-none">
                     R$ <CountUp 
                       value={calculations.suggestedPrice} 
                       formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
                     />
                   </span>
                 </div>
-                <p className="text-metadata">custo + {config?.margem_lucro}% de margem</p>
+                <p className="text-[10px] text-muted">custo + {config?.margem_lucro}% de margem</p>
               </div>
               <div className="mt-6 space-y-2">
-                <div className="flex justify-between items-center text-metadata uppercase tracking-widest text-muted">
+                <div className="flex justify-between items-center text-[10px] font-dm-mono uppercase tracking-widest text-muted">
                   <span>Margem de Lucro</span>
                   <span className="text-graphite font-bold">{config?.margem_lucro}%</span>
                 </div>
@@ -743,58 +743,58 @@ Máximo 3 linhas. Sem markdown. Em português.
               <div className="flex items-center justify-between">
                 <div className="grid grid-cols-5 gap-8 flex-1">
                   <div className="space-y-3">
-                    <label className="text-h3">Horas por dia</label>
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
                     <Input 
                       type="number" 
                       value={config?.horas_dia} 
                       onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs focus:border-bronze"
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-h3">Dias úteis/mês</label>
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
                     <Input 
                       type="number" 
                       value={config?.dias_mes} 
                       onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs focus:border-bronze"
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-h3">% Produtivo</label>
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
                     <Input 
                       type="number" 
                       value={config?.percentual_produtivo} 
                       onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs focus:border-bronze"
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-h3">Nº Arquitetos</label>
+                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
                     <Input 
                       type="number" 
                       value={config?.num_arquitetos} 
                       onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                      className="h-9 border-beige text-xs focus:border-bronze"
+                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-h3">Meta Custo/Hora</label>
+                    <label className="text-[9px] font-dm-mono text-bronze uppercase tracking-widest font-bold">Meta Custo/Hora</label>
                     <Input 
                       type="number" 
                       value={config?.meta_custo_hora || ''} 
                       placeholder="Ex: 120"
                       onChange={(e) => updateConfig({ meta_custo_hora: parseFloat(e.target.value) })}
-                      className="h-9 border-bronze/50 bg-bronze/5 text-xs focus:border-bronze"
+                      className="h-9 border-bronze/50 bg-bronze/5 text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                 </div>
                 
                 <div className="ml-8 pl-8 border-l border-beige text-right">
-                  <p className="text-highlight">
+                  <p className="text-3xl font-cormorant font-bold text-bronze">
                     = <CountUp value={calculations.faturableHours} />h
                   </p>
-                  <p className="text-metadata uppercase tracking-widest">faturáveis/mês</p>
+                  <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
                 </div>
               </div>
 
@@ -1001,7 +1001,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                             )}
                             <Button 
                               onClick={handleAddItem}
-                              className="w-full h-12 bg-graphite hover:bg-bronze text-white text-btn-primary transition-all duration-300 rounded-[2px]"
+                              className="w-full h-12 bg-graphite hover:bg-bronze text-white text-[11px] tracking-widest uppercase font-bold transition-all duration-300 rounded-[2px]"
                             >
                               Adicionar à base
                             </Button>
@@ -1051,7 +1051,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
                   <History size={16} />
                 </div>
-                <span className="text-h3">Evolução do Custo/Hora</span>
+                <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">Evolução do Custo/Hora</span>
               </div>
               {isEvolucaoOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
             </button>
@@ -1059,7 +1059,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             {isEvolucaoOpen && (
               <div className="p-8 h-[350px] animate-in fade-in slide-in-from-top-2 duration-300">
                 {aiHistory.length < 2 ? (
-                  <div className="h-full flex items-center justify-center text-metadata">
+                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-muted">
                     Histórico disponível após 30 dias de uso (mínimo 2 diagnósticos salvos)
                   </div>
                 ) : (
