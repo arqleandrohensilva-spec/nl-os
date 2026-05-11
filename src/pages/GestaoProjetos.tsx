@@ -42,6 +42,7 @@ interface EtapaInfo {
   etapa: string;
   status: string;
   data_entrega: string;
+  data_inicio?: string;
 }
 
 const GestaoProjetos = () => {
@@ -68,7 +69,7 @@ const GestaoProjetos = () => {
         // Fetch stages for these projects
         const { data: eData } = await supabase
           .from('projeto_etapas')
-          .select('projeto_id, etapa, status, data_entrega');
+          .select('projeto_id, etapa, status, data_entrega, data_inicio');
         
         if (eData) {
           const grouped = eData.reduce((acc: any, curr) => {
@@ -103,13 +104,6 @@ const GestaoProjetos = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const getProgress = (etapa: string) => {
-    const order = ['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'];
-    const index = order.indexOf(etapa.toUpperCase());
-    if (index === -1) return 0;
-    return ((index + 1) / 4) * 100;
   };
 
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
@@ -186,28 +180,8 @@ const GestaoProjetos = () => {
                   </div>
                 </div>
 
-                <div className="w-full md:w-64">
-                  <div className="flex justify-between items-end mb-2">
-                    <span className="text-[10px] text-[#8B7355] font-bold uppercase tracking-widest">
-                      {projeto.etapa_atual}
-                    </span>
-                    <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
-                      {Math.round(getProgress(projeto.etapa_atual))}%
-                    </span>
-                  </div>
-                  <Progress value={getProgress(projeto.etapa_atual)} className="h-[2px] bg-white/5" />
-                  <div className="flex gap-1 mt-2">
-                    {['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'].map(e => (
-                      <div 
-                        key={e} 
-                        className={cn(
-                          "flex-1 h-[1px]", 
-                          projeto.etapa_atual.toUpperCase() === e ? "bg-[#8B7355]" : 
-                          getProgress(e) < getProgress(projeto.etapa_atual) ? "bg-[#8B7355]/30" : "bg-white/5"
-                        )} 
-                      />
-                    ))}
-                  </div>
+                <div className="w-full md:w-80">
+                  <CompactTimeline projeto={projeto} projetoEtapas={projetoEtapas} />
                 </div>
 
                 <div className="w-full md:w-48 text-center md:text-left">
@@ -290,5 +264,54 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
     </div>
   </div>
 );
+
+const CompactTimeline = ({ projeto, projetoEtapas }: { projeto: Projeto, projetoEtapas: EtapaInfo[] }) => {
+  const ETAPAS_ORDER = ['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'];
+  
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-between items-end">
+        <span className="text-[9px] text-[#8B7355] font-bold uppercase tracking-widest">
+          {projeto.etapa_atual}
+        </span>
+        <span className="text-[9px] text-white/40 font-bold uppercase tracking-widest">
+          Evolução do Ativo
+        </span>
+      </div>
+      
+      <div className="flex gap-1 h-[3px]">
+        {ETAPAS_ORDER.map((etapaNome) => {
+          const etapaData = projetoEtapas.find(e => e.etapa.toUpperCase() === etapaNome);
+          const isCurrent = projeto.etapa_atual.toUpperCase() === etapaNome;
+          const isDone = etapaData?.status === 'Aprovado';
+          const isFuture = !isCurrent && !isDone;
+          const isOverdue = etapaData?.data_entrega && 
+                          new Date(etapaData.data_entrega) < new Date() && 
+                          !isDone;
+
+          return (
+            <div 
+              key={etapaNome}
+              className={cn(
+                "flex-1 transition-all duration-500",
+                isDone ? "bg-[#3A3A3A]" : 
+                isCurrent ? (isOverdue ? "bg-[#8B2020]" : "bg-[#8B7355]") :
+                isFuture ? "bg-white/5" : "bg-white/5"
+              )}
+            />
+          );
+        })}
+      </div>
+      
+      <div className="flex justify-between text-[7px] text-white/20 font-bold uppercase tracking-tighter">
+        {ETAPAS_ORDER.map(e => (
+          <span key={e} className={cn(projeto.etapa_atual.toUpperCase() === e && "text-[#8B7355]")}>
+            {e.slice(0, 4)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default GestaoProjetos;
