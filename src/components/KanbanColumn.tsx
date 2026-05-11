@@ -50,7 +50,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
                 boxShadow: `0 0 0 4px ${theme.indicator}20`
               }} 
             />
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black font-mono">
+            <h2 className="text-h3 text-black">
               {stage}
             </h2>
           </div>
@@ -60,11 +60,11 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
         </div>
         
         <div className="flex items-baseline gap-2">
-          <span className="text-[18px] font-cormorant text-graphite">{leads.length}</span>
-          <span className="text-[8px] font-bold text-muted uppercase tracking-widest">Leads</span>
+          <span className="text-highlight leading-none">{leads.length}</span>
+          <span className="text-badge-status">Leads</span>
           <div className="ml-auto flex items-center gap-1.5">
             <span className={cn(
-              "text-[11px] font-bold text-graphite",
+              "text-metadata font-bold text-graphite",
               isHighValue && "scale-110 origin-right transition-transform"
             )}>
               R$ {(totalValue / 1000).toLocaleString('pt-BR')}k
@@ -100,7 +100,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
           ) : (
             <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
               <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
-              <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Nenhum lead aqui</span>
+              <span className="text-h3">Nenhum lead aqui</span>
             </div>
           )}
         </SortableContext>
