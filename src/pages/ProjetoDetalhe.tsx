@@ -19,8 +19,10 @@ import {
   Image as ImageIcon,
   Check
 } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isBefore, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -101,6 +103,141 @@ const ProjetoDetalhe = () => {
   const [loading, setLoading] = useState(true);
   const [horasReais, setHorasReais] = useState(0);
   const [clientMode, setClientMode] = useState(false);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  const generatePDFReport = async () => {
+    if (!projeto) return;
+    setGeneratingPDF(true);
+    try {
+      const doc = new jsPDF();
+      const bronze = [139, 115, 85];
+      const graphite = [58, 58, 58];
+      
+      // Header
+      doc.setFont("georgia", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+      doc.text("NL ARQUITETOS", 105, 30, { align: "center" });
+      
+      doc.setFontSize(14);
+      doc.text("Relatório de Entrega", 105, 40, { align: "center" });
+      
+      doc.setFont("courier", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+      doc.text("A ARQUITETURA COMO DECISÃO", 105, 50, { align: "center" });
+      
+      // Divider
+      doc.setDrawColor(bronze[0], bronze[1], bronze[2]);
+      doc.setLineWidth(0.5);
+      doc.line(20, 55, 190, 55);
+      
+      // Dados do Projeto
+      doc.setFont("georgia", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+      doc.text("DADOS DO PROJETO", 20, 70);
+      
+      doc.setFont("arial", "normal");
+      doc.setFontSize(10);
+      const dataX = 20;
+      let dataY = 80;
+      doc.text(`Cliente: ${projeto.nome_cliente}`, dataX, dataY);
+      doc.text(`Tipo: ${projeto.tipo}`, dataX + 80, dataY);
+      dataY += 7;
+      doc.text(`Cidade: ${projeto.cidade || 'N/A'}`, dataX, dataY);
+      doc.text(`Área: ${projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'}`, dataX + 80, dataY);
+      dataY += 7;
+      doc.text(`Início: ${format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}`, dataX, dataY);
+      doc.text(`Entrega: ${projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'N/A'}`, dataX + 80, dataY);
+      
+      // Linha do Tempo
+      dataY += 15;
+      doc.setFont("georgia", "bold");
+      doc.setFontSize(12);
+      doc.text("LINHA DO TEMPO EXECUTADA", 20, dataY);
+      
+      const timelineData = ETAPAS_CONFIG.map(config => {
+        const e = etapas.find(et => et.etapa === config.id);
+        const duration = e?.data_inicio && e?.data_aprovacao 
+          ? Math.ceil((new Date(e.data_aprovacao).getTime() - new Date(e.data_inicio).getTime()) / (1000 * 60 * 60 * 24))
+          : 'N/A';
+        return [
+          config.label,
+          e?.data_inicio ? format(parseISO(e.data_inicio), 'dd/MM/yyyy') : '-',
+          e?.data_aprovacao ? format(parseISO(e.data_aprovacao), 'dd/MM/yyyy') : '-',
+          `${duration} dias`,
+          'APROVADO'
+        ];
+      });
+      
+      autoTable(doc, {
+        startY: dataY + 5,
+        head: [['Etapa', 'Início', 'Aprovação', 'Duração', 'Status']],
+        body: timelineData,
+        headStyles: { fillColor: bronze, textColor: [255, 255, 255], font: 'arial', fontStyle: 'bold' },
+        styles: { font: 'arial', fontSize: 9 },
+        margin: { left: 20, right: 20 }
+      });
+      
+      // Resumo de Horas
+      dataY = (doc as any).lastAutoTable.finalY + 15;
+      doc.setFont("georgia", "bold");
+      doc.setFontSize(12);
+      doc.text("RESUMO DE HORAS", 20, dataY);
+      
+      doc.setFont("arial", "normal");
+      doc.setFontSize(10);
+      dataY += 8;
+      const estimadas = projeto.horas_estimadas || 0;
+      const variação = horasReais - estimadas;
+      doc.text(`Horas estimadas: ${estimadas}h`, 20, dataY);
+      doc.text(`Horas realizadas: ${horasReais}h`, 80, dataY);
+      doc.text(`Variação: ${variação > 0 ? '+' : ''}${variação}h`, 140, dataY);
+      
+      // Checklist
+      dataY += 15;
+      doc.setFont("georgia", "bold");
+      doc.setFontSize(12);
+      doc.text("CHECKLISTS CONCLUÍDOS", 20, dataY);
+      
+      const checklistData = checklist.map(c => [
+        c.etapa,
+        c.item,
+        '✓'
+      ]);
+      
+      autoTable(doc, {
+        startY: dataY + 5,
+        head: [['Módulo', 'Item', 'Conclusão']],
+        body: checklistData,
+        headStyles: { fillColor: graphite, textColor: [255, 255, 255], font: 'arial', fontStyle: 'bold' },
+        styles: { font: 'arial', fontSize: 8 },
+        margin: { left: 20, right: 20 }
+      });
+      
+      // Rodapé
+      const pageCount = doc.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        const footerY = 285;
+        doc.setDrawColor(bronze[0], bronze[1], bronze[2]);
+        doc.line(20, footerY - 5, 190, footerY - 5);
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text("NL Arquitetos · São José dos Campos, SP", 20, footerY);
+        doc.text(`Gerado em ${format(new Date(), 'dd/MM/yyyy HH:mm')} · Protocolo ${projeto.id.slice(0, 8).toUpperCase()}`, 190, footerY, { align: "right" });
+      }
+      
+      doc.save(`Relatorio_${projeto.nome_cliente.replace(/\s+/g, '_')}.pdf`);
+      toast.success("Relatório gerado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar relatório");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
 
   useEffect(() => {
     if (id) fetchData();
@@ -321,6 +458,21 @@ const ProjetoDetalhe = () => {
             </span>
           </div>
         </header>
+
+        <VisualTimeline projeto={projeto} etapas={etapas} />
+
+        {projeto.etapa_atual === 'ACOMPANHAMENTO' && etapas.every(e => e.status === 'Aprovado') && (
+          <div className="mb-12 flex justify-end">
+            <Button
+              onClick={() => generatePDFReport()}
+              disabled={loading}
+              className="bg-transparent hover:bg-[#8B7355]/10 text-[#8B7355] border border-[#8B7355] rounded-none px-8 py-6 text-[11px] uppercase font-bold tracking-[0.2em] transition-all duration-500"
+            >
+              <Save size={16} className="mr-2" /> 
+              {loading ? "GERANDO..." : "GERAR RELATÓRIO DE ENTREGA"}
+            </Button>
+          </div>
+        )}
 
         {clientMode ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -641,6 +793,67 @@ const ProjetoDetalhe = () => {
           </div>
         )}
       </main>
+    </div>
+  );
+};
+
+const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[] }) => {
+  const ETAPAS_CONFIG_LOC = [
+    { id: 'BRIEFING', label: 'BRIEFING' },
+    { id: 'ANTEPROJETO', label: 'ANTEPROJETO' },
+    { id: 'EXECUTIVO', label: 'EXECUTIVO' },
+    { id: 'ACOMPANHAMENTO', label: 'ACOMPANHAMENTO' }
+  ];
+
+  return (
+    <div className="mb-16 space-y-6">
+      <div className="relative">
+        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/5 -translate-y-1/2" />
+        
+        <div className="relative flex justify-between">
+          {ETAPAS_CONFIG_LOC.map((config, index) => {
+            const etapaData = etapas.find(e => e.etapa === config.id);
+            const isCurrent = projeto.etapa_atual === config.id;
+            const isDone = etapaData?.status === 'Aprovado';
+            const isFuture = !isCurrent && !isDone;
+            const isOverdue = etapaData?.data_entrega && 
+                            isBefore(parseISO(etapaData.data_entrega), startOfDay(new Date())) && 
+                            !isDone;
+
+            return (
+              <div key={config.id} className="relative flex flex-col items-center flex-1">
+                {isCurrent && (
+                  <div className="absolute -top-8 text-[9px] text-[#8B7355] font-bold uppercase tracking-widest animate-bounce">
+                    Você está aqui
+                  </div>
+                )}
+                
+                <div className={cn(
+                  "w-4 h-4 rounded-full border-2 z-10 transition-all duration-700 flex items-center justify-center",
+                  isDone ? "bg-[#3A3A3A] border-[#3A3A3A]" :
+                  isCurrent ? (isOverdue ? "bg-[#8B2020] border-[#8B2020] animate-pulse" : "bg-[#8B7355] border-[#8B7355] animate-pulse") :
+                  "bg-[#1A1816] border-white/10"
+                )}>
+                  {isDone && <Check size={8} className="text-white" />}
+                  {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                </div>
+
+                <div className="mt-4 text-center">
+                  <p className={cn(
+                    "text-[10px] font-bold uppercase tracking-widest",
+                    isCurrent ? "text-[#8B7355]" : isDone ? "text-white/60" : "text-white/20"
+                  )}>
+                    {config.label}
+                  </p>
+                  <p className="text-[8px] text-white/20 mt-1 font-bold">
+                    {etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'dd/MM/yy') : '--/--/--'}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };
