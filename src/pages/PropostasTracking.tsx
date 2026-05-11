@@ -529,10 +529,10 @@ Gere a mensagem de WhatsApp.`;
               >
                 <div className="relative z-10">
                   <p className={cn(
-                    "text-[10px] uppercase tracking-[0.2em] mb-1 font-bold",
+                    "text-h3 mb-1",
                     m.highlight ? "text-bronze" : "text-muted-foreground"
                   )}>{m.label}</p>
-                  <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
+                  <h2 className="text-highlight leading-none text-[#1A1A1A]">{m.value}</h2>
                 </div>
                 <m.icon size={40} className={cn(
                   "absolute right-[-10px] bottom-[-10px] transition-colors",
