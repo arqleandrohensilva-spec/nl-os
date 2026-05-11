@@ -145,34 +145,35 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
         <SectionAccordion 
-          label="RELACIONAMENTO" 
+          label="LEADS" 
           icon={<LayoutGrid size={14} />}
           isOpen={!!openSections['LEADS']}
           onToggle={() => toggleSection('LEADS')}
         >
           <NavItem 
-            label="01 · Pipeline de Ativos" 
+            label="01 · Pipeline de Leads" 
             active={location.pathname === '/'} 
             onClick={() => navigate('/')} 
           />
-          
         </SectionAccordion>
 
         <SectionAccordion 
-          label="PATRIMÔNIO" 
+          label="FINANCEIRO" 
           icon={<DollarSign size={14} />}
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
         >
           <NavItem 
-            label="02 · Base de Ativos" 
+            label="02 · Base Financeira" 
             active={location.pathname === '/financeiro/base'} 
             onClick={() => navigate('/financeiro/base')} 
           />
-          <NavItem label="07 · Fin. de Projetos" disabled />
-          <NavItem label="12 · Dashboard" disabled />
+          <NavItem 
+            label="03 · Controle de Horas" 
+            active={location.pathname === '/projetos/horas'} 
+            onClick={() => navigate('/projetos/horas')} 
+          />
         </SectionAccordion>
-
 
         <SectionAccordion 
           label="PROJETOS" 
@@ -186,11 +187,10 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/projetos/horas')} 
           />
           <NavItem 
-            label="06 · Atelier de Projetos" 
+            label="06 · Gestão de Projetos" 
             active={location.pathname === '/projetos/gestao' || location.pathname.startsWith('/projetos/detalhe/')} 
             onClick={() => navigate('/projetos/gestao')} 
           />
-          <NavItem label="10 · Modo Cliente" disabled />
         </SectionAccordion>
 
         <SectionAccordion 
@@ -218,8 +218,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
         >
-          <NavItem label="09 · Satisfação" disabled />
-          <NavItem label="11 · CMO Virtual" disabled />
+          <div />
         </SectionAccordion>
       </div>
 

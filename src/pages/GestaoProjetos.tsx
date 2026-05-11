@@ -95,7 +95,7 @@ const GestaoProjetos = () => {
           const val = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
           return acc + (Number.isNaN(val) ? 0 : (val || 0));
         }, 0);
-        setTotalHorasMes(Math.round(total / 60));
+        setTotalHorasMes(Math.round(total / 60) || 0);
       }
 
     } catch (error) {
@@ -127,8 +127,8 @@ const GestaoProjetos = () => {
       
       <main className="flex-1 ml-[230px] p-12">
         <header className="mb-12">
-          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Atelier de Projetos</h1>
-          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">Curadoria · Gestão de Ativos · Alta Performance</p>
+          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Gestão de Projetos</h1>
+          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
         </header>
 
         {/* Metric Cards */}
