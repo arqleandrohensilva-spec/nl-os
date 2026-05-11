@@ -473,19 +473,6 @@ const ProjetoDetalhe = () => {
 
         <VisualTimeline projeto={projeto} etapas={etapas} />
 
-        {projeto.etapa_atual === 'ACOMPANHAMENTO' && etapas.every(e => e.status === 'Aprovado') && (
-          <div className="mb-12 flex justify-end">
-            <Button
-              onClick={() => generatePDFReport()}
-              disabled={loading}
-              className="bg-transparent hover:bg-[#8B7355]/10 text-[#8B7355] border border-[#8B7355] rounded-none px-8 py-6 text-[11px] uppercase font-bold tracking-[0.2em] transition-all duration-500"
-            >
-              <Save size={16} className="mr-2" /> 
-              {loading ? "GERANDO..." : "GERAR RELATÓRIO DE ENTREGA"}
-            </Button>
-          </div>
-        )}
-
         {clientMode ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Visual Experience Header */}
