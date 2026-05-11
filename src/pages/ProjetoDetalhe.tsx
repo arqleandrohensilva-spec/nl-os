@@ -249,7 +249,7 @@ const ProjetoDetalhe = () => {
       const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).single();
       if (pData) setProjeto(pData);
 
-      const { data: eData } = await supabase.from('projeto_etapas').select('*').eq('projeto_id', id);
+      const { data: eData } = await supabase.from('projeto_etapas').select('*').eq('projeto_id', id).order('criado_em', { ascending: true });
       if (eData) setEtapas(eData);
 
       const { data: cData } = await supabase.from('projeto_checklist').select('*').eq('projeto_id', id);
