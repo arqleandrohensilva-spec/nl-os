@@ -685,18 +685,30 @@ const ControleHoras = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
-          {[
-            { label: 'HORAS NO MÊS', value: `${Math.round(metrics.totalMes)}h`, sub: 'Total registrado' },
-            { label: 'PROJETOS ATIVOS', value: metrics.ativos, sub: 'Em andamento' },
-            { label: 'CUSTO INTERNO', value: `R$ ${metrics.custoInterno.toLocaleString()}`, sub: `horas × R$ ${metrics.custoHora}/h`, bronze: true },
-            { label: 'EFICIÊNCIA', value: '92%', sub: 'estimado vs realizado', green: true },
-          ].map((m, i) => (
-            <div key={i} className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground mb-2 font-bold">{m.label}</p>
-              <h2 className={cn("text-4xl font-cormorant font-bold mb-1", m.bronze ? "text-bronze" : "text-[#1A1A1A]", m.green && "text-emerald-600")}>{m.value}</h2>
-              <p className="text-[9px] uppercase tracking-wider text-muted-foreground/50 font-bold">{m.sub}</p>
-            </div>
-          ))}
+          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">HORAS NO MÊS</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              {Math.round(metrics.totalMes)}h
+            </span>
+          </div>
+          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROJETOS ATIVOS</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              {metrics.ativos}
+            </span>
+          </div>
+          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">CUSTO INTERNO</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              R$ {metrics.custoInterno.toLocaleString()}
+            </span>
+          </div>
+          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">EFICIÊNCIA</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              92%
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
