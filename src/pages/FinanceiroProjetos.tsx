@@ -18,11 +18,26 @@ import {
   MoreVertical,
   MessageCircle,
   FileText,
-  PieChart,
+  PieChart as PieChartIcon,
   Target,
-  Download
+  Download,
+  BarChart3,
+  Activity
 } from 'lucide-react';
-import { format, parseISO, addMonths, startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, isToday, subDays, addDays } from 'date-fns';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Cell, 
+  PieChart, 
+  Pie,
+  Legend
+} from 'recharts';
+import { format, parseISO, addMonths, startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, isToday, subDays, addDays, startOfYear, eachMonthOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
