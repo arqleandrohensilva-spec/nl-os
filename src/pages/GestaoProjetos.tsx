@@ -266,7 +266,7 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
 );
 
 const CompactTimeline = ({ projeto, projetoEtapas }: { projeto: Projeto, projetoEtapas: EtapaInfo[] }) => {
-  const ETAPAS_ORDER = ['BRIEFING', 'ANTEPROJETO', 'EXECUTIVO', 'ACOMPANHAMENTO'];
+  const ETAPAS_ORDER = ['BRIEFING', 'CONCEITO', 'ESTUDO', 'EXECUTIVO', 'DETALHAMENTO', 'ACOMPANHAMENTO'];
   
   return (
     <div className="space-y-3">

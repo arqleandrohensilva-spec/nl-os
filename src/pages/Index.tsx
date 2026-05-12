@@ -95,8 +95,10 @@ const Index = () => {
   const [conversionLead, setConversionLead] = useState<Lead | null>(null);
   const [conversionHours, setConversionHours] = useState({
     briefing: 20,
-    anteprojeto: 120,
+    conceito: 40,
+    estudo: 80,
     executivo: 100,
+    detalhamento: 60,
     acompanhamento: 40
   });
 
@@ -900,8 +902,10 @@ const Index = () => {
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                   {[
                     { id: 'briefing', label: 'Briefing' },
-                    { id: 'anteprojeto', label: 'Anteprojeto' },
+                    { id: 'conceito', label: 'Conceito' },
+                    { id: 'estudo', label: 'Estudo' },
                     { id: 'executivo', label: 'Executivo' },
+                    { id: 'detalhamento', label: 'Detalhamento' },
                     { id: 'acompanhamento', label: 'Acompanhamento' },
                   ].map(h => (
                     <div key={h.id}>
@@ -933,10 +937,12 @@ const Index = () => {
                         tipo: conversionLead.tipo,
                         area_m2: conversionLead.area,
                         valor_proposta: conversionLead.orcamento,
-                        horas_estimadas: conversionHours.briefing + conversionHours.anteprojeto + conversionHours.executivo + conversionHours.acompanhamento,
+                        horas_estimadas: conversionHours.briefing + conversionHours.conceito + conversionHours.estudo + conversionHours.executivo + conversionHours.detalhamento + conversionHours.acompanhamento,
                         horas_briefing: conversionHours.briefing,
-                        horas_anteprojeto: conversionHours.anteprojeto,
+                        horas_conceito: conversionHours.conceito,
+                        horas_anteprojeto: conversionHours.estudo,
                         horas_executivo: conversionHours.executivo,
+                        horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
                         status_geral: 'ativo'
                       });

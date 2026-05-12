@@ -46,8 +46,10 @@ export interface Projeto {
   valor_proposta: number;
   horas_estimadas: number;
   horas_briefing: number;
+  horas_conceito: number;
   horas_anteprojeto: number;
   horas_executivo: number;
+  horas_detalhamento: number;
   horas_acompanhamento: number;
   etapa_atual: string;
   status_geral: string;
@@ -88,9 +90,10 @@ export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: num
 const StageBadge = ({ stage }: { stage: string }) => {
   const configs: Record<string, { bg: string, text: string }> = {
     'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
-    'Anteprojeto': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Conceito': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Estudo Preliminar': { bg: 'bg-[#D4AF37]/15', text: 'text-[#D4AF37]' },
     'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
-    'Acompanhamento de Obra': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+    'Detalhamento': { bg: 'bg-[#6B4E71]/15', text: 'text-[#6B4E71]' },
     'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
   };
 
@@ -877,10 +880,12 @@ const ControleHoras = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                    <SelectItem value="Briefing">Briefing</SelectItem>
-                    <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
-                    <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
-                    <SelectItem value="Acompanhamento de Obra">Acompanhamento de Obra</SelectItem>
+                    <SelectItem value="Briefing">01 · Briefing</SelectItem>
+                    <SelectItem value="Conceito">02 · Conceito</SelectItem>
+                    <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
+                    <SelectItem value="Projeto Executivo">04 · Projeto Executivo</SelectItem>
+                    <SelectItem value="Detalhamento">05 · Detalhamento</SelectItem>
+                    <SelectItem value="Acompanhamento">06 · Acompanhamento</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -970,9 +975,11 @@ const ControleHoras = () => {
                   <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Orçado vs Realizado</h4>
                   {[
                     { label: 'Briefing', estim: panelProjeto.horas_briefing },
-                    { label: 'Anteprojeto', estim: panelProjeto.horas_anteprojeto },
+                    { label: 'Conceito', estim: panelProjeto.horas_conceito },
+                    { label: 'Estudo Preliminar', estim: panelProjeto.horas_anteprojeto },
                     { label: 'Projeto Executivo', estim: panelProjeto.horas_executivo },
-                    { label: 'Acompanhamento de Obra', estim: panelProjeto.horas_acompanhamento },
+                    { label: 'Detalhamento', estim: panelProjeto.horas_detalhamento },
+                    { label: 'Acompanhamento', estim: panelProjeto.horas_acompanhamento },
                   ].map(e => {
                     const real = sessoes.filter(s => s.projeto_id === panelProjeto.id && s.etapa === e.label).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
                     const desvio = e.estim > 0 ? ((real - e.estim) / e.estim) * 100 : 0;
@@ -1069,10 +1076,12 @@ const ControleHoras = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                      <SelectItem value="Briefing">Briefing</SelectItem>
-                      <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
-                      <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
-                      <SelectItem value="Acompanhamento de Obra">Acompanhamento</SelectItem>
+                      <SelectItem value="Briefing">01 · Briefing</SelectItem>
+                      <SelectItem value="Conceito">02 · Conceito</SelectItem>
+                      <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
+                      <SelectItem value="Projeto Executivo">04 · Projeto Executivo</SelectItem>
+                      <SelectItem value="Detalhamento">05 · Detalhamento</SelectItem>
+                      <SelectItem value="Acompanhamento">06 · Acompanhamento</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
