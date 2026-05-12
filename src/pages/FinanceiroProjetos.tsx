@@ -18,11 +18,26 @@ import {
   MoreVertical,
   MessageCircle,
   FileText,
-  PieChart,
+  PieChart as PieChartIcon,
   Target,
-  Download
+  Download,
+  BarChart3,
+  Activity
 } from 'lucide-react';
-import { format, parseISO, addMonths, startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, isToday, subDays, addDays } from 'date-fns';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer, 
+  Cell, 
+  PieChart, 
+  Pie,
+  Legend
+} from 'recharts';
+import { format, parseISO, addMonths, startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, isToday, subDays, addDays, startOfYear, eachMonthOfInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -600,6 +615,51 @@ const FinanceiroProjetos = () => {
     return { totalRecebido, totalCusto, margemMedia };
   }, [projetosLucratividade]);
 
+  const chartData = useMemo(() => {
+    // 1. Monthly Revenue vs Cost (Last 6 Months)
+    const last6Months = Array.from({ length: 6 }).map((_, i) => {
+      const date = subDays(new Date(), (5 - i) * 30);
+      const start = startOfMonth(date);
+      const end = endOfMonth(date);
+      
+      const receita = parcelas
+        .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start, end }))
+        .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
+      
+      // Cost is more complex as it depends on hours worked in that month
+      // For simplicity, we use a proportion of projectsLucratividade or if we want precision, we'd need hData here
+      // Let's use a simplified calculation or just revenue for now to not overload the component
+      return {
+        name: format(date, 'MMM', { locale: ptBR }),
+        receita,
+      };
+    });
+
+    // 2. Revenue by Project Type
+    const typeDataMap: Record<string, number> = {};
+    parcelas
+      .filter(p => p.status === 'PAGO')
+      .forEach(p => {
+        const type = p.projetos?.tipo || 'Outros';
+        typeDataMap[type] = (typeDataMap[type] || 0) + (p.valor_recebido || 0);
+      });
+    
+    const typeData = Object.entries(typeDataMap).map(([name, value]) => ({ name, value }));
+
+    return { last6Months, typeData };
+  }, [parcelas]);
+
+  const agingData = useMemo(() => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    return {
+      '0-15': parcelas.filter(p => p.status === 'ATRASADO' && isAfter(parseISO(p.data_vencimento), subDays(today, 15))).reduce((acc, p) => acc + p.valor, 0),
+      '15-30': parcelas.filter(p => p.status === 'ATRASADO' && isWithinInterval(parseISO(p.data_vencimento), { start: subDays(today, 30), end: subDays(today, 15) })).reduce((acc, p) => acc + p.valor, 0),
+      '30+': parcelas.filter(p => p.status === 'ATRASADO' && isBefore(parseISO(p.data_vencimento), subDays(today, 30))).reduce((acc, p) => acc + p.valor, 0),
+    };
+  }, [parcelas]);
+
   const exportAccountantReport = () => {
     let startDate: Date;
     let endDate: Date;
@@ -754,12 +814,177 @@ const FinanceiroProjetos = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="parcelas" onValueChange={setActiveTab} className="w-full">
+        <Tabs defaultValue="dashboard" onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-white/5 border border-white/10 p-1 mb-6 rounded-none">
+            <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Dashboard</TabsTrigger>
             <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Parcelas</TabsTrigger>
             <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Fluxo de Caixa</TabsTrigger>
             <TabsTrigger value="lucratividade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Lucratividade</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard">
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              {/* Main Revenue Chart */}
+              <div className="col-span-2 bg-white/5 border border-white/5 p-6 h-[350px]">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                      <BarChart3 size={14} className="text-bronze" />
+                      Receita Mensal (6 Meses)
+                    </h3>
+                  </div>
+                </div>
+                <div className="h-[250px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData.last6Months}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                      <XAxis 
+                        dataKey="name" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#777777', fontSize: 10 }} 
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#777777', fontSize: 10 }}
+                        tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                        itemStyle={{ color: '#fff' }}
+                        formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Receita']}
+                      />
+                      <Bar dataKey="receita" fill="#8B7355" radius={[2, 2, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Aging Analysis */}
+              <div className="bg-white/5 border border-white/5 p-6 h-[350px]">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <Clock size={14} className="text-red-500" />
+                  Aging (Inadimplência)
+                </h3>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
+                      <span className="text-white/40">0 - 15 dias</span>
+                      <span className="font-bold">R$ {agingData['0-15'].toLocaleString('pt-BR')}</span>
+                    </div>
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-bronze/40" style={{ width: `${Math.min((agingData['0-15'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
+                      <span className="text-white/40">15 - 30 dias</span>
+                      <span className="font-bold">R$ {agingData['15-30'].toLocaleString('pt-BR')}</span>
+                    </div>
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-bronze/70" style={{ width: `${Math.min((agingData['15-30'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
+                      <span className="text-white/40">Acima de 30 dias</span>
+                      <span className="font-bold text-red-500">R$ {agingData['30+'].toLocaleString('pt-BR')}</span>
+                    </div>
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-red-500" style={{ width: `${Math.min((agingData['30+'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-white/5 mt-4">
+                    <p className="text-[10px] text-white/20 uppercase text-center">Total Atrasado: R$ {metrics.totalAtrasado.toLocaleString('pt-BR')}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              {/* Distribution by Type */}
+              <div className="bg-white/5 border border-white/5 p-6 h-[300px]">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <Activity size={14} className="text-bronze" />
+                  Receita por Tipo de Projeto
+                </h3>
+                <div className="h-[180px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData.typeData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {chartData.typeData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={['#8B7355', '#3A3A3A', '#FFFFFF', '#777777'][index % 4]} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                        itemStyle={{ color: '#fff' }}
+                      />
+                      <Legend 
+                        verticalAlign="bottom" 
+                        align="center"
+                        iconSize={8}
+                        wrapperStyle={{ fontSize: '10px', paddingTop: '20px' }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Health Score / Next Actions */}
+              <div className="bg-white/5 border border-white/5 p-6 h-[300px]">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                  <Target size={14} className="text-bronze" />
+                  Ações Prioritárias
+                </h3>
+                <div className="space-y-4">
+                  {metrics.totalAtrasado > 0 && (
+                    <div className="p-4 bg-red-500/5 border border-red-500/10 flex justify-between items-center group cursor-pointer hover:bg-red-500/10 transition-colors" onClick={() => { setActiveTab('parcelas'); setFilterStatus('ATRASADO'); }}>
+                      <div className="flex items-center gap-3">
+                        <AlertCircle size={16} className="text-red-500" />
+                        <div>
+                          <p className="text-xs font-bold">Cobrar Inadimplência</p>
+                          <p className="text-[10px] text-white/40 uppercase">R$ {metrics.totalAtrasado.toLocaleString('pt-BR')} em atraso</p>
+                        </div>
+                      </div>
+                      <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
+                    </div>
+                  )}
+                  {metrics.vencendo7Dias > 0 && (
+                    <div className="p-4 bg-bronze/5 border border-bronze/10 flex justify-between items-center group cursor-pointer hover:bg-bronze/10 transition-colors" onClick={() => { setActiveTab('parcelas'); setFilterStatus('REGUA_PENDENTE'); }}>
+                      <div className="flex items-center gap-3">
+                        <Calendar size={16} className="text-bronze" />
+                        <div>
+                          <p className="text-xs font-bold">Régua de Cobrança</p>
+                          <p className="text-[10px] text-white/40 uppercase">{metrics.vencendo7Dias} lembretes pendentes</p>
+                        </div>
+                      </div>
+                      <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
+                    </div>
+                  )}
+                  <div className="p-4 bg-white/5 border border-white/10 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition-colors" onClick={() => { setActiveTab('parcelas'); setFilterStatus('NF_PENDENTE'); }}>
+                    <div className="flex items-center gap-3">
+                      <FileText size={16} className="text-white/60" />
+                      <div>
+                        <p className="text-xs font-bold">Emitir Notas Fiscais</p>
+                        <p className="text-[10px] text-white/40 uppercase">Verificar parcelas pagas sem NF</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="parcelas">
             <div className="flex flex-col gap-6 mb-6">
