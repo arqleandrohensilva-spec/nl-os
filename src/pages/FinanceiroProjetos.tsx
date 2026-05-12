@@ -808,8 +808,10 @@ const FinanceiroProjetos = () => {
                     { id: 'EM ABERTO', label: 'Em Aberto' },
                     { id: 'ATRASADO', label: 'Atrasado' },
                     { id: 'PAGO', label: 'Pago' },
+                    { id: 'NF_PENDENTE', label: 'NF Pendente' },
                     { id: 'REGUA_PENDENTE', label: 'Régua Pendente' },
                     { id: 'ENVIADAS', label: 'Enviadas' }
+
                   ].map(status => (
                     <Button 
                       key={status.id}
@@ -834,16 +836,18 @@ const FinanceiroProjetos = () => {
                   <tr className="border-b border-white/10 bg-white/5">
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Cliente / Projeto</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Parcela</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor (Bruto)</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Líquido</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Vencimento</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / Régua</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / NF / Régua</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40 text-right">Ações</th>
+
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filteredParcelas.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-xs italic">Nenhuma parcela encontrada</td>
+                      <td colSpan={7} className="px-6 py-12 text-center text-white/20 text-xs italic">Nenhuma parcela encontrada</td>
                     </tr>
                   ) : filteredParcelas.map(p => (
                     <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
@@ -860,17 +864,32 @@ const FinanceiroProjetos = () => {
                         <span className="text-sm font-medium">R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </td>
                       <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-white/60">
+                          R$ {(p.valor_liquido || (p.valor * (1 - (p.iss_aliquota || 2) / 100))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <span className="text-xs text-white/60">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
-                          {getStatusBadge(p)}
+                          <div className="flex gap-2 items-center">
+                            {getStatusBadge(p)}
+                            {p.status === 'PAGO' && (
+                              p.nf_emitida ? (
+                                <Badge className="bg-green-500/20 text-green-500 border-none text-[8px] h-4">NF EMITIDA</Badge>
+                              ) : (
+                                <Badge className="bg-amber-500/20 text-amber-500 border-none text-[8px] h-4">NF PENDENTE</Badge>
+                              )
+                            )}
+                          </div>
                           {getReguaStatus(p)}
                           {(p as any).data_notificacao_cobranca && (
                             <span className="text-[8px] text-white/20 uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
                           )}
                         </div>
                       </td>
+
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
                           {(p.status === 'EM ABERTO' || p.status === 'ATRASADO' || p.status === 'VENCE HOJE') && (
