@@ -1,0 +1,2 @@
+ALTER TABLE public.projetos ADD COLUMN IF NOT EXISTS horas_estimadas INTEGER DEFAULT 0;
+ALTER TABLE public.financeiro_parcelas ADD COLUMN IF NOT EXISTS data_notificacao_cobranca TIMESTAMP WITH TIME ZONE;

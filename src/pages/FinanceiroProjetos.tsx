@@ -65,9 +65,11 @@ interface ProjetoLucratividade {
   tipo: string;
   receitaTotal: number;
   horasReais: number;
+  horasEstimadas: number;
   custoReal: number;
   margemRS: number;
   margemPercent: number;
+  dataInicio?: string;
 }
 
 const FinanceiroProjetos = () => {
@@ -152,7 +154,9 @@ const FinanceiroProjetos = () => {
       }
 
       // Fetch projects for profitability
-      const { data: projData } = await supabase.from('projetos').select('id, nome, nome_cliente, tipo');
+      const { data: projData } = await supabase
+        .from('projetos')
+        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em');
       
       // Fetch hours for all projects within period
       const { data: hData } = await supabase
@@ -194,9 +198,11 @@ const FinanceiroProjetos = () => {
             tipo: proj.tipo,
             receitaTotal,
             horasReais,
+            horasEstimadas: (proj as any).horas_estimadas || 0,
             custoReal,
             margemRS,
-            margemPercent
+            margemPercent,
+            dataInicio: (proj as any).criado_em
           };
         }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
@@ -260,9 +266,21 @@ const FinanceiroProjetos = () => {
     }
   };
 
-  const sendWhatsApp = (p: Parcela) => {
-    const msg = `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  const sendWhatsApp = async (p: Parcela) => {
+    try {
+      const msg = `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
+      
+      // Update notification date in database
+      await supabase
+        .from('financeiro_parcelas')
+        .update({ data_notificacao_cobranca: new Date().toISOString() })
+        .eq('id', p.id);
+      
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+      fetchData(); // Refresh to show notification badge
+    } catch (error) {
+      console.error('Error updating notification date:', error);
+    }
   };
 
   const getStatusBadge = (p: Parcela) => {
@@ -331,23 +349,34 @@ const FinanceiroProjetos = () => {
         </header>
 
         {/* Metrics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada (Mês)</span>
-            <span className="text-2xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada</span>
+            <span className="text-xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Prevista (Mês)</span>
-            <span className="text-2xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista (Mês)</span>
+            <span className="text-xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[10px] text-red-500/60 uppercase tracking-widest font-bold">Em Atraso</span>
-            <span className="text-2xl font-bold text-red-500">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-red-500/60 uppercase tracking-widest font-bold">Atrasado</span>
+            <span className="text-xl font-bold text-red-500">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Vencendo em 7 dias</span>
-            <span className={cn("text-2xl font-bold", metrics.vencendo7Dias > 0 && "text-bronze")}>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Próximos 7 dias</span>
+            <span className={cn("text-xl font-bold", metrics.vencendo7Dias > 0 && "text-bronze")}>
               {metrics.vencendo7Dias} {metrics.vencendo7Dias === 1 ? 'parcela' : 'parcelas'}
+            </span>
+          </div>
+          <div className="bg-white/5 p-6 border border-bronze/20 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
+              <TrendingUp size={12} className="text-bronze" />
+            </div>
+            <span className="text-[10px] text-bronze uppercase tracking-widest font-bold">LTV Médio (Hist.)</span>
+            <span className="text-xl font-bold">
+              R$ {(projetosLucratividade.length > 0 
+                ? projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0) / projetosLucratividade.length 
+                : 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
             </span>
           </div>
         </div>
@@ -387,7 +416,7 @@ const FinanceiroProjetos = () => {
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Parcela</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Vencimento</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / Régua</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40 text-right">Ações</th>
                   </tr>
                 </thead>
@@ -414,7 +443,12 @@ const FinanceiroProjetos = () => {
                         <span className="text-xs text-white/60">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</span>
                       </td>
                       <td className="px-6 py-4">
-                        {getStatusBadge(p)}
+                        <div className="flex flex-col gap-1">
+                          {getStatusBadge(p)}
+                          {(p as any).data_notificacao_cobranca && (
+                            <span className="text-[8px] text-white/20 uppercase">Avisado em {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
@@ -636,7 +670,7 @@ const FinanceiroProjetos = () => {
                 {/* Projects Grid */}
                 <div className="grid grid-cols-3 gap-4">
                   {projetosLucratividade.map(proj => (
-                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors flex flex-col">
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <h3 className="text-sm font-bold uppercase tracking-tight">{proj.nome_cliente}</h3>
@@ -652,28 +686,61 @@ const FinanceiroProjetos = () => {
                         </Badge>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-4 flex-1">
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
                           <span className="text-white/40">Receita Total</span>
                           <span className="font-bold">R$ {proj.receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-white/40">Horas Reais</span>
-                          <span className="font-bold">{proj.horasReais.toFixed(1)}h</span>
+                        
+                        {/* Horas Orçadas vs Reais */}
+                        <div className="space-y-2 py-3 border-y border-white/5">
+                          <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                            <span className="text-white/40">Horas Reais</span>
+                            <span className={cn(
+                              "font-bold",
+                              proj.horasEstimadas > 0 && proj.horasReais > proj.horasEstimadas ? "text-red-500" : "text-white"
+                            )}>
+                              {proj.horasReais.toFixed(1)}h
+                              {proj.horasEstimadas > 0 && ` / ${proj.horasEstimadas}h`}
+                            </span>
+                          </div>
+                          {proj.horasEstimadas > 0 && (
+                            <div className="h-1 bg-white/10 w-full rounded-full overflow-hidden">
+                              <div 
+                                className={cn(
+                                  "h-full transition-all",
+                                  (proj.horasReais / proj.horasEstimadas) > 1 ? "bg-red-500" : 
+                                  (proj.horasReais / proj.horasEstimadas) > 0.8 ? "bg-bronze" : "bg-green-500"
+                                )}
+                                style={{ width: `${Math.min((proj.horasReais / proj.horasEstimadas) * 100, 100)}%` }}
+                              />
+                            </div>
+                          )}
                         </div>
+
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
                           <span className="text-white/40">Custo Real</span>
                           <span className="font-bold">R$ {proj.custoReal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                          <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
-                          <span className={cn(
-                            "text-sm font-bold",
-                            proj.margemRS >= 0 ? "text-white" : "text-red-500"
-                          )}>
-                            R$ {proj.margemRS.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
+                        
+                        {/* Break-even Indicator (Simplified Logic) */}
+                        {proj.dataInicio && (
+                          <div className="flex items-center gap-2 text-[9px] text-white/20 uppercase tracking-tighter">
+                            <Target size={10} />
+                            Início: {format(parseISO(proj.dataInicio), 'MMM/yy', { locale: ptBR })}
+                            {proj.margemRS > 0 && " • Ponto de Equilíbrio Atingido"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-4 mt-4 border-t border-white/5 flex justify-between items-center">
+                        <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
+                        <span className={cn(
+                          "text-sm font-bold",
+                          proj.margemRS >= 0 ? "text-white" : "text-red-500"
+                        )}>
+                          R$ {proj.margemRS.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
                       </div>
                     </div>
                   ))}
