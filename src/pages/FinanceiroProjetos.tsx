@@ -133,21 +133,46 @@ const FinanceiroProjetos = () => {
       setConfigEscritorio(cData);
       const custoHora = cData?.custo_hora || 0;
 
+      // Filter dates for profitability
+      let startDate: Date;
+      let endDate: Date = new Date();
+      endDate.setHours(23, 59, 59, 999);
+
+      if (lucroFilter === 'MES_ATUAL') {
+        startDate = startOfMonth(new Date());
+        endDate = endOfMonth(new Date());
+      } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+        startDate = startOfMonth(subDays(new Date(), 90));
+      } else {
+        startDate = parseISO(lucroCustomDates.start);
+        endDate = parseISO(lucroCustomDates.end);
+        endDate.setHours(23, 59, 59, 999);
+      }
+
       // Fetch projects for profitability
       const { data: projData } = await supabase.from('projetos').select('id, nome, nome_cliente, tipo');
       
-      // Fetch hours for all projects
-      const { data: hData } = await supabase.from('sessoes_horas').select('projeto_id, duracao_minutos');
+      // Fetch hours for all projects within period
+      const { data: hData } = await supabase
+        .from('sessoes_horas')
+        .select('projeto_id, duracao_minutos, data')
+        .gte('data', startDate.toISOString())
+        .lte('data', endDate.toISOString());
       
       // Calculate profitability for each project
       if (projData) {
         const profitData = projData.map(proj => {
-          // Total Revenue: sum of paid parcelas for this project
+          // Total Revenue: sum of paid parcelas for this project RECEIVED within period
           const receitaTotal = (pData || [])
-            .filter(p => p.projeto_id === proj.id && p.status === 'PAGO')
+            .filter(p => 
+              p.projeto_id === proj.id && 
+              p.status === 'PAGO' && 
+              p.data_recebimento &&
+              isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate })
+            )
             .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
           
-          // Total Hours: sum of minutes / 60
+          // Total Hours: sum of minutes / 60 within period
           const totalMinutos = (hData || [])
             .filter(h => h.projeto_id === proj.id)
             .reduce((acc, h) => {
@@ -171,7 +196,7 @@ const FinanceiroProjetos = () => {
             margemRS,
             margemPercent
           };
-        }).filter(p => p.horasReais > 0); // Only show projects with hours registered
+        }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
         setProjetosLucratividade(profitData);
       }
