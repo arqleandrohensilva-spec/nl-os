@@ -664,6 +664,204 @@ const FinanceiroProjetos = () => {
     return { last6Months, typeData };
   }, [parcelas]);
 
+  const clientScores = useMemo(() => {
+    const clients: Record<string, any> = {};
+    
+    parcelas.forEach(p => {
+      if (!clients[p.cliente_nome]) {
+        clients[p.cliente_nome] = {
+          nome: p.cliente_nome,
+          tipoProjeto: p.projetos?.tipo || 'N/A',
+          parcelasPagas: 0,
+          parcelasAtrasadas: 0,
+          diasAtrasoTotal: 0,
+          pagamentosAdiantados: 0,
+          pedidosDesconto: 0,
+          retrabalhoGerado: 0,
+          indicacoesFeitas: 0,
+          historico: []
+        };
+      }
+      
+      const client = clients[p.cliente_nome];
+      client.historico.push(p);
+      
+      if (p.status === 'PAGO') {
+        client.parcelasPagas++;
+        if (p.data_recebimento && p.data_vencimento) {
+          const rec = parseISO(p.data_recebimento);
+          const venc = parseISO(p.data_vencimento);
+          if (isBefore(rec, venc)) {
+            client.pagamentosAdiantados++;
+          } else if (isAfter(rec, venc)) {
+            const diff = Math.ceil((rec.getTime() - venc.getTime()) / (1000 * 60 * 60 * 24));
+            client.diasAtrasoTotal += diff;
+          }
+        }
+      } else if (p.status === 'ATRASADO') {
+        client.parcelasAtrasadas++;
+        const venc = parseISO(p.data_vencimento);
+        const diff = Math.ceil((new Date().getTime() - venc.getTime()) / (1000 * 60 * 60 * 24));
+        client.diasAtrasoTotal += diff;
+      }
+    });
+
+    return Object.values(clients).map(client => {
+      const totalParcelas = client.parcelasPagas + client.parcelasAtrasadas;
+      const diasMediaAtraso = totalParcelas > 0 ? client.diasAtrasoTotal / totalParcelas : 0;
+      
+      let score = 100;
+      score -= client.parcelasAtrasadas * 10;
+      score -= diasMediaAtraso * 0.5;
+      score -= client.pedidosDesconto * 5;
+      score -= client.retrabalhoGerado * 8;
+      score += client.indicacoesFeitas * 15;
+      score += client.pagamentosAdiantados * 5;
+      
+      const finalScore = Math.max(0, Math.min(100, score));
+      
+      let label = 'EXCELENTE';
+      let color = 'text-green-500';
+      if (finalScore < 50) { label = 'RISCO'; color = 'text-red-500'; }
+      else if (finalScore < 70) { label = 'ATENÇÃO'; color = 'text-amber-500'; }
+      else if (finalScore < 85) { label = 'BOM'; color = 'text-blue-400'; }
+      
+      return { ...client, score: finalScore, label, color, diasMediaAtraso };
+    });
+  }, [parcelas]);
+
+  const breakEven = useMemo(() => {
+    const custosFixos = configEscritorio?.custos_fixos || 15000;
+    const impostosEstimados = metrics.pagasMes * 0.1;
+    const totalACobrir = custosFixos + impostosEstimados;
+    const faturado = metrics.pagasMes;
+    const percentual = totalACobrir > 0 ? (faturado / totalACobrir) * 100 : 0;
+    
+    return { custosFixos, impostosEstimados, totalACobrir, faturado, percentual };
+  }, [configEscritorio, metrics.pagasMes]);
+
+  const sazonalidade = useMemo(() => {
+    const months = eachMonthOfInterval({
+      start: startOfYear(subDays(new Date(), 365)),
+      end: new Date()
+    }).slice(-12);
+
+    const data = months.map(m => {
+      const start = startOfMonth(m);
+      const end = endOfMonth(m);
+      const receita = parcelas
+        .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start, end }))
+        .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
+      
+      return {
+        name: format(m, 'MMM', { locale: ptBR }),
+        receita,
+      };
+    });
+
+    const mediaAnual = data.reduce((acc, d) => acc + d.receita, 0) / (data.length || 1);
+    const sorted = [...data].sort((a, b) => b.receita - a.receita);
+    const top3 = sorted.slice(0, 3).filter(d => d.receita > 0).map(d => d.name);
+    const bottom3 = sorted.slice(-3).filter(d => d.receita > 0).map(d => d.name);
+
+    return { data, mediaAnual, top3, bottom3 };
+  }, [parcelas]);
+
+  const rentabilidadePorM2 = useMemo(() => {
+    const types: Record<string, any> = {};
+    
+    projetosLucratividade.forEach(p => {
+      if (!types[p.tipo]) {
+        types[p.tipo] = { tipo: p.tipo, projetos: 0, m2Total: 0, receitaTotal: 0, lucroTotal: 0 };
+      }
+      const t = types[p.tipo];
+      t.projetos++;
+      t.m2Total += (p as any).area_m2 || 0;
+      t.receitaTotal += p.receitaTotal;
+      t.lucroTotal += p.margemRS;
+    });
+
+    return Object.values(types).map(t => ({
+      ...t,
+      rsPorM2: t.m2Total > 0 ? t.receitaTotal / t.m2Total : 0,
+      margem: t.receitaTotal > 0 ? (t.lucroTotal / t.receitaTotal) * 100 : 0
+    }));
+  }, [projetosLucratividade]);
+
+  const activeAlerts = useMemo(() => {
+    const custosMensais = configEscritorio?.custos_fixos || 15000;
+    const fluxo30dias = metrics.previstasMes;
+    const diasRestantes = 30 - new Date().getDate();
+    const percentualMeta = (metrics.pagasMes / 50000) * 100;
+    const capacidadeTotal = 320;
+    const horasProjetadas = projetosLucratividade.reduce((acc, p) => acc + p.horasEstimadas, 0);
+
+    const list = [];
+    
+    if (fluxo30dias < custosMensais) {
+      list.push({
+        tipo: "CAIXA_NEGATIVO",
+        mensagem: `Seu fluxo de caixa pode ficar negativo em 30 dias se nenhum projeto novo fechar.`,
+        cor: "red",
+        acao: "Ver fluxo de caixa",
+        tab: "fluxo"
+      });
+    }
+
+    if (diasRestantes < 10 && percentualMeta < 60) {
+      list.push({
+        tipo: "META_EM_RISCO",
+        mensagem: `Faltam ${diasRestantes} dias no mês e você atingiu ${percentualMeta.toFixed(0)}% da meta. Necessário fechar R$ ${(50000 - metrics.pagasMes).toLocaleString('pt-BR')} ainda.`,
+        cor: "amber",
+        acao: "Ver simulador",
+        tab: "simulador"
+      });
+    }
+
+    projetosLucratividade.forEach(p => {
+      if (p.margemRS < 0) {
+        list.push({
+          tipo: "PROJETO_PREJUIZO",
+          mensagem: `O projeto ${p.nome} está com margem negativa de R$ ${Math.abs(p.margemRS).toLocaleString('pt-BR')}. Verifique as horas registradas.`,
+          cor: "red",
+          acao: "Ver lucratividade",
+          tab: "lucratividade"
+        });
+      }
+    });
+
+    if (horasProjetadas > capacidadeTotal) {
+      list.push({
+        tipo: "CAPACIDADE_EXCEDIDA",
+        mensagem: `Os projetos ativos exigem ${horasProjetadas.toFixed(0)}h mas a capacidade disponível é ${capacidadeTotal}h. Risco de atraso.`,
+        cor: "amber",
+        acao: null
+      });
+    }
+
+    const inadimplentes = parcelas.filter(p => p.status === 'ATRASADO');
+    if (inadimplentes.length > 0) {
+      list.push({
+        tipo: "CLIENTE_INADIMPLENTE",
+        mensagem: `${inadimplentes[0].cliente_nome} tem ${inadimplentes.length} parcelas em atraso totalizando R$ ${inadimplentes.reduce((acc, p) => acc + p.valor, 0).toLocaleString('pt-BR')}.`,
+        cor: "red",
+        acao: "Ver parcelas",
+        tab: "parcelas"
+      });
+    }
+
+    if (metrics.pagasMes > 30000) {
+       list.push({
+        tipo: "MES_FORTE",
+        mensagem: `Este mês está acima da média. Boa oportunidade para reforçar reservas.`,
+        cor: "green",
+        acao: null
+      });
+    }
+
+    return list;
+  }, [parcelas, metrics, configEscritorio, projetosLucratividade]);
+
   const agingData = useMemo(() => {
     const today = new Date();
     today.setHours(0,0,0,0);
