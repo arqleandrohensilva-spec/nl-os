@@ -254,10 +254,10 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
       {icon}
     </div>
     <div>
-      <p className="text-[9px] uppercase tracking-[0.4em] text-white/40 mb-2 font-bold">{label}</p>
+      <p className="text-[11px] uppercase text-[#777777] mb-2 font-normal font-inter">{label}</p>
       <p className={cn(
-        "text-4xl font-cormorant leading-none",
-        accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
+        "text-[22px] font-normal font-inter",
+        accent ? "text-[#FFFFFF]" : warning ? "text-[#FFFFFF]" : "text-[#FFFFFF]"
       )}>
         {value}
       </p>

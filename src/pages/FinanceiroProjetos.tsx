@@ -582,20 +582,20 @@ const FinanceiroProjetos = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
-            <span className="text-xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">RECEITA CONFIRMADA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
-            <span className="text-xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PREVISTA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[10px] text-red-500/60 uppercase tracking-widest font-bold">Atrasado</span>
-            <span className="text-xl font-bold text-red-500">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">ATRASADO</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Próximos 7 dias</span>
-            <span className={cn("text-xl font-bold", metrics.vencendo7Dias > 0 && "text-bronze")}>
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PRÓXIMOS 7 DIAS</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               {metrics.vencendo7Dias} {metrics.vencendo7Dias === 1 ? 'parcela' : 'parcelas'}
             </span>
           </div>
@@ -603,8 +603,8 @@ const FinanceiroProjetos = () => {
             <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
               <TrendingUp size={12} className="text-bronze" />
             </div>
-            <span className="text-[10px] text-bronze uppercase tracking-widest font-bold">LTV Médio (Hist.)</span>
-            <span className="text-xl font-bold">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LTV MÉDIO (HIST.)</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               R$ {(projetosLucratividade.length > 0 
                 ? projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0) / projetosLucratividade.length 
                 : 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
@@ -778,11 +778,11 @@ const FinanceiroProjetos = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Confirmado</p>
-                        <p className="text-sm font-bold text-green-500">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-sm font-bold text-[#FFFFFF]">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Previsto</p>
-                        <p className="text-sm font-bold text-bronze">R$ {mes.previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-sm font-bold text-[#777777]">R$ {mes.previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                     <div className="mt-4 h-1 bg-white/5 w-full relative">
@@ -829,7 +829,7 @@ const FinanceiroProjetos = () => {
                 </div>
                 <div>
                   <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Confirmado Total</p>
-                  <p className="text-xl font-bold text-green-500">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-xl font-bold text-[#FFFFFF]">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
             </div>
@@ -939,7 +939,7 @@ const FinanceiroProjetos = () => {
                     <div className="grid grid-cols-2 gap-8">
                       <div>
                         <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Recebido</p>
-                        <p className="text-xl font-bold text-green-500">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-xl font-bold text-[#FFFFFF]">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Custo Total</p>
