@@ -1657,6 +1657,322 @@ const FinanceiroProjetos = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="ponto_equilibrio">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white/5 border border-bronze/20 p-12 text-center space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Target size={120} className="text-bronze" />
+                </div>
+                
+                <div>
+                  <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Ponto de Equilíbrio do Mês</h2>
+                  <p className="text-[10px] text-white/20 uppercase">Acompanhamento em tempo real dos custos vs faturamento</p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-8 text-left border-y border-white/5 py-8">
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Custos Fixos Totais</p>
+                    <p className="text-xl font-bold font-inter">R$ {breakEven.custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Impostos Estimados</p>
+                    <p className="text-xl font-bold font-inter text-white/40">R$ {breakEven.impostosEstimados.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Total a Cobrir</p>
+                    <p className="text-xl font-bold font-inter text-bronze">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <div className="text-left">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Faturado até agora</p>
+                      <p className="text-2xl font-bold font-inter">R$ {breakEven.faturado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Meta de Cobertura</p>
+                      <p className="text-sm font-bold font-inter text-white/20">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="h-4 bg-white/5 w-full rounded-none overflow-hidden p-1 border border-white/10">
+                    <div 
+                      className={cn(
+                        "h-full transition-all duration-1000",
+                        breakEven.percentual >= 100 ? "bg-bronze" : 
+                        breakEven.percentual >= 80 ? "bg-green-500" : 
+                        breakEven.percentual >= 50 ? "bg-amber-500" : "bg-red-500"
+                      )}
+                      style={{ width: `${Math.min(breakEven.percentual, 100)}%` }}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <span className={cn(
+                      breakEven.percentual >= 100 ? "text-bronze" : 
+                      breakEven.percentual >= 80 ? "text-green-500" : 
+                      breakEven.percentual >= 50 ? "text-amber-500" : "text-red-500"
+                    )}>
+                      {breakEven.percentual.toFixed(1)}% Coberto
+                    </span>
+                    {breakEven.percentual < 100 ? (
+                      <span className="text-white/20">Faltam R$ {(breakEven.totalACobrir - breakEven.faturado).toLocaleString('pt-BR')}</span>
+                    ) : (
+                      <span className="text-bronze">Margem de Segurança: R$ {(breakEven.faturado - breakEven.totalACobrir).toLocaleString('pt-BR')}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Equivalência em Projetos</p>
+                    <p className="text-lg font-bold font-inter">
+                      {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / 15000)} PROJETOS 
+                      <span className="text-[10px] text-white/20 ml-2">DE TICKET MÉDIO R$ 15k</span>
+                    </p>
+                  </div>
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Faturáveis Necessárias</p>
+                    <p className="text-lg font-bold font-inter">
+                      {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / (configEscritorio?.custo_hora || 150))} HORAS
+                      <span className="text-[10px] text-white/20 ml-2">A R$ {(configEscritorio?.custo_hora || 150)}/h</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sazonalidade">
+            <div className="space-y-8">
+              <div className="bg-white/5 border border-white/5 p-8 h-[450px]">
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                      <TrendingUp size={14} className="text-bronze" />
+                      Sazonalidade (Últimos 12 Meses)
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-bronze"></div>
+                      <span className="text-[10px] uppercase text-white/40">Receita</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-[1px] bg-bronze/40 border-t border-dashed"></div>
+                      <span className="text-[10px] uppercase text-white/40">Média Anual</span>
+                    </div>
+                  </div>
+                </div>
+
+                {sazonalidade.data.filter(d => d.receita > 0).length < 3 ? (
+                  <div className="h-[300px] flex flex-col items-center justify-center text-center gap-4">
+                    <Activity size={32} className="text-white/10" />
+                    <p className="text-white/40 text-sm italic">Dados insuficientes — continue registrando recebimentos para ver a sazonalidade.</p>
+                  </div>
+                ) : (
+                  <div className="h-[320px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={sazonalidade.data}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#777777', fontSize: 10 }} 
+                        />
+                        <YAxis 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#777777', fontSize: 10 }}
+                          tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                          itemStyle={{ color: '#fff' }}
+                        />
+                        <Bar dataKey="receita" radius={[2, 2, 0, 0]}>
+                          {sazonalidade.data.map((entry, index) => {
+                            let color = "#8B735540";
+                            if (sazonalidade.top3.includes(entry.name)) color = "#22c55e";
+                            else if (sazonalidade.bottom3.includes(entry.name)) color = "#f59e0b";
+                            return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Melhor Período</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-green-500/10 text-green-500">
+                      <ArrowUpRight size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter uppercase">{sazonalidade.top3[0] || '-'}</p>
+                      <p className="text-[10px] text-white/20 uppercase">Maior volume histórico</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Média de Faturamento</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-bronze/10 text-bronze">
+                      <Target size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter">R$ {sazonalidade.mediaAnual.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</p>
+                      <p className="text-[10px] text-white/20 uppercase">Mensal consolidada</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tendência Próximo Mês</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-500/10 text-blue-500">
+                      <Activity size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter">ESTÁVEL</p>
+                      <p className="text-[10px] text-white/20 uppercase">Baseado no histórico</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="rentabilidade_m2">
+            <div className="space-y-8">
+              <div className="bg-white/5 border border-white/5 p-8">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-8 flex items-center gap-2">
+                  <Layers size={14} className="text-bronze" />
+                  Performance por m² e Tipo de Projeto
+                </h3>
+                
+                <div className="overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold">Tipo de Projeto</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">Projetos</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">m² Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Receita Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Lucro Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">R$ / m²</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Margem</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {rentabilidadePorM2.map((item) => (
+                        <tr key={item.tipo} className="hover:bg-white/5 transition-colors group">
+                          <td className="py-4 text-xs font-bold uppercase tracking-widest text-bronze">{item.tipo}</td>
+                          <td className="py-4 text-xs font-bold text-center font-inter">{item.projetos}</td>
+                          <td className="py-4 text-xs text-center font-inter text-white/60">{item.m2Total.toFixed(0)} m²</td>
+                          <td className="py-4 text-xs text-right font-inter">R$ {item.receitaTotal.toLocaleString('pt-BR')}</td>
+                          <td className="py-4 text-xs text-right font-inter text-green-500">R$ {item.lucroTotal.toLocaleString('pt-BR')}</td>
+                          <td className="py-4 text-sm text-right font-bold font-inter text-white">R$ {item.rsPorM2.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</td>
+                          <td className="py-4 text-xs text-right font-inter font-bold">{item.margem.toFixed(1)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white/5 border border-white/5 p-8">
+                  <h3 className="text-[10px] uppercase tracking-widest text-white/40 mb-6">Comparativo R$ / m²</h3>
+                  <div className="h-[200px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={rentabilidadePorM2}>
+                        <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: '#777777', fontSize: 10 }} />
+                        <YAxis hide />
+                        <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                        <Bar dataKey="rsPorM2" fill="#8B7355" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-bronze/20 p-8 flex flex-col justify-center text-center">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tipo mais rentável por m²</p>
+                  {(() => {
+                    const top = [...rentabilidadePorM2].sort((a, b) => b.rsPorM2 - a.rsPorM2)[0];
+                    return top ? (
+                      <>
+                        <p className="text-3xl font-bold uppercase tracking-tighter text-bronze mb-2">{top.tipo}</p>
+                        <p className="text-xl font-bold font-inter">R$ {top.rsPorM2.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}/m²</p>
+                        <p className="text-[10px] text-white/20 uppercase mt-4">Margem média de {top.margem.toFixed(1)}%</p>
+                      </>
+                    ) : '-';
+                  })()}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="alertas">
+            <div className="max-w-4xl mx-auto space-y-4">
+              {activeAlerts.length === 0 ? (
+                <div className="bg-white/5 border border-green-500/20 p-12 text-center flex flex-col items-center gap-4">
+                  <CheckCircle2 className="text-green-500 w-12 h-12" />
+                  <div>
+                    <h3 className="text-green-500 font-bold uppercase tracking-widest">Tudo sob controle</h3>
+                    <p className="text-white/40 text-xs mt-2">Nenhum alerta crítico ou preditivo no momento.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-6 px-2">
+                    <Bell size={16} className="text-bronze" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest">Alertas Ativos ({activeAlerts.length})</h3>
+                  </div>
+                  {activeAlerts.map((alerta, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "p-6 border flex items-center justify-between group transition-all",
+                        alerta.cor === 'red' ? "bg-red-500/5 border-red-500/20" : 
+                        alerta.cor === 'amber' ? "bg-amber-500/5 border-amber-500/20" : 
+                        "bg-green-500/5 border-green-500/20"
+                      )}
+                    >
+                      <div className="flex items-center gap-6">
+                        <div className={cn(
+                          "p-3 rounded-full",
+                          alerta.cor === 'red' ? "bg-red-500/10 text-red-500" : 
+                          alerta.cor === 'amber' ? "bg-amber-500/10 text-amber-500" : 
+                          "bg-green-500/10 text-green-500"
+                        )}>
+                          {alerta.cor === 'red' ? <AlertCircle size={20} /> : <Activity size={20} />}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform">{alerta.mensagem}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-white/20 mt-1">Alerta {alerta.tipo.replace('_', ' ')}</p>
+                        </div>
+                      </div>
+                      
+                      {alerta.acao && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => alerta.tab && setActiveTab(alerta.tab)}
+                          className="rounded-none border-white/10 text-[9px] uppercase tracking-widest hover:bg-white/10"
+                        >
+                          {alerta.acao}
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
           <TabsContent value="lucratividade">
             <div className="flex justify-between items-center mb-6">
               <div className="flex gap-2">
