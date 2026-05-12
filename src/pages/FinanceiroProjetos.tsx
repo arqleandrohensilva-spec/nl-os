@@ -155,9 +155,9 @@ const FinanceiroProjetos = () => {
       // Fetch hours for all projects within period
       const { data: hData } = await supabase
         .from('sessoes_horas')
-        .select('projeto_id, duracao_minutos, data')
-        .gte('data', startDate.toISOString())
-        .lte('data', endDate.toISOString());
+        .select('projeto_id, duracao_minutos, inicio')
+        .gte('inicio', startDate.toISOString())
+        .lte('inicio', endDate.toISOString());
       
       // Calculate profitability for each project
       if (projData) {
