@@ -130,6 +130,13 @@ const FinanceiroProjetos = () => {
     end: format(endOfMonth(new Date()), 'yyyy-MM-dd')
   });
 
+  // Simulator State (ABA 6)
+  const [simulator, setSimulator] = useState({
+    numProjetos: 1,
+    tipo: 'ArqInt',
+    areaM2: 100
+  });
+
   useEffect(() => {
     fetchData();
   }, [lucroFilter, lucroCustomDates]);
