@@ -266,9 +266,21 @@ const FinanceiroProjetos = () => {
     }
   };
 
-  const sendWhatsApp = (p: Parcela) => {
-    const msg = `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  const sendWhatsApp = async (p: Parcela) => {
+    try {
+      const msg = `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
+      
+      // Update notification date in database
+      await supabase
+        .from('financeiro_parcelas')
+        .update({ data_notificacao_cobranca: new Date().toISOString() })
+        .eq('id', p.id);
+      
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+      fetchData(); // Refresh to show notification badge
+    } catch (error) {
+      console.error('Error updating notification date:', error);
+    }
   };
 
   const getStatusBadge = (p: Parcela) => {
