@@ -1029,10 +1029,21 @@ const FinanceiroProjetos = () => {
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-white/5 border border-white/10 p-1 mb-6 rounded-none">
-            <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Dashboard</TabsTrigger>
-            <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Parcelas</TabsTrigger>
-            <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Fluxo de Caixa</TabsTrigger>
-            <TabsTrigger value="lucratividade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Lucratividade</TabsTrigger>
+            <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Dashboard</TabsTrigger>
+            <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Parcelas</TabsTrigger>
+            <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Fluxo de Caixa</TabsTrigger>
+            <TabsTrigger value="lucratividade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Lucratividade</TabsTrigger>
+            <TabsTrigger value="score" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Score Cliente</TabsTrigger>
+            <TabsTrigger value="simulador" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Simulador</TabsTrigger>
+            <TabsTrigger value="ponto_equilibrio" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Ponto Equilíbrio</TabsTrigger>
+            <TabsTrigger value="sazonalidade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Sazonalidade</TabsTrigger>
+            <TabsTrigger value="rentabilidade_m2" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Rentabilidade m²</TabsTrigger>
+            <TabsTrigger value="alertas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4 relative">
+              Alertas
+              {activeAlerts.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#1A1816]"></span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
