@@ -523,11 +523,11 @@ const FinanceiroProjetos = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
             <span className="text-xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista (Mês)</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
             <span className="text-xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
