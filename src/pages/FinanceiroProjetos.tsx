@@ -65,9 +65,11 @@ interface ProjetoLucratividade {
   tipo: string;
   receitaTotal: number;
   horasReais: number;
+  horasEstimadas: number;
   custoReal: number;
   margemRS: number;
   margemPercent: number;
+  dataInicio?: string;
 }
 
 const FinanceiroProjetos = () => {
