@@ -560,8 +560,20 @@ const FinanceiroProjetos = () => {
             </div>
 
             {projetosLucratividade.length === 0 ? (
-              <div className="bg-white/5 border border-white/5 p-12 text-center text-white/40 italic text-sm">
-                Nenhum projeto com horas registradas. Registre horas no Módulo 03 para ver a lucratividade.
+              <div className="bg-white/5 border border-white/5 p-12 text-center flex flex-col items-center gap-4">
+                <AlertCircle className="text-white/20 w-8 h-8" />
+                <div className="max-w-md">
+                  <p className="text-white/60 text-sm mb-2">
+                    Nenhum projeto com movimentação {
+                      lucroFilter === 'MES_ATUAL' ? 'neste mês' : 
+                      lucroFilter === 'ULTIMOS_3_MESES' ? 'nos últimos 3 meses' : 
+                      'no período selecionado'
+                    }.
+                  </p>
+                  <p className="text-white/20 text-xs italic">
+                    Para visualizar a lucratividade, é necessário registrar horas trabalhadas no Módulo 03 ou lançar o recebimento de parcelas (status PAGO) dentro deste intervalo.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-6">
