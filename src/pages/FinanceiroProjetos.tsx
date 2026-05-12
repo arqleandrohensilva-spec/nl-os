@@ -56,6 +56,12 @@ interface Parcela {
   projetos?: {
     tipo: string;
   };
+  agendamento_cobranca?: {
+    d7: boolean;
+    d3: boolean;
+    d1: boolean;
+  };
+  data_notificacao_cobranca?: string;
 }
 
 interface ProjetoLucratividade {
