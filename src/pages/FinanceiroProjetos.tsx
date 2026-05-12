@@ -19,7 +19,8 @@ import {
   MessageCircle,
   FileText,
   PieChart,
-  Target
+  Target,
+  Download
 } from 'lucide-react';
 import { format, parseISO, addMonths, startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, isToday, subDays, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -508,16 +509,74 @@ const FinanceiroProjetos = () => {
     return { totalRecebido, totalCusto, margemMedia };
   }, [projetosLucratividade]);
 
+  const exportReport = () => {
+    let startDate: Date;
+    let endDate: Date;
+
+    if (lucroFilter === 'MES_ATUAL') {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+      startDate = startOfMonth(subDays(new Date(), 90));
+      endDate = new Date();
+    } else {
+      startDate = parseISO(lucroCustomDates.start);
+      endDate = parseISO(lucroCustomDates.end);
+    }
+
+    const reportData = {
+      periodo: `${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`,
+      metricas: metrics,
+      parcelas: filteredParcelas.map(p => ({
+        cliente: p.cliente_nome,
+        parcela: `${p.numero_parcela}/${p.total_parcelas}`,
+        valor: p.valor,
+        vencimento: format(parseISO(p.data_vencimento), 'dd/MM/yyyy'),
+        status: p.status,
+        recebido: p.valor_recebido || 0,
+        data_recebimento: p.data_recebimento ? format(parseISO(p.data_recebimento), 'dd/MM/yyyy') : '-'
+      })),
+      lucratividade: projetosLucratividade.map(proj => ({
+        projeto: proj.nome,
+        cliente: proj.nome_cliente,
+        receita: proj.receitaTotal,
+        custo: proj.custoReal,
+        horas: proj.horasReais.toFixed(1),
+        margem: `${proj.margemPercent.toFixed(1)}%`
+      }))
+    };
+
+    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `relatorio-financeiro-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success('Relatório exportado com sucesso!');
+  };
+
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-8">
-        <header className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight mb-2 uppercase font-inter">07 · Financeiro de Projetos</h1>
-          <p className="text-white/40 text-xs tracking-[0.3em] font-bold uppercase">
-            PARCELAS · FLUXO DE CAIXA · LUCRATIVIDADE
-          </p>
+        <header className="mb-10 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight mb-2 uppercase font-inter">07 · Financeiro de Projetos</h1>
+            <p className="text-white/40 text-xs tracking-[0.3em] font-bold uppercase">
+              PARCELAS · FLUXO DE CAIXA · LUCRATIVIDADE
+            </p>
+          </div>
+          <Button 
+            onClick={exportReport}
+            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[10px] uppercase tracking-widest px-6 flex items-center gap-2"
+          >
+            <Download size={14} className="text-bronze" />
+            Exportar Relatório
+          </Button>
         </header>
 
         {/* Metrics Cards */}
