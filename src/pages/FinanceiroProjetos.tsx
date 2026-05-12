@@ -404,7 +404,7 @@ const FinanceiroProjetos = () => {
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Parcela</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Vencimento</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / Régua</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40 text-right">Ações</th>
                   </tr>
                 </thead>
