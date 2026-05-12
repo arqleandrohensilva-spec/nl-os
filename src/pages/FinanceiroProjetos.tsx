@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Sidebar from '@/components/Sidebar';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   DollarSign, 
@@ -70,6 +71,7 @@ interface ProjetoLucratividade {
 }
 
 const FinanceiroProjetos = () => {
+  const navigate = useNavigate();
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('parcelas');
@@ -560,7 +562,7 @@ const FinanceiroProjetos = () => {
             </div>
 
             {projetosLucratividade.length === 0 ? (
-              <div className="bg-white/5 border border-white/5 p-12 text-center flex flex-col items-center gap-4">
+              <div className="bg-white/5 border border-white/5 p-12 text-center flex flex-col items-center gap-6">
                 <AlertCircle className="text-white/20 w-8 h-8" />
                 <div className="max-w-md">
                   <p className="text-white/60 text-sm mb-2">
@@ -570,9 +572,26 @@ const FinanceiroProjetos = () => {
                       'no período selecionado'
                     }.
                   </p>
-                  <p className="text-white/20 text-xs italic">
+                  <p className="text-white/20 text-xs italic mb-6">
                     Para visualizar a lucratividade, é necessário registrar horas trabalhadas no Módulo 03 ou lançar o recebimento de parcelas (status PAGO) dentro deste intervalo.
                   </p>
+                  
+                  <div className="flex gap-4 justify-center">
+                    <Button 
+                      onClick={() => navigate('/projetos/horas')}
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[10px] uppercase tracking-widest px-6 h-10 flex items-center gap-2"
+                    >
+                      <Clock size={14} className="text-bronze" />
+                      Registrar Horas (Mod 03)
+                    </Button>
+                    <Button 
+                      onClick={() => setActiveTab('parcelas')}
+                      className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[10px] uppercase tracking-widest px-6 h-10 flex items-center gap-2"
+                    >
+                      <DollarSign size={14} />
+                      Lançar Pagamentos
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (
