@@ -101,11 +101,9 @@ const FinanceiroProjetos = () => {
       
       if (pError) throw pError;
       
-      // Lógica automática de status
       const updatedParcelas = (pData || []).map(p => {
         if (p.status === 'PAGO') return p;
         
-        const vencimento = startOfMonth(parseISO(p.data_vencimento)); // Using startOfMonth because date string might be just YYYY-MM-DD
         const dateVenc = parseISO(p.data_vencimento);
         const today = new Date();
         today.setHours(0,0,0,0);
@@ -115,12 +113,9 @@ const FinanceiroProjetos = () => {
         if (isToday(dateVenc)) {
           status = 'VENCE HOJE';
         } else if (isBefore(dateVenc, today)) {
-          // 2 days after vencimento
           if (isBefore(dateVenc, subDays(today, 1))) {
             status = 'ATRASADO';
           }
-        } else if (isWithinInterval(dateVenc, { start: today, end: addDays(today, 3) })) {
-           // This will be handled in the badge display for "VENCE EM X DIAS"
         }
 
         return { ...p, status };
@@ -131,17 +126,49 @@ const FinanceiroProjetos = () => {
       // Fetch config for cost/hour
       const { data: cData } = await supabase.from('config_escritorio').select('*').single();
       setConfigEscritorio(cData);
+      const custoHora = cData?.custo_hora || 0;
 
-      // Fetch hours for profitability
+      // Fetch projects for profitability
+      const { data: projData } = await supabase.from('projetos').select('id, nome, nome_cliente, tipo');
+      
+      // Fetch hours for all projects
       const { data: hData } = await supabase.from('sessoes_horas').select('projeto_id, duracao_minutos');
-      if (hData) {
-        const hoursByProject = hData.reduce((acc: any, curr: any) => {
-          const pid = curr.projeto_id;
-          const mins = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
-          acc[pid] = (acc[pid] || 0) + (mins || 0);
-          return acc;
-        }, {});
-        setProjetosHoras(hoursByProject);
+      
+      // Calculate profitability for each project
+      if (projData) {
+        const profitData = projData.map(proj => {
+          // Total Revenue: sum of paid parcelas for this project
+          const receitaTotal = (pData || [])
+            .filter(p => p.projeto_id === proj.id && p.status === 'PAGO')
+            .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
+          
+          // Total Hours: sum of minutes / 60
+          const totalMinutos = (hData || [])
+            .filter(h => h.projeto_id === proj.id)
+            .reduce((acc, h) => {
+              const mins = typeof h.duracao_minutos === 'string' ? parseFloat(h.duracao_minutos) : h.duracao_minutos;
+              return acc + (mins || 0);
+            }, 0);
+          
+          const horasReais = totalMinutos / 60;
+          const custoReal = horasReais * custoHora;
+          const margemRS = receitaTotal - custoReal;
+          const margemPercent = receitaTotal > 0 ? (margemRS / receitaTotal) * 100 : 0;
+          
+          return {
+            id: proj.id,
+            nome: proj.nome,
+            nome_cliente: proj.nome_cliente,
+            tipo: proj.tipo,
+            receitaTotal,
+            horasReais,
+            custoReal,
+            margemRS,
+            margemPercent
+          };
+        }).filter(p => p.horasReais > 0); // Only show projects with hours registered
+
+        setProjetosLucratividade(profitData);
       }
 
     } catch (error) {
