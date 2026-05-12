@@ -332,6 +332,8 @@ export type Database = {
           horas_acompanhamento: number | null
           horas_anteprojeto: number | null
           horas_briefing: number | null
+          horas_conceito: number | null
+          horas_detalhamento: number | null
           horas_estimadas: number | null
           horas_executivo: number | null
           id: string
@@ -355,6 +357,8 @@ export type Database = {
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null
           horas_briefing?: number | null
+          horas_conceito?: number | null
+          horas_detalhamento?: number | null
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
@@ -378,6 +382,8 @@ export type Database = {
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null
           horas_briefing?: number | null
+          horas_conceito?: number | null
+          horas_detalhamento?: number | null
           horas_estimadas?: number | null
           horas_executivo?: number | null
           id?: string
