@@ -777,12 +777,12 @@ const FinanceiroProjetos = () => {
                     <h3 className="text-sm font-bold uppercase tracking-widest mb-4">{mes.label}</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Confirmado</p>
-                        <p className="text-sm font-bold text-[#FFFFFF]">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado</p>
+                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
-                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Previsto</p>
-                        <p className="text-sm font-bold text-[#777777]">R$ {mes.previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Previsto</p>
+                        <p className="text-[22px] font-normal text-[#777777] font-inter">R$ {mes.previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                     <div className="mt-4 h-1 bg-white/5 w-full relative">
