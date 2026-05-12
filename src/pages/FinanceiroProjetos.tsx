@@ -642,7 +642,7 @@ const FinanceiroProjetos = () => {
                 {/* Projects Grid */}
                 <div className="grid grid-cols-3 gap-4">
                   {projetosLucratividade.map(proj => (
-                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
+                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors flex flex-col">
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <h3 className="text-sm font-bold uppercase tracking-tight">{proj.nome_cliente}</h3>
@@ -658,28 +658,61 @@ const FinanceiroProjetos = () => {
                         </Badge>
                       </div>
 
-                      <div className="space-y-4">
+                      <div className="space-y-4 flex-1">
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
                           <span className="text-white/40">Receita Total</span>
                           <span className="font-bold">R$ {proj.receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-white/40">Horas Reais</span>
-                          <span className="font-bold">{proj.horasReais.toFixed(1)}h</span>
+                        
+                        {/* Horas Orçadas vs Reais */}
+                        <div className="space-y-2 py-3 border-y border-white/5">
+                          <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                            <span className="text-white/40">Horas Reais</span>
+                            <span className={cn(
+                              "font-bold",
+                              proj.horasEstimadas > 0 && proj.horasReais > proj.horasEstimadas ? "text-red-500" : "text-white"
+                            )}>
+                              {proj.horasReais.toFixed(1)}h
+                              {proj.horasEstimadas > 0 && ` / ${proj.horasEstimadas}h`}
+                            </span>
+                          </div>
+                          {proj.horasEstimadas > 0 && (
+                            <div className="h-1 bg-white/10 w-full rounded-full overflow-hidden">
+                              <div 
+                                className={cn(
+                                  "h-full transition-all",
+                                  (proj.horasReais / proj.horasEstimadas) > 1 ? "bg-red-500" : 
+                                  (proj.horasReais / proj.horasEstimadas) > 0.8 ? "bg-bronze" : "bg-green-500"
+                                )}
+                                style={{ width: `${Math.min((proj.horasReais / proj.horasEstimadas) * 100, 100)}%` }}
+                              />
+                            </div>
+                          )}
                         </div>
+
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
                           <span className="text-white/40">Custo Real</span>
                           <span className="font-bold">R$ {proj.custoReal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="pt-4 border-t border-white/5 flex justify-between items-center">
-                          <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
-                          <span className={cn(
-                            "text-sm font-bold",
-                            proj.margemRS >= 0 ? "text-white" : "text-red-500"
-                          )}>
-                            R$ {proj.margemRS.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
+                        
+                        {/* Break-even Indicator (Simplified Logic) */}
+                        {proj.dataInicio && (
+                          <div className="flex items-center gap-2 text-[9px] text-white/20 uppercase tracking-tighter">
+                            <Target size={10} />
+                            Início: {format(parseISO(proj.dataInicio), 'MMM/yy', { locale: ptBR })}
+                            {proj.margemRS > 0 && " • Ponto de Equilíbrio Atingido"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-4 mt-4 border-t border-white/5 flex justify-between items-center">
+                        <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
+                        <span className={cn(
+                          "text-sm font-bold",
+                          proj.margemRS >= 0 ? "text-white" : "text-red-500"
+                        )}>
+                          R$ {proj.margemRS.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
                       </div>
                     </div>
                   ))}
