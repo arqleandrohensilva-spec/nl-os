@@ -431,7 +431,12 @@ const FinanceiroProjetos = () => {
                         <span className="text-xs text-white/60">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</span>
                       </td>
                       <td className="px-6 py-4">
-                        {getStatusBadge(p)}
+                        <div className="flex flex-col gap-1">
+                          {getStatusBadge(p)}
+                          {(p as any).data_notificacao_cobranca && (
+                            <span className="text-[8px] text-white/20 uppercase">Avisado em {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
