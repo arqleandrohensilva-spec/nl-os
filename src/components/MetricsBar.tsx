@@ -13,20 +13,20 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }: MetricCardProps) => (
-  <div className="flex-1 px-8 py-7 border-r border-beige last:border-r-0 relative group hover:bg-beige/10 transition-colors">
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-[9px] text-muted uppercase tracking-[0.2em] font-bold">{label}</span>
+  <div className="flex-1 px-8 py-7 border-r border-beige last:border-r-0 relative group hover:bg-beige/10 transition-colors flex flex-col gap-1">
+    <div className="flex items-center gap-2 mb-2">
+      <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">{label}</span>
       {pulse && <div className="w-1.5 h-1.5 rounded-full bg-red animate-pulse" />}
     </div>
     
     <div className={cn(
-      "text-[36px] font-cormorant leading-none tracking-tight",
-      isNegative ? "text-red" : "text-graphite"
+      "text-[22px] font-normal font-inter",
+      isNegative ? "text-red" : "text-[#1A1A1A]"
     )}>
       {value}
     </div>
     
-    {subLabel && <div className="mt-3 text-[11px] font-bold uppercase tracking-wider">{subLabel}</div>}
+    {subLabel && <div className="mt-2 text-[10px] text-[#777777] uppercase font-normal font-inter">{subLabel}</div>}
     
     <div className={cn(
       "absolute bottom-0 left-0 right-0 h-[1px] transition-opacity",
