@@ -517,40 +517,40 @@ Gere a mensagem de WhatsApp.`;
           </div>
 
           <div className="grid grid-cols-5 gap-4">
-            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+            <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
-              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
                 {proposals.length}
               </span>
             </div>
-            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+            <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">TAXA DE ABERTURA</span>
-              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.views_count && p.views_count > 0).length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
-            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+            <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
-            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+            <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS NO FUNIL</span>
-              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
                 {leads.length}
               </span>
             </div>
-            <div className="bg-white p-6 border border-bronze/20 rounded-[2px] shadow-sm flex flex-col gap-1 relative overflow-hidden group">
+            <div className="bg-[#1A1816] p-6 border border-bronze/20 rounded-[2px] flex flex-col gap-1 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
                 <TrendingUp size={12} className="text-bronze" />
               </div>
               <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
                 R$ {proposals
                   .filter(p => p.status !== 'Aprovada' && p.status !== 'Recusada')
                   .reduce((acc, p) => acc + (p.valor_completo || 0), 0)
