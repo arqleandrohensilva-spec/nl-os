@@ -685,27 +685,27 @@ const ControleHoras = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
-          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">HORAS NO MÊS</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
-          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROJETOS ATIVOS</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               {metrics.ativos}
             </span>
           </div>
-          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">CUSTO INTERNO</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
-          <div className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-b-2 border-b-bronze relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">EFICIÊNCIA</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               92%
             </span>
           </div>
