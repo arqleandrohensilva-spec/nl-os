@@ -300,10 +300,10 @@ const ProjetoDetalhe = () => {
       doc.setFontSize(10);
       dataY += 8;
       const estimadas = projeto.horas_estimadas || 0;
-      const variação = horasReais - estimadas;
+      const variacao = horasReais - estimadas;
       doc.text(`Horas estimadas: ${estimadas}h`, 20, dataY);
       doc.text(`Horas realizadas: ${horasReais}h`, 80, dataY);
-      doc.text(`Variação: ${variação > 0 ? '+' : ''}${variação}h`, 140, dataY);
+      doc.text(`Variação: ${variacao > 0 ? '+' : ''}${variacao}h`, 140, dataY);
       
       // Checklist
       dataY += 15;
