@@ -14,7 +14,13 @@ import {
   Eye,
   Download,
   Users,
-  X
+  X,
+  TrendingUp,
+  MapPin,
+  Maximize2,
+  Clock,
+  LayoutGrid,
+  Calendar
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
