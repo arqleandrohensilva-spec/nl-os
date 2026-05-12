@@ -252,7 +252,8 @@ const FinanceiroProjetos = () => {
             custoReal,
             margemRS,
             margemPercent,
-            dataInicio: (proj as any).criado_em
+            dataInicio: (proj as any).criado_em,
+            area_m2: proj.area_m2 || 0
           };
         }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
