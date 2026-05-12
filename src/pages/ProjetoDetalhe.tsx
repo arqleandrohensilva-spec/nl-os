@@ -652,43 +652,6 @@ const ProjetoDetalhe = () => {
                     </Button>
                   </div>
 
-                  {/* Profitability Index Feature */}
-                  <div className="bg-[#1A1816] border border-[#8B7355]/30 p-10 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
-                    
-                    <div className="flex justify-between items-start mb-8">
-                      <div>
-                        <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-2">Índice de Lucratividade</h4>
-                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Saúde Financeira do Ativo</p>
-                      </div>
-                      <Badge className="bg-[#8B7355]/20 text-[#8B7355] border-none text-[8px] tracking-widest rounded-none">PREMIUM</Badge>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-end">
-                        <span className="text-4xl font-cormorant italic">
-                          {projeto.horas_estimadas && horasReais > 0 
-                            ? `${Math.max(0, Math.round((1 - (horasReais / projeto.horas_estimadas)) * 100))}%` 
-                            : '100%'}
-                        </span>
-                        <div className="text-right">
-                          <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Margem Operacional</p>
-                          <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Saudável</p>
-                        </div>
-                      </div>
-
-                      <div className="w-full bg-white/5 h-[2px]">
-                        <div 
-                          className="h-full bg-[#8B7355] transition-all duration-1000"
-                          style={{ width: `${projeto.horas_estimadas ? Math.max(0, (1 - (horasReais / projeto.horas_estimadas)) * 100) : 100}%` }}
-                        />
-                      </div>
-
-                      <p className="text-[9px] text-white/40 leading-relaxed italic">
-                        Este índice reflete a eficiência produtiva em relação ao investimento temporal planejado. Valores acima de 20% indicam alta performance.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
