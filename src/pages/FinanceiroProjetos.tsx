@@ -655,13 +655,15 @@ const FinanceiroProjetos = () => {
     doc.text(`Período: ${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`, 105, 34, { align: "center" });
 
     const tableData = paidParcelas.map(p => {
-      const issVal = p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100));
+      const issAliq = p.iss_aliquota || 2;
+      const issVal = p.iss_valor || (p.valor * (issAliq / 100));
       const liqVal = p.valor_liquido || (p.valor - issVal);
       return [
         p.cliente_nome,
-        p.projetos?.tipo || 'Projeto',
+        `${p.projetos?.tipo || 'Projeto'} · ${p.projetos?.cidade || 'N/A'}`,
         `${p.numero_parcela}/${p.total_parcelas}`,
         `R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `${issAliq}%`,
         `R$ ${issVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
         `R$ ${liqVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
         format(parseISO(p.data_recebimento!), 'dd/MM/yyyy'),
@@ -671,10 +673,10 @@ const FinanceiroProjetos = () => {
 
     (window as any).jspdf.autoTable(doc, {
       startY: 45,
-      head: [['Cliente', 'Projeto', 'Parc.', 'Bruto', 'ISS', 'Líquido', 'Recebimento', 'NF']],
+      head: [['Cliente', 'Projeto/Cidade', 'Parc.', 'Bruto', '% ISS', 'ISS', 'Líquido', 'Recebimento', 'NF']],
       body: tableData,
       headStyles: { fillColor: bronze },
-      styles: { fontSize: 8 }
+      styles: { fontSize: 7 }
     });
 
     const finalY = (doc as any).lastAutoTable.finalY + 10;
