@@ -46,8 +46,10 @@ export interface Projeto {
   valor_proposta: number;
   horas_estimadas: number;
   horas_briefing: number;
+  horas_conceito: number;
   horas_anteprojeto: number;
   horas_executivo: number;
+  horas_detalhamento: number;
   horas_acompanhamento: number;
   etapa_atual: string;
   status_geral: string;
@@ -971,9 +973,11 @@ const ControleHoras = () => {
                   <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Orçado vs Realizado</h4>
                   {[
                     { label: 'Briefing', estim: panelProjeto.horas_briefing },
-                    { label: 'Anteprojeto', estim: panelProjeto.horas_anteprojeto },
+                    { label: 'Conceito', estim: panelProjeto.horas_conceito },
+                    { label: 'Estudo Preliminar', estim: panelProjeto.horas_anteprojeto },
                     { label: 'Projeto Executivo', estim: panelProjeto.horas_executivo },
-                    { label: 'Acompanhamento de Obra', estim: panelProjeto.horas_acompanhamento },
+                    { label: 'Detalhamento', estim: panelProjeto.horas_detalhamento },
+                    { label: 'Acompanhamento', estim: panelProjeto.horas_acompanhamento },
                   ].map(e => {
                     const real = sessoes.filter(s => s.projeto_id === panelProjeto.id && s.etapa === e.label).reduce((acc, s) => acc + (s.duracao_minutos || 0), 0) / 60;
                     const desvio = e.estim > 0 ? ((real - e.estim) / e.estim) * 100 : 0;
