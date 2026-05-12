@@ -1463,7 +1463,201 @@ const FinanceiroProjetos = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="lucratividade">
+          <TabsContent value="score">
+            <div className="grid grid-cols-2 gap-4">
+              {clientScores.map(client => (
+                <div key={client.nome} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-tight">{client.nome}</h3>
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest">{client.tipoProjeto}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className={cn("text-3xl font-bold font-inter", client.color)}>
+                        {client.score.toFixed(0)}
+                      </div>
+                      <Badge className={cn("border-none rounded-none text-[9px] px-2 mt-1 bg-white/5", client.color)}>
+                        {client.label}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-8 py-4 border-y border-white/5 mb-6">
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Parcelas em Dia</p>
+                      <p className="text-xs font-bold text-green-500">{client.parcelasPagas}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Atrasos</p>
+                      <p className="text-xs font-bold text-red-500">{client.parcelasAtrasadas}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Média Atraso</p>
+                      <p className="text-xs font-bold">{client.diasMediaAtraso.toFixed(1)} dias</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Indicações</p>
+                      <p className="text-xs font-bold text-bronze">{client.indicacoesFeitas}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Resumo do Relacionamento</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.pagamentosAdiantados} Adiantamentos
+                      </Badge>
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.pedidosDesconto} Pedidos Desconto
+                      </Badge>
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.retrabalhoGerado} Retrabalhos
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="simulador">
+            <div className="grid grid-cols-3 gap-6">
+              <div className="bg-white/5 border border-white/5 p-6 space-y-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
+                  <Calculator size={14} className="text-bronze" />
+                  Parâmetros de Simulação
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Número de Projetos (Mês)</label>
+                    <Input 
+                      type="number" 
+                      min="1" max="10"
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      value={simulator.numProjetos}
+                      onChange={e => setSimulator({ ...simulator, numProjetos: parseInt(e.target.value) || 1 })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Projeto</label>
+                    <select 
+                      className="w-full bg-white/5 border border-white/10 rounded-none h-10 text-xs px-3 focus:outline-none focus:border-bronze"
+                      value={simulator.tipo}
+                      onChange={e => setSimulator({ ...simulator, tipo: e.target.value })}
+                    >
+                      <option value="ArqInt">ArqInt</option>
+                      <option value="Interiores">Interiores</option>
+                      <option value="Comercial">Comercial</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Área Média (m²)</label>
+                    <Input 
+                      type="number" 
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      value={simulator.areaM2}
+                      onChange={e => setSimulator({ ...simulator, areaM2: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-2 bg-white/5 border border-white/5 p-8">
+                {(() => {
+                  const tickets = { ArqInt: 150, Interiores: 120, Comercial: 180 };
+                  const ticketMedio = (tickets as any)[simulator.tipo] || 150;
+                  const receitaBruta = simulator.numProjetos * simulator.areaM2 * ticketMedio;
+                  const iss = receitaBruta * 0.02; // 2%
+                  const simples = receitaBruta * 0.06; // 6%
+                  const custosFixos = configEscritorio?.custos_fixos || 15000;
+                  const lucro = receitaBruta - iss - simples - custosFixos;
+                  
+                  const horasNecessarias = simulator.numProjetos * (simulator.areaM2 * 0.5); // Simplified
+                  const capacidadeDisponivel = 320;
+                  const viabilidade = horasNecessarias <= capacidadeDisponivel ? 'VIÁVEL' : 
+                                     horasNecessarias <= capacidadeDisponivel * 1.2 ? 'ATENÇÃO' : 'INVIÁVEL';
+                  const viabilidadeColor = viabilidade === 'VIÁVEL' ? 'text-green-500' : 
+                                         viabilidade === 'ATENÇÃO' ? 'text-amber-500' : 'text-red-500';
+
+                  return (
+                    <div className="grid grid-cols-2 gap-12">
+                      <div className="space-y-6">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Resultado Estimado</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">Receita Bruta</span>
+                            <span className="text-sm font-bold">R$ {receitaBruta.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) ISS (2%)</span>
+                            <span className="text-sm text-red-400">R$ {iss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Simples Nacional (6%)</span>
+                            <span className="text-sm text-red-400">R$ {simples.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Custos Fixos</span>
+                            <span className="text-sm text-red-400">R$ {custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-4">
+                            <span className="text-[10px] uppercase tracking-widest font-bold">Lucro Estimado</span>
+                            <span className={cn("text-xl font-bold font-inter", lucro >= 0 ? "text-bronze" : "text-red-500")}>
+                              R$ {lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Capacidade Operacional</h3>
+                        <div className="bg-white/5 p-6 border border-white/5 space-y-6 text-center">
+                          <div>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Necessárias</p>
+                            <p className="text-2xl font-bold font-inter">{horasNecessarias.toFixed(0)}h</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Capacidade Disponível</p>
+                            <p className="text-2xl font-bold font-inter text-white/20">{capacidadeDisponivel}h</p>
+                          </div>
+                          <div className="pt-4 border-t border-white/5">
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Viabilidade</p>
+                            <p className={cn("text-xl font-bold tracking-widest", viabilidadeColor)}>{viabilidade}</p>
+                          </div>
+                        </div>
+
+                        <div className="h-[100px] w-full mt-4">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={[
+                              { name: 'Receita', val: receitaBruta, fill: '#8B7355' },
+                              { name: 'Custos', val: iss + simples + custosFixos, fill: '#777777' },
+                              { name: 'Lucro', val: lucro > 0 ? lucro : 0, fill: '#FFFFFF' }
+                            ]}>
+                              <XAxis dataKey="name" hide />
+                              <YAxis hide />
+                              <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                              <Bar dataKey="val">
+                                {[
+                                  { fill: '#8B7355' },
+                                  { fill: '#777777' },
+                                  { fill: '#FFFFFF' }
+                                ].map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ponto_equilibrio">
             <div className="flex justify-between items-center mb-6">
               <div className="flex gap-2">
                 {[
