@@ -154,7 +154,9 @@ const FinanceiroProjetos = () => {
       }
 
       // Fetch projects for profitability
-      const { data: projData } = await supabase.from('projetos').select('id, nome, nome_cliente, tipo');
+      const { data: projData } = await supabase
+        .from('projetos')
+        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em');
       
       // Fetch hours for all projects within period
       const { data: hData } = await supabase
@@ -196,9 +198,11 @@ const FinanceiroProjetos = () => {
             tipo: proj.tipo,
             receitaTotal,
             horasReais,
+            horasEstimadas: (proj as any).horas_estimadas || 0,
             custoReal,
             margemRS,
-            margemPercent
+            margemPercent,
+            dataInicio: (proj as any).criado_em
           };
         }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
