@@ -56,6 +56,9 @@ interface Parcela {
   projetos?: {
     tipo: string;
   };
+  agendamento_cobranca?: any;
+  data_notificacao_cobranca?: string;
+  notificacoes_enviadas?: any;
 }
 
 interface ProjetoLucratividade {
@@ -219,16 +222,30 @@ const FinanceiroProjetos = () => {
 
   const metrics = useMemo(() => {
     const today = new Date();
-    const startMonth = startOfMonth(today);
-    const endMonth = endOfMonth(today);
+    
+    let startDate: Date;
+    let endDate: Date = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    if (lucroFilter === 'MES_ATUAL') {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+      startDate = startOfMonth(subDays(new Date(), 90));
+    } else {
+      startDate = parseISO(lucroCustomDates.start);
+      endDate = parseISO(lucroCustomDates.end);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
     const in7Days = addDays(today, 7);
 
     const pagasMes = parcelas
-      .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start: startMonth, end: endMonth }))
+      .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
 
     const previstasMes = parcelas
-      .filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startMonth, end: endMonth }))
+      .filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + p.valor, 0);
 
     const totalAtrasado = parcelas
@@ -416,7 +433,48 @@ const FinanceiroProjetos = () => {
   };
 
   const filteredParcelas = parcelas.filter(p => {
+    // Period filter
+    const dateVenc = parseISO(p.data_vencimento);
+    const dateRec = p.data_recebimento ? parseISO(p.data_recebimento) : null;
+    
+    let startDate: Date;
+    let endDate: Date = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    if (lucroFilter === 'MES_ATUAL') {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+      startDate = startOfMonth(subDays(new Date(), 90));
+    } else {
+      startDate = parseISO(lucroCustomDates.start);
+      endDate = parseISO(lucroCustomDates.end);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    // For period filter, we usually look at vencimento for unpaid and recebimento for paid
+    // But to be consistent with the user's view, let's filter by the date that matters:
+    // If it's paid, it counts for the period if it was received then.
+    // If it's unpaid, it counts if it's due then.
+    const dateToCompare = p.status === 'PAGO' && dateRec ? dateRec : dateVenc;
+    const isInPeriod = isWithinInterval(dateToCompare, { start: startDate, end: endDate });
+    
+    if (!isInPeriod) return false;
+
+    // Status filter
     if (filterStatus === 'TODOS') return true;
+    if (filterStatus === 'EM ABERTO') return p.status === 'EM ABERTO' || p.status === 'VENCE HOJE';
+    
+    const agendamento = p.agendamento_cobranca || { d7: false, d3: false, d1: false };
+    const hasSent = agendamento.d7 || agendamento.d3 || agendamento.d1;
+
+    if (filterStatus === 'REGUA_PENDENTE') {
+      return p.status !== 'PAGO' && !hasSent;
+    }
+    if (filterStatus === 'ENVIADAS') {
+      return p.status !== 'PAGO' && hasSent;
+    }
+    
     return p.status === filterStatus;
   });
 
@@ -465,11 +523,11 @@ const FinanceiroProjetos = () => {
         {/* Metrics Cards */}
         <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
             <span className="text-xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista (Mês)</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista ({lucroFilter === 'MES_ATUAL' ? 'Mês' : 'Período'})</span>
             <span className="text-xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
@@ -503,22 +561,72 @@ const FinanceiroProjetos = () => {
           </TabsList>
 
           <TabsContent value="parcelas">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex gap-2">
-                {['TODOS', 'EM ABERTO', 'ATRASADO', 'PAGO'].map(status => (
-                  <Button 
-                    key={status}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setFilterStatus(status)}
-                    className={cn(
-                      "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
-                      filterStatus === status ? "bg-white/10 text-white" : "text-white/40"
-                    )}
-                  >
-                    {status}
-                  </Button>
-                ))}
+            <div className="flex flex-col gap-6 mb-6">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  {[
+                    { id: 'MES_ATUAL', label: 'Mês Atual' },
+                    { id: 'ULTIMOS_3_MESES', label: 'Últimos 3 Meses' },
+                    { id: 'PERSONALIZADO', label: 'Personalizado' }
+                  ].map(filter => (
+                    <Button 
+                      key={filter.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setLucroFilter(filter.id as any)}
+                      className={cn(
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
+                      )}
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                </div>
+
+                {lucroFilter === 'PERSONALIZADO' && (
+                  <div className="flex gap-2 items-center">
+                    <Input 
+                      type="date" 
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                      value={lucroCustomDates.start}
+                      onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
+                    />
+                    <span className="text-white/20 text-[10px] uppercase">até</span>
+                    <Input 
+                      type="date" 
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                      value={lucroCustomDates.end}
+                      onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  {[
+                    { id: 'TODOS', label: 'Todos' },
+                    { id: 'EM ABERTO', label: 'Em Aberto' },
+                    { id: 'ATRASADO', label: 'Atrasado' },
+                    { id: 'PAGO', label: 'Pago' },
+                    { id: 'REGUA_PENDENTE', label: 'Régua Pendente' },
+                    { id: 'ENVIADAS', label: 'Enviadas' }
+                  ].map(status => (
+                    <Button 
+                      key={status.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFilterStatus(status.id)}
+                      className={cn(
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        filterStatus === status.id ? "bg-white/10 text-white" : "text-white/40"
+                      )}
+                    >
+                      {status.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
 
