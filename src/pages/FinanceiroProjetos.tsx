@@ -54,13 +54,21 @@ interface Parcela {
   status: string;
   data_recebimento?: string;
   valor_recebido?: number;
+  iss_aliquota?: number;
+  iss_valor?: number;
+  valor_liquido?: number;
+  nf_emitida?: boolean;
+  nf_numero?: string;
+  nf_data_emissao?: string;
   projetos?: {
     tipo: string;
+    cidade: string;
   };
   agendamento_cobranca?: any;
   data_notificacao_cobranca?: string;
   notificacoes_enviadas?: any;
 }
+
 
 interface ProjetoLucratividade {
   id: string;
@@ -84,7 +92,14 @@ const FinanceiroProjetos = () => {
   const [filterStatus, setFilterStatus] = useState('TODOS');
   const [selectedParcela, setSelectedParcela] = useState<Parcela | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmData, setConfirmData] = useState({ data: format(new Date(), 'yyyy-MM-dd'), valor: '' });
+  const [confirmData, setConfirmData] = useState({ 
+    data: format(new Date(), 'yyyy-MM-dd'), 
+    valor: '',
+    nf_emitida: false,
+    nf_numero: '',
+    nf_data_emissao: format(new Date(), 'yyyy-MM-dd')
+  });
+
   const [configEscritorio, setConfigEscritorio] = useState<any>(null);
   const [projetosLucratividade, setProjetosLucratividade] = useState<ProjetoLucratividade[]>([]);
   const [lucroFilter, setLucroFilter] = useState<'MES_ATUAL' | 'ULTIMOS_3_MESES' | 'PERSONALIZADO'>('MES_ATUAL');
@@ -107,9 +122,11 @@ const FinanceiroProjetos = () => {
         .select(`
           *,
           projetos (
-            tipo
+            tipo,
+            cidade
           )
         `)
+
         .order('data_vencimento', { ascending: true });
       
       if (pError) throw pError;
@@ -264,14 +281,18 @@ const FinanceiroProjetos = () => {
     if (!selectedParcela) return;
     
     try {
-      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${parseFloat(confirmData.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
+      const valorRecebido = parseFloat(confirmData.valor);
+      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${valorRecebido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
       
       const { error } = await supabase
         .from('financeiro_parcelas')
         .update({
           status: 'PAGO',
           data_recebimento: new Date(confirmData.data).toISOString(),
-          valor_recebido: parseFloat(confirmData.valor)
+          valor_recebido: valorRecebido,
+          nf_emitida: confirmData.nf_emitida,
+          nf_numero: confirmData.nf_numero,
+          nf_data_emissao: confirmData.nf_emitida ? confirmData.nf_data_emissao : null
         })
         .eq('id', selectedParcela.id);
 
@@ -279,6 +300,14 @@ const FinanceiroProjetos = () => {
       
       toast.success('Recebimento confirmado!');
       
+      // Prompt to generate receipt
+      toast.info("Deseja gerar o recibo agora?", {
+        action: {
+          label: "Gerar Recibo",
+          onClick: () => generateReceipt(selectedParcela, { ...selectedParcela, valor_recebido: valorRecebido, data_recebimento: new Date(confirmData.data).toISOString() })
+        }
+      });
+
       // Prompt to send confirmation message
       toast.info("Enviar confirmação de pagamento?", {
         action: {
@@ -294,6 +323,64 @@ const FinanceiroProjetos = () => {
       toast.error('Erro ao confirmar recebimento');
     }
   };
+
+  const generateReceipt = (p: Parcela, updatedP?: any) => {
+    const data = updatedP || p;
+    const doc = new (window as any).jspdf.jsPDF();
+    const bronze: [number, number, number] = [139, 115, 85];
+    const graphite: [number, number, number] = [58, 58, 58];
+    
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text("NL ARQUITETOS", 105, 30, { align: "center" });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.text("A ARQUITETURA COMO DECISÃO", 105, 38, { align: "center" });
+    
+    doc.setFontSize(16);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text("RECIBO DE PAGAMENTO", 105, 55, { align: "center" });
+    
+    doc.setDrawColor(bronze[0], bronze[1], bronze[2]);
+    doc.setLineWidth(0.5);
+    doc.line(40, 60, 170, 60);
+    
+    // Content
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    let y = 80;
+    const leftX = 40;
+    
+    doc.text(`Cliente: ${data.cliente_nome}`, leftX, y); y += 10;
+    doc.text(`Projeto: ${data.projetos?.tipo || 'Projeto'} · ${data.projetos?.cidade || 'N/A'}`, leftX, y); y += 10;
+    doc.text(`Parcela: ${data.numero_parcela}/${data.total_parcelas}`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "bold");
+    doc.text(`Valor bruto: R$ ${data.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "normal");
+    const issVal = data.iss_valor || (data.valor * ((data.iss_aliquota || 2) / 100));
+    const issAliq = data.iss_aliquota || 2;
+    doc.text(`ISS retido: R$ ${issVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${issAliq}%)`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "bold");
+    const liqVal = data.valor_liquido || (data.valor - issVal);
+    doc.text(`Valor líquido: R$ ${liqVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, leftX, y); y += 10;
+    
+    const dataRec = data.data_recebimento ? format(parseISO(data.data_recebimento), 'dd/MM/yyyy') : format(new Date(), 'dd/MM/yyyy');
+    doc.text(`Data de recebimento: ${dataRec}`, leftX, y); y += 30;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.text("NL Arquitetos · São José dos Campos, SP", 105, y, { align: "center" });
+    
+    doc.save(`Recibo_${data.cliente_nome.replace(/\s+/g, '_')}_P${data.numero_parcela}.pdf`);
+    toast.success("Recibo gerado com sucesso!");
+  };
+
 
   const sendWhatsApp = async (p: Parcela, customMsg?: string) => {
     try {
