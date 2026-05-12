@@ -892,6 +892,17 @@ const FinanceiroProjetos = () => {
 
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
+                          {p.status === 'PAGO' && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-white rounded-none"
+                              onClick={() => generateReceipt(p)}
+                            >
+                              <FileText size={14} className="mr-1" />
+                              Recibo
+                            </Button>
+                          )}
                           {(p.status === 'EM ABERTO' || p.status === 'ATRASADO' || p.status === 'VENCE HOJE') && (
                             <>
                               <Button 
@@ -900,12 +911,19 @@ const FinanceiroProjetos = () => {
                                 className="h-8 text-[9px] uppercase tracking-widest border-white/10 hover:bg-bronze hover:text-white rounded-none"
                                 onClick={() => {
                                   setSelectedParcela(p);
-                                  setConfirmData({ ...confirmData, valor: p.valor.toString() });
+                                  setConfirmData({ 
+                                    ...confirmData, 
+                                    valor: p.valor.toString(),
+                                    nf_emitida: false,
+                                    nf_numero: '',
+                                    nf_data_emissao: format(new Date(), 'yyyy-MM-dd')
+                                  });
                                   setIsConfirmModalOpen(true);
                                 }}
                               >
                                 Confirmar
                               </Button>
+
                               {(p.status === 'ATRASADO' || isToday(parseISO(p.data_vencimento))) && (
                                 <Button 
                                   variant="ghost" 
@@ -1215,7 +1233,44 @@ const FinanceiroProjetos = () => {
                   onChange={e => setConfirmData({ ...confirmData, valor: e.target.value })}
                 />
               </div>
+
+              <div className="pt-4 border-t border-white/5 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="checkbox" 
+                    id="nf_emitida"
+                    className="w-4 h-4 rounded-none border-white/10 bg-white/5 accent-bronze"
+                    checked={confirmData.nf_emitida}
+                    onChange={e => setConfirmData({ ...confirmData, nf_emitida: e.target.checked })}
+                  />
+                  <label htmlFor="nf_emitida" className="text-[10px] uppercase tracking-widest text-white/60">NFS-e emitida</label>
+                </div>
+
+                {confirmData.nf_emitida && (
+                  <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Número da Nota</label>
+                      <Input 
+                        placeholder="Ex: 2024001"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        value={confirmData.nf_numero}
+                        onChange={e => setConfirmData({ ...confirmData, nf_numero: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Data de Emissão</label>
+                      <Input 
+                        type="date" 
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        value={confirmData.nf_data_emissao}
+                        onChange={e => setConfirmData({ ...confirmData, nf_data_emissao: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
             <DialogFooter>
               <Button 
                 variant="ghost" 
