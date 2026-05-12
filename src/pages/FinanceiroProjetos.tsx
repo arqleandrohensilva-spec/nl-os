@@ -206,7 +206,7 @@ const FinanceiroProjetos = () => {
       // Fetch projects for profitability
       const { data: projData } = await supabase
         .from('projetos')
-        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em');
+        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em, area_m2');
       
       // Fetch hours for all projects within period
       const { data: hData } = await supabase
