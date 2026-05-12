@@ -1657,7 +1657,7 @@ const FinanceiroProjetos = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="ponto_equilibrio">
+          <TabsContent value="lucratividade">
             <div className="flex justify-between items-center mb-6">
               <div className="flex gap-2">
                 {[
