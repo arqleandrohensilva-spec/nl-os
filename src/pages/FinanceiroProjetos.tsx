@@ -240,11 +240,11 @@ const FinanceiroProjetos = () => {
 
     const in7Days = addDays(today, 7);
 
-    const pagasPeriodo = parcelas
+    const pagasMes = parcelas
       .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
 
-    const previstasPeriodo = parcelas
+    const previstasMes = parcelas
       .filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + p.valor, 0);
 
