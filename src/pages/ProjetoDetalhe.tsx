@@ -74,23 +74,33 @@ interface ChecklistItem {
 const ETAPAS_CONFIG = [
   { 
     id: 'BRIEFING', 
-    label: 'BRIEFING', 
-    items: ['Contrato assinado', 'Entrada recebida', 'Briefing preenchido', 'Visita técnica realizada'] 
+    label: '01 · BRIEFING & VIABILIDADE', 
+    items: ['Contrato assinado', 'Financeiro aprovado', 'Briefing preenchido', 'Levantamento técnico realizado'] 
   },
   { 
-    id: 'ANTEPROJETO', 
-    label: 'ANTEPROJETO', 
-    items: ['Plantas esquemáticas', 'Mood board', 'Apresentação ao cliente', 'Aprovação formal recebida'] 
+    id: 'CONCEITO', 
+    label: '02 · CONCEITO & MOODBOARD', 
+    items: ['Painel de referências', 'Definição de paleta de cores', 'Setores e fluxogramas', 'Aprovação do partido arquitetônico'] 
+  },
+  { 
+    id: 'ESTUDO', 
+    label: '03 · ESTUDO PRELIMINAR (3D)', 
+    items: ['Modelagem 3D volumétrica', 'Imagens fotorrealistas', 'Definição de materiais', 'Aprovação visual do cliente'] 
   },
   { 
     id: 'EXECUTIVO', 
-    label: 'PROJETO EXECUTIVO', 
-    items: ['Todos os arquivos exportados', 'Revisão técnica concluída', 'Compatibilização realizada', 'Aprovação formal recebida'] 
+    label: '04 · PROJETO EXECUTIVO', 
+    items: ['Plantas técnicas de construção', 'Pontos elétricos e hidráulicos', 'Paginação de pisos e revestimentos', 'Revisão técnica final'] 
+  },
+  { 
+    id: 'DETALHAMENTO', 
+    label: '05 · DETALHAMENTO PREMIUM', 
+    items: ['Marcenaria detalhada', 'Marmoraria e pedras', 'Luminotécnico e gesso', 'Caderno de especificações (Mobiliário)'] 
   },
   { 
     id: 'ACOMPANHAMENTO', 
-    label: 'ACOMPANHAMENTO DE OBRA', 
-    items: ['Relatório de visita registrado', 'Fotos anexadas', 'Pendências documentadas', 'Comunicação com cliente realizada'] 
+    label: '06 · ACOMPANHAMENTO DE OBRA', 
+    items: ['Visita inicial de marcação', 'Relatório de evolução semanal', 'Gestão de fornecedores', 'Entrega final (As Built)'] 
   }
 ];
 
@@ -870,9 +880,11 @@ const ProjetoDetalhe = () => {
 const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[] }) => {
   const ETAPAS_CONFIG_LOC = [
     { id: 'BRIEFING', label: 'BRIEFING' },
-    { id: 'ANTEPROJETO', label: 'ANTEPROJETO' },
+    { id: 'CONCEITO', label: 'CONCEITO' },
+    { id: 'ESTUDO', label: 'ESTUDO' },
     { id: 'EXECUTIVO', label: 'EXECUTIVO' },
-    { id: 'ACOMPANHAMENTO', label: 'ACOMPANHAMENTO' }
+    { id: 'DETALHAMENTO', label: 'DETALHAMENTO' },
+    { id: 'ACOMPANHAMENTO', label: 'OBRA' }
   ];
 
   return (

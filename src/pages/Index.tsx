@@ -95,8 +95,10 @@ const Index = () => {
   const [conversionLead, setConversionLead] = useState<Lead | null>(null);
   const [conversionHours, setConversionHours] = useState({
     briefing: 20,
-    anteprojeto: 120,
+    conceito: 40,
+    estudo: 80,
     executivo: 100,
+    detalhamento: 60,
     acompanhamento: 40
   });
 

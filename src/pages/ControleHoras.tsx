@@ -88,9 +88,10 @@ export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: num
 const StageBadge = ({ stage }: { stage: string }) => {
   const configs: Record<string, { bg: string, text: string }> = {
     'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
-    'Anteprojeto': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Conceito': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
+    'Estudo Preliminar': { bg: 'bg-[#D4AF37]/15', text: 'text-[#D4AF37]' },
     'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
-    'Acompanhamento de Obra': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+    'Detalhamento': { bg: 'bg-[#6B4E71]/15', text: 'text-[#6B4E71]' },
     'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
   };
 
