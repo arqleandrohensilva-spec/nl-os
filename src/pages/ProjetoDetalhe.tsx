@@ -932,6 +932,109 @@ const ProjetoDetalhe = () => {
                 </div>
               </div>
 
+              {/* Financeiro do Projeto - Internal Only */}
+              <div className="bg-[#1A1816] border border-white/5 p-10 relative overflow-hidden space-y-6">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-2 flex items-center gap-2">
+                      <DollarSign size={12} /> Financeiro
+                    </h4>
+                  </div>
+                  <Badge className="bg-[#8B7355]/20 text-[#8B7355] border-none text-[8px] tracking-widest rounded-none">CADASTRO</Badge>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Valor Total (R$)</label>
+                    <Input 
+                      type="number" 
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      placeholder="0,00"
+                      value={projeto.valor_total || ''}
+                      onChange={(e) => setProjeto(prev => prev ? {...prev, valor_total: parseFloat(e.target.value)} : null)}
+                      onBlur={async () => {
+                        if (projeto?.id && (projeto?.valor_total ?? 0) > 0) {
+                          await supabase.from('projetos').update({ valor_total: projeto.valor_total }).eq('id', projeto.id);
+                          toast.success('Valor total atualizado');
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Entrada (R$)</label>
+                      <Input 
+                        type="number" 
+                        id="valor_entrada"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        placeholder="0,00"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Parcelas</label>
+                      <Input 
+                        type="number" 
+                        id="num_parcelas"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        placeholder="Ex: 4"
+                      />
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full bg-[#8B7355] hover:bg-[#8B7355]/90 text-white rounded-none text-[9px] uppercase font-bold tracking-widest h-10"
+                    onClick={async () => {
+                      const valorTotal = projeto?.valor_total;
+                      const entrada = parseFloat((document.getElementById('valor_entrada') as HTMLInputElement)?.value || '0');
+                      const numParcelas = parseInt((document.getElementById('num_parcelas') as HTMLInputElement)?.value || '1');
+                      
+                      if (!valorTotal || !numParcelas || !projeto) {
+                        toast.error('Preencha os valores corretamente');
+                        return;
+                      }
+
+                      const valorRestante = valorTotal - entrada;
+                      const valorParcela = valorRestante / numParcelas;
+                      const novasParcelas = [];
+
+                      if (entrada > 0) {
+                        novasParcelas.push({
+                          projeto_id: projeto.id,
+                          cliente_nome: projeto.nome_cliente,
+                          numero_parcela: 1,
+                          total_parcelas: numParcelas + 1,
+                          valor: entrada,
+                          data_vencimento: new Date().toISOString().split('T')[0],
+                          status: 'EM ABERTO'
+                        });
+                      }
+
+                      for (let i = 1; i <= numParcelas; i++) {
+                        const dataVenc = addMonths(new Date(), i);
+                        novasParcelas.push({
+                          projeto_id: projeto.id,
+                          cliente_nome: projeto.nome_cliente,
+                          numero_parcela: i + (entrada > 0 ? 1 : 0),
+                          total_parcelas: numParcelas + (entrada > 0 ? 1 : 0),
+                          valor: valorParcela,
+                          data_vencimento: dataVenc.toISOString().split('T')[0],
+                          status: 'EM ABERTO'
+                        });
+                      }
+
+                      const { error } = await supabase.from('financeiro_parcelas').insert(novasParcelas);
+                      if (error) {
+                        toast.error('Erro ao gerar parcelas');
+                      } else {
+                        toast.success('Parcelas geradas no Financeiro');
+                      }
+                    }}
+                  >
+                    Gerar Fluxo de Caixa
+                  </Button>
+                </div>
+              </div>
+
               {/* Profitability Index - Internal Only */}
               <div className="bg-[#1A1816] border border-[#8B7355]/30 p-10 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
