@@ -246,6 +246,8 @@ const FinanceiroProjetos = () => {
     if (!selectedParcela) return;
     
     try {
+      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${parseFloat(confirmData.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
+      
       const { error } = await supabase
         .from('financeiro_parcelas')
         .update({
@@ -258,6 +260,15 @@ const FinanceiroProjetos = () => {
       if (error) throw error;
       
       toast.success('Recebimento confirmado!');
+      
+      // Prompt to send confirmation message
+      toast.info("Enviar confirmação de pagamento?", {
+        action: {
+          label: "Enviar WhatsApp",
+          onClick: () => sendWhatsApp(selectedParcela, msg)
+        }
+      });
+
       setIsConfirmModalOpen(false);
       fetchData();
     } catch (error) {
