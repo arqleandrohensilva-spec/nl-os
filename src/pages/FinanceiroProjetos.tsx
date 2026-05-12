@@ -547,22 +547,72 @@ const FinanceiroProjetos = () => {
           </TabsList>
 
           <TabsContent value="parcelas">
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex gap-2">
-                {['TODOS', 'EM ABERTO', 'ATRASADO', 'PAGO'].map(status => (
-                  <Button 
-                    key={status}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setFilterStatus(status)}
-                    className={cn(
-                      "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
-                      filterStatus === status ? "bg-white/10 text-white" : "text-white/40"
-                    )}
-                  >
-                    {status}
-                  </Button>
-                ))}
+            <div className="flex flex-col gap-6 mb-6">
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  {[
+                    { id: 'MES_ATUAL', label: 'Mês Atual' },
+                    { id: 'ULTIMOS_3_MESES', label: 'Últimos 3 Meses' },
+                    { id: 'PERSONALIZADO', label: 'Personalizado' }
+                  ].map(filter => (
+                    <Button 
+                      key={filter.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setLucroFilter(filter.id as any)}
+                      className={cn(
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
+                      )}
+                    >
+                      {filter.label}
+                    </Button>
+                  ))}
+                </div>
+
+                {lucroFilter === 'PERSONALIZADO' && (
+                  <div className="flex gap-2 items-center">
+                    <Input 
+                      type="date" 
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                      value={lucroCustomDates.start}
+                      onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
+                    />
+                    <span className="text-white/20 text-[10px] uppercase">até</span>
+                    <Input 
+                      type="date" 
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                      value={lucroCustomDates.end}
+                      onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center">
+                <div className="flex gap-2">
+                  {[
+                    { id: 'TODOS', label: 'Todos' },
+                    { id: 'EM ABERTO', label: 'Em Aberto' },
+                    { id: 'ATRASADO', label: 'Atrasado' },
+                    { id: 'PAGO', label: 'Pago' },
+                    { id: 'REGUA_PENDENTE', label: 'Régua Pendente' },
+                    { id: 'ENVIADAS', label: 'Enviadas' }
+                  ].map(status => (
+                    <Button 
+                      key={status.id}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFilterStatus(status.id)}
+                      className={cn(
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        filterStatus === status.id ? "bg-white/10 text-white" : "text-white/40"
+                      )}
+                    >
+                      {status.label}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
 
