@@ -880,10 +880,12 @@ const ControleHoras = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                    <SelectItem value="Briefing">Briefing</SelectItem>
-                    <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
-                    <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
-                    <SelectItem value="Acompanhamento de Obra">Acompanhamento de Obra</SelectItem>
+                    <SelectItem value="Briefing">01 · Briefing</SelectItem>
+                    <SelectItem value="Conceito">02 · Conceito</SelectItem>
+                    <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
+                    <SelectItem value="Projeto Executivo">04 · Projeto Executivo</SelectItem>
+                    <SelectItem value="Detalhamento">05 · Detalhamento</SelectItem>
+                    <SelectItem value="Acompanhamento">06 · Acompanhamento</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1074,10 +1076,12 @@ const ControleHoras = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1A1A1A] border-white/5 text-white">
-                      <SelectItem value="Briefing">Briefing</SelectItem>
-                      <SelectItem value="Anteprojeto">Anteprojeto</SelectItem>
-                      <SelectItem value="Projeto Executivo">Projeto Executivo</SelectItem>
-                      <SelectItem value="Acompanhamento de Obra">Acompanhamento</SelectItem>
+                      <SelectItem value="Briefing">01 · Briefing</SelectItem>
+                      <SelectItem value="Conceito">02 · Conceito</SelectItem>
+                      <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
+                      <SelectItem value="Projeto Executivo">04 · Projeto Executivo</SelectItem>
+                      <SelectItem value="Detalhamento">05 · Detalhamento</SelectItem>
+                      <SelectItem value="Acompanhamento">06 · Acompanhamento</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
