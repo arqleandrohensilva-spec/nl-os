@@ -419,7 +419,48 @@ const FinanceiroProjetos = () => {
   };
 
   const filteredParcelas = parcelas.filter(p => {
+    // Period filter
+    const dateVenc = parseISO(p.data_vencimento);
+    const dateRec = p.data_recebimento ? parseISO(p.data_recebimento) : null;
+    
+    let startDate: Date;
+    let endDate: Date = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    if (lucroFilter === 'MES_ATUAL') {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+      startDate = startOfMonth(subDays(new Date(), 90));
+    } else {
+      startDate = parseISO(lucroCustomDates.start);
+      endDate = parseISO(lucroCustomDates.end);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    // For period filter, we usually look at vencimento for unpaid and recebimento for paid
+    // But to be consistent with the user's view, let's filter by the date that matters:
+    // If it's paid, it counts for the period if it was received then.
+    // If it's unpaid, it counts if it's due then.
+    const dateToCompare = p.status === 'PAGO' && dateRec ? dateRec : dateVenc;
+    const isInPeriod = isWithinInterval(dateToCompare, { start: startDate, end: endDate });
+    
+    if (!isInPeriod) return false;
+
+    // Status filter
     if (filterStatus === 'TODOS') return true;
+    if (filterStatus === 'EM ABERTO') return p.status === 'EM ABERTO' || p.status === 'VENCE HOJE';
+    
+    const agendamento = p.agendamento_cobranca || { d7: false, d3: false, d1: false };
+    const hasSent = agendamento.d7 || agendamento.d3 || agendamento.d1;
+
+    if (filterStatus === 'REGUA_PENDENTE') {
+      return p.status !== 'PAGO' && !hasSent;
+    }
+    if (filterStatus === 'ENVIADAS') {
+      return p.status !== 'PAGO' && hasSent;
+    }
+    
     return p.status === filterStatus;
   });
 
