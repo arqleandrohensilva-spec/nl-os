@@ -817,19 +817,19 @@ const FinanceiroProjetos = () => {
               ))}
             </div>
             
-            <div className="mt-8 p-6 bg-bronze/10 border border-bronze/20 flex justify-between items-center">
+            <div className="mt-8 p-6 bg-white/5 border border-white/5 flex justify-between items-center">
               <div>
-                <h4 className="text-[10px] uppercase tracking-widest font-bold text-bronze">Total Geral (Próximos 3 meses)</h4>
-                <p className="text-xs text-white/60">Consolidado de todas as parcelas previstas e confirmadas</p>
+                <h4 className="text-[11px] uppercase tracking-widest font-normal text-[#777777] font-inter">Total Geral (Próximos 3 meses)</h4>
+                <p className="text-[10px] text-white/20 uppercase font-inter mt-1">Consolidado de todas as parcelas previstas e confirmadas</p>
               </div>
               <div className="flex gap-12 text-right">
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Previsto Total</p>
-                  <p className="text-xl font-bold">R$ {fluxoCaixa.reduce((acc, m) => acc + m.previsto, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Previsto Geral</p>
+                  <p className="text-[22px] font-normal text-[#777777] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.previsto, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Confirmado Total</p>
-                  <p className="text-xl font-bold text-[#FFFFFF]">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado Geral</p>
+                  <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
             </div>
