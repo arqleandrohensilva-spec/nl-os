@@ -58,7 +58,7 @@ interface Parcela {
   };
   agendamento_cobranca?: any;
   data_notificacao_cobranca?: string;
-  notificacoes_enviadas?: any[];
+  notificacoes_enviadas?: any;
 }
 
 interface ProjetoLucratividade {
