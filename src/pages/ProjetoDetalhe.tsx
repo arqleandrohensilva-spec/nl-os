@@ -579,6 +579,18 @@ const ProjetoDetalhe = () => {
 
         {clientMode ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+            {/* Status do Projeto Card */}
+            <div className="mb-12 bg-[#F8F9FA] p-8 border-none flex flex-col items-center text-center animate-in fade-in duration-1000">
+              <span className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-4">Status do Projeto</span>
+              <p className="text-[15px] text-[#3A3A3A] font-inter leading-relaxed max-w-2xl">
+                {gerarResumo(
+                  projeto.tipo, 
+                  projeto.etapa_atual, 
+                  etapas.find(e => e.etapa === projeto.etapa_atual.toUpperCase())?.status || 'Em andamento'
+                )}
+              </p>
+            </div>
+
             {/* Visual Experience Header */}
             <div className="mb-20 text-center space-y-4">
               <span className="text-[10px] uppercase tracking-[0.5em] text-[#8B7355] font-bold italic">Experiência do Cliente</span>
