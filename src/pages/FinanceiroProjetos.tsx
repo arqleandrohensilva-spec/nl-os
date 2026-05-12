@@ -337,23 +337,34 @@ const FinanceiroProjetos = () => {
         </header>
 
         {/* Metrics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada (Mês)</span>
-            <span className="text-2xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Confirmada</span>
+            <span className="text-xl font-bold">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Receita Prevista (Mês)</span>
-            <span className="text-2xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Prevista (Mês)</span>
+            <span className="text-xl font-bold">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[10px] text-red-500/60 uppercase tracking-widest font-bold">Em Atraso</span>
-            <span className="text-2xl font-bold text-red-500">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[10px] text-red-500/60 uppercase tracking-widest font-bold">Atrasado</span>
+            <span className="text-xl font-bold text-red-500">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Vencendo em 7 dias</span>
-            <span className={cn("text-2xl font-bold", metrics.vencendo7Dias > 0 && "text-bronze")}>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Próximos 7 dias</span>
+            <span className={cn("text-xl font-bold", metrics.vencendo7Dias > 0 && "text-bronze")}>
               {metrics.vencendo7Dias} {metrics.vencendo7Dias === 1 ? 'parcela' : 'parcelas'}
+            </span>
+          </div>
+          <div className="bg-white/5 p-6 border border-bronze/20 flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
+              <TrendingUp size={12} className="text-bronze" />
+            </div>
+            <span className="text-[10px] text-bronze uppercase tracking-widest font-bold">LTV Médio (Hist.)</span>
+            <span className="text-xl font-bold">
+              R$ {(projetosLucratividade.length > 0 
+                ? projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0) / projetosLucratividade.length 
+                : 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
             </span>
           </div>
         </div>
