@@ -22,7 +22,14 @@ import {
   Target,
   Download,
   BarChart3,
-  Activity
+  Activity,
+  UserCheck,
+  Calculator,
+  Thermometer,
+  TrendingDown,
+  Layers,
+  Bell,
+  Check
 } from 'lucide-react';
 import { 
   BarChart, 
