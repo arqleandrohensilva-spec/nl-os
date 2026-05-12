@@ -587,8 +587,42 @@ const Index = () => {
       <Sidebar user={user} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-10 pt-10 pb-0">
+          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS ATIVOS</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              {leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length}
+            </span>
+          </div>
+          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO MÉDIA</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              {leads.length > 0 ? `${Math.round((leads.filter(l => l.stage === 'Fechado').length / leads.length) * 100)}%` : '0%'}
+            </span>
+          </div>
+          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">FOLLOW-UPS HOJE</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              {leads.filter(l => l.stage === 'Proposta Enviada').length}
+            </span>
+          </div>
+          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
+              <TrendingUp size={12} className="text-bronze" />
+            </div>
+            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+              R$ {leads
+                .filter(l => l.stage !== 'Perdido')
+                .reduce((acc, l) => acc + (l.orcamento || 0), 0)
+                .toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+            </span>
+          </div>
+        </div>
+
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-white z-10">
+        <div className="flex-shrink-0 bg-[#FDFDFD] z-10">
           <div className="px-10 py-6 border-b border-beige flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none uppercase">Pipeline de Leads</h1>
