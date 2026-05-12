@@ -48,6 +48,12 @@ interface Projeto {
   data_inicio: string;
   prazo_final: string;
   horas_estimadas?: number;
+  horas_briefing?: number;
+  horas_conceito?: number;
+  horas_anteprojeto?: number;
+  horas_executivo?: number;
+  horas_detalhamento?: number;
+  horas_acompanhamento?: number;
 }
 
 interface Etapa {
