@@ -100,16 +100,16 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
   };
 
   return (
-    <div className="flex flex-col bg-white border-b border-beige">
-      <div className="flex border-b border-beige/50">
+    <div className="flex flex-col bg-[#1A1816] border-b border-white/10">
+      <div className="flex border-b border-white/10">
         <div className="flex-1 px-10 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-[9px] font-bold text-muted uppercase tracking-[0.2em]">Meta do Mês:</span>
+            <span className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em]">Meta do Mês:</span>
             <span className={cn("text-[10px] font-bold uppercase tracking-widest", corTextoMeta)}>
               {fechadosMes} de {metaFechamentos} projetos fechados
             </span>
           </div>
-          <div className="flex-1 max-w-md ml-8 h-1 bg-[#E8E4DF] rounded-full overflow-hidden">
+          <div className="flex-1 max-w-md ml-8 h-1 bg-white/5 rounded-full overflow-hidden">
             <div 
               className={cn("h-full transition-all duration-1000", corMeta)} 
               style={{ width: `${percentualMeta}%` }}
