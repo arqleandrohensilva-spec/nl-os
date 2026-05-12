@@ -20,7 +20,11 @@ import {
   MessageSquare,
   ChevronDown,
   Activity,
-  LayoutDashboard
+  LayoutDashboard,
+  TrendingUp,
+  DollarSign,
+  FileText,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -512,34 +516,47 @@ Gere a mensagem de WhatsApp.`;
             </Button>
           </div>
 
-          <div className="grid grid-cols-5 gap-6">
-            {[
-              { label: 'Total Enviadas', value: proposals.length, icon: Send },
-              { label: 'Aguardando', value: proposals.filter(p => p.status === 'Enviada' || p.status === 'Vista').length, icon: Clock },
-              { label: 'Alto Interesse', value: proposals.filter(p => (p.views_count || 0) >= 3).length, icon: Activity, highlight: true },
-              { label: 'Aprovadas', value: proposals.filter(p => p.status === 'Aprovada').length, icon: CheckCircle2 },
-              { label: 'Taxa de Conversão', value: `${proposals.length > 0 ? Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100) : 0}%`, icon: History },
-            ].map((m, i) => (
-              <div 
-                key={i}
-                className={cn(
-                  "bg-white p-6 rounded-[2px] border shadow-sm relative overflow-hidden group transition-all",
-                  m.highlight ? "border-bronze/50 bg-bronze/[0.02]" : "border-[#E8E4DF]"
-                )}
-              >
-                <div className="relative z-10">
-                  <p className={cn(
-                    "text-[10px] uppercase tracking-[0.2em] mb-1 font-bold",
-                    m.highlight ? "text-bronze" : "text-muted-foreground"
-                  )}>{m.label}</p>
-                  <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
-                </div>
-                <m.icon size={40} className={cn(
-                  "absolute right-[-10px] bottom-[-10px] transition-colors",
-                  m.highlight ? "text-bronze/20" : "text-bronze/5 group-hover:text-bronze/10"
-                )} />
+          <div className="grid grid-cols-5 gap-4">
+            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
+              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+                {proposals.length}
+              </span>
+            </div>
+            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">TAXA DE ABERTURA</span>
+              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+                {proposals.length > 0 
+                  ? `${Math.round((proposals.filter(p => p.views_count && p.views_count > 0).length / proposals.length) * 100)}%`
+                  : '0%'}
+              </span>
+            </div>
+            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO</span>
+              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+                {proposals.length > 0 
+                  ? `${Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100)}%`
+                  : '0%'}
+              </span>
+            </div>
+            <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col gap-1">
+              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS NO FUNIL</span>
+              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+                {leads.length}
+              </span>
+            </div>
+            <div className="bg-white p-6 border border-bronze/20 rounded-[2px] shadow-sm flex flex-col gap-1 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
+                <TrendingUp size={12} className="text-bronze" />
               </div>
-            ))}
+              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+              <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+                R$ {proposals
+                  .filter(p => p.status !== 'Aprovada' && p.status !== 'Recusada')
+                  .reduce((acc, p) => acc + (p.valor_completo || 0), 0)
+                  .toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+              </span>
+            </div>
           </div>
         </header>
 

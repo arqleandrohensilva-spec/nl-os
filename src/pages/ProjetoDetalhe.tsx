@@ -300,10 +300,10 @@ const ProjetoDetalhe = () => {
       doc.setFontSize(10);
       dataY += 8;
       const estimadas = projeto.horas_estimadas || 0;
-      const variação = horasReais - estimadas;
+      const variacao = horasReais - estimadas;
       doc.text(`Horas estimadas: ${estimadas}h`, 20, dataY);
       doc.text(`Horas realizadas: ${horasReais}h`, 80, dataY);
-      doc.text(`Variação: ${variação > 0 ? '+' : ''}${variação}h`, 140, dataY);
+      doc.text(`Variação: ${variacao > 0 ? '+' : ''}${variacao}h`, 140, dataY);
       
       // Checklist
       dataY += 15;
@@ -557,25 +557,25 @@ const ProjetoDetalhe = () => {
               </span>
             </div>
             
-            <div className="flex flex-wrap gap-8 text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+            <div className="flex flex-wrap gap-8 text-[11px] text-[#777777] uppercase font-normal font-inter">
+              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
                 <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
                 <Maximize2 size={14} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2} m²` : 'Área não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
                 <Calendar size={14} className="text-[#8B7355]" /> Início: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
               </div>
-              <div className="flex items-center gap-2 hover:text-white transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
                 <Clock size={14} className="text-[#8B7355]" /> Prazo: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'Sob consulta'}
               </div>
             </div>
           </div>
 
           <div className="text-right">
-            <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-3 font-bold">Status do Ativo</p>
-            <span className="text-3xl font-cormorant italic text-white leading-none">
+            <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-3">Status do Ativo</p>
+            <span className="text-3xl font-cormorant italic text-[#FFFFFF] leading-none">
               {projeto.status_geral}
             </span>
           </div>
