@@ -723,8 +723,7 @@ const FinanceiroProjetos = () => {
       let label = 'EXCELENTE';
       let color = 'text-green-500';
       if (finalScore < 50) { label = 'RISCO'; color = 'text-red-500'; }
-      else if (finalScore < 70) { label = 'ATENÇÃO'; color = 'text-amber-500'; }
-      else if (finalScore < 85) { label = 'BOM'; color = 'text-blue-400'; }
+      else if (finalScore < 80) { label = 'ATENÇÃO'; color = 'text-amber-500'; }
       
       return { ...client, score: finalScore, label, color, diasMediaAtraso };
     });
