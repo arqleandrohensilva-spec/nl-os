@@ -915,10 +915,10 @@ const FinanceiroProjetos = () => {
                 {/* Summary Card */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white/5 p-8 border border-white/5">
-                    <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold block mb-2">Margem Média Geral</span>
+                    <span className="text-[11px] text-[#777777] uppercase font-normal font-inter block mb-2">Margem Média Geral</span>
                     <div className="flex items-center gap-4">
                       <span className={cn(
-                        "text-3xl font-bold",
+                        "text-[22px] font-normal font-inter",
                         (lucroResumo?.margemMedia || 0) > 20 ? "text-green-500" : (lucroResumo?.margemMedia || 0) > 10 ? "text-bronze" : "text-red-500"
                       )}>
                         {(lucroResumo?.margemMedia || 0).toFixed(1)}%
@@ -935,15 +935,15 @@ const FinanceiroProjetos = () => {
                     </div>
                   </div>
                   <div className="bg-white/5 p-8 border border-white/5">
-                    <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold block mb-2">Total Recebido vs Custo Real</span>
+                    <span className="text-[11px] text-[#777777] uppercase font-normal font-inter block mb-2">Total Recebido vs Custo Real</span>
                     <div className="grid grid-cols-2 gap-8">
                       <div>
-                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Recebido</p>
-                        <p className="text-xl font-bold text-[#FFFFFF]">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Recebido</p>
+                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
-                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Custo Total</p>
-                        <p className="text-xl font-bold text-white/60">R$ {(lucroResumo?.totalCusto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Custo Total</p>
+                        <p className="text-[22px] font-normal text-[#777777] font-inter">R$ {(lucroResumo?.totalCusto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
                   </div>
