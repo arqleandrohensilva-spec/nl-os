@@ -246,6 +246,8 @@ const FinanceiroProjetos = () => {
     if (!selectedParcela) return;
     
     try {
+      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${parseFloat(confirmData.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
+      
       const { error } = await supabase
         .from('financeiro_parcelas')
         .update({
@@ -258,6 +260,15 @@ const FinanceiroProjetos = () => {
       if (error) throw error;
       
       toast.success('Recebimento confirmado!');
+      
+      // Prompt to send confirmation message
+      toast.info("Enviar confirmação de pagamento?", {
+        action: {
+          label: "Enviar WhatsApp",
+          onClick: () => sendWhatsApp(selectedParcela, msg)
+        }
+      });
+
       setIsConfirmModalOpen(false);
       fetchData();
     } catch (error) {
@@ -266,22 +277,125 @@ const FinanceiroProjetos = () => {
     }
   };
 
-  const sendWhatsApp = async (p: Parcela) => {
+  const sendWhatsApp = async (p: Parcela, customMsg?: string) => {
     try {
-      const msg = `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
+      const msg = customMsg || `Olá ${p.cliente_nome}, a parcela ${p.numero_parcela}/${p.total_parcelas} do projeto vence hoje, no valor de R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Qualquer dúvida estou à disposição.`;
       
-      // Update notification date in database
+      const newNotification = {
+        data: new Date().toISOString(),
+        tipo: customMsg ? 'RÉGUA' : 'MANUAL',
+        mensagem: msg
+      };
+
+      const { data: currentData } = await supabase
+        .from('financeiro_parcelas')
+        .select('notificacoes_enviadas')
+        .eq('id', p.id)
+        .single();
+
+      const currentNotificacoes = Array.isArray(currentData?.notificacoes_enviadas) 
+        ? currentData.notificacoes_enviadas 
+        : [];
+      const notificacoes = [...currentNotificacoes, newNotification];
+
       await supabase
         .from('financeiro_parcelas')
-        .update({ data_notificacao_cobranca: new Date().toISOString() })
+        .update({ 
+          data_notificacao_cobranca: new Date().toISOString(),
+          notificacoes_enviadas: notificacoes
+        })
         .eq('id', p.id);
       
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-      fetchData(); // Refresh to show notification badge
+      fetchData(); 
     } catch (error) {
       console.error('Error updating notification date:', error);
     }
   };
+
+  const getReguaStatus = (p: Parcela) => {
+    const dateVenc = parseISO(p.data_vencimento);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const diffDays = Math.ceil((dateVenc.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const agendamento = (p as any).agendamento_cobranca || { d7: false, d3: false, d1: false };
+    
+    const steps = [
+      { day: 7, key: 'd7' as const, label: 'D-7' },
+      { day: 3, key: 'd3' as const, label: 'D-3' },
+      { day: 1, key: 'd1' as const, label: 'D-1' }
+    ];
+
+    return (
+      <div className="flex gap-1 mt-1">
+        {steps.map(step => {
+          const isPast = diffDays < step.day;
+          const isSent = agendamento[step.key];
+          return (
+            <div 
+              key={step.key}
+              title={isSent ? `Enviado ${step.label}` : isPast ? `Pulado ${step.label}` : `Agendado ${step.label}`}
+              className={cn(
+                "w-2 h-2 rounded-full",
+                isSent ? "bg-green-500" : isPast ? "bg-white/10" : "bg-bronze/40 animate-pulse"
+              )}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
+  const processReguaCobranca = async (parcelasToProcess: Parcela[]) => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    for (const p of parcelasToProcess) {
+      if (p.status === 'PAGO') continue;
+
+      const dateVenc = parseISO(p.data_vencimento);
+      const diffDays = Math.ceil((dateVenc.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      const agendamento = (p as any).agendamento_cobranca || { d7: false, d3: false, d1: false };
+      
+      let msg = "";
+      let key: 'd7' | 'd3' | 'd1' | null = null;
+
+      if (diffDays === 7 && !agendamento.d7) {
+        msg = `Olá ${p.cliente_nome}, lembrete da parcela ${p.numero_parcela}/${p.total_parcelas} que vence em 7 dias (R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}).`;
+        key = 'd7';
+      } else if (diffDays === 3 && !agendamento.d3) {
+        msg = `Olá ${p.cliente_nome}, passando para lembrar que sua parcela vence em 3 dias. Valor: R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}.`;
+        key = 'd3';
+      } else if (diffDays === 1 && !agendamento.d1) {
+        msg = `Amanhã vence a sua parcela ${p.numero_parcela}/${p.total_parcelas}. Segue o lembrete para evitar atrasos!`;
+        key = 'd1';
+      }
+
+      if (key && msg) {
+        const newAgendamento = { ...agendamento, [key]: true };
+        await supabase
+          .from('financeiro_parcelas')
+          .update({ agendamento_cobranca: newAgendamento })
+          .eq('id', p.id);
+        
+        // In a real app, this would be a backend trigger. 
+        // Here we notify the user to send it.
+        toast.info(`Régua: Notificação ${key.toUpperCase()} disponível para ${p.cliente_nome}`, {
+          action: {
+            label: "Enviar",
+            onClick: () => sendWhatsApp(p, msg)
+          }
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (parcelas.length > 0) {
+      processReguaCobranca(parcelas);
+    }
+  }, [parcelas.length]);
 
   const getStatusBadge = (p: Parcela) => {
     const dateVenc = parseISO(p.data_vencimento);
@@ -445,8 +559,9 @@ const FinanceiroProjetos = () => {
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
                           {getStatusBadge(p)}
+                          {getReguaStatus(p)}
                           {(p as any).data_notificacao_cobranca && (
-                            <span className="text-[8px] text-white/20 uppercase">Avisado em {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
+                            <span className="text-[8px] text-white/20 uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
                           )}
                         </div>
                       </td>
