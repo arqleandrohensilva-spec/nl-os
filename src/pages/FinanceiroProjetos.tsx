@@ -71,6 +71,7 @@ interface ProjetoLucratividade {
 }
 
 const FinanceiroProjetos = () => {
+  const navigate = useNavigate();
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('parcelas');
