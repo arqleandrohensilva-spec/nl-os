@@ -57,6 +57,18 @@ interface Parcela {
   };
 }
 
+interface ProjetoLucratividade {
+  id: string;
+  nome: string;
+  nome_cliente: string;
+  tipo: string;
+  receitaTotal: number;
+  horasReais: number;
+  custoReal: number;
+  margemRS: number;
+  margemPercent: number;
+}
+
 const FinanceiroProjetos = () => {
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +78,7 @@ const FinanceiroProjetos = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [confirmData, setConfirmData] = useState({ data: format(new Date(), 'yyyy-MM-dd'), valor: '' });
   const [configEscritorio, setConfigEscritorio] = useState<any>(null);
-  const [projetosHoras, setProjetosHoras] = useState<any[]>([]);
+  const [projetosLucratividade, setProjetosLucratividade] = useState<ProjetoLucratividade[]>([]);
 
   useEffect(() => {
     fetchData();
