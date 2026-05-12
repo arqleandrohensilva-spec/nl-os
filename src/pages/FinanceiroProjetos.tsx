@@ -22,7 +22,14 @@ import {
   Target,
   Download,
   BarChart3,
-  Activity
+  Activity,
+  UserCheck,
+  Calculator,
+  Thermometer,
+  TrendingDown,
+  Layers,
+  Bell,
+  Check
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -123,6 +130,13 @@ const FinanceiroProjetos = () => {
     end: format(endOfMonth(new Date()), 'yyyy-MM-dd')
   });
 
+  // Simulator State (ABA 6)
+  const [simulator, setSimulator] = useState({
+    numProjetos: 1,
+    tipo: 'ArqInt',
+    areaM2: 100
+  });
+
   useEffect(() => {
     fetchData();
   }, [lucroFilter, lucroCustomDates]);
@@ -192,7 +206,7 @@ const FinanceiroProjetos = () => {
       // Fetch projects for profitability
       const { data: projData } = await supabase
         .from('projetos')
-        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em');
+        .select('id, nome, nome_cliente, tipo, horas_estimadas, criado_em, area_m2');
       
       // Fetch hours for all projects within period
       const { data: hData } = await supabase
@@ -238,7 +252,8 @@ const FinanceiroProjetos = () => {
             custoReal,
             margemRS,
             margemPercent,
-            dataInicio: (proj as any).criado_em
+            dataInicio: (proj as any).criado_em,
+            area_m2: proj.area_m2 || 0
           };
         }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
@@ -649,6 +664,203 @@ const FinanceiroProjetos = () => {
     return { last6Months, typeData };
   }, [parcelas]);
 
+  const clientScores = useMemo(() => {
+    const clients: Record<string, any> = {};
+    
+    parcelas.forEach(p => {
+      if (!clients[p.cliente_nome]) {
+        clients[p.cliente_nome] = {
+          nome: p.cliente_nome,
+          tipoProjeto: p.projetos?.tipo || 'N/A',
+          parcelasPagas: 0,
+          parcelasAtrasadas: 0,
+          diasAtrasoTotal: 0,
+          pagamentosAdiantados: 0,
+          pedidosDesconto: 0,
+          retrabalhoGerado: 0,
+          indicacoesFeitas: 0,
+          historico: []
+        };
+      }
+      
+      const client = clients[p.cliente_nome];
+      client.historico.push(p);
+      
+      if (p.status === 'PAGO') {
+        client.parcelasPagas++;
+        if (p.data_recebimento && p.data_vencimento) {
+          const rec = parseISO(p.data_recebimento);
+          const venc = parseISO(p.data_vencimento);
+          if (isBefore(rec, venc)) {
+            client.pagamentosAdiantados++;
+          } else if (isAfter(rec, venc)) {
+            const diff = Math.ceil((rec.getTime() - venc.getTime()) / (1000 * 60 * 60 * 24));
+            client.diasAtrasoTotal += diff;
+          }
+        }
+      } else if (p.status === 'ATRASADO') {
+        client.parcelasAtrasadas++;
+        const venc = parseISO(p.data_vencimento);
+        const diff = Math.ceil((new Date().getTime() - venc.getTime()) / (1000 * 60 * 60 * 24));
+        client.diasAtrasoTotal += diff;
+      }
+    });
+
+    return Object.values(clients).map(client => {
+      const totalParcelas = client.parcelasPagas + client.parcelasAtrasadas;
+      const diasMediaAtraso = totalParcelas > 0 ? client.diasAtrasoTotal / totalParcelas : 0;
+      
+      let score = 100;
+      score -= client.parcelasAtrasadas * 10;
+      score -= diasMediaAtraso * 0.5;
+      score -= client.pedidosDesconto * 5;
+      score -= client.retrabalhoGerado * 8;
+      score += client.indicacoesFeitas * 15;
+      score += client.pagamentosAdiantados * 5;
+      
+      const finalScore = Math.max(0, Math.min(100, score));
+      
+      let label = 'EXCELENTE';
+      let color = 'text-green-500';
+      if (finalScore < 50) { label = 'RISCO'; color = 'text-red-500'; }
+      else if (finalScore < 80) { label = 'ATENÇÃO'; color = 'text-amber-500'; }
+      
+      return { ...client, score: finalScore, label, color, diasMediaAtraso };
+    });
+  }, [parcelas]);
+
+  const breakEven = useMemo(() => {
+    const custosFixos = configEscritorio?.custos_fixos || 15000;
+    const impostosEstimados = metrics.pagasMes * 0.1;
+    const totalACobrir = custosFixos + impostosEstimados;
+    const faturado = metrics.pagasMes;
+    const percentual = totalACobrir > 0 ? (faturado / totalACobrir) * 100 : 0;
+    
+    return { custosFixos, impostosEstimados, totalACobrir, faturado, percentual };
+  }, [configEscritorio, metrics.pagasMes]);
+
+  const sazonalidade = useMemo(() => {
+    const months = eachMonthOfInterval({
+      start: startOfYear(subDays(new Date(), 365)),
+      end: new Date()
+    }).slice(-12);
+
+    const data = months.map(m => {
+      const start = startOfMonth(m);
+      const end = endOfMonth(m);
+      const receita = parcelas
+        .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start, end }))
+        .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
+      
+      return {
+        name: format(m, 'MMM', { locale: ptBR }),
+        receita,
+      };
+    });
+
+    const mediaAnual = data.reduce((acc, d) => acc + d.receita, 0) / (data.length || 1);
+    const sorted = [...data].sort((a, b) => b.receita - a.receita);
+    const top3 = sorted.slice(0, 3).filter(d => d.receita > 0).map(d => d.name);
+    const bottom3 = sorted.slice(-3).filter(d => d.receita > 0).map(d => d.name);
+
+    return { data, mediaAnual, top3, bottom3 };
+  }, [parcelas]);
+
+  const rentabilidadePorM2 = useMemo(() => {
+    const types: Record<string, any> = {};
+    
+    projetosLucratividade.forEach(p => {
+      if (!types[p.tipo]) {
+        types[p.tipo] = { tipo: p.tipo, projetos: 0, m2Total: 0, receitaTotal: 0, lucroTotal: 0 };
+      }
+      const t = types[p.tipo];
+      t.projetos++;
+      t.m2Total += (p as any).area_m2 || 0;
+      t.receitaTotal += p.receitaTotal;
+      t.lucroTotal += p.margemRS;
+    });
+
+    return Object.values(types).map(t => ({
+      ...t,
+      rsPorM2: t.m2Total > 0 ? t.receitaTotal / t.m2Total : 0,
+      margem: t.receitaTotal > 0 ? (t.lucroTotal / t.receitaTotal) * 100 : 0
+    }));
+  }, [projetosLucratividade]);
+
+  const activeAlerts = useMemo(() => {
+    const custosMensais = configEscritorio?.custos_fixos || 15000;
+    const fluxo30dias = metrics.previstasMes;
+    const diasRestantes = 30 - new Date().getDate();
+    const percentualMeta = (metrics.pagasMes / 50000) * 100;
+    const capacidadeTotal = 320;
+    const horasProjetadas = projetosLucratividade.reduce((acc, p) => acc + p.horasEstimadas, 0);
+
+    const list = [];
+    
+    if (fluxo30dias < custosMensais) {
+      list.push({
+        tipo: "CAIXA_NEGATIVO",
+        mensagem: `Seu fluxo de caixa pode ficar negativo em 30 dias se nenhum projeto novo fechar.`,
+        cor: "red",
+        acao: "Ver fluxo de caixa",
+        tab: "fluxo"
+      });
+    }
+
+    if (diasRestantes < 10 && percentualMeta < 60) {
+      list.push({
+        tipo: "META_EM_RISCO",
+        mensagem: `Faltam ${diasRestantes} dias no mês e você atingiu ${percentualMeta.toFixed(0)}% da meta. Necessário fechar R$ ${(50000 - metrics.pagasMes).toLocaleString('pt-BR')} ainda.`,
+        cor: "amber",
+        acao: "Ver simulador",
+        tab: "simulador"
+      });
+    }
+
+    projetosLucratividade.forEach(p => {
+      if (p.margemRS < 0) {
+        list.push({
+          tipo: "PROJETO_PREJUIZO",
+          mensagem: `O projeto ${p.nome} está com margem negativa de R$ ${Math.abs(p.margemRS).toLocaleString('pt-BR')}. Verifique as horas registradas.`,
+          cor: "red",
+          acao: "Ver lucratividade",
+          tab: "lucratividade"
+        });
+      }
+    });
+
+    if (horasProjetadas > capacidadeTotal) {
+      list.push({
+        tipo: "CAPACIDADE_EXCEDIDA",
+        mensagem: `Os projetos ativos exigem ${horasProjetadas.toFixed(0)}h mas a capacidade disponível é ${capacidadeTotal}h. Risco de atraso.`,
+        cor: "amber",
+        acao: null
+      });
+    }
+
+    const inadimplentes = parcelas.filter(p => p.status === 'ATRASADO');
+    if (inadimplentes.length > 0) {
+      list.push({
+        tipo: "CLIENTE_INADIMPLENTE",
+        mensagem: `${inadimplentes[0].cliente_nome} tem ${inadimplentes.length} parcelas em atraso totalizando R$ ${inadimplentes.reduce((acc, p) => acc + p.valor, 0).toLocaleString('pt-BR')}.`,
+        cor: "red",
+        acao: "Ver parcelas",
+        tab: "parcelas"
+      });
+    }
+
+    if (metrics.pagasMes > 30000) {
+       list.push({
+        tipo: "MES_FORTE",
+        mensagem: `Este mês está acima da média. Boa oportunidade para reforçar reservas.`,
+        cor: "green",
+        acao: null
+      });
+    }
+
+    return list;
+  }, [parcelas, metrics, configEscritorio, projetosLucratividade]);
+
   const agingData = useMemo(() => {
     const today = new Date();
     today.setHours(0,0,0,0);
@@ -816,10 +1028,21 @@ const FinanceiroProjetos = () => {
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} className="w-full">
           <TabsList className="bg-white/5 border border-white/10 p-1 mb-6 rounded-none">
-            <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Dashboard</TabsTrigger>
-            <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Parcelas</TabsTrigger>
-            <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Fluxo de Caixa</TabsTrigger>
-            <TabsTrigger value="lucratividade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-8">Lucratividade</TabsTrigger>
+            <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Dashboard</TabsTrigger>
+            <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Parcelas</TabsTrigger>
+            <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Fluxo de Caixa</TabsTrigger>
+            <TabsTrigger value="lucratividade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Lucratividade</TabsTrigger>
+            <TabsTrigger value="score" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Score Cliente</TabsTrigger>
+            <TabsTrigger value="simulador" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Simulador</TabsTrigger>
+            <TabsTrigger value="ponto_equilibrio" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Ponto Equilíbrio</TabsTrigger>
+            <TabsTrigger value="sazonalidade" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Sazonalidade</TabsTrigger>
+            <TabsTrigger value="rentabilidade_m2" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Rentabilidade m²</TabsTrigger>
+            <TabsTrigger value="alertas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4 relative">
+              Alertas
+              {activeAlerts.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#1A1816]"></span>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard">
@@ -1239,6 +1462,516 @@ const FinanceiroProjetos = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="score">
+            <div className="grid grid-cols-2 gap-4">
+              {clientScores.map(client => (
+                <div key={client.nome} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-tight">{client.nome}</h3>
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest">{client.tipoProjeto}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className={cn("text-3xl font-bold font-inter", client.color)}>
+                        {client.score.toFixed(0)}
+                      </div>
+                      <Badge className={cn("border-none rounded-none text-[9px] px-2 mt-1 bg-white/5", client.color)}>
+                        {client.label}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-8 py-4 border-y border-white/5 mb-6">
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Parcelas em Dia</p>
+                      <p className="text-xs font-bold text-green-500">{client.parcelasPagas}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Atrasos</p>
+                      <p className="text-xs font-bold text-red-500">{client.parcelasAtrasadas}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Média Atraso</p>
+                      <p className="text-xs font-bold">{client.diasMediaAtraso.toFixed(1)} dias</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Indicações</p>
+                      <p className="text-xs font-bold text-bronze">{client.indicacoesFeitas}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Resumo do Relacionamento</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.pagamentosAdiantados} Adiantamentos
+                      </Badge>
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.pedidosDesconto} Pedidos Desconto
+                      </Badge>
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
+                        {client.retrabalhoGerado} Retrabalhos
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="simulador">
+            <div className="grid grid-cols-3 gap-6">
+              <div className="bg-white/5 border border-white/5 p-6 space-y-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
+                  <Calculator size={14} className="text-bronze" />
+                  Parâmetros de Simulação
+                </h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Número de Projetos (Mês)</label>
+                    <Input 
+                      type="number" 
+                      min="1" max="10"
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      value={simulator.numProjetos}
+                      onChange={e => setSimulator({ ...simulator, numProjetos: parseInt(e.target.value) || 1 })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Projeto</label>
+                    <select 
+                      className="w-full bg-white/5 border border-white/10 rounded-none h-10 text-xs px-3 focus:outline-none focus:border-bronze"
+                      value={simulator.tipo}
+                      onChange={e => setSimulator({ ...simulator, tipo: e.target.value })}
+                    >
+                      <option value="ArqInt">ArqInt</option>
+                      <option value="Interiores">Interiores</option>
+                      <option value="Comercial">Comercial</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Área Média (m²)</label>
+                    <Input 
+                      type="number" 
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      value={simulator.areaM2}
+                      onChange={e => setSimulator({ ...simulator, areaM2: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-span-2 bg-white/5 border border-white/5 p-8">
+                {(() => {
+                  const tickets = { ArqInt: 150, Interiores: 120, Comercial: 180 };
+                  const ticketMedio = (tickets as any)[simulator.tipo] || 150;
+                  const receitaBruta = simulator.numProjetos * simulator.areaM2 * ticketMedio;
+                  const iss = receitaBruta * 0.02; // 2%
+                  const simples = receitaBruta * 0.06; // 6%
+                  const custosFixos = configEscritorio?.custos_fixos || 15000;
+                  const lucro = receitaBruta - iss - simples - custosFixos;
+                  
+                  const horasNecessarias = simulator.numProjetos * (simulator.areaM2 * 0.5); // Simplified
+                  const capacidadeDisponivel = 320;
+                  const viabilidade = horasNecessarias <= capacidadeDisponivel ? 'VIÁVEL' : 
+                                     horasNecessarias <= capacidadeDisponivel * 1.2 ? 'ATENÇÃO' : 'INVIÁVEL';
+                  const viabilidadeColor = viabilidade === 'VIÁVEL' ? 'text-green-500' : 
+                                         viabilidade === 'ATENÇÃO' ? 'text-amber-500' : 'text-red-500';
+
+                  return (
+                    <div className="grid grid-cols-2 gap-12">
+                      <div className="space-y-6">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Resultado Estimado</h3>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">Receita Bruta</span>
+                            <span className="text-sm font-bold">R$ {receitaBruta.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) ISS (2%)</span>
+                            <span className="text-sm text-red-400">R$ {iss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Simples Nacional (6%)</span>
+                            <span className="text-sm text-red-400">R$ {simples.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Custos Fixos</span>
+                            <span className="text-sm text-red-400">R$ {custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-4">
+                            <span className="text-[10px] uppercase tracking-widest font-bold">Lucro Estimado</span>
+                            <span className={cn("text-xl font-bold font-inter", lucro >= 0 ? "text-bronze" : "text-red-500")}>
+                              R$ {lucro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Capacidade Operacional</h3>
+                        <div className="bg-white/5 p-6 border border-white/5 space-y-6 text-center">
+                          <div>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Necessárias</p>
+                            <p className="text-2xl font-bold font-inter">{horasNecessarias.toFixed(0)}h</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Capacidade Disponível</p>
+                            <p className="text-2xl font-bold font-inter text-white/20">{capacidadeDisponivel}h</p>
+                          </div>
+                          <div className="pt-4 border-t border-white/5">
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Viabilidade</p>
+                            <p className={cn("text-xl font-bold tracking-widest", viabilidadeColor)}>{viabilidade}</p>
+                          </div>
+                        </div>
+
+                        <div className="h-[100px] w-full mt-4">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={[
+                              { name: 'Receita', val: receitaBruta, fill: '#8B7355' },
+                              { name: 'Custos', val: iss + simples + custosFixos, fill: '#777777' },
+                              { name: 'Lucro', val: lucro > 0 ? lucro : 0, fill: '#FFFFFF' }
+                            ]}>
+                              <XAxis dataKey="name" hide />
+                              <YAxis hide />
+                              <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                              <Bar dataKey="val">
+                                {[
+                                  { fill: '#8B7355' },
+                                  { fill: '#777777' },
+                                  { fill: '#FFFFFF' }
+                                ].map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="ponto_equilibrio">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white/5 border border-bronze/20 p-12 text-center space-y-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                  <Target size={120} className="text-bronze" />
+                </div>
+                
+                <div>
+                  <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Ponto de Equilíbrio do Mês</h2>
+                  <p className="text-[10px] text-white/20 uppercase">Acompanhamento em tempo real dos custos vs faturamento</p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-8 text-left border-y border-white/5 py-8">
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Custos Fixos Totais</p>
+                    <p className="text-xl font-bold font-inter">R$ {breakEven.custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Impostos Estimados</p>
+                    <p className="text-xl font-bold font-inter text-white/40">R$ {breakEven.impostosEstimados.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Total a Cobrir</p>
+                    <p className="text-xl font-bold font-inter text-bronze">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-end">
+                    <div className="text-left">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Faturado até agora</p>
+                      <p className="text-2xl font-bold font-inter">R$ {breakEven.faturado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Meta de Cobertura</p>
+                      <p className="text-sm font-bold font-inter text-white/20">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="h-4 bg-white/5 w-full rounded-none overflow-hidden p-1 border border-white/10">
+                    <div 
+                      className={cn(
+                        "h-full transition-all duration-1000",
+                        breakEven.percentual >= 100 ? "bg-bronze" : 
+                        breakEven.percentual >= 80 ? "bg-green-500" : 
+                        breakEven.percentual >= 50 ? "bg-amber-500" : "bg-red-500"
+                      )}
+                      style={{ width: `${Math.min(breakEven.percentual, 100)}%` }}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] font-bold">
+                    <span className={cn(
+                      breakEven.percentual >= 100 ? "text-bronze" : 
+                      breakEven.percentual >= 80 ? "text-green-500" : 
+                      breakEven.percentual >= 50 ? "text-amber-500" : "text-red-500"
+                    )}>
+                      {breakEven.percentual.toFixed(1)}% Coberto
+                    </span>
+                    {breakEven.percentual < 100 ? (
+                      <span className="text-white/20">Faltam R$ {(breakEven.totalACobrir - breakEven.faturado).toLocaleString('pt-BR')}</span>
+                    ) : (
+                      <span className="text-bronze">Margem de Segurança: R$ {(breakEven.faturado - breakEven.totalACobrir).toLocaleString('pt-BR')}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-4">
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Equivalência em Projetos</p>
+                    <p className="text-lg font-bold font-inter">
+                      {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / 15000)} PROJETOS 
+                      <span className="text-[10px] text-white/20 ml-2">DE TICKET MÉDIO R$ 15k</span>
+                    </p>
+                  </div>
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Faturáveis Necessárias</p>
+                    <p className="text-lg font-bold font-inter">
+                      {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / (configEscritorio?.custo_hora || 150))} HORAS
+                      <span className="text-[10px] text-white/20 ml-2">A R$ {(configEscritorio?.custo_hora || 150)}/h</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="sazonalidade">
+            <div className="space-y-8">
+              <div className="bg-white/5 border border-white/5 p-8 h-[450px]">
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                      <TrendingUp size={14} className="text-bronze" />
+                      Sazonalidade (Últimos 12 Meses)
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-bronze"></div>
+                      <span className="text-[10px] uppercase text-white/40">Receita</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-[1px] bg-bronze/40 border-t border-dashed"></div>
+                      <span className="text-[10px] uppercase text-white/40">Média Anual</span>
+                    </div>
+                  </div>
+                </div>
+
+                {sazonalidade.data.filter(d => d.receita > 0).length < 3 ? (
+                  <div className="h-[300px] flex flex-col items-center justify-center text-center gap-4">
+                    <Activity size={32} className="text-white/10" />
+                    <p className="text-white/40 text-sm italic">Dados insuficientes — continue registrando recebimentos para ver a sazonalidade.</p>
+                  </div>
+                ) : (
+                  <div className="h-[320px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={sazonalidade.data}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#777777', fontSize: 10 }} 
+                        />
+                        <YAxis 
+                          axisLine={false} 
+                          tickLine={false} 
+                          tick={{ fill: '#777777', fontSize: 10 }}
+                          tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                          itemStyle={{ color: '#fff' }}
+                        />
+                        <Bar dataKey="receita" radius={[2, 2, 0, 0]}>
+                          {sazonalidade.data.map((entry, index) => {
+                            let color = "#8B735540";
+                            if (sazonalidade.top3.includes(entry.name)) color = "#22c55e";
+                            else if (sazonalidade.bottom3.includes(entry.name)) color = "#f59e0b";
+                            return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-6">
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Melhor Período</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-green-500/10 text-green-500">
+                      <ArrowUpRight size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter uppercase">{sazonalidade.top3[0] || '-'}</p>
+                      <p className="text-[10px] text-white/20 uppercase">Maior volume histórico</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Média de Faturamento</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-bronze/10 text-bronze">
+                      <Target size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter">R$ {sazonalidade.mediaAnual.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</p>
+                      <p className="text-[10px] text-white/20 uppercase">Mensal consolidada</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tendência Próximo Mês</p>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-500/10 text-blue-500">
+                      <Activity size={20} />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold font-inter">ESTÁVEL</p>
+                      <p className="text-[10px] text-white/20 uppercase">Baseado no histórico</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="rentabilidade_m2">
+            <div className="space-y-8">
+              <div className="bg-white/5 border border-white/5 p-8">
+                <h3 className="text-xs font-bold uppercase tracking-widest mb-8 flex items-center gap-2">
+                  <Layers size={14} className="text-bronze" />
+                  Performance por m² e Tipo de Projeto
+                </h3>
+                
+                <div className="overflow-hidden">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-white/5">
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold">Tipo de Projeto</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">Projetos</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">m² Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Receita Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Lucro Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">R$ / m²</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Margem</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {rentabilidadePorM2.map((item) => (
+                        <tr key={item.tipo} className="hover:bg-white/5 transition-colors group">
+                          <td className="py-4 text-xs font-bold uppercase tracking-widest text-bronze">{item.tipo}</td>
+                          <td className="py-4 text-xs font-bold text-center font-inter">{item.projetos}</td>
+                          <td className="py-4 text-xs text-center font-inter text-white/60">{item.m2Total.toFixed(0)} m²</td>
+                          <td className="py-4 text-xs text-right font-inter">R$ {item.receitaTotal.toLocaleString('pt-BR')}</td>
+                          <td className="py-4 text-xs text-right font-inter text-green-500">R$ {item.lucroTotal.toLocaleString('pt-BR')}</td>
+                          <td className="py-4 text-sm text-right font-bold font-inter text-white">R$ {item.rsPorM2.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</td>
+                          <td className="py-4 text-xs text-right font-inter font-bold">{item.margem.toFixed(1)}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white/5 border border-white/5 p-8">
+                  <h3 className="text-[10px] uppercase tracking-widest text-white/40 mb-6">Comparativo R$ / m²</h3>
+                  <div className="h-[200px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={rentabilidadePorM2}>
+                        <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: '#777777', fontSize: 10 }} />
+                        <YAxis hide />
+                        <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                        <Bar dataKey="rsPorM2" fill="#8B7355" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="bg-white/5 border border-bronze/20 p-8 flex flex-col justify-center text-center">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tipo mais rentável por m²</p>
+                  {(() => {
+                    const top = [...rentabilidadePorM2].sort((a, b) => b.rsPorM2 - a.rsPorM2)[0];
+                    return top ? (
+                      <>
+                        <p className="text-3xl font-bold uppercase tracking-tighter text-bronze mb-2">{top.tipo}</p>
+                        <p className="text-xl font-bold font-inter">R$ {top.rsPorM2.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}/m²</p>
+                        <p className="text-[10px] text-white/20 uppercase mt-4">Margem média de {top.margem.toFixed(1)}%</p>
+                      </>
+                    ) : '-';
+                  })()}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="alertas">
+            <div className="max-w-4xl mx-auto space-y-4">
+              {activeAlerts.length === 0 ? (
+                <div className="bg-white/5 border border-green-500/20 p-12 text-center flex flex-col items-center gap-4">
+                  <CheckCircle2 className="text-green-500 w-12 h-12" />
+                  <div>
+                    <h3 className="text-green-500 font-bold uppercase tracking-widest">Tudo sob controle</h3>
+                    <p className="text-white/40 text-xs mt-2">Nenhum alerta crítico ou preditivo no momento.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 mb-6 px-2">
+                    <Bell size={16} className="text-bronze" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest">Alertas Ativos ({activeAlerts.length})</h3>
+                  </div>
+                  {activeAlerts.map((alerta, idx) => (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "p-6 border flex items-center justify-between group transition-all",
+                        alerta.cor === 'red' ? "bg-red-500/5 border-red-500/20" : 
+                        alerta.cor === 'amber' ? "bg-amber-500/5 border-amber-500/20" : 
+                        "bg-green-500/5 border-green-500/20"
+                      )}
+                    >
+                      <div className="flex items-center gap-6">
+                        <div className={cn(
+                          "p-3 rounded-full",
+                          alerta.cor === 'red' ? "bg-red-500/10 text-red-500" : 
+                          alerta.cor === 'amber' ? "bg-amber-500/10 text-amber-500" : 
+                          "bg-green-500/10 text-green-500"
+                        )}>
+                          {alerta.cor === 'red' ? <AlertCircle size={20} /> : <Activity size={20} />}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform">{alerta.mensagem}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-white/20 mt-1">Alerta {alerta.tipo.replace('_', ' ')}</p>
+                        </div>
+                      </div>
+                      
+                      {alerta.acao && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => alerta.tab && setActiveTab(alerta.tab)}
+                          className="rounded-none border-white/10 text-[9px] uppercase tracking-widest hover:bg-white/10"
+                        >
+                          {alerta.acao}
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
           <TabsContent value="lucratividade">
             <div className="flex justify-between items-center mb-6">
               <div className="flex gap-2">
