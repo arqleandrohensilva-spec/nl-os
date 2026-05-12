@@ -562,6 +562,10 @@ const FinanceiroProjetos = () => {
     if (filterStatus === 'ENVIADAS') {
       return p.status !== 'PAGO' && hasSent;
     }
+    if (filterStatus === 'NF_PENDENTE') {
+      return p.status === 'PAGO' && !p.nf_emitida;
+    }
+
     
     return p.status === filterStatus;
   });
@@ -596,7 +600,7 @@ const FinanceiroProjetos = () => {
     return { totalRecebido, totalCusto, margemMedia };
   }, [projetosLucratividade]);
 
-  const exportReport = () => {
+  const exportAccountantReport = () => {
     let startDate: Date;
     let endDate: Date;
 
@@ -611,39 +615,87 @@ const FinanceiroProjetos = () => {
       endDate = parseISO(lucroCustomDates.end);
     }
 
-    const reportData = {
-      periodo: `${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`,
-      metricas: metrics,
-      parcelas: filteredParcelas.map(p => ({
-        cliente: p.cliente_nome,
-        parcela: `${p.numero_parcela}/${p.total_parcelas}`,
-        valor: p.valor,
-        vencimento: format(parseISO(p.data_vencimento), 'dd/MM/yyyy'),
-        status: p.status,
-        recebido: p.valor_recebido || 0,
-        data_recebimento: p.data_recebimento ? format(parseISO(p.data_recebimento), 'dd/MM/yyyy') : '-'
-      })),
-      lucratividade: projetosLucratividade.map(proj => ({
-        projeto: proj.nome,
-        cliente: proj.nome_cliente,
-        receita: proj.receitaTotal,
-        custo: proj.custoReal,
-        horas: proj.horasReais.toFixed(1),
-        margem: `${proj.margemPercent.toFixed(1)}%`
-      }))
-    };
+    const paidParcelas = parcelas.filter(p => 
+      p.status === 'PAGO' && 
+      p.data_recebimento && 
+      isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate })
+    );
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `relatorio-financeiro-${format(new Date(), 'yyyy-MM-dd')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (paidParcelas.length === 0) {
+      toast.error('Nenhuma parcela paga no período selecionado.');
+      return;
+    }
+
+    // CSV Generation
+    const csvHeader = "Cliente,Projeto,Parcela,Valor Bruto,ISS Retido,Valor Liquido,Data Recebimento,Numero NF\n";
+    const csvRows = paidParcelas.map(p => {
+      const issVal = p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100));
+      const liqVal = p.valor_liquido || (p.valor - issVal);
+      return `${p.cliente_nome},${p.projetos?.tipo || 'Projeto'},${p.numero_parcela}/${p.total_parcelas},${p.valor},${issVal},${liqVal},${format(parseISO(p.data_recebimento!), 'dd/MM/yyyy')},${p.nf_numero || '-'}`;
+    }).join("\n");
     
-    toast.success('Relatório exportado com sucesso!');
+    const csvBlob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
+    const csvUrl = URL.createObjectURL(csvBlob);
+    const csvLink = document.createElement('a');
+    csvLink.href = csvUrl;
+    csvLink.download = `relatorio-contador-${format(startDate, 'MMM-yyyy')}.csv`;
+    csvLink.click();
+
+    // PDF Generation
+    const doc = new (window as any).jspdf.jsPDF();
+    const bronze: [number, number, number] = [139, 115, 85];
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("NL ARQUITETOS", 105, 20, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("RELATÓRIO FINANCEIRO - CONTABILIDADE", 105, 28, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Período: ${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`, 105, 34, { align: "center" });
+
+    const tableData = paidParcelas.map(p => {
+      const issVal = p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100));
+      const liqVal = p.valor_liquido || (p.valor - issVal);
+      return [
+        p.cliente_nome,
+        p.projetos?.tipo || 'Projeto',
+        `${p.numero_parcela}/${p.total_parcelas}`,
+        `R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${issVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${liqVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        format(parseISO(p.data_recebimento!), 'dd/MM/yyyy'),
+        p.nf_numero || '-'
+      ];
+    });
+
+    (window as any).jspdf.autoTable(doc, {
+      startY: 45,
+      head: [['Cliente', 'Projeto', 'Parc.', 'Bruto', 'ISS', 'Líquido', 'Recebimento', 'NF']],
+      body: tableData,
+      headStyles: { fillColor: bronze },
+      styles: { fontSize: 8 }
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    const totalBruto = paidParcelas.reduce((acc, p) => acc + p.valor, 0);
+    const totalIss = paidParcelas.reduce((acc, p) => acc + (p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100))), 0);
+    const totalLiquido = totalBruto - totalIss;
+
+    doc.setFontSize(10);
+    doc.text(`TOTAL BRUTO: R$ ${totalBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY, { align: "right" });
+    doc.text(`TOTAL ISS RETIDO: R$ ${totalIss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY + 6, { align: "right" });
+    doc.text(`TOTAL LÍQUIDO: R$ ${totalLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY + 12, { align: "right" });
+
+    doc.save(`relatorio-contador-${format(startDate, 'MMM-yyyy')}.pdf`);
+    
+    toast.success('Relatórios exportados com sucesso!');
   };
+
+  const exportReport = () => {
+    // Keep existing general export logic if needed, or redirect to accountant export
+    exportAccountantReport();
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
