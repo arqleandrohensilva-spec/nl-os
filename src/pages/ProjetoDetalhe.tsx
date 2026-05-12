@@ -113,6 +113,21 @@ const ETAPAS_CONFIG = [
   }
 ];
 
+const issAliquotas: Record<string, number> = {
+  "são josé dos campos": 2,
+  "taubaté": 2,
+  "jacareí": 2,
+  "campos do jordão": 2,
+  "são paulo": 5,
+  "campinas": 2,
+  "guarulhos": 2,
+  "santos": 5,
+  "ribeirão preto": 2,
+  "sorocaba": 2,
+  "default": 2
+};
+
+
 const gerarResumo = (tipo: string, etapa: string, status: string) => {
   const normalizedTipo = (tipo || '').toLowerCase();
   const normalizedEtapa = (etapa || '').toUpperCase();
@@ -214,6 +229,8 @@ const ProjetoDetalhe = () => {
   const [horasReais, setHorasReais] = useState(0);
   const [clientMode, setClientMode] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
+  const [issAliquota, setIssAliquota] = useState<number>(2);
+
 
   const generatePDFReport = async () => {
     if (!projeto) return;
@@ -357,7 +374,12 @@ const ProjetoDetalhe = () => {
     try {
       setLoading(true);
       const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).single();
-      if (pData) setProjeto(pData);
+      if (pData) {
+        setProjeto(pData);
+        const city = (pData.cidade || '').toLowerCase().trim();
+        setIssAliquota(issAliquotas[city] || issAliquotas.default);
+      }
+
 
       const { data: eData } = await supabase.from('projeto_etapas').select('*').eq('projeto_id', id).order('criado_em', { ascending: true });
       if (eData) setEtapas(eData);
@@ -984,6 +1006,35 @@ const ProjetoDetalhe = () => {
                       />
                     </div>
                   </div>
+
+                  <div className="space-y-2 pt-2 border-t border-white/5">
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Alíquota ISS (%)</label>
+                      <span className="text-[7px] text-bronze uppercase font-bold italic">Alíquota sugerida. Confirme com seu contador.</span>
+                    </div>
+                    <Input 
+                      type="number" 
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      value={issAliquota}
+                      onChange={(e) => setIssAliquota(parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
+
+                  <div className="p-4 bg-white/5 border border-white/5 space-y-2">
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                      <span className="text-white/40">Valor Bruto</span>
+                      <span className="font-bold">R$ {(projeto.valor_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-[10px] uppercase tracking-widest text-bronze">
+                      <span>ISS ({issAliquota}%)</span>
+                      <span>- R$ {((projeto.valor_total || 0) * (issAliquota / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] uppercase tracking-[0.2em] pt-2 border-t border-white/10">
+                      <span className="text-white/40 font-bold">Valor Líquido</span>
+                      <span className="font-bold">R$ {((projeto.valor_total || 0) * (1 - issAliquota / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+
                   <Button 
                     className="w-full bg-[#8B7355] hover:bg-[#8B7355]/90 text-white rounded-none text-[9px] uppercase font-bold tracking-widest h-10"
                     onClick={async () => {
@@ -1000,6 +1051,12 @@ const ProjetoDetalhe = () => {
                       const valorParcela = valorRestante / numParcelas;
                       const novasParcelas = [];
 
+                      const calcParcelaInfo = (valor: number) => {
+                        const issValor = valor * (issAliquota / 100);
+                        const valorLiquido = valor - issValor;
+                        return { iss_aliquota: issAliquota, iss_valor: issValor, valor_liquido: valorLiquido };
+                      };
+
                       if (entrada > 0) {
                         novasParcelas.push({
                           projeto_id: projeto.id,
@@ -1008,25 +1065,29 @@ const ProjetoDetalhe = () => {
                           total_parcelas: numParcelas + 1,
                           valor: entrada,
                           data_vencimento: new Date().toISOString().split('T')[0],
-                          status: 'EM ABERTO'
+                          status: 'EM ABERTO',
+                          ...calcParcelaInfo(entrada)
                         });
                       }
 
                       for (let i = 1; i <= numParcelas; i++) {
                         const dataVenc = addMonths(new Date(), i);
+                        const valorP = valorParcela;
                         novasParcelas.push({
                           projeto_id: projeto.id,
                           cliente_nome: projeto.nome_cliente,
                           numero_parcela: i + (entrada > 0 ? 1 : 0),
                           total_parcelas: numParcelas + (entrada > 0 ? 1 : 0),
-                          valor: valorParcela,
+                          valor: valorP,
                           data_vencimento: dataVenc.toISOString().split('T')[0],
-                          status: 'EM ABERTO'
+                          status: 'EM ABERTO',
+                          ...calcParcelaInfo(valorP)
                         });
                       }
 
                       const { error } = await supabase.from('financeiro_parcelas').insert(novasParcelas);
                       if (error) {
+                        console.error('Error inserting parcelas:', error);
                         toast.error('Erro ao gerar parcelas');
                       } else {
                         toast.success('Parcelas geradas no Financeiro');
@@ -1035,6 +1096,7 @@ const ProjetoDetalhe = () => {
                   >
                     Gerar Fluxo de Caixa
                   </Button>
+
                 </div>
               </div>
 

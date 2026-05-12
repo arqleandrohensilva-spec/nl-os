@@ -54,13 +54,21 @@ interface Parcela {
   status: string;
   data_recebimento?: string;
   valor_recebido?: number;
+  iss_aliquota?: number;
+  iss_valor?: number;
+  valor_liquido?: number;
+  nf_emitida?: boolean;
+  nf_numero?: string;
+  nf_data_emissao?: string;
   projetos?: {
     tipo: string;
+    cidade: string;
   };
   agendamento_cobranca?: any;
   data_notificacao_cobranca?: string;
   notificacoes_enviadas?: any;
 }
+
 
 interface ProjetoLucratividade {
   id: string;
@@ -84,7 +92,14 @@ const FinanceiroProjetos = () => {
   const [filterStatus, setFilterStatus] = useState('TODOS');
   const [selectedParcela, setSelectedParcela] = useState<Parcela | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmData, setConfirmData] = useState({ data: format(new Date(), 'yyyy-MM-dd'), valor: '' });
+  const [confirmData, setConfirmData] = useState({ 
+    data: format(new Date(), 'yyyy-MM-dd'), 
+    valor: '',
+    nf_emitida: false,
+    nf_numero: '',
+    nf_data_emissao: format(new Date(), 'yyyy-MM-dd')
+  });
+
   const [configEscritorio, setConfigEscritorio] = useState<any>(null);
   const [projetosLucratividade, setProjetosLucratividade] = useState<ProjetoLucratividade[]>([]);
   const [lucroFilter, setLucroFilter] = useState<'MES_ATUAL' | 'ULTIMOS_3_MESES' | 'PERSONALIZADO'>('MES_ATUAL');
@@ -107,9 +122,11 @@ const FinanceiroProjetos = () => {
         .select(`
           *,
           projetos (
-            tipo
+            tipo,
+            cidade
           )
         `)
+
         .order('data_vencimento', { ascending: true });
       
       if (pError) throw pError;
@@ -264,14 +281,18 @@ const FinanceiroProjetos = () => {
     if (!selectedParcela) return;
     
     try {
-      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${parseFloat(confirmData.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
+      const valorRecebido = parseFloat(confirmData.valor);
+      const msg = `Recebemos o pagamento da parcela ${selectedParcela.numero_parcela}/${selectedParcela.total_parcelas} no valor de R$ ${valorRecebido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}. Obrigado!`;
       
       const { error } = await supabase
         .from('financeiro_parcelas')
         .update({
           status: 'PAGO',
           data_recebimento: new Date(confirmData.data).toISOString(),
-          valor_recebido: parseFloat(confirmData.valor)
+          valor_recebido: valorRecebido,
+          nf_emitida: confirmData.nf_emitida,
+          nf_numero: confirmData.nf_numero,
+          nf_data_emissao: confirmData.nf_emitida ? confirmData.nf_data_emissao : null
         })
         .eq('id', selectedParcela.id);
 
@@ -279,6 +300,14 @@ const FinanceiroProjetos = () => {
       
       toast.success('Recebimento confirmado!');
       
+      // Prompt to generate receipt
+      toast.info("Deseja gerar o recibo agora?", {
+        action: {
+          label: "Gerar Recibo",
+          onClick: () => generateReceipt(selectedParcela, { ...selectedParcela, valor_recebido: valorRecebido, data_recebimento: new Date(confirmData.data).toISOString() })
+        }
+      });
+
       // Prompt to send confirmation message
       toast.info("Enviar confirmação de pagamento?", {
         action: {
@@ -294,6 +323,64 @@ const FinanceiroProjetos = () => {
       toast.error('Erro ao confirmar recebimento');
     }
   };
+
+  const generateReceipt = (p: Parcela, updatedP?: any) => {
+    const data = updatedP || p;
+    const doc = new (window as any).jspdf.jsPDF();
+    const bronze: [number, number, number] = [139, 115, 85];
+    const graphite: [number, number, number] = [58, 58, 58];
+    
+    // Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text("NL ARQUITETOS", 105, 30, { align: "center" });
+    
+    doc.setFontSize(10);
+    doc.setTextColor(bronze[0], bronze[1], bronze[2]);
+    doc.text("A ARQUITETURA COMO DECISÃO", 105, 38, { align: "center" });
+    
+    doc.setFontSize(16);
+    doc.setTextColor(graphite[0], graphite[1], graphite[2]);
+    doc.text("RECIBO DE PAGAMENTO", 105, 55, { align: "center" });
+    
+    doc.setDrawColor(bronze[0], bronze[1], bronze[2]);
+    doc.setLineWidth(0.5);
+    doc.line(40, 60, 170, 60);
+    
+    // Content
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    let y = 80;
+    const leftX = 40;
+    
+    doc.text(`Cliente: ${data.cliente_nome}`, leftX, y); y += 10;
+    doc.text(`Projeto: ${data.projetos?.tipo || 'Projeto'} · ${data.projetos?.cidade || 'N/A'}`, leftX, y); y += 10;
+    doc.text(`Parcela: ${data.numero_parcela}/${data.total_parcelas}`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "bold");
+    doc.text(`Valor bruto: R$ ${data.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "normal");
+    const issVal = data.iss_valor || (data.valor * ((data.iss_aliquota || 2) / 100));
+    const issAliq = data.iss_aliquota || 2;
+    doc.text(`ISS retido: R$ ${issVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} (${issAliq}%)`, leftX, y); y += 10;
+    
+    doc.setFont("helvetica", "bold");
+    const liqVal = data.valor_liquido || (data.valor - issVal);
+    doc.text(`Valor líquido: R$ ${liqVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, leftX, y); y += 10;
+    
+    const dataRec = data.data_recebimento ? format(parseISO(data.data_recebimento), 'dd/MM/yyyy') : format(new Date(), 'dd/MM/yyyy');
+    doc.text(`Data de recebimento: ${dataRec}`, leftX, y); y += 30;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.text("NL Arquitetos · São José dos Campos, SP", 105, y, { align: "center" });
+    
+    doc.save(`Recibo_${data.cliente_nome.replace(/\s+/g, '_')}_P${data.numero_parcela}.pdf`);
+    toast.success("Recibo gerado com sucesso!");
+  };
+
 
   const sendWhatsApp = async (p: Parcela, customMsg?: string) => {
     try {
@@ -475,6 +562,10 @@ const FinanceiroProjetos = () => {
     if (filterStatus === 'ENVIADAS') {
       return p.status !== 'PAGO' && hasSent;
     }
+    if (filterStatus === 'NF_PENDENTE') {
+      return p.status === 'PAGO' && !p.nf_emitida;
+    }
+
     
     return p.status === filterStatus;
   });
@@ -509,7 +600,7 @@ const FinanceiroProjetos = () => {
     return { totalRecebido, totalCusto, margemMedia };
   }, [projetosLucratividade]);
 
-  const exportReport = () => {
+  const exportAccountantReport = () => {
     let startDate: Date;
     let endDate: Date;
 
@@ -524,39 +615,87 @@ const FinanceiroProjetos = () => {
       endDate = parseISO(lucroCustomDates.end);
     }
 
-    const reportData = {
-      periodo: `${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`,
-      metricas: metrics,
-      parcelas: filteredParcelas.map(p => ({
-        cliente: p.cliente_nome,
-        parcela: `${p.numero_parcela}/${p.total_parcelas}`,
-        valor: p.valor,
-        vencimento: format(parseISO(p.data_vencimento), 'dd/MM/yyyy'),
-        status: p.status,
-        recebido: p.valor_recebido || 0,
-        data_recebimento: p.data_recebimento ? format(parseISO(p.data_recebimento), 'dd/MM/yyyy') : '-'
-      })),
-      lucratividade: projetosLucratividade.map(proj => ({
-        projeto: proj.nome,
-        cliente: proj.nome_cliente,
-        receita: proj.receitaTotal,
-        custo: proj.custoReal,
-        horas: proj.horasReais.toFixed(1),
-        margem: `${proj.margemPercent.toFixed(1)}%`
-      }))
-    };
+    const paidParcelas = parcelas.filter(p => 
+      p.status === 'PAGO' && 
+      p.data_recebimento && 
+      isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate })
+    );
 
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `relatorio-financeiro-${format(new Date(), 'yyyy-MM-dd')}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (paidParcelas.length === 0) {
+      toast.error('Nenhuma parcela paga no período selecionado.');
+      return;
+    }
+
+    // CSV Generation
+    const csvHeader = "Cliente,Projeto,Parcela,Valor Bruto,ISS Retido,Valor Liquido,Data Recebimento,Numero NF\n";
+    const csvRows = paidParcelas.map(p => {
+      const issVal = p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100));
+      const liqVal = p.valor_liquido || (p.valor - issVal);
+      return `${p.cliente_nome},${p.projetos?.tipo || 'Projeto'},${p.numero_parcela}/${p.total_parcelas},${p.valor},${issVal},${liqVal},${format(parseISO(p.data_recebimento!), 'dd/MM/yyyy')},${p.nf_numero || '-'}`;
+    }).join("\n");
     
-    toast.success('Relatório exportado com sucesso!');
+    const csvBlob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
+    const csvUrl = URL.createObjectURL(csvBlob);
+    const csvLink = document.createElement('a');
+    csvLink.href = csvUrl;
+    csvLink.download = `relatorio-contador-${format(startDate, 'MMM-yyyy')}.csv`;
+    csvLink.click();
+
+    // PDF Generation
+    const doc = new (window as any).jspdf.jsPDF();
+    const bronze: [number, number, number] = [139, 115, 85];
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("NL ARQUITETOS", 105, 20, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("RELATÓRIO FINANCEIRO - CONTABILIDADE", 105, 28, { align: "center" });
+    doc.setFontSize(10);
+    doc.text(`Período: ${format(startDate, 'dd/MM/yyyy')} a ${format(endDate, 'dd/MM/yyyy')}`, 105, 34, { align: "center" });
+
+    const tableData = paidParcelas.map(p => {
+      const issVal = p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100));
+      const liqVal = p.valor_liquido || (p.valor - issVal);
+      return [
+        p.cliente_nome,
+        p.projetos?.tipo || 'Projeto',
+        `${p.numero_parcela}/${p.total_parcelas}`,
+        `R$ ${p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${issVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `R$ ${liqVal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        format(parseISO(p.data_recebimento!), 'dd/MM/yyyy'),
+        p.nf_numero || '-'
+      ];
+    });
+
+    (window as any).jspdf.autoTable(doc, {
+      startY: 45,
+      head: [['Cliente', 'Projeto', 'Parc.', 'Bruto', 'ISS', 'Líquido', 'Recebimento', 'NF']],
+      body: tableData,
+      headStyles: { fillColor: bronze },
+      styles: { fontSize: 8 }
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    const totalBruto = paidParcelas.reduce((acc, p) => acc + p.valor, 0);
+    const totalIss = paidParcelas.reduce((acc, p) => acc + (p.iss_valor || (p.valor * ((p.iss_aliquota || 2) / 100))), 0);
+    const totalLiquido = totalBruto - totalIss;
+
+    doc.setFontSize(10);
+    doc.text(`TOTAL BRUTO: R$ ${totalBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY, { align: "right" });
+    doc.text(`TOTAL ISS RETIDO: R$ ${totalIss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY + 6, { align: "right" });
+    doc.text(`TOTAL LÍQUIDO: R$ ${totalLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 190, finalY + 12, { align: "right" });
+
+    doc.save(`relatorio-contador-${format(startDate, 'MMM-yyyy')}.pdf`);
+    
+    toast.success('Relatórios exportados com sucesso!');
   };
+
+  const exportReport = () => {
+    // Keep existing general export logic if needed, or redirect to accountant export
+    exportAccountantReport();
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
@@ -669,8 +808,10 @@ const FinanceiroProjetos = () => {
                     { id: 'EM ABERTO', label: 'Em Aberto' },
                     { id: 'ATRASADO', label: 'Atrasado' },
                     { id: 'PAGO', label: 'Pago' },
+                    { id: 'NF_PENDENTE', label: 'NF Pendente' },
                     { id: 'REGUA_PENDENTE', label: 'Régua Pendente' },
                     { id: 'ENVIADAS', label: 'Enviadas' }
+
                   ].map(status => (
                     <Button 
                       key={status.id}
@@ -695,16 +836,18 @@ const FinanceiroProjetos = () => {
                   <tr className="border-b border-white/10 bg-white/5">
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Cliente / Projeto</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Parcela</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor (Bruto)</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Líquido</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Vencimento</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / Régua</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / NF / Régua</th>
                     <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40 text-right">Ações</th>
+
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filteredParcelas.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-white/20 text-xs italic">Nenhuma parcela encontrada</td>
+                      <td colSpan={7} className="px-6 py-12 text-center text-white/20 text-xs italic">Nenhuma parcela encontrada</td>
                     </tr>
                   ) : filteredParcelas.map(p => (
                     <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
@@ -721,19 +864,45 @@ const FinanceiroProjetos = () => {
                         <span className="text-sm font-medium">R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                       </td>
                       <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-white/60">
+                          R$ {(p.valor_liquido || (p.valor * (1 - (p.iss_aliquota || 2) / 100))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <span className="text-xs text-white/60">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
-                          {getStatusBadge(p)}
+                          <div className="flex gap-2 items-center">
+                            {getStatusBadge(p)}
+                            {p.status === 'PAGO' && (
+                              p.nf_emitida ? (
+                                <Badge className="bg-green-500/20 text-green-500 border-none text-[8px] h-4">NF EMITIDA</Badge>
+                              ) : (
+                                <Badge className="bg-amber-500/20 text-amber-500 border-none text-[8px] h-4">NF PENDENTE</Badge>
+                              )
+                            )}
+                          </div>
                           {getReguaStatus(p)}
                           {(p as any).data_notificacao_cobranca && (
                             <span className="text-[8px] text-white/20 uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
                           )}
                         </div>
                       </td>
+
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
+                          {p.status === 'PAGO' && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-white rounded-none"
+                              onClick={() => generateReceipt(p)}
+                            >
+                              <FileText size={14} className="mr-1" />
+                              Recibo
+                            </Button>
+                          )}
                           {(p.status === 'EM ABERTO' || p.status === 'ATRASADO' || p.status === 'VENCE HOJE') && (
                             <>
                               <Button 
@@ -742,12 +911,19 @@ const FinanceiroProjetos = () => {
                                 className="h-8 text-[9px] uppercase tracking-widest border-white/10 hover:bg-bronze hover:text-white rounded-none"
                                 onClick={() => {
                                   setSelectedParcela(p);
-                                  setConfirmData({ ...confirmData, valor: p.valor.toString() });
+                                  setConfirmData({ 
+                                    ...confirmData, 
+                                    valor: p.valor.toString(),
+                                    nf_emitida: false,
+                                    nf_numero: '',
+                                    nf_data_emissao: format(new Date(), 'yyyy-MM-dd')
+                                  });
                                   setIsConfirmModalOpen(true);
                                 }}
                               >
                                 Confirmar
                               </Button>
+
                               {(p.status === 'ATRASADO' || isToday(parseISO(p.data_vencimento))) && (
                                 <Button 
                                   variant="ghost" 
@@ -1057,7 +1233,44 @@ const FinanceiroProjetos = () => {
                   onChange={e => setConfirmData({ ...confirmData, valor: e.target.value })}
                 />
               </div>
+
+              <div className="pt-4 border-t border-white/5 space-y-4">
+                <div className="flex items-center space-x-2">
+                  <input 
+                    type="checkbox" 
+                    id="nf_emitida"
+                    className="w-4 h-4 rounded-none border-white/10 bg-white/5 accent-bronze"
+                    checked={confirmData.nf_emitida}
+                    onChange={e => setConfirmData({ ...confirmData, nf_emitida: e.target.checked })}
+                  />
+                  <label htmlFor="nf_emitida" className="text-[10px] uppercase tracking-widest text-white/60">NFS-e emitida</label>
+                </div>
+
+                {confirmData.nf_emitida && (
+                  <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Número da Nota</label>
+                      <Input 
+                        placeholder="Ex: 2024001"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        value={confirmData.nf_numero}
+                        onChange={e => setConfirmData({ ...confirmData, nf_numero: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Data de Emissão</label>
+                      <Input 
+                        type="date" 
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        value={confirmData.nf_data_emissao}
+                        onChange={e => setConfirmData({ ...confirmData, nf_data_emissao: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
+
             <DialogFooter>
               <Button 
                 variant="ghost" 
