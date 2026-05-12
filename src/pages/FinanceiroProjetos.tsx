@@ -79,10 +79,15 @@ const FinanceiroProjetos = () => {
   const [confirmData, setConfirmData] = useState({ data: format(new Date(), 'yyyy-MM-dd'), valor: '' });
   const [configEscritorio, setConfigEscritorio] = useState<any>(null);
   const [projetosLucratividade, setProjetosLucratividade] = useState<ProjetoLucratividade[]>([]);
+  const [lucroFilter, setLucroFilter] = useState<'MES_ATUAL' | 'ULTIMOS_3_MESES' | 'PERSONALIZADO'>('MES_ATUAL');
+  const [lucroCustomDates, setLucroCustomDates] = useState({ 
+    start: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
+    end: format(endOfMonth(new Date()), 'yyyy-MM-dd')
+  });
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [lucroFilter, lucroCustomDates]);
 
   const fetchData = async () => {
     try {
@@ -128,21 +133,46 @@ const FinanceiroProjetos = () => {
       setConfigEscritorio(cData);
       const custoHora = cData?.custo_hora || 0;
 
+      // Filter dates for profitability
+      let startDate: Date;
+      let endDate: Date = new Date();
+      endDate.setHours(23, 59, 59, 999);
+
+      if (lucroFilter === 'MES_ATUAL') {
+        startDate = startOfMonth(new Date());
+        endDate = endOfMonth(new Date());
+      } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+        startDate = startOfMonth(subDays(new Date(), 90));
+      } else {
+        startDate = parseISO(lucroCustomDates.start);
+        endDate = parseISO(lucroCustomDates.end);
+        endDate.setHours(23, 59, 59, 999);
+      }
+
       // Fetch projects for profitability
       const { data: projData } = await supabase.from('projetos').select('id, nome, nome_cliente, tipo');
       
-      // Fetch hours for all projects
-      const { data: hData } = await supabase.from('sessoes_horas').select('projeto_id, duracao_minutos');
+      // Fetch hours for all projects within period
+      const { data: hData } = await supabase
+        .from('sessoes_horas')
+        .select('projeto_id, duracao_minutos, inicio')
+        .gte('inicio', startDate.toISOString())
+        .lte('inicio', endDate.toISOString());
       
       // Calculate profitability for each project
       if (projData) {
         const profitData = projData.map(proj => {
-          // Total Revenue: sum of paid parcelas for this project
+          // Total Revenue: sum of paid parcelas for this project RECEIVED within period
           const receitaTotal = (pData || [])
-            .filter(p => p.projeto_id === proj.id && p.status === 'PAGO')
+            .filter(p => 
+              p.projeto_id === proj.id && 
+              p.status === 'PAGO' && 
+              p.data_recebimento &&
+              isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate })
+            )
             .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
           
-          // Total Hours: sum of minutes / 60
+          // Total Hours: sum of minutes / 60 within period
           const totalMinutos = (hData || [])
             .filter(h => h.projeto_id === proj.id)
             .reduce((acc, h) => {
@@ -166,7 +196,7 @@ const FinanceiroProjetos = () => {
             margemRS,
             margemPercent
           };
-        }).filter(p => p.horasReais > 0); // Only show projects with hours registered
+        }).filter(p => p.horasReais > 0 || p.receitaTotal > 0); 
 
         setProjetosLucratividade(profitData);
       }
@@ -488,6 +518,47 @@ const FinanceiroProjetos = () => {
           </TabsContent>
 
           <TabsContent value="lucratividade">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex gap-2">
+                {[
+                  { id: 'MES_ATUAL', label: 'Mês Atual' },
+                  { id: 'ULTIMOS_3_MESES', label: 'Últimos 3 Meses' },
+                  { id: 'PERSONALIZADO', label: 'Personalizado' }
+                ].map(filter => (
+                  <Button 
+                    key={filter.id}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLucroFilter(filter.id as any)}
+                    className={cn(
+                      "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                      lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
+                    )}
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
+
+              {lucroFilter === 'PERSONALIZADO' && (
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    type="date" 
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                    value={lucroCustomDates.start}
+                    onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
+                  />
+                  <span className="text-white/20 text-[10px] uppercase">até</span>
+                  <Input 
+                    type="date" 
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                    value={lucroCustomDates.end}
+                    onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+
             {projetosLucratividade.length === 0 ? (
               <div className="bg-white/5 border border-white/5 p-12 text-center text-white/40 italic text-sm">
                 Nenhum projeto com horas registradas. Registre horas no Módulo 03 para ver a lucratividade.
