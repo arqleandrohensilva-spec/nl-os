@@ -222,16 +222,30 @@ const FinanceiroProjetos = () => {
 
   const metrics = useMemo(() => {
     const today = new Date();
-    const startMonth = startOfMonth(today);
-    const endMonth = endOfMonth(today);
+    
+    let startDate: Date;
+    let endDate: Date = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    if (lucroFilter === 'MES_ATUAL') {
+      startDate = startOfMonth(new Date());
+      endDate = endOfMonth(new Date());
+    } else if (lucroFilter === 'ULTIMOS_3_MESES') {
+      startDate = startOfMonth(subDays(new Date(), 90));
+    } else {
+      startDate = parseISO(lucroCustomDates.start);
+      endDate = parseISO(lucroCustomDates.end);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
     const in7Days = addDays(today, 7);
 
-    const pagasMes = parcelas
-      .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start: startMonth, end: endMonth }))
+    const pagasPeriodo = parcelas
+      .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
 
-    const previstasMes = parcelas
-      .filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startMonth, end: endMonth }))
+    const previstasPeriodo = parcelas
+      .filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startDate, end: endDate }))
       .reduce((acc, p) => acc + p.valor, 0);
 
     const totalAtrasado = parcelas
