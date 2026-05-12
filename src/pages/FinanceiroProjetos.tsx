@@ -518,6 +518,47 @@ const FinanceiroProjetos = () => {
           </TabsContent>
 
           <TabsContent value="lucratividade">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex gap-2">
+                {[
+                  { id: 'MES_ATUAL', label: 'Mês Atual' },
+                  { id: 'ULTIMOS_3_MESES', label: 'Últimos 3 Meses' },
+                  { id: 'PERSONALIZADO', label: 'Personalizado' }
+                ].map(filter => (
+                  <Button 
+                    key={filter.id}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLucroFilter(filter.id as any)}
+                    className={cn(
+                      "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                      lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
+                    )}
+                  >
+                    {filter.label}
+                  </Button>
+                ))}
+              </div>
+
+              {lucroFilter === 'PERSONALIZADO' && (
+                <div className="flex gap-2 items-center">
+                  <Input 
+                    type="date" 
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                    value={lucroCustomDates.start}
+                    onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
+                  />
+                  <span className="text-white/20 text-[10px] uppercase">até</span>
+                  <Input 
+                    type="date" 
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
+                    value={lucroCustomDates.end}
+                    onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
+                  />
+                </div>
+              )}
+            </div>
+
             {projetosLucratividade.length === 0 ? (
               <div className="bg-white/5 border border-white/5 p-12 text-center text-white/40 italic text-sm">
                 Nenhum projeto com horas registradas. Registre horas no Módulo 03 para ver a lucratividade.
