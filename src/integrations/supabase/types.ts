@@ -122,12 +122,18 @@ export type Database = {
           data_recebimento: string | null
           data_vencimento: string
           id: string
+          iss_aliquota: number | null
+          iss_valor: number | null
+          nf_data_emissao: string | null
+          nf_emitida: boolean | null
+          nf_numero: string | null
           notificacoes_enviadas: Json | null
           numero_parcela: number
           projeto_id: string | null
           status: string
           total_parcelas: number
           valor: number
+          valor_liquido: number | null
           valor_recebido: number | null
         }
         Insert: {
@@ -138,12 +144,18 @@ export type Database = {
           data_recebimento?: string | null
           data_vencimento: string
           id?: string
+          iss_aliquota?: number | null
+          iss_valor?: number | null
+          nf_data_emissao?: string | null
+          nf_emitida?: boolean | null
+          nf_numero?: string | null
           notificacoes_enviadas?: Json | null
           numero_parcela: number
           projeto_id?: string | null
           status?: string
           total_parcelas: number
           valor: number
+          valor_liquido?: number | null
           valor_recebido?: number | null
         }
         Update: {
@@ -154,12 +166,18 @@ export type Database = {
           data_recebimento?: string | null
           data_vencimento?: string
           id?: string
+          iss_aliquota?: number | null
+          iss_valor?: number | null
+          nf_data_emissao?: string | null
+          nf_emitida?: boolean | null
+          nf_numero?: string | null
           notificacoes_enviadas?: Json | null
           numero_parcela?: number
           projeto_id?: string | null
           status?: string
           total_parcelas?: number
           valor?: number
+          valor_liquido?: number | null
           valor_recebido?: number | null
         }
         Relationships: [
