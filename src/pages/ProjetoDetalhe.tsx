@@ -112,19 +112,19 @@ const ETAPAS_CONFIG = [
 
 const gerarResumo = (tipo: string, etapa: string, status: string) => {
   const normalizedTipo = (tipo || '').toLowerCase();
-  const normalizedEtapa = (etapa || '').toLowerCase();
+  const normalizedEtapa = (etapa || '').toUpperCase();
   const normalizedStatus = (status || '').toLowerCase().replace(/\s+/g, '_').normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   const mappingEtapa: Record<string, string> = {
-    'briefing': 'briefing',
-    'conceito': 'briefing',
-    'estudo': 'anteprojeto',
-    'executivo': 'executivo',
-    'detalhamento': 'executivo',
-    'acompanhamento': 'acompanhamento'
+    'BRIEFING': 'briefing',
+    'CONCEITO': 'briefing',
+    'ESTUDO': 'anteprojeto',
+    'EXECUTIVO': 'executivo',
+    'DETALHAMENTO': 'executivo',
+    'ACOMPANHAMENTO': 'acompanhamento'
   };
 
-  const etapaKey = mappingEtapa[normalizedEtapa] || normalizedEtapa;
+  const etapaKey = mappingEtapa[normalizedEtapa] || 'briefing';
 
   const textos: any = {
     arqint: {
@@ -179,7 +179,7 @@ const gerarResumo = (tipo: string, etapa: string, status: string) => {
       },
       anteprojeto: {
         "em_andamento": "Estamos desenvolvendo o layout operacional e a concepção do espaço. Fluxo de clientes, equipe e operação sendo testados antes de qualquer execução.",
-        "aguardando_aprovacao": "O anteprojeto comercial está pronto. Verifique se o fluxo e a distribuição dos ambientes atendem à operação do negócio.",
+        "aguardando_aprovacao": "O anteprojeto comercial está pronto. Verifique se o fluxo e a distribution dos ambientes atendem à operação do negócio.",
         "aprovado": "Anteprojeto aprovado. Conceito espacial e fluxo operacional validados."
       },
       executivo: {
@@ -195,7 +195,10 @@ const gerarResumo = (tipo: string, etapa: string, status: string) => {
     }
   };
 
-  return textos[normalizedTipo]?.[etapaKey]?.[normalizedStatus] ?? "Projeto em andamento. Acompanhe as etapas abaixo.";
+  const projectTextos = textos[normalizedTipo] || textos['arqint'];
+  const etapaTextos = projectTextos[etapaKey] || projectTextos['briefing'];
+  
+  return etapaTextos[normalizedStatus] || "Projeto em andamento. Acompanhe as etapas abaixo.";
 };
 
 const ProjetoDetalhe = () => {
