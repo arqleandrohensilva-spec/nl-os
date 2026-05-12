@@ -173,6 +173,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             active={location.pathname === '/projetos/horas'} 
             onClick={() => navigate('/projetos/horas')} 
           />
+          <NavItem 
+            label="07 · Financeiro de Projetos" 
+            active={location.pathname === '/financeiro/projetos'} 
+            onClick={() => navigate('/financeiro/projetos')} 
+          />
         </SectionAccordion>
 
         <SectionAccordion 
