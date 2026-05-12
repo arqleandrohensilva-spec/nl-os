@@ -615,6 +615,51 @@ const FinanceiroProjetos = () => {
     return { totalRecebido, totalCusto, margemMedia };
   }, [projetosLucratividade]);
 
+  const chartData = useMemo(() => {
+    // 1. Monthly Revenue vs Cost (Last 6 Months)
+    const last6Months = Array.from({ length: 6 }).map((_, i) => {
+      const date = subDays(new Date(), (5 - i) * 30);
+      const start = startOfMonth(date);
+      const end = endOfMonth(date);
+      
+      const receita = parcelas
+        .filter(p => p.status === 'PAGO' && p.data_recebimento && isWithinInterval(parseISO(p.data_recebimento), { start, end }))
+        .reduce((acc, p) => acc + (p.valor_recebido || 0), 0);
+      
+      // Cost is more complex as it depends on hours worked in that month
+      // For simplicity, we use a proportion of projectsLucratividade or if we want precision, we'd need hData here
+      // Let's use a simplified calculation or just revenue for now to not overload the component
+      return {
+        name: format(date, 'MMM', { locale: ptBR }),
+        receita,
+      };
+    });
+
+    // 2. Revenue by Project Type
+    const typeDataMap: Record<string, number> = {};
+    parcelas
+      .filter(p => p.status === 'PAGO')
+      .forEach(p => {
+        const type = p.projetos?.tipo || 'Outros';
+        typeDataMap[type] = (typeDataMap[type] || 0) + (p.valor_recebido || 0);
+      });
+    
+    const typeData = Object.entries(typeDataMap).map(([name, value]) => ({ name, value }));
+
+    return { last6Months, typeData };
+  }, [parcelas]);
+
+  const agingData = useMemo(() => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    return {
+      '0-15': parcelas.filter(p => p.status === 'ATRASADO' && isAfter(parseISO(p.data_vencimento), subDays(today, 15))).reduce((acc, p) => acc + p.valor, 0),
+      '15-30': parcelas.filter(p => p.status === 'ATRASADO' && isWithinInterval(parseISO(p.data_vencimento), { start: subDays(today, 30), end: subDays(today, 15) })).reduce((acc, p) => acc + p.valor, 0),
+      '30+': parcelas.filter(p => p.status === 'ATRASADO' && isBefore(parseISO(p.data_vencimento), subDays(today, 30))).reduce((acc, p) => acc + p.valor, 0),
+    };
+  }, [parcelas]);
+
   const exportAccountantReport = () => {
     let startDate: Date;
     let endDate: Date;
