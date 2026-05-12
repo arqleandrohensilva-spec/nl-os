@@ -115,12 +115,14 @@ export type Database = {
       }
       financeiro_parcelas: {
         Row: {
+          agendamento_cobranca: Json | null
           cliente_nome: string
           criado_em: string | null
           data_notificacao_cobranca: string | null
           data_recebimento: string | null
           data_vencimento: string
           id: string
+          notificacoes_enviadas: Json | null
           numero_parcela: number
           projeto_id: string | null
           status: string
@@ -129,12 +131,14 @@ export type Database = {
           valor_recebido: number | null
         }
         Insert: {
+          agendamento_cobranca?: Json | null
           cliente_nome: string
           criado_em?: string | null
           data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento: string
           id?: string
+          notificacoes_enviadas?: Json | null
           numero_parcela: number
           projeto_id?: string | null
           status?: string
@@ -143,12 +147,14 @@ export type Database = {
           valor_recebido?: number | null
         }
         Update: {
+          agendamento_cobranca?: Json | null
           cliente_nome?: string
           criado_em?: string | null
           data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento?: string
           id?: string
+          notificacoes_enviadas?: Json | null
           numero_parcela?: number
           projeto_id?: string | null
           status?: string
