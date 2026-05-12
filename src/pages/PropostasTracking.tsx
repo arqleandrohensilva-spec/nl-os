@@ -20,7 +20,11 @@ import {
   MessageSquare,
   ChevronDown,
   Activity,
-  LayoutDashboard
+  LayoutDashboard,
+  TrendingUp,
+  DollarSign,
+  FileText,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
