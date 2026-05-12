@@ -117,6 +117,7 @@ export type Database = {
         Row: {
           cliente_nome: string
           criado_em: string | null
+          data_notificacao_cobranca: string | null
           data_recebimento: string | null
           data_vencimento: string
           id: string
@@ -130,6 +131,7 @@ export type Database = {
         Insert: {
           cliente_nome: string
           criado_em?: string | null
+          data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento: string
           id?: string
@@ -143,6 +145,7 @@ export type Database = {
         Update: {
           cliente_nome?: string
           criado_em?: string | null
+          data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento?: string
           id?: string
