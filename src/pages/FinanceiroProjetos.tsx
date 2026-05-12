@@ -282,7 +282,10 @@ const FinanceiroProjetos = () => {
         .eq('id', p.id)
         .single();
 
-      const notificacoes = [...(currentData?.notificacoes_enviadas || []), newNotification];
+      const currentNotificacoes = Array.isArray(currentData?.notificacoes_enviadas) 
+        ? currentData.notificacoes_enviadas 
+        : [];
+      const notificacoes = [...currentNotificacoes, newNotification];
 
       await supabase
         .from('financeiro_parcelas')
