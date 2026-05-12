@@ -79,10 +79,15 @@ const FinanceiroProjetos = () => {
   const [confirmData, setConfirmData] = useState({ data: format(new Date(), 'yyyy-MM-dd'), valor: '' });
   const [configEscritorio, setConfigEscritorio] = useState<any>(null);
   const [projetosLucratividade, setProjetosLucratividade] = useState<ProjetoLucratividade[]>([]);
+  const [lucroFilter, setLucroFilter] = useState<'MES_ATUAL' | 'ULTIMOS_3_MESES' | 'PERSONALIZADO'>('MES_ATUAL');
+  const [lucroCustomDates, setLucroCustomDates] = useState({ 
+    start: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
+    end: format(endOfMonth(new Date()), 'yyyy-MM-dd')
+  });
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [lucroFilter, lucroCustomDates]);
 
   const fetchData = async () => {
     try {
