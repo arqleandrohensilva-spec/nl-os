@@ -14,6 +14,7 @@ import PropostasTracking from "./pages/PropostasTracking.tsx";
 import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
+import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
         <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
         <Route path="/projetos/gestao" element={<ProtectedRoute><GestaoProjetos /></ProtectedRoute>} />
         <Route path="/projetos/detalhe/:id" element={<ProtectedRoute><ProjetoDetalhe /></ProtectedRoute>} />
+        <Route path="/financeiro/projetos" element={<ProtectedRoute><FinanceiroProjetos /></ProtectedRoute>} />
 
         <Route path="/propostas/tracking" element={<ProtectedRoute><PropostasTracking /></ProtectedRoute>} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
