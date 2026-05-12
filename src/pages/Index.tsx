@@ -940,7 +940,7 @@ const Index = () => {
                         horas_estimadas: conversionHours.briefing + conversionHours.conceito + conversionHours.estudo + conversionHours.executivo + conversionHours.detalhamento + conversionHours.acompanhamento,
                         horas_briefing: conversionHours.briefing,
                         horas_conceito: conversionHours.conceito,
-                        horas_estudo: conversionHours.estudo,
+                        horas_anteprojeto: conversionHours.estudo,
                         horas_executivo: conversionHours.executivo,
                         horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
