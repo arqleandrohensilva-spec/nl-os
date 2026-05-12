@@ -478,10 +478,96 @@ const FinanceiroProjetos = () => {
           </TabsContent>
 
           <TabsContent value="lucratividade">
-             {/* Profitability content would go here, calculating based on projects, values and hours */}
-             <div className="bg-white/5 border border-white/5 p-12 text-center text-white/40 italic text-sm">
-                Relatório de lucratividade em desenvolvimento baseado no Módulo 02 e 03.
-             </div>
+            {projetosLucratividade.length === 0 ? (
+              <div className="bg-white/5 border border-white/5 p-12 text-center text-white/40 italic text-sm">
+                Nenhum projeto com horas registradas. Registre horas no Módulo 03 para ver a lucratividade.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Summary Card */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 p-8 border border-white/5">
+                    <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold block mb-2">Margem Média Geral</span>
+                    <div className="flex items-center gap-4">
+                      <span className={cn(
+                        "text-3xl font-bold",
+                        (lucroResumo?.margemMedia || 0) > 20 ? "text-green-500" : (lucroResumo?.margemMedia || 0) > 10 ? "text-bronze" : "text-red-500"
+                      )}>
+                        {(lucroResumo?.margemMedia || 0).toFixed(1)}%
+                      </span>
+                      <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                        <div 
+                          className={cn(
+                            "h-full transition-all",
+                            (lucroResumo?.margemMedia || 0) > 20 ? "bg-green-500" : (lucroResumo?.margemMedia || 0) > 10 ? "bg-bronze" : "bg-red-500"
+                          )}
+                          style={{ width: `${Math.min(Math.max(lucroResumo?.margemMedia || 0, 0), 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white/5 p-8 border border-white/5">
+                    <span className="text-[10px] text-white/40 uppercase tracking-widest font-bold block mb-2">Total Recebido vs Custo Real</span>
+                    <div className="grid grid-cols-2 gap-8">
+                      <div>
+                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Recebido</p>
+                        <p className="text-xl font-bold text-green-500">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-1">Custo Total</p>
+                        <p className="text-xl font-bold text-white/60">R$ {(lucroResumo?.totalCusto || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Projects Grid */}
+                <div className="grid grid-cols-3 gap-4">
+                  {projetosLucratividade.map(proj => (
+                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
+                      <div className="flex justify-between items-start mb-6">
+                        <div>
+                          <h3 className="text-sm font-bold uppercase tracking-tight">{proj.nome_cliente}</h3>
+                          <span className="text-[10px] text-white/40 uppercase tracking-widest">{proj.tipo}</span>
+                        </div>
+                        <Badge className={cn(
+                          "border-none rounded-none text-[10px] px-2",
+                          proj.margemPercent > 20 ? "bg-green-500/20 text-green-500" : 
+                          proj.margemPercent > 10 ? "bg-bronze/20 text-bronze" : 
+                          "bg-red-500/20 text-red-500"
+                        )}>
+                          {proj.margemPercent.toFixed(1)}%
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                          <span className="text-white/40">Receita Total</span>
+                          <span className="font-bold">R$ {proj.receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                          <span className="text-white/40">Horas Reais</span>
+                          <span className="font-bold">{proj.horasReais.toFixed(1)}h</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest">
+                          <span className="text-white/40">Custo Real</span>
+                          <span className="font-bold">R$ {proj.custoReal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="pt-4 border-t border-white/5 flex justify-between items-center">
+                          <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
+                          <span className={cn(
+                            "text-sm font-bold",
+                            proj.margemRS >= 0 ? "text-white" : "text-red-500"
+                          )}>
+                            R$ {proj.margemRS.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 
