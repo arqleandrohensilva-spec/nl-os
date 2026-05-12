@@ -113,6 +113,56 @@ export type Database = {
         }
         Relationships: []
       }
+      financeiro_parcelas: {
+        Row: {
+          cliente_nome: string
+          criado_em: string | null
+          data_recebimento: string | null
+          data_vencimento: string
+          id: string
+          numero_parcela: number
+          projeto_id: string | null
+          status: string
+          total_parcelas: number
+          valor: number
+          valor_recebido: number | null
+        }
+        Insert: {
+          cliente_nome: string
+          criado_em?: string | null
+          data_recebimento?: string | null
+          data_vencimento: string
+          id?: string
+          numero_parcela: number
+          projeto_id?: string | null
+          status?: string
+          total_parcelas: number
+          valor: number
+          valor_recebido?: number | null
+        }
+        Update: {
+          cliente_nome?: string
+          criado_em?: string | null
+          data_recebimento?: string | null
+          data_vencimento?: string
+          id?: string
+          numero_parcela?: number
+          projeto_id?: string | null
+          status?: string
+          total_parcelas?: number
+          valor?: number
+          valor_recebido?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financeiro_parcelas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_logs: {
         Row: {
           autor: string
@@ -345,6 +395,7 @@ export type Database = {
           tipo: string | null
           updated_at: string | null
           valor_proposta: number | null
+          valor_total: number | null
         }
         Insert: {
           area_m2?: number | null
@@ -370,6 +421,7 @@ export type Database = {
           tipo?: string | null
           updated_at?: string | null
           valor_proposta?: number | null
+          valor_total?: number | null
         }
         Update: {
           area_m2?: number | null
@@ -395,6 +447,7 @@ export type Database = {
           tipo?: string | null
           updated_at?: string | null
           valor_proposta?: number | null
+          valor_total?: number | null
         }
         Relationships: [
           {
