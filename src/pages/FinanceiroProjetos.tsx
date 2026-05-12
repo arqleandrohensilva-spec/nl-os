@@ -559,8 +559,9 @@ const FinanceiroProjetos = () => {
                       <td className="px-6 py-4">
                         <div className="flex flex-col gap-1">
                           {getStatusBadge(p)}
+                          {getReguaStatus(p)}
                           {(p as any).data_notificacao_cobranca && (
-                            <span className="text-[8px] text-white/20 uppercase">Avisado em {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
+                            <span className="text-[8px] text-white/20 uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
                           )}
                         </div>
                       </td>
