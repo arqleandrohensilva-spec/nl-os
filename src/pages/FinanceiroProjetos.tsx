@@ -276,6 +276,16 @@ const FinanceiroProjetos = () => {
     return months;
   }, [parcelas]);
 
+  const lucroResumo = useMemo(() => {
+    if (projetosLucratividade.length === 0) return null;
+    
+    const totalRecebido = projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0);
+    const totalCusto = projetosLucratividade.reduce((acc, p) => acc + p.custoReal, 0);
+    const margemMedia = projetosLucratividade.reduce((acc, p) => acc + p.margemPercent, 0) / projetosLucratividade.length;
+    
+    return { totalRecebido, totalCusto, margemMedia };
+  }, [projetosLucratividade]);
+
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
       <Sidebar user="Sócio" />
