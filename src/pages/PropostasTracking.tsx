@@ -518,30 +518,30 @@ Gere a mensagem de WhatsApp.`;
 
           <div className="grid grid-cols-5 gap-4">
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">TAXA DE ABERTURA</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">TAXA DE ABERTURA</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.views_count && p.views_count > 0).length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS NO FUNIL</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS NO FUNIL</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {leads.length}
               </span>
             </div>
@@ -549,8 +549,8 @@ Gere a mensagem de WhatsApp.`;
               <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
                 <TrendingUp size={12} className="text-bronze" />
               </div>
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 R$ {proposals
                   .filter(p => p.status !== 'Aprovada' && p.status !== 'Recusada')
                   .reduce((acc, p) => acc + (p.valor_completo || 0), 0)
@@ -755,7 +755,7 @@ Gere a mensagem de WhatsApp.`;
                       
                       <Button 
                         onClick={() => handleGenerateFollowup(p)}
-                        className="bg-graphite hover:bg-graphite/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                        className="bg-white/10 hover:bg-white/20 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
                       >
                         <MessageSquare size={12} className="mr-2" />
                         Gerar Follow-up

@@ -293,7 +293,7 @@ const BibliotecaServicos = () => {
                             </Button>
                             <Button 
                               size="sm"
-                              className="h-8 bg-[#1A1A1A] hover:bg-bronze text-white rounded-[1px] text-[9px] uppercase font-bold tracking-widest px-4 transition-all"
+                              className="h-8 bg-white/10 hover:bg-bronze text-white rounded-[1px] text-[9px] uppercase font-bold tracking-widest px-4 transition-all"
                             >
                               Usar
                               <ArrowRight size={12} className="ml-2" />

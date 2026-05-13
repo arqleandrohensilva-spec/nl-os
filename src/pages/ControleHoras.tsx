@@ -594,7 +594,7 @@ const ControleHoras = () => {
               <Plus size={14} className="mr-2" />
               Registrar Horas
             </Button>
-            <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+            <Button variant="outline" className="border-white/10 hover:border-bronze text-white text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
               + Novo Projeto
             </Button>
           </div>
@@ -686,26 +686,26 @@ const ControleHoras = () => {
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">HORAS NO MÊS</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">HORAS NO MÊS</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROJETOS ATIVOS</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {metrics.ativos}
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">CUSTO INTERNO</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">CUSTO INTERNO</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">EFICIÊNCIA</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">EFICIÊNCIA</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               92%
             </span>
           </div>
@@ -790,7 +790,7 @@ const ControleHoras = () => {
                     <Button 
                       onClick={() => openTimerModal(p)}
                       variant="outline"
-                      className="flex-1 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                      className="flex-1 border-white/40 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
                     >
                       <Play size={10} className="mr-2" />
                       Iniciar

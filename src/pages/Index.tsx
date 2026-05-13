@@ -590,20 +590,20 @@ const Index = () => {
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-10 pt-10 pb-0">
           <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS ATIVOS</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS ATIVOS</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length}
             </span>
           </div>
           <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO MÉDIA</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO MÉDIA</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {leads.length > 0 ? `${Math.round((leads.filter(l => l.stage === 'Fechado').length / leads.length) * 100)}%` : '0%'}
             </span>
           </div>
           <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">FOLLOW-UPS HOJE</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">FOLLOW-UPS HOJE</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {leads.filter(l => l.stage === 'Proposta Enviada').length}
             </span>
           </div>
@@ -611,8 +611,8 @@ const Index = () => {
             <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
               <TrendingUp size={12} className="text-bronze" />
             </div>
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
-            <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               R$ {leads
                 .filter(l => l.stage !== 'Perdido')
                 .reduce((acc, l) => acc + (l.orcamento || 0), 0)
@@ -631,15 +631,15 @@ const Index = () => {
             
             <div className="flex items-center gap-6">
               <div className="relative group">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-bronze transition-colors" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-bronze transition-colors" />
                 <Input 
                   placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#FAFAFA] border-beige focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
+                  className="w-72 h-10 pl-10 bg-[#1A1816] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
                 />
               </div>
-              <div className="h-8 w-[1px] bg-beige" />
+              <div className="h-8 w-[1px] bg-white/10" />
               <div className="flex items-center gap-3">
                 <button 
                   onClick={exportToPDF}
