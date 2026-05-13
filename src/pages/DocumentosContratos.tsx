@@ -187,11 +187,147 @@ const DocumentosContratos = () => {
     }
   };
 
+  const checkOrCreateProjectFolders = async (projeto: any) => {
+    try {
+      setDropboxLoading(true);
+      const projectFolderName = `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
+      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+      
+      // 1. Check if base folder exists
+      const { data: metadata, error: metaError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_metadata', path: projectBasePath }
+      });
+
+      // If not exists (or error), create it and subfolders
+      if (metaError || metadata.error) {
+        console.log('Creating project folders...');
+        await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', folder: projectBasePath }
+        });
+
+        const subfolders = [
+          '01 - Briefing',
+          '02 - Anteprojeto',
+          '03 - Projeto Executivo',
+          '04 - Acompanhamento de Obra'
+        ];
+
+        for (const sub of subfolders) {
+          await supabase.functions.invoke('dropbox-proxy', {
+            body: { action: 'create_folder', folder: `${projectBasePath}/${sub}` }
+          });
+        }
+      }
+
+      await fetchProjectFiles(projectBasePath);
+    } catch (error) {
+      console.error('Error in checkOrCreateProjectFolders:', error);
+      toast.error('Erro ao verificar/criar pastas no Dropbox');
+    } finally {
+      setDropboxLoading(false);
+    }
+  };
+
+  const fetchProjectFiles = async (basePath: string) => {
+    try {
+      setDropboxLoading(true);
+      const subfolders = [
+        '01 - Briefing',
+        '02 - Anteprojeto',
+        '03 - Projeto Executivo',
+        '04 - Acompanhamento de Obra'
+      ];
+
+      const filesMap: Record<string, any[]> = {};
+      
+      for (const sub of subfolders) {
+        const fullPath = `${basePath}/${sub}`;
+        const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'list_folder', path: fullPath }
+        });
+
+        if (!error && data && data.entries) {
+          filesMap[sub] = data.entries.filter((e: any) => e['.tag'] === 'file');
+        } else {
+          filesMap[sub] = [];
+        }
+      }
+
+      setProjectSubfoldersFiles(filesMap);
+      setCurrentPath(basePath);
+    } catch (error) {
+      console.error('Error fetching project files:', error);
+    } finally {
+      setDropboxLoading(false);
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (!uploadFile || !selectedProjetoArquivos) return;
+
+    try {
+      setUploading(true);
+      const projectFolderName = `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
+      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}/${uploadStage}/${uploadFile.name}`;
+
+      // Convert file to binary and send to proxy
+      const arrayBuffer = await uploadFile.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: destinationPath,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.success('Arquivo enviado com sucesso!');
+      setIsUploadModalOpen(false);
+      setUploadFile(null);
+      
+      // Refresh files
+      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+      await fetchProjectFiles(projectBasePath);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Erro ao fazer upload do arquivo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleShareFile = async (path: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'create_shared_link', path }
+      });
+
+      if (error) throw error;
+      
+      const link = data.url || data.link;
+      navigator.clipboard.writeText(link);
+      toast.success('Link de compartilhamento copiado!');
+    } catch (error) {
+      console.error('Share error:', error);
+      toast.error('Erro ao gerar link de compartilhamento');
+    }
+  };
+
   useEffect(() => {
-    if (activeTab === 'arquivos') {
+    if (activeTab === 'arquivos' && !selectedProjetoArquivos) {
       fetchDropboxFiles();
     }
-  }, [activeTab]);
+  }, [activeTab, selectedProjetoArquivos]);
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white">
