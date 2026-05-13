@@ -141,19 +141,27 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchDropboxFiles = async (path = '') => {
+  const fetchDropboxFiles = async (path = '/NL Arquitetos') => {
     try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'list_folder', path }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Dropbox error from function:', error);
+        throw error;
+      }
+      
+      if (data.error) {
+        throw new Error(data.error_summary || data.error || 'Erro desconhecido no Dropbox');
+      }
+
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Dropbox error:', error);
-      toast.error('Erro ao conectar com Dropbox');
+      toast.error(error.message || 'Erro ao conectar com Dropbox');
     } finally {
       setDropboxLoading(false);
     }
@@ -292,14 +300,14 @@ const DocumentosContratos = () => {
                 
                 <div className="flex-1 overflow-y-auto space-y-1">
                   <div 
-                    onClick={() => fetchDropboxFiles('')}
+                    onClick={() => fetchDropboxFiles('/NL Arquitetos')}
                     className={cn(
                       "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
-                      currentPath === '' && "bg-white/5 border-l-2 border-bronze"
+                      (currentPath === '/NL Arquitetos' || currentPath === '') && "bg-white/5 border-l-2 border-bronze"
                     )}
                   >
                     <Cloud size={14} className="text-blue-400" />
-                    <span>Raiz Dropbox</span>
+                    <span>NL Arquitetos</span>
                   </div>
 
                   <div className="h-px bg-white/5 my-4" />
