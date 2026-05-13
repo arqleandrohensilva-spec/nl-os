@@ -157,13 +157,13 @@ const BibliotecaServicos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#1A1816] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-graphite">Biblioteca de Serviços</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-white">Biblioteca de Serviços</h1>
               <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Catálogo de Serviços e Precificação</p>
             </div>
             <Button 
@@ -186,7 +186,7 @@ const BibliotecaServicos = () => {
             ].map((m, i) => (
               <div 
                 key={i}
-                className="bg-white p-6 rounded-[2px] border border-[#E8E4DF] shadow-sm relative overflow-hidden group"
+                className="bg-[#242220] p-6 rounded-[2px] border border-white/10 shadow-sm relative overflow-hidden group"
               >
                 <div className="relative z-10">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1 font-bold">{m.label}</p>
@@ -208,7 +208,7 @@ const BibliotecaServicos = () => {
           <div className="grid grid-cols-12 gap-10">
             {/* Main Content */}
             <div className="col-span-8 space-y-8">
-              <div className="flex items-center justify-between bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm">
+              <div className="flex items-center justify-between bg-[#242220] p-4 border border-white/10 rounded-[2px] shadow-sm">
                 <div className="flex gap-4">
                   {['all', 'por_projeto', 'por_m2', 'por_hora'].map(type => (
                     <button 
@@ -231,7 +231,7 @@ const BibliotecaServicos = () => {
                     placeholder="BUSCAR SERVIÇO..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#FDFDFD]"
+                    className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#1A1816]"
                   />
                 </div>
               </div>
@@ -245,7 +245,7 @@ const BibliotecaServicos = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="bg-white p-8 border border-[#E8E4DF] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group"
+                      className="bg-[#242220] p-8 border border-white/10 rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group"
                     >
                       <div className="flex items-start justify-between gap-8">
                         <div className="flex-1">
@@ -259,7 +259,7 @@ const BibliotecaServicos = () => {
                             </div>
                           </div>
                           
-                          <h3 className="text-xl font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors mb-2">
+                          <h3 className="text-xl font-bold text-white group-hover:text-bronze transition-colors mb-2">
                             {s.nome}
                           </h3>
                           
@@ -271,7 +271,7 @@ const BibliotecaServicos = () => {
                         <div className="text-right flex flex-col items-end justify-between min-h-[100px]">
                           <div>
                             <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Valor sugerido</p>
-                            <h4 className="text-2xl font-bold text-[#1A1A1A]">
+                            <h4 className="text-2xl font-bold text-white">
                               R$ {Math.round(calcularValor(s)).toLocaleString()}
                               {s.tipo === 'por_m2' && <span className="text-xs font-normal text-muted-foreground ml-1">/m²</span>}
                               {s.tipo === 'por_hora' && <span className="text-xs font-normal text-muted-foreground ml-1">/h</span>}
@@ -368,7 +368,7 @@ const BibliotecaServicos = () => {
                   </div>
                 </div>
 
-                <div className="p-6 border border-[#E8E4DF] rounded-[2px] bg-[#F5F2EF]/30">
+                <div className="p-6 border border-white/10 rounded-[2px] bg-[#242220]">
                   <div className="flex items-center gap-2 mb-3 text-bronze">
                     <Info size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest">Aviso</span>
