@@ -141,19 +141,27 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchDropboxFiles = async (path = '') => {
+  const fetchDropboxFiles = async (path = '/NL Arquitetos') => {
     try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'list_folder', path }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Dropbox error from function:', error);
+        throw error;
+      }
+      
+      if (data.error) {
+        throw new Error(data.error_summary || data.error || 'Erro desconhecido no Dropbox');
+      }
+
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Dropbox error:', error);
-      toast.error('Erro ao conectar com Dropbox');
+      toast.error(error.message || 'Erro ao conectar com Dropbox');
     } finally {
       setDropboxLoading(false);
     }
