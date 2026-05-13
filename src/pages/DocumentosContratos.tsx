@@ -144,7 +144,7 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchDropboxFiles = async (path = '/NL Arquitetos') => {
+  const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
     try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
@@ -154,6 +154,8 @@ const DocumentosContratos = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error_summary || data.error);
 
+      // Se estivermos na raiz dos projetos, podemos filtrar se necessário, 
+      // mas como já estamos apontando para a subpasta correta, resolve o problema.
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
     } catch (error: any) {
@@ -180,7 +182,7 @@ const DocumentosContratos = () => {
   const checkOrCreateProjectFolders = async (projeto: any) => {
     try {
       setDropboxLoading(true);
-      const projectFolderName = `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
+      const projectFolderName = projeto.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
       const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
       
       const { data: metadata, error: metaError } = await supabase.functions.invoke('dropbox-proxy', {
@@ -254,7 +256,7 @@ const DocumentosContratos = () => {
 
     try {
       setUploading(true);
-      const projectFolderName = `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
+      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
       const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}/${uploadStage}/${uploadFile.name}`;
 
       const arrayBuffer = await uploadFile.arrayBuffer();
@@ -428,15 +430,15 @@ const DocumentosContratos = () => {
                   <div 
                     onClick={() => {
                       setSelectedProjetoArquivos(null);
-                      fetchDropboxFiles('/NL Arquitetos');
+                      fetchDropboxFiles('/NL Arquitetos/07 - Projetos NL OS');
                     }}
                     className={cn(
                       "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
-                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos' || currentPath === '')) && "bg-white/5 border-l-2 border-bronze"
+                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos/07 - Projetos NL OS' || currentPath === '')) && "bg-white/5 border-l-2 border-bronze"
                     )}
                   >
                     <Cloud size={14} className="text-blue-400" />
-                    <span>NL Arquitetos</span>
+                    <span>07 - Projetos NL OS</span>
                   </div>
                   <div className="h-px bg-white/5 my-4" />
                   <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
