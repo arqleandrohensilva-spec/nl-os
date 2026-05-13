@@ -18,7 +18,9 @@ import {
   User,
   MapPin,
   ClipboardList,
-  Share2
+  Share2,
+  Cloud,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -51,6 +53,9 @@ const DocumentosContratos = () => {
   const [contratos, setContratos] = useState<any[]>([]);
   const [documentos, setDocumentos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [dropboxFiles, setDropboxFiles] = useState<any[]>([]);
+  const [dropboxLoading, setDropboxLoading] = useState(false);
+  const [currentPath, setCurrentPath] = useState('');
   
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
@@ -135,6 +140,43 @@ const DocumentosContratos = () => {
       toast.error('Erro ao gerar contrato');
     }
   };
+
+  const fetchDropboxFiles = async (path = '') => {
+    try {
+      setDropboxLoading(true);
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'list_folder', path }
+      });
+
+      if (error) throw error;
+      setDropboxFiles(data.entries || []);
+      setCurrentPath(path);
+    } catch (error) {
+      console.error('Dropbox error:', error);
+      toast.error('Erro ao conectar com Dropbox');
+    } finally {
+      setDropboxLoading(false);
+    }
+  };
+
+  const handleDownloadDropbox = async (path: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_temporary_link', path }
+      });
+
+      if (error) throw error;
+      window.open(data.link, '_blank');
+    } catch (error) {
+      toast.error('Erro ao baixar arquivo do Dropbox');
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'arquivos') {
+      fetchDropboxFiles();
+    }
+  }, [activeTab]);
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white">
@@ -243,11 +285,26 @@ const DocumentosContratos = () => {
           </TabsContent>
 
           <TabsContent value="arquivos">
-            <div className="flex gap-6 h-[500px]">
+            <div className="flex gap-6 h-[600px]">
               {/* Pasta Tree */}
-              <div className="w-64 bg-[#242220] border border-white/10 p-4">
-                <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-4">PROJETOS</h3>
-                <div className="space-y-1">
+              <div className="w-64 bg-[#242220] border border-white/10 p-4 flex flex-col">
+                <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-4">Dropbox Integration</h3>
+                
+                <div className="flex-1 overflow-y-auto space-y-1">
+                  <div 
+                    onClick={() => fetchDropboxFiles('')}
+                    className={cn(
+                      "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
+                      currentPath === '' && "bg-white/5 border-l-2 border-bronze"
+                    )}
+                  >
+                    <Cloud size={14} className="text-blue-400" />
+                    <span>Raiz Dropbox</span>
+                  </div>
+
+                  <div className="h-px bg-white/5 my-4" />
+                  
+                  <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS LOCAIS</h3>
                   {projetos.map(p => (
                     <div key={p.id} className="p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]">
                       <Folder size={14} className="text-bronze" />
@@ -260,35 +317,73 @@ const DocumentosContratos = () => {
               {/* File List */}
               <div className="flex-1 bg-[#242220] border border-white/10 p-6 overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-sm font-bold uppercase tracking-tight">Arquivos do Projeto</h3>
-                  <Button size="sm" className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[9px] uppercase tracking-widest">
-                    <Upload size={12} className="mr-2" /> UPLOAD
-                  </Button>
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-sm font-bold uppercase tracking-tight">
+                      {currentPath || "Arquivos do Dropbox"}
+                    </h3>
+                    {dropboxLoading && <Loader2 size={14} className="animate-spin text-bronze" />}
+                  </div>
+                  <div className="flex gap-2">
+                    {currentPath && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          const parts = currentPath.split('/');
+                          parts.pop();
+                          fetchDropboxFiles(parts.join('/'));
+                        }}
+                        className="border-white/10 hover:bg-white/5 text-white rounded-none text-[9px] uppercase tracking-widest"
+                      >
+                        VOLTAR
+                      </Button>
+                    )}
+                    <Button size="sm" className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[9px] uppercase tracking-widest">
+                      <Upload size={12} className="mr-2" /> UPLOAD
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
-                  {documentos.map(doc => (
-                    <div key={doc.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <FileText size={16} className="text-white/40" />
+                  {dropboxFiles.map(file => (
+                    <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
+                      <div 
+                        className="flex items-center gap-3 cursor-pointer flex-1"
+                        onClick={() => file['.tag'] === 'folder' ? fetchDropboxFiles(file.path_display) : handleDownloadDropbox(file.path_display)}
+                      >
+                        {file['.tag'] === 'folder' ? (
+                          <Folder size={16} className="text-blue-400" />
+                        ) : (
+                          <FileText size={16} className="text-white/40" />
+                        )}
                         <div>
-                          <p className="text-[11px] font-medium">{doc.nome}</p>
-                          <p className="text-[9px] text-white/40">Versão {doc.versao} · {format(parseISO(doc.criado_em), 'dd/MM/yyyy')}</p>
+                          <p className="text-[11px] font-medium">{file.name}</p>
+                          <p className="text-[9px] text-white/40 uppercase tracking-widest">
+                            {file['.tag'] === 'folder' ? 'Pasta' : `${(file.size / 1024).toFixed(1)} KB`}
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white">
-                          <Download size={14} />
-                        </Button>
+                        {file['.tag'] !== 'folder' && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleDownloadDropbox(file.path_display)}
+                            className="h-7 w-7 text-white/40 hover:text-white"
+                          >
+                            <Download size={14} />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-white/40 hover:text-white">
                           <Share2 size={14} />
                         </Button>
                       </div>
                     </div>
                   ))}
-                  {documentos.length === 0 && (
+                  
+                  {dropboxFiles.length === 0 && !dropboxLoading && (
                     <div className="text-center py-20 text-white/20 italic text-[11px]">
-                      Selecione um projeto para visualizar os arquivos.
+                      Nenhum arquivo encontrado nesta pasta do Dropbox.
                     </div>
                   )}
                 </div>
