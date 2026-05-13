@@ -214,7 +214,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             active={location.pathname === '/propostas/biblioteca'} 
             onClick={() => navigate('/propostas/biblioteca')} 
           />
-          <NavItem label="08 · Documentos" disabled />
+          <NavItem 
+            label="08 · Documentos" 
+            active={location.pathname === '/propostas/documentos'} 
+            onClick={() => navigate('/propostas/documentos')} 
+          />
         </SectionAccordion>
 
         <SectionAccordion 

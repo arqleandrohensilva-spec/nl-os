@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      briefings: {
+        Row: {
+          criado_em: string
+          id: string
+          lead_id: string | null
+          respostas: Json | null
+          status: string
+          token: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          lead_id?: string | null
+          respostas?: Json | null
+          status?: string
+          token: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          lead_id?: string | null
+          respostas?: Json | null
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefings_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       config_escritorio: {
         Row: {
           atualizado_em: string | null
@@ -52,6 +87,41 @@ export type Database = {
           percentual_produtivo?: number | null
         }
         Relationships: []
+      }
+      contratos: {
+        Row: {
+          conteudo: string | null
+          criado_em: string
+          id: string
+          projeto_id: string | null
+          status: string
+          tipo: string
+        }
+        Insert: {
+          conteudo?: string | null
+          criado_em?: string
+          id?: string
+          projeto_id?: string | null
+          status?: string
+          tipo: string
+        }
+        Update: {
+          conteudo?: string | null
+          criado_em?: string
+          id?: string
+          projeto_id?: string | null
+          status?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       custos_escritorio: {
         Row: {
@@ -112,6 +182,79 @@ export type Database = {
           status?: string | null
         }
         Relationships: []
+      }
+      documento_links: {
+        Row: {
+          criado_em: string
+          documento_id: string | null
+          expira_em: string
+          id: string
+          token: string
+        }
+        Insert: {
+          criado_em?: string
+          documento_id?: string | null
+          expira_em: string
+          id?: string
+          token: string
+        }
+        Update: {
+          criado_em?: string
+          documento_id?: string | null
+          expira_em?: string
+          id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documento_links_documento_id_fkey"
+            columns: ["documento_id"]
+            isOneToOne: false
+            referencedRelation: "documentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documentos: {
+        Row: {
+          criado_em: string
+          etapa: string
+          id: string
+          nome: string
+          projeto_id: string | null
+          tamanho: number | null
+          url: string
+          versao: number
+        }
+        Insert: {
+          criado_em?: string
+          etapa: string
+          id?: string
+          nome: string
+          projeto_id?: string | null
+          tamanho?: number | null
+          url: string
+          versao?: number
+        }
+        Update: {
+          criado_em?: string
+          etapa?: string
+          id?: string
+          nome?: string
+          projeto_id?: string | null
+          tamanho?: number | null
+          url?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       financeiro_parcelas: {
         Row: {
