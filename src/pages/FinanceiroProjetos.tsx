@@ -1569,11 +1569,18 @@ const FinanceiroProjetos = () => {
                   const receitaBruta = simulator.numProjetos * simulator.areaM2 * ticketMedio;
                   const iss = receitaBruta * 0.02; // 2%
                   const simples = receitaBruta * 0.06; // 6%
+                  
+                  // Melhoria: Usando custos fixos reais da Base Financeira (Módulo 02)
                   const custosFixos = configEscritorio?.custos_fixos || 15000;
                   const lucro = receitaBruta - iss - simples - custosFixos;
                   
                   const horasNecessarias = simulator.numProjetos * (simulator.areaM2 * 0.5); // Simplified
-                  const capacidadeDisponivel = 320;
+                  
+                  // Melhoria: Capacidade baseada no número de arquitetos (Módulo 02)
+                  // Cada arquiteto = 160h/mês (produtividade média considerada em faturáveis)
+                  const numArquitetos = configEscritorio?.num_arquitetos || 2;
+                  const capacidadeDisponivel = numArquitetos * 160; 
+                  
                   const viabilidade = horasNecessarias <= capacidadeDisponivel ? 'VIÁVEL' : 
                                      horasNecessarias <= capacidadeDisponivel * 1.2 ? 'ATENÇÃO' : 'INVIÁVEL';
                   const viabilidadeColor = viabilidade === 'VIÁVEL' ? 'text-green-500' : 
