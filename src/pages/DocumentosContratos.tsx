@@ -300,14 +300,14 @@ const DocumentosContratos = () => {
                 
                 <div className="flex-1 overflow-y-auto space-y-1">
                   <div 
-                    onClick={() => fetchDropboxFiles('')}
+                    onClick={() => fetchDropboxFiles('/NL Arquitetos')}
                     className={cn(
                       "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
-                      currentPath === '' && "bg-white/5 border-l-2 border-bronze"
+                      (currentPath === '/NL Arquitetos' || currentPath === '') && "bg-white/5 border-l-2 border-bronze"
                     )}
                   >
                     <Cloud size={14} className="text-blue-400" />
-                    <span>Raiz Dropbox</span>
+                    <span>NL Arquitetos</span>
                   </div>
 
                   <div className="h-px bg-white/5 my-4" />
