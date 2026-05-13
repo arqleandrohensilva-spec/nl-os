@@ -583,31 +583,31 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FDFDFD]">
+    <div className="flex min-h-screen bg-[#1A1816] text-white">
       <Sidebar user={user} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-10 pt-10 pb-0">
-          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS ATIVOS</span>
             <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
               {leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length}
             </span>
           </div>
-          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO MÉDIA</span>
             <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
               {leads.length > 0 ? `${Math.round((leads.filter(l => l.stage === 'Fechado').length / leads.length) * 100)}%` : '0%'}
             </span>
           </div>
-          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1">
+          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">FOLLOW-UPS HOJE</span>
             <span className="text-[22px] font-normal text-[#1A1A1A] font-inter">
               {leads.filter(l => l.stage === 'Proposta Enviada').length}
             </span>
           </div>
-          <div className="bg-white p-6 border border-[#E8E4DF] flex flex-col gap-1 relative overflow-hidden group">
+          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
               <TrendingUp size={12} className="text-bronze" />
             </div>
@@ -622,11 +622,11 @@ const Index = () => {
         </div>
 
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#FDFDFD] z-10">
-          <div className="px-10 py-6 border-b border-beige flex items-center justify-between">
+        <div className="flex-shrink-0 bg-[#1A1816] z-10">
+          <div className="px-10 py-6 border-b border-white/10 flex items-center justify-between">
             <div className="space-y-1">
-              <h1 className="text-2xl font-cormorant text-graphite tracking-tight leading-none uppercase">Pipeline de Leads</h1>
-              <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
+              <h1 className="text-2xl font-cormorant text-white tracking-tight leading-none uppercase">Pipeline de Leads</h1>
+              <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
             </div>
             
             <div className="flex items-center gap-6">
@@ -808,7 +808,7 @@ const Index = () => {
           <MetricsBar leads={leads} />
           <OriginBreakdown leads={leads} />
 
-          <div className="px-10 py-4 border-b border-beige flex items-center justify-between bg-white shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
+          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A1816] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
               <button 
                 onClick={showMockToast}
@@ -856,7 +856,7 @@ const Index = () => {
         </div>
 
         {/* Kanban Board */}
-        <div className="flex-1 bg-[#FAFAFA] overflow-y-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#1A1816] overflow-y-auto p-6 pt-2 scrollbar-custom">
           <DndContext 
             sensors={sensors}
             collisionDetection={closestCorners}

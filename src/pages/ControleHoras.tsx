@@ -577,13 +577,13 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#1A1816] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
-            <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
           <div className="flex gap-3">
             <Button 
@@ -652,7 +652,7 @@ const ControleHoras = () => {
         )}
 
         {/* Weekly Goals Bar */}
-        <div className="mb-12 bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-l-4 border-l-bronze">
+        <div className="mb-12 bg-[#242220] border border-white/10 p-6 rounded-[4px] border-l-4 border-l-bronze">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Meta de Horas Semanal</h4>
             <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
@@ -720,10 +720,10 @@ const ControleHoras = () => {
             const isRunning = activeTimer?.id === p.id;
 
             return (
-              <div key={p.id} className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
+              <div key={p.id} className="bg-[#242220] border border-white/10 p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
                 <div>
                   <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
+                    <h3 className="text-xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
                     {isRunning && (
                       <div className="flex items-center gap-1.5 shrink-0">
                         <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-ping" />
@@ -810,7 +810,7 @@ const ControleHoras = () => {
         </div>
 
         {/* Profitability Report */}
-        <div className="bg-white border border-[#E8E4DF] rounded-[4px] overflow-hidden">
+        <div className="bg-[#242220] border border-white/10 rounded-[4px] overflow-hidden">
           <button 
             onClick={() => setIsReportExpanded(!isReportExpanded)}
             className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors"
@@ -843,7 +843,7 @@ const ControleHoras = () => {
                     
                     return (
                       <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
-                        <td className="py-4 font-medium text-[#1A1A1A]">{p.nome}</td>
+                        <td className="py-4 font-medium text-white">{p.nome}</td>
                         <td className="py-4 text-muted-foreground font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
                         <td className="py-4 text-muted-foreground font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(
