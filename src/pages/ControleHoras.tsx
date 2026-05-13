@@ -577,13 +577,13 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#1A1816] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
-            <h1 className="text-[28px] font-cormorant font-bold text-[#1A1A1A] mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
           <div className="flex gap-3">
             <Button 
@@ -594,7 +594,7 @@ const ControleHoras = () => {
               <Plus size={14} className="mr-2" />
               Registrar Horas
             </Button>
-            <Button variant="outline" className="border-[#1A1A1A]/10 hover:border-bronze text-[#1A1A1A] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+            <Button variant="outline" className="border-white/10 hover:border-bronze text-white text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
               + Novo Projeto
             </Button>
           </div>
@@ -652,7 +652,7 @@ const ControleHoras = () => {
         )}
 
         {/* Weekly Goals Bar */}
-        <div className="mb-12 bg-white border border-[#E8E4DF] p-6 rounded-[4px] border-l-4 border-l-bronze">
+        <div className="mb-12 bg-[#242220] border border-white/10 p-6 rounded-[4px] border-l-4 border-l-bronze">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">Meta de Horas Semanal</h4>
             <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
@@ -686,26 +686,26 @@ const ControleHoras = () => {
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">HORAS NO MÊS</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">HORAS NO MÊS</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROJETOS ATIVOS</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               {metrics.ativos}
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">CUSTO INTERNO</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">CUSTO INTERNO</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
           <div className="bg-[#1A1816] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">EFICIÊNCIA</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">EFICIÊNCIA</span>
+            <span className="text-[22px] font-normal text-white font-inter">
               92%
             </span>
           </div>
@@ -720,10 +720,10 @@ const ControleHoras = () => {
             const isRunning = activeTimer?.id === p.id;
 
             return (
-              <div key={p.id} className="bg-white border border-[#E8E4DF] p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
+              <div key={p.id} className="bg-[#242220] border border-white/10 p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
                 <div>
                   <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-xl font-cormorant font-bold text-[#1A1A1A] group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
+                    <h3 className="text-xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
                     {isRunning && (
                       <div className="flex items-center gap-1.5 shrink-0">
                         <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-ping" />
@@ -790,7 +790,7 @@ const ControleHoras = () => {
                     <Button 
                       onClick={() => openTimerModal(p)}
                       variant="outline"
-                      className="flex-1 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                      className="flex-1 border-white/40 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
                     >
                       <Play size={10} className="mr-2" />
                       Iniciar
@@ -810,7 +810,7 @@ const ControleHoras = () => {
         </div>
 
         {/* Profitability Report */}
-        <div className="bg-white border border-[#E8E4DF] rounded-[4px] overflow-hidden">
+        <div className="bg-[#242220] border border-white/10 rounded-[4px] overflow-hidden">
           <button 
             onClick={() => setIsReportExpanded(!isReportExpanded)}
             className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors"
@@ -843,7 +843,7 @@ const ControleHoras = () => {
                     
                     return (
                       <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
-                        <td className="py-4 font-medium text-[#1A1A1A]">{p.nome}</td>
+                        <td className="py-4 font-medium text-white">{p.nome}</td>
                         <td className="py-4 text-muted-foreground font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
                         <td className="py-4 text-muted-foreground font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(

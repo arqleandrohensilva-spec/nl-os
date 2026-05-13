@@ -525,24 +525,24 @@ Máximo 3 linhas. Sem markdown. Em português.
   if (isLoading) return <div className="flex h-screen items-center justify-center">Carregando...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#FDFDFD]">
+    <div className="flex min-h-screen bg-[#1A1816] text-white">
       <Sidebar user={user || ''} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-white z-10">
-          <div className="px-10 py-6 border-b border-beige">
+        <div className="flex-shrink-0 bg-[#1A1816] z-10">
+          <div className="px-10 py-6 border-b border-white/10">
             <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">
-                <h1 className="text-2xl font-cormorant text-graphite font-bold leading-none">Base Financeira</h1>
-                <p className="text-[10px] text-muted uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
+                <h1 className="text-2xl font-cormorant text-white font-bold leading-none">Base Financeira</h1>
+                <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
               </div>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={exportReport}
                 disabled={isExporting}
-                className="h-8 border-beige text-[9px] uppercase tracking-widest text-graphite hover:bg-beige/10 flex items-center gap-2"
+                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-beige/10 flex items-center gap-2"
               >
                 {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
                 Exportar Relatório
@@ -629,7 +629,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <p className="text-xs font-dm-mono text-graphite leading-relaxed whitespace-pre-line border-b border-black/5 pb-6">
+                  <p className="text-xs font-dm-mono text-white leading-relaxed whitespace-pre-line border-b border-black/5 pb-6">
                     {aiDiagnostic || "Clique em atualizar para gerar o diagnóstico financeiro baseado nos seus dados."}
                   </p>
 
@@ -640,7 +640,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     </h4>
                     <div className="space-y-2">
                       {aiHistory.map((item) => (
-                        <div key={item.id} className="bg-white/50 p-3 border border-black/5 rounded-[2px] space-y-2">
+                        <div key={item.id} className="bg-[#242220] p-3 border border-white/10 rounded-[2px] space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <span className="text-[9px] font-dm-mono text-muted">
@@ -676,11 +676,11 @@ Máximo 3 linhas. Sem markdown. Em português.
           {/* Top Result Cards */}
           <div className="grid grid-cols-2 gap-6">
             {/* Card 1: Custo/Hora Real */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
+            <div className="bg-[#242220] p-8 border border-white/10 border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
               <div className="space-y-1">
                 <p className="text-[9px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold">CUSTO/HORA REAL</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[64px] font-cormorant font-bold text-graphite leading-none">
+                  <span className="text-[64px] font-cormorant font-bold text-white leading-none">
                     R$ <CountUp 
                       value={calculations.costPerHour} 
                       formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} 
@@ -698,7 +698,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
 
             {/* Card 2: Preço Sugerido */}
-            <div className="bg-white p-8 border border-beige border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
+            <div className="bg-[#242220] p-8 border border-white/10 border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
                   <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
@@ -738,7 +738,7 @@ Máximo 3 linhas. Sem markdown. Em português.
           </div>
 
           {/* Configuração de Horas Produtivas */}
-          <div className="bg-white p-8 border border-beige rounded-[4px]">
+          <div className="bg-[#242220] p-8 border border-white/10 rounded-[4px]">
             <div className="flex flex-col gap-8">
               <div className="flex items-center justify-between">
                 <div className="grid grid-cols-5 gap-8 flex-1">

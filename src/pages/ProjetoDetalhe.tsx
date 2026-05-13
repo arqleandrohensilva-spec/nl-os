@@ -608,9 +608,9 @@ const ProjetoDetalhe = () => {
         {clientMode ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Status do Projeto Card */}
-            <div className="mb-12 bg-[#F8F9FA] p-8 border-none flex flex-col items-center text-center animate-in fade-in duration-1000">
+            <div className="mb-12 bg-[#242220] p-8 border border-white/10 flex flex-col items-center text-center animate-in fade-in duration-1000">
               <span className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-4">Status do Projeto</span>
-              <p className="text-[15px] text-[#3A3A3A] font-inter leading-relaxed max-w-2xl">
+              <p className="text-[15px] text-white font-inter leading-relaxed max-w-2xl">
                 {gerarResumo(
                   projeto.tipo, 
                   projeto.etapa_atual, 
@@ -650,7 +650,7 @@ const ProjetoDetalhe = () => {
                 <h3 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold border-b border-[#8B7355]/20 pb-4">Conceitos e Atmosfera</h3>
                 <div className="grid grid-cols-1 gap-8">
                   {etapas.filter(e => e.moodboard_url).map((e) => (
-                    <div key={e.id} className="group relative overflow-hidden bg-white/[0.02] border border-white/5 p-6 hover:border-[#8B7355]/30 transition-all duration-500">
+                    <div key={e.id} className="group relative overflow-hidden bg-[#242220] border border-white/10 p-6 hover:border-[#8B7355]/30 transition-all duration-500">
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <span className="text-[8px] uppercase tracking-widest text-white/30 font-bold">Ref: {e.etapa}</span>
@@ -743,14 +743,14 @@ const ProjetoDetalhe = () => {
 
                 {/* Atendimento Prime & Moodboard Link */}
                 <div className="space-y-6">
-                  <div className="bg-white/[0.02] border border-[#8B7355]/10 p-10 space-y-4">
+                  <div className="bg-[#242220] border border-white/10 p-10 space-y-4">
                     <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold">Atendimento Prime</h4>
                     <p className="text-xs text-white/60 leading-relaxed italic font-light">
                       Sua jornada é única. Se desejar ajustes finos em qualquer uma das etapas acima, contate seu concierge via canal direto.
                     </p>
                   </div>
 
-                  <div className="bg-white/[0.02] border border-white/5 p-10 space-y-6">
+                  <div className="bg-[#242220] border border-white/10 p-10 space-y-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 flex items-center justify-center bg-[#8B7355]/10 border border-[#8B7355]/20 text-[#8B7355]">
                         <ImageIcon size={18} />
@@ -798,7 +798,7 @@ const ProjetoDetalhe = () => {
                     <AccordionItem 
                       key={config.id} 
                       value={config.id} 
-                      className="border border-white/5 bg-white/[0.01] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
+                      className="border border-white/10 bg-[#242220] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
                     >
                       <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-data-[state=open]:scale-y-100 transition-transform duration-500 origin-top" />
                       <AccordionTrigger className="hover:no-underline py-6">

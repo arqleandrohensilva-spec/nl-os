@@ -491,14 +491,14 @@ Gere a mensagem de WhatsApp.`;
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A]">
+    <div className="min-h-screen bg-[#1A1816] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight text-graphite font-cormorant text-gradient">04 · Tracking de Propostas</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-white font-cormorant text-gradient">04 · Tracking de Propostas</h1>
                 <div className="flex items-center gap-2 px-2 py-0.5 bg-bronze/5 border border-bronze/20 rounded-full h-fit">
                   <div className="w-1.5 h-1.5 bg-bronze rounded-full animate-pulse" />
                   <span className="text-[8px] font-bold text-bronze uppercase tracking-[0.2em]">Premium Tracking</span>
@@ -518,30 +518,30 @@ Gere a mensagem de WhatsApp.`;
 
           <div className="grid grid-cols-5 gap-4">
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">TAXA DE ABERTURA</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">TAXA DE ABERTURA</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.views_count && p.views_count > 0).length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">APROVAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
             <div className="bg-[#1A1816] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LEADS NO FUNIL</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS NO FUNIL</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 {leads.length}
               </span>
             </div>
@@ -549,8 +549,8 @@ Gere a mensagem de WhatsApp.`;
               <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
                 <TrendingUp size={12} className="text-bronze" />
               </div>
-              <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
-              <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+              <span className="text-[22px] font-normal text-white font-inter">
                 R$ {proposals
                   .filter(p => p.status !== 'Aprovada' && p.status !== 'Recusada')
                   .reduce((acc, p) => acc + (p.valor_completo || 0), 0)
@@ -585,7 +585,7 @@ Gere a mensagem de WhatsApp.`;
               ))}
             </div>
 
-            <div className="flex items-center justify-between bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm">
+            <div className="flex items-center justify-between bg-[#242220] p-4 border border-white/10 rounded-[2px] shadow-sm">
               <div className="flex gap-4">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger className="h-9 w-40 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
@@ -606,7 +606,7 @@ Gere a mensagem de WhatsApp.`;
                   placeholder="BUSCAR CLIENTE..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 pl-9 w-64 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#FDFDFD]"
+                  className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#1A1816]"
                 />
               </div>
             </div>
@@ -622,7 +622,7 @@ Gere a mensagem de WhatsApp.`;
               {filteredProposals.map((p) => (
                 <div 
                   key={p.id}
-                  className="bg-white border border-[#E8E4DF] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-lg"
+                  className="bg-[#242220] border border-white/10 rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-lg"
                 >
                   <div className="p-6 flex-1">
                     <div className="flex justify-between items-start mb-4">
@@ -637,7 +637,7 @@ Gere a mensagem de WhatsApp.`;
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-graphite mb-1 font-cormorant">{p.cliente}</h3>
+                    <h3 className="text-lg font-bold text-white mb-1 font-cormorant">{p.cliente}</h3>
                     <p className="text-[10px] text-bronze uppercase tracking-widest font-bold mb-4">{p.tipo}</p>
 
                     <div className="grid grid-cols-2 gap-4 mb-6">
@@ -743,7 +743,7 @@ Gere a mensagem de WhatsApp.`;
                     )}
                   </div>
 
-                  <div className="px-6 py-4 bg-[#FDFDFD] border-t border-[#E8E4DF] space-y-3">
+                  <div className="px-6 py-4 bg-[#242220] border-t border-white/10 space-y-3">
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => handleOpenDashboard(p)}
@@ -755,7 +755,7 @@ Gere a mensagem de WhatsApp.`;
                       
                       <Button 
                         onClick={() => handleGenerateFollowup(p)}
-                        className="bg-graphite hover:bg-graphite/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                        className="bg-white/10 hover:bg-white/20 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
                       >
                         <MessageSquare size={12} className="mr-2" />
                         Gerar Follow-up
