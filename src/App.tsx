@@ -15,6 +15,7 @@ import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
+import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 
 
 const queryClient = new QueryClient();
