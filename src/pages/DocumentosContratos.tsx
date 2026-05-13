@@ -56,6 +56,8 @@ const DocumentosContratos = () => {
   const [dropboxFiles, setDropboxFiles] = useState<any[]>([]);
   const [dropboxLoading, setDropboxLoading] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
+  const [selectedProjetoArquivos, setSelectedProjetoArquivos] = useState<any>(null);
+  const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
   
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
@@ -64,6 +66,11 @@ const DocumentosContratos = () => {
   const [isContratoModalOpen, setIsContratoModalOpen] = useState(false);
   const [selectedProjetoId, setSelectedProjetoId] = useState('');
   const [tipoContrato, setTipoContrato] = useState('ArqInt');
+
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadStage, setUploadStage] = useState('01 - Briefing');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchData();
