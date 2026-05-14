@@ -188,6 +188,7 @@ const DocumentosContratos = () => {
   const checkOrCreateProjectFolders = async (projeto: any) => {
     try {
       setDropboxLoading(true);
+      setSelectedStage(null); // Reset stage selection when selecting a new project
       const projectFolderName = projeto.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
       const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
       
@@ -195,7 +196,8 @@ const DocumentosContratos = () => {
         body: { action: 'get_metadata', path: projectBasePath }
       });
 
-      if (metaError || metadata.error) {
+      if (metaError || (metadata && metadata.error)) {
+        console.log("Creating folder structure for project:", projectBasePath);
         await supabase.functions.invoke('dropbox-proxy', {
           body: { action: 'create_folder', folder: projectBasePath }
         });
