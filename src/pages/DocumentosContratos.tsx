@@ -242,10 +242,8 @@ const DocumentosContratos = () => {
       console.log('Iniciando fetch do template do Dropbox...');
       
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
-        headers: {
-          'x-action': 'download'
-        },
         body: {
+          action: 'download',
           path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
         }
       });
