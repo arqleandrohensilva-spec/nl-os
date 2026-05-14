@@ -431,6 +431,7 @@ const DocumentosContratos = () => {
   };
 
   const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
+    try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'list_folder', path }
