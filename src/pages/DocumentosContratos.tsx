@@ -74,7 +74,49 @@ const DocumentosContratos = () => {
   
   const [isContratoModalOpen, setIsContratoModalOpen] = useState(false);
   const [selectedProjetoId, setSelectedProjetoId] = useState('');
-  const [tipoContrato, setTipoContrato] = useState('ArqInt');
+  const [tipoContrato, setTipoContrato] = useState('Arquitetura + Interiores');
+  const [planoContrato, setPlanoContrato] = useState('Executivo');
+  
+  const [contractFormData, setContractFormData] = useState<ContractData>({
+    numero: '',
+    cliente: {
+      nome: '',
+      cpf: '',
+      endereco: '',
+      nacionalidade: 'Brasileiro(a)',
+      estadoCivil: 'Solteiro(a)',
+      profissao: ''
+    },
+    projeto: {
+      tipo: 'Arquitetura + Interiores',
+      plano: 'Executivo',
+      endereco: '',
+      tipoImovel: 'Residência',
+      areaTerreno: '',
+      areaConstruida: '',
+      matricula: ''
+    },
+    prazos: {
+      briefing: '',
+      estudo: '',
+      legal: '',
+      executivo: '',
+      total: ''
+    },
+    honorarios: {
+      totalExecutivo: '',
+      totalCompleto: '',
+      marco1: '',
+      marco2: '',
+      marco3: ''
+    },
+    nl: {
+      cauLeandro: 'A203598-7',
+      cauNeandro: 'A203599-5',
+      cpfNeandro: '000.000.000-00'
+    }
+  });
+
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
