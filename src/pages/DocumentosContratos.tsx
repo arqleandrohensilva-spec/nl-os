@@ -546,7 +546,7 @@ const DocumentosContratos = () => {
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-bold uppercase tracking-tight">
-                      {selectedProjetoArquivos ? selectedProjetoArquivos.nome : (currentPath || "Arquivos do Dropbox")}
+                      {selectedProjetoArquivos ? selectedProjetoArquivos.name : (currentPath || "Arquivos do Dropbox")}
                     </h3>
                     {dropboxLoading && <Loader2 size={14} className="animate-spin text-bronze" />}
                   </div>
