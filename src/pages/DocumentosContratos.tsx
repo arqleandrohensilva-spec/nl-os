@@ -189,9 +189,7 @@ const DocumentosContratos = () => {
 
   const handleRefresh = async () => {
     if (selectedProjetoArquivos) {
-      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      await fetchProjectFiles(projectBasePath);
+      await fetchProjectFiles(selectedProjetoArquivos.path_display);
     } else {
       await fetchDropboxFiles(currentPath);
     }
