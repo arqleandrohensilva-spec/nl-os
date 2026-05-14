@@ -280,8 +280,7 @@ const DocumentosContratos = () => {
       setIsUploadModalOpen(false);
       setUploadFile(null);
       
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      await fetchProjectFiles(projectBasePath);
+      await fetchProjectFiles(selectedProjetoArquivos.path_display);
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Erro ao fazer upload do arquivo');
