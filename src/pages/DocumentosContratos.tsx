@@ -21,7 +21,8 @@ import {
   ClipboardList,
   Share2,
   Cloud,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -170,8 +171,6 @@ const DocumentosContratos = () => {
         throw new Error(errorDetail);
       }
 
-      // Se estivermos na raiz dos projetos, podemos filtrar se necessário, 
-      // mas como já estamos apontando para a subpasta correta, resolve o problema.
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
     } catch (error: any) {
@@ -180,6 +179,17 @@ const DocumentosContratos = () => {
     } finally {
       setDropboxLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    if (selectedProjetoArquivos) {
+      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
+      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+      await fetchProjectFiles(projectBasePath);
+    } else {
+      await fetchDropboxFiles(currentPath);
+    }
+    toast.success('Listagem atualizada direto do Dropbox');
   };
 
   const handleDownloadDropbox = async (path: string) => {
@@ -438,9 +448,19 @@ const DocumentosContratos = () => {
               </Button>
             )}
             {activeTab === 'arquivos' && (
-              <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-white hover:bg-white/90 text-black border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
-                <Plus size={14} className="mr-2" /> NOVO PROJETO
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleRefresh} 
+                  disabled={dropboxLoading}
+                  variant="outline"
+                  className="bg-transparent hover:bg-white/5 text-white border-white/10 rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold"
+                >
+                  <RefreshCw size={14} className={cn("mr-2", dropboxLoading && "animate-spin")} /> ATUALIZAR
+                </Button>
+                <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-white hover:bg-white/90 text-black border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
+                  <Plus size={14} className="mr-2" /> NOVO PROJETO
+                </Button>
+              </div>
             )}
           </div>
 
@@ -659,17 +679,6 @@ const DocumentosContratos = () => {
                                   >
                                     <Share2 size={14} />
                                   </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    onClick={() => {
-                                      setPathToDelete(file.path_display);
-                                      setIsDeleteConfirmOpen(true);
-                                    }}
-                                    className="h-7 w-7 text-white/40 hover:text-red-500"
-                                  >
-                                    <Trash2 size={14} />
-                                  </Button>
                                 </div>
                               </div>
                             ))
@@ -748,17 +757,6 @@ const DocumentosContratos = () => {
                             className="h-7 w-7 text-white/40 hover:text-white"
                           >
                             <Share2 size={14} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            onClick={() => {
-                              setPathToDelete(file.path_display);
-                              setIsDeleteConfirmOpen(true);
-                            }}
-                            className="h-7 w-7 text-white/40 hover:text-red-500"
-                          >
-                            <Trash2 size={14} />
                           </Button>
                         </div>
                       </div>
