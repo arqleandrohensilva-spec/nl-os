@@ -399,6 +399,7 @@ const DocumentosContratos = () => {
               <Button onClick={() => setIsContratoModalOpen(true)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
                 <Plus size={14} className="mr-2" /> NOVO CONTRATO
               </Button>
+            )}
             {activeTab === 'arquivos' && (
               <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-white hover:bg-white/90 text-black border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
                 <Plus size={14} className="mr-2" /> NOVO PROJETO
