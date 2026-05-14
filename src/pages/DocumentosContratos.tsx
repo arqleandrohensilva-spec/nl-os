@@ -260,29 +260,73 @@ const DocumentosContratos = () => {
         throw new Error('Response data is empty');
       }
 
-      // Convert response data (Blob) to ArrayBuffer
       const arrayBuffer = await response.data.arrayBuffer();
       const zip = new PizZip(arrayBuffer);
       
-      // Get the main document XML
+      // 1. First, perform manual replacement for placeholders that don't follow the {TAG} format
+      // as they might be broken across XML tags in Word, but this is the user's requested fix.
       let docXml = zip.files['word/document.xml'].asText();
       
-      // Placeholder replacement logic as requested
       const filledXml = docXml
-        .replace(/\[NOME COMPLETO\]/g, data.cliente.nome)
-        .replace(/\[xxx\]/g, data.cliente.cpf)
-        .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade)
-        .replace(/\[estado civil\]/g, data.cliente.estadoCivil)
-        .replace(/\[profissão\]/g, data.cliente.profissao)
-        .replace(/\[endereço completo\]/g, data.cliente.endereco)
-        .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco)
+        .replace(/\[NOME COMPLETO\]/g, data.cliente.nome || '')
+        .replace(/\[xxx\]/g, data.cliente.cpf || '')
+        .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || '')
+        .replace(/\[estado civil\]/g, data.cliente.estadoCivil || '')
+        .replace(/\[profissão\]/g, data.cliente.profissao || '')
+        .replace(/\[endereço completo\]/g, data.cliente.endereco || '')
+        .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco || '')
         .replace(/\[DATA DA ASSINATURA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
-        .replace(/NL-\[ANO\]-\[NR\]/g, data.numero);
+        .replace(/NL-\[ANO\]-\[NR\]/g, data.numero || '');
         
       zip.file('word/document.xml', filledXml);
+
+      // 2. Now use Docxtemplater for the standard placeholders in {TAG} format
+      // this handles XML escaping and is more robust for these tags.
+      const doc = new Docxtemplater(zip, { 
+        paragraphLoop: true,
+        linebreaks: true 
+      });
+
+      doc.setData({
+        NOME_CLIENTE: data.cliente.nome,
+        CPF_CLIENTE: data.cliente.cpf,
+        NACIONALIDADE: data.cliente.nacionalidade,
+        ESTADO_CIVIL: data.cliente.estadoCivil,
+        PROFISSAO: data.cliente.profissao,
+        ENDERECO_CLIENTE: data.cliente.endereco,
+        CAU_LEANDRO: data.nl.cauLeandro,
+        CAU_NEANDRO: data.nl.cauNeandro,
+        CPF_NEANDRO: data.nl.cpfNeandro,
+        TIPO_PROJETO: data.projeto.tipo,
+        PLANO: data.projeto.plano,
+        ENDERECO_IMOVEL: data.projeto.endereco,
+        TIPO_IMOVEL: data.projeto.tipoImovel,
+        AREA_TERRENO: data.projeto.areaTerreno,
+        AREA_CONSTRUIDA: data.projeto.areaConstruida,
+        MATRICULA: data.projeto.matricula,
+        CARTORIO: data.projeto.cartorio,
+        PRAZO_LEVANTAMENTO: data.prazos.briefing,
+        PRAZO_ESTUDO: data.prazos.estudo,
+        PRAZO_LEGAL: data.prazos.legal,
+        PRAZO_EXECUTIVO: data.prazos.executivo,
+        PRAZO_TOTAL: data.prazos.total,
+        VALOR_EXECUTIVO: data.honorarios.totalExecutivo,
+        VALOR_COMPLETO: data.honorarios.totalCompleto,
+        MARCO1: data.honorarios.marco1,
+        MARCO2: data.honorarios.marco2,
+        MARCO3: data.honorarios.marco3,
+        NUMERO_CONTRATO: data.numero,
+        DATA_ASSINATURA: data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'),
+      });
+
+      try {
+        doc.render();
+      } catch (error) {
+        console.error('Erro ao renderizar Docxtemplater:', error);
+        // If it fails, we still have the zip with manual replacements
+      }
       
-      // Generate the modified DOCX blob
-      const blob = zip.generate({ 
+      const blob = doc.getZip().generate({ 
         type: 'blob', 
         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
       });
