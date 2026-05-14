@@ -71,6 +71,11 @@ const DocumentosContratos = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadStage, setUploadStage] = useState('01 - Briefing');
   const [uploading, setUploading] = useState(false);
+  const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [newProjectName, setNewProjectName] = useState('');
+  const [newProjectClient, setNewProjectClient] = useState('');
+  const [newProjectType, setNewProjectType] = useState('');
+  const [isCreatingProject, setIsCreatingProject] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -310,6 +315,57 @@ const DocumentosContratos = () => {
     }
   };
 
+  const handleCreateNewProject = async () => {
+    if (!newProjectName) return;
+    try {
+      setIsCreatingProject(true);
+      const projectFolderName = `${newProjectClient || 'Cliente'} - ${newProjectType || 'Projeto'}`;
+      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+      
+      const subfolders = [
+        '01 - Briefing',
+        '02 - Anteprojeto',
+        '03 - Projeto Executivo',
+        '04 - Acompanhamento de Obra'
+      ];
+
+      for (const sub of subfolders) {
+        await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', folder: `${projectBasePath}/${sub}` }
+        });
+      }
+
+      toast.success('Projeto criado no Dropbox com sucesso!');
+      setIsNewProjectModalOpen(false);
+      setNewProjectName('');
+      setNewProjectClient('');
+      setNewProjectType('');
+      fetchDropboxFiles();
+    } catch (error) {
+      toast.error('Erro ao criar projeto');
+    } finally {
+      setIsCreatingProject(false);
+    }
+  };
+
+  const deleteFictitiousData = async () => {
+    try {
+      const pathToDelete = '/NL Arquitetos/07 - Projetos NL OS/Atelier de Projetos · Premium - Arq+Int';
+      await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'delete', path: pathToDelete }
+      });
+      fetchDropboxFiles();
+    } catch (error) {
+      console.error('Error deleting fictitious data:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'arquivos') {
+      deleteFictitiousData();
+    }
+  }, [activeTab]);
+
   useEffect(() => {
     if (activeTab === 'arquivos' && !selectedProjetoArquivos) {
       fetchDropboxFiles();
@@ -342,6 +398,11 @@ const DocumentosContratos = () => {
             {activeTab === 'contratos' && (
               <Button onClick={() => setIsContratoModalOpen(true)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
                 <Plus size={14} className="mr-2" /> NOVO CONTRATO
+              </Button>
+            )}
+            {activeTab === 'arquivos' && (
+              <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-white hover:bg-white/90 text-black border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
+                <Plus size={14} className="mr-2" /> NOVO PROJETO
               </Button>
             )}
           </div>
@@ -485,13 +546,18 @@ const DocumentosContratos = () => {
                       </Button>
                     )}
                     {selectedProjetoArquivos && (
-                      <Button 
-                        onClick={() => setIsUploadModalOpen(true)}
-                        size="sm" 
-                        className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest"
-                      >
-                        <Upload size={12} className="mr-2" /> UPLOAD
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            setUploadStage('01 - Briefing');
+                            setIsUploadModalOpen(true);
+                          }}
+                          size="sm" 
+                          className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest"
+                        >
+                          <Upload size={12} className="mr-2" /> UPLOAD
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -500,9 +566,22 @@ const DocumentosContratos = () => {
                   {selectedProjetoArquivos ? (
                     Object.entries(projectSubfoldersFiles).map(([stage, files]) => (
                       <div key={stage} className="space-y-3">
-                        <h4 className="text-[10px] uppercase font-bold text-[#8B7355] border-b border-white/5 pb-2">
-                          {stage}
-                        </h4>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <h4 className="text-[10px] uppercase font-bold text-[#8B7355]">
+                            {stage}
+                          </h4>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setUploadStage(stage);
+                              setIsUploadModalOpen(true);
+                            }}
+                            className="h-6 text-[8px] uppercase tracking-widest text-white/40 hover:text-white"
+                          >
+                            <Upload size={10} className="mr-1" /> UPLOAD
+                          </Button>
+                        </div>
                         <div className="space-y-2">
                           {files.map(file => (
                             <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
@@ -699,6 +778,53 @@ const DocumentosContratos = () => {
             <DialogFooter>
               <Button onClick={handleGerarContrato} disabled={!selectedProjetoId} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
                 GERAR CONTRATO
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest">NOVO PROJETO NO DROPBOX</DialogTitle>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">NOME DO CLIENTE</label>
+                <Input 
+                  value={newProjectClient}
+                  onChange={(e) => setNewProjectClient(e.target.value)}
+                  placeholder="Ex: João Silva"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">TIPO DE PROJETO</label>
+                <Input 
+                  value={newProjectType}
+                  onChange={(e) => setNewProjectType(e.target.value)}
+                  placeholder="Ex: Residencial"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">IDENTIFICADOR (NOME)</label>
+                <Input 
+                  value={newProjectName}
+                  onChange={(e) => setNewProjectName(e.target.value)}
+                  placeholder="Ex: Residência Modernista"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                onClick={handleCreateNewProject} 
+                disabled={!newProjectName || isCreatingProject} 
+                className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10 font-bold"
+              >
+                {isCreatingProject ? <Loader2 size={16} className="animate-spin mr-2" /> : <Plus size={16} className="mr-2" />}
+                CRIAR E GERAR ESTRUTURA
               </Button>
             </DialogFooter>
           </DialogContent>
