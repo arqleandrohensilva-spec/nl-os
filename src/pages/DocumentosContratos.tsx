@@ -1629,14 +1629,14 @@ const DocumentosContratos = () => {
               <Button 
                 variant="ghost"
                 onClick={() => setIsCancelModalOpen(false)} 
-                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 MANTER CONTRATO
               </Button>
               <Button 
                 onClick={handleCancelContract} 
                 disabled={isCancelling} 
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+                className="flex-1 bg-transparent border border-[#8B2020] text-[#8B2020] hover:bg-[#8B2020] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-10 transition-colors"
               >
                 {isCancelling ? <Loader2 size={16} className="animate-spin" /> : "CONFIRMAR CANCELAMENTO"}
               </Button>
