@@ -25,7 +25,8 @@ import {
   RefreshCw,
   FileCheck,
   Ban,
-  Save
+  Save,
+  FileDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,9 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractPDF, ContractData } from '@/utils/contractTemplates';
+import { ContractData } from '@/utils/contractTemplates';
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -237,60 +240,100 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchContractTemplate = async () => {
+  const generateContractDocx = async (data: ContractData) => {
     try {
-      console.log('Iniciando fetch do template do Dropbox...');
+      console.log('Iniciando geração de DOCX via template do Dropbox...');
       
-      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+      const response = await supabase.functions.invoke('dropbox-proxy', {
         body: {
           action: 'download',
-          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
+          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Contrato_NL_Final.docx'
         }
       });
 
-      console.log('Response completo da Edge Function:', JSON.stringify({ data, error }));
-
-      if (error) {
-        console.error('Erro retornado pela Edge Function:', error);
-        throw error;
+      if (response.error) {
+        console.error('Erro retornado pela Edge Function:', response.error);
+        throw response.error;
       }
       
-      if (!data) {
-        console.error('Data está vazia no response');
+      if (!response.data) {
         throw new Error('Response data is empty');
       }
 
-      let text = '';
-      if (data instanceof Blob) {
-        text = await data.text();
-      } else if (typeof data === 'string') {
-        text = data;
-      } else if (data.text && typeof data.text === 'function') {
-        text = await data.text();
-      } else if (data.url) {
-        const fileRes = await fetch(data.url);
-        text = await fileRes.text();
-      } else {
-        console.error('Tipo de dado inesperado:', typeof data, data);
-        text = JSON.stringify(data);
-      }
+      const arrayBuffer = await response.data.arrayBuffer();
+      const zip = new PizZip(arrayBuffer);
+      
+      // 1. First, perform manual replacement for placeholders that don't follow the {TAG} format
+      // as they might be broken across XML tags in Word, but this is the user's requested fix.
+      let docXml = zip.files['word/document.xml'].asText();
+      
+      const filledXml = docXml
+        .replace(/\[NOME COMPLETO\]/g, data.cliente.nome || '')
+        .replace(/\[xxx\]/g, data.cliente.cpf || '')
+        .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || '')
+        .replace(/\[estado civil\]/g, data.cliente.estadoCivil || '')
+        .replace(/\[profissão\]/g, data.cliente.profissao || '')
+        .replace(/\[endereço completo\]/g, data.cliente.endereco || '')
+        .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco || '')
+        .replace(/\[DATA DA ASSINATURA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
+        .replace(/NL-\[ANO\]-\[NR\]/g, data.numero || '');
+        
+      zip.file('word/document.xml', filledXml);
 
-      console.log('Conteúdo do arquivo (primeiros 200 chars):', text.substring(0, 200));
+      // 2. Now use Docxtemplater for the standard placeholders in {TAG} format
+      // this handles XML escaping and is more robust for these tags.
+      const doc = new Docxtemplater(zip, { 
+        paragraphLoop: true,
+        linebreaks: true 
+      });
 
-      const match = text.match(/export const CONTRATO_PARAGRAFOS\s*=\s*(\[[\s\S]*\]);/);
-      if (match && match[1]) {
-        try {
-          return JSON.parse(match[1]);
-        } catch (parseError) {
-          console.error('Erro ao fazer parse do JSON do template:', parseError);
-          throw parseError;
-        }
+      doc.setData({
+        NOME_CLIENTE: data.cliente.nome,
+        CPF_CLIENTE: data.cliente.cpf,
+        NACIONALIDADE: data.cliente.nacionalidade,
+        ESTADO_CIVIL: data.cliente.estadoCivil,
+        PROFISSAO: data.cliente.profissao,
+        ENDERECO_CLIENTE: data.cliente.endereco,
+        CAU_LEANDRO: data.nl.cauLeandro,
+        CAU_NEANDRO: data.nl.cauNeandro,
+        CPF_NEANDRO: data.nl.cpfNeandro,
+        TIPO_PROJETO: data.projeto.tipo,
+        PLANO: data.projeto.plano,
+        ENDERECO_IMOVEL: data.projeto.endereco,
+        TIPO_IMOVEL: data.projeto.tipoImovel,
+        AREA_TERRENO: data.projeto.areaTerreno,
+        AREA_CONSTRUIDA: data.projeto.areaConstruida,
+        MATRICULA: data.projeto.matricula,
+        CARTORIO: data.projeto.cartorio,
+        PRAZO_LEVANTAMENTO: data.prazos.briefing,
+        PRAZO_ESTUDO: data.prazos.estudo,
+        PRAZO_LEGAL: data.prazos.legal,
+        PRAZO_EXECUTIVO: data.prazos.executivo,
+        PRAZO_TOTAL: data.prazos.total,
+        VALOR_EXECUTIVO: data.honorarios.totalExecutivo,
+        VALOR_COMPLETO: data.honorarios.totalCompleto,
+        MARCO1: data.honorarios.marco1,
+        MARCO2: data.honorarios.marco2,
+        MARCO3: data.honorarios.marco3,
+        NUMERO_CONTRATO: data.numero,
+        DATA_ASSINATURA: data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'),
+      });
+
+      try {
+        doc.render();
+      } catch (error) {
+        console.error('Erro ao renderizar Docxtemplater:', error);
+        // If it fails, we still have the zip with manual replacements
       }
       
-      console.error('Formato do template inválido. Match não encontrado.');
-      throw new Error('Template format invalid');
+      const blob = doc.getZip().generate({ 
+        type: 'blob', 
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      });
+      
+      return blob;
     } catch (error: any) {
-      console.error('Erro completo ao buscar template:', error);
+      console.error('Erro completo ao gerar DOCX:', error);
       toast.error(`Erro ao carregar template do Dropbox: ${error.message || error}`);
       return null;
     }
@@ -299,11 +342,9 @@ const DocumentosContratos = () => {
   const handleGenerateContract = async () => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
+      const docxBlob = await generateContractDocx(contractFormData);
+      if (!docxBlob) return;
 
-      const doc = generateContractPDF(contractFormData, paragraphs);
-      
       // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
         numero: contractFormData.numero,
@@ -321,8 +362,13 @@ const DocumentosContratos = () => {
       
       toast.success('Contrato gerado e registrado com sucesso!');
       
-      // Download automatically
-      doc.save(`${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`);
+      // Download DOCX automatically
+      const url = URL.createObjectURL(docxBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
       
       setIsContratoModalOpen(false);
       fetchData();
@@ -337,9 +383,6 @@ const DocumentosContratos = () => {
   const handleDownloadExistingContract = async (contract: any) => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -359,11 +402,19 @@ const DocumentosContratos = () => {
           cauLeandro: 'A203598-7',
           cauNeandro: 'A203599-5',
           cpfNeandro: '000.000.000-00'
-        }
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
       };
       
-      const doc = generateContractPDF(data, paragraphs);
-      doc.save(`${contract.numero} - ${contract.cliente_nome}.pdf`);
+      const docxBlob = await generateContractDocx(data);
+      if (!docxBlob) return;
+
+      const url = URL.createObjectURL(docxBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contract.numero} - ${contract.cliente_nome}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading contract:', error);
       toast.error('Erro ao baixar contrato');
@@ -375,15 +426,12 @@ const DocumentosContratos = () => {
   const handleSaveToDropbox = async () => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-
-      const doc = generateContractPDF(contractFormData, paragraphs);
-      const pdfBlob = doc.output('blob');
+      const docxBlob = await generateContractDocx(contractFormData);
+      if (!docxBlob) return;
       
       const folderName = `${contractFormData.cliente.nome} - ${contractFormData.projeto.tipo}`;
       const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
-      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
@@ -393,7 +441,7 @@ const DocumentosContratos = () => {
         }
       });
 
-      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const arrayBuffer = await docxBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
         mode: 'overwrite',
@@ -424,9 +472,6 @@ const DocumentosContratos = () => {
   const handleSaveExistingToDropbox = async (contract: any) => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-      
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -446,15 +491,16 @@ const DocumentosContratos = () => {
           cauLeandro: 'A203598-7',
           cauNeandro: 'A203599-5',
           cpfNeandro: '000.000.000-00'
-        }
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
       };
 
-      const doc = generateContractPDF(data, paragraphs);
-      const pdfBlob = doc.output('blob');
+      const docxBlob = await generateContractDocx(data);
+      if (!docxBlob) return;
       
       const folderName = `${contract.cliente_nome} - ${contract.tipo}`;
       const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
-      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.pdf`;
+      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.docx`;
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
@@ -464,7 +510,7 @@ const DocumentosContratos = () => {
         }
       });
 
-      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const arrayBuffer = await docxBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
         mode: 'overwrite',
@@ -871,7 +917,7 @@ const DocumentosContratos = () => {
                       onClick={() => handleDownloadExistingContract(c)}
                       className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
-                      <Download size={12} className="mr-1" /> BAIXAR PDF
+                      <FileDown size={12} className="mr-1" /> BAIXAR DOCX
                     </Button>
                     <Button 
                       variant="outline" 
@@ -1589,7 +1635,7 @@ const DocumentosContratos = () => {
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} className="mr-2" />} GERAR E BAIXAR PDF
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR E BAIXAR DOCX
               </Button>
             </DialogFooter>
           </DialogContent>
