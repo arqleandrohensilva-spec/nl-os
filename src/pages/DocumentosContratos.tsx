@@ -387,8 +387,10 @@ const DocumentosContratos = () => {
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
-        headers: { 'x-action': 'create_folder' },
-        body: { folder: contractFolder }
+        body: { 
+          action: 'create_folder',
+          folder: contractFolder 
+        }
       });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
