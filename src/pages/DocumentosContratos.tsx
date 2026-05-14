@@ -354,10 +354,23 @@ const DocumentosContratos = () => {
   const deleteFictitiousData = async () => {
     try {
       const pathToDelete = '/NL Arquitetos/07 - Projetos NL OS/Atelier de Projetos · Premium - Arq+Int';
-      await supabase.functions.invoke('dropbox-proxy', {
-        body: { action: 'delete', path: pathToDelete }
+      
+      // First check if it exists to avoid unnecessary error logs
+      const { data: metadata } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_metadata', path: pathToDelete }
       });
-      fetchDropboxFiles();
+
+      if (metadata && !metadata.error) {
+        console.log("Deleting fictitious data:", pathToDelete);
+        const { error } = await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'delete', path: pathToDelete }
+        });
+        
+        if (!error) {
+          toast.success('Dados fictícios removidos do Dropbox');
+          fetchDropboxFiles();
+        }
+      }
     } catch (error) {
       console.error('Error deleting fictitious data:', error);
     }
