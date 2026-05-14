@@ -8,6 +8,9 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  const { method, url } = req;
+  console.log(`[${new Date().toISOString()}] Recebendo requisição: ${method} ${url}`);
+  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
