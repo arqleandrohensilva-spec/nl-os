@@ -371,7 +371,7 @@ const DocumentosContratos = () => {
         throw new Error(data?.error?.summary || error?.message || 'Erro ao excluir');
       }
       
-      toast.success('Exclusão concluída com sucesso');
+      toast.success('Pasta removida com sucesso. A listagem foi atualizada.');
       setIsDeleteConfirmOpen(false);
       
       // Update the list
