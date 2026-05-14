@@ -239,60 +239,56 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchContractTemplate = async () => {
+  const generateContractDocx = async (data: ContractData) => {
     try {
-      console.log('Iniciando fetch do template do Dropbox...');
+      console.log('Iniciando geração de DOCX via template do Dropbox...');
       
-      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+      const response = await supabase.functions.invoke('dropbox-proxy', {
         body: {
           action: 'download',
-          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
+          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Contrato_NL_Final.docx'
         }
       });
 
-      console.log('Response completo da Edge Function:', JSON.stringify({ data, error }));
-
-      if (error) {
-        console.error('Erro retornado pela Edge Function:', error);
-        throw error;
+      if (response.error) {
+        console.error('Erro retornado pela Edge Function:', response.error);
+        throw response.error;
       }
       
-      if (!data) {
-        console.error('Data está vazia no response');
+      if (!response.data) {
         throw new Error('Response data is empty');
       }
 
-      let text = '';
-      if (data instanceof Blob) {
-        text = await data.text();
-      } else if (typeof data === 'string') {
-        text = data;
-      } else if (data.text && typeof data.text === 'function') {
-        text = await data.text();
-      } else if (data.url) {
-        const fileRes = await fetch(data.url);
-        text = await fileRes.text();
-      } else {
-        console.error('Tipo de dado inesperado:', typeof data, data);
-        text = JSON.stringify(data);
-      }
-
-      console.log('Conteúdo do arquivo (primeiros 200 chars):', text.substring(0, 200));
-
-      const match = text.match(/export const CONTRATO_PARAGRAFOS\s*=\s*(\[[\s\S]*\]);/);
-      if (match && match[1]) {
-        try {
-          return JSON.parse(match[1]);
-        } catch (parseError) {
-          console.error('Erro ao fazer parse do JSON do template:', parseError);
-          throw parseError;
-        }
-      }
+      // Convert response data (Blob) to ArrayBuffer
+      const arrayBuffer = await response.data.arrayBuffer();
+      const zip = new PizZip(arrayBuffer);
       
-      console.error('Formato do template inválido. Match não encontrado.');
-      throw new Error('Template format invalid');
+      // Get the main document XML
+      let docXml = zip.files['word/document.xml'].asText();
+      
+      // Placeholder replacement logic as requested
+      const filledXml = docXml
+        .replace(/\[NOME COMPLETO\]/g, data.cliente.nome)
+        .replace(/\[xxx\]/g, data.cliente.cpf)
+        .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade)
+        .replace(/\[estado civil\]/g, data.cliente.estadoCivil)
+        .replace(/\[profissão\]/g, data.cliente.profissao)
+        .replace(/\[endereço completo\]/g, data.cliente.endereco)
+        .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco)
+        .replace(/\[DATA DA ASSINATURA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
+        .replace(/NL-\[ANO\]-\[NR\]/g, data.numero);
+        
+      zip.file('word/document.xml', filledXml);
+      
+      // Generate the modified DOCX blob
+      const blob = zip.generate({ 
+        type: 'blob', 
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      });
+      
+      return blob;
     } catch (error: any) {
-      console.error('Erro completo ao buscar template:', error);
+      console.error('Erro completo ao gerar DOCX:', error);
       toast.error(`Erro ao carregar template do Dropbox: ${error.message || error}`);
       return null;
     }
@@ -301,11 +297,9 @@ const DocumentosContratos = () => {
   const handleGenerateContract = async () => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
+      const docxBlob = await generateContractDocx(contractFormData);
+      if (!docxBlob) return;
 
-      const doc = generateContractPDF(contractFormData, paragraphs);
-      
       // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
         numero: contractFormData.numero,
@@ -323,8 +317,13 @@ const DocumentosContratos = () => {
       
       toast.success('Contrato gerado e registrado com sucesso!');
       
-      // Download automatically
-      doc.save(`${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`);
+      // Download DOCX automatically
+      const url = URL.createObjectURL(docxBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
       
       setIsContratoModalOpen(false);
       fetchData();
@@ -339,9 +338,6 @@ const DocumentosContratos = () => {
   const handleDownloadExistingContract = async (contract: any) => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -361,11 +357,19 @@ const DocumentosContratos = () => {
           cauLeandro: 'A203598-7',
           cauNeandro: 'A203599-5',
           cpfNeandro: '000.000.000-00'
-        }
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
       };
       
-      const doc = generateContractPDF(data, paragraphs);
-      doc.save(`${contract.numero} - ${contract.cliente_nome}.pdf`);
+      const docxBlob = await generateContractDocx(data);
+      if (!docxBlob) return;
+
+      const url = URL.createObjectURL(docxBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contract.numero} - ${contract.cliente_nome}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading contract:', error);
       toast.error('Erro ao baixar contrato');
@@ -377,15 +381,12 @@ const DocumentosContratos = () => {
   const handleSaveToDropbox = async () => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-
-      const doc = generateContractPDF(contractFormData, paragraphs);
-      const pdfBlob = doc.output('blob');
+      const docxBlob = await generateContractDocx(contractFormData);
+      if (!docxBlob) return;
       
       const folderName = `${contractFormData.cliente.nome} - ${contractFormData.projeto.tipo}`;
       const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
-      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
@@ -395,7 +396,7 @@ const DocumentosContratos = () => {
         }
       });
 
-      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const arrayBuffer = await docxBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
         mode: 'overwrite',
@@ -426,9 +427,6 @@ const DocumentosContratos = () => {
   const handleSaveExistingToDropbox = async (contract: any) => {
     try {
       setLoading(true);
-      const paragraphs = await fetchContractTemplate();
-      if (!paragraphs) return;
-      
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -448,15 +446,16 @@ const DocumentosContratos = () => {
           cauLeandro: 'A203598-7',
           cauNeandro: 'A203599-5',
           cpfNeandro: '000.000.000-00'
-        }
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
       };
 
-      const doc = generateContractPDF(data, paragraphs);
-      const pdfBlob = doc.output('blob');
+      const docxBlob = await generateContractDocx(data);
+      if (!docxBlob) return;
       
       const folderName = `${contract.cliente_nome} - ${contract.tipo}`;
       const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
-      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.pdf`;
+      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.docx`;
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
@@ -466,7 +465,7 @@ const DocumentosContratos = () => {
         }
       });
 
-      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const arrayBuffer = await docxBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
         mode: 'overwrite',
