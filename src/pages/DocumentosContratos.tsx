@@ -58,6 +58,7 @@ const DocumentosContratos = () => {
   const [dropboxLoading, setDropboxLoading] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   const [selectedProjetoArquivos, setSelectedProjetoArquivos] = useState<any>(null);
+  const [dropboxProjectsFolders, setDropboxProjectsFolders] = useState<any[]>([]);
   const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   
@@ -173,6 +174,11 @@ const DocumentosContratos = () => {
 
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
+      
+      // Sempre que listamos a pasta raiz de projetos, atualizamos a lista lateral
+      if (path === '/NL Arquitetos/07 - Projetos NL OS') {
+        setDropboxProjectsFolders(data.entries.filter((e: any) => e['.tag'] === 'folder') || []);
+      }
     } catch (error: any) {
       console.error('Dropbox error:', error);
       toast.error(error.message || 'Erro ao conectar com Dropbox');
@@ -183,9 +189,7 @@ const DocumentosContratos = () => {
 
   const handleRefresh = async () => {
     if (selectedProjetoArquivos) {
-      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      await fetchProjectFiles(projectBasePath);
+      await fetchProjectFiles(selectedProjetoArquivos.path_display);
     } else {
       await fetchDropboxFiles(currentPath);
     }
@@ -205,44 +209,10 @@ const DocumentosContratos = () => {
     }
   };
 
-  const checkOrCreateProjectFolders = async (projeto: any) => {
-    try {
-      setDropboxLoading(true);
-      setSelectedStage(null); // Reset stage selection when selecting a new project
-      const projectFolderName = projeto.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      
-      const { data: metadata, error: metaError } = await supabase.functions.invoke('dropbox-proxy', {
-        body: { action: 'get_metadata', path: projectBasePath }
-      });
-
-      if (metaError || (metadata && metadata.error)) {
-        console.log("Creating folder structure for project:", projectBasePath);
-        await supabase.functions.invoke('dropbox-proxy', {
-          body: { action: 'create_folder', folder: projectBasePath }
-        });
-
-        const subfolders = [
-          '01 - Briefing',
-          '02 - Anteprojeto',
-          '03 - Projeto Executivo',
-          '04 - Acompanhamento de Obra'
-        ];
-
-        for (const sub of subfolders) {
-          await supabase.functions.invoke('dropbox-proxy', {
-            body: { action: 'create_folder', folder: `${projectBasePath}/${sub}` }
-          });
-        }
-      }
-
-      await fetchProjectFiles(projectBasePath);
-    } catch (error) {
-      console.error('Error in checkOrCreateProjectFolders:', error);
-      toast.error('Erro ao verificar/criar pastas no Dropbox');
-    } finally {
-      setDropboxLoading(false);
-    }
+  const handleSelectProjectFolder = async (folder: any) => {
+    setSelectedProjetoArquivos(folder);
+    setSelectedStage(null);
+    await fetchProjectFiles(folder.path_display);
   };
 
   const fetchProjectFiles = async (basePath: string) => {
@@ -284,8 +254,7 @@ const DocumentosContratos = () => {
 
     try {
       setUploading(true);
-      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
-      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}/${uploadStage}/${uploadFile.name}`;
+      const destinationPath = `${selectedProjetoArquivos.path_display}/${uploadStage}/${uploadFile.name}`;
 
       const arrayBuffer = await uploadFile.arrayBuffer();
       const dropboxArg = JSON.stringify({
@@ -311,8 +280,7 @@ const DocumentosContratos = () => {
       setIsUploadModalOpen(false);
       setUploadFile(null);
       
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      await fetchProjectFiles(projectBasePath);
+      await fetchProjectFiles(selectedProjetoArquivos.path_display);
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Erro ao fazer upload do arquivo');
@@ -397,9 +365,7 @@ const DocumentosContratos = () => {
       
       // Update the list
       if (selectedProjetoArquivos) {
-        const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
-        const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-        await fetchProjectFiles(projectBasePath);
+        await fetchProjectFiles(selectedProjetoArquivos.path_display);
       } else {
         await fetchDropboxFiles(currentPath);
       }
@@ -560,20 +526,17 @@ const DocumentosContratos = () => {
                   </div>
                   <div className="h-px bg-white/5 my-4" />
                   <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
-                  {projetos.map(p => (
+                  {dropboxProjectsFolders.map(p => (
                     <div 
                       key={p.id} 
-                      onClick={() => {
-                        setSelectedProjetoArquivos(p);
-                        checkOrCreateProjectFolders(p);
-                      }}
+                      onClick={() => handleSelectProjectFolder(p)}
                       className={cn(
                         "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
                         selectedProjetoArquivos?.id === p.id && "bg-white/5 border-l-2 border-bronze text-bronze font-bold"
                       )}
                     >
                       <Folder size={14} className={selectedProjetoArquivos?.id === p.id ? "text-bronze" : "text-white/40"} />
-                      <span className="truncate">{p.nome}</span>
+                      <span className="truncate">{p.name}</span>
                     </div>
                   ))}
                 </div>
@@ -583,7 +546,7 @@ const DocumentosContratos = () => {
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-bold uppercase tracking-tight">
-                      {selectedProjetoArquivos ? selectedProjetoArquivos.nome : (currentPath || "Arquivos do Dropbox")}
+                      {selectedProjetoArquivos ? selectedProjetoArquivos.name : (currentPath || "Arquivos do Dropbox")}
                     </h3>
                     {dropboxLoading && <Loader2 size={14} className="animate-spin text-bronze" />}
                   </div>
