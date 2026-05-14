@@ -209,44 +209,10 @@ const DocumentosContratos = () => {
     }
   };
 
-  const checkOrCreateProjectFolders = async (projeto: any) => {
-    try {
-      setDropboxLoading(true);
-      setSelectedStage(null); // Reset stage selection when selecting a new project
-      const projectFolderName = projeto.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${projeto.nome_cliente || 'Cliente'} - ${projeto.tipo || 'Projeto'}`;
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
-      
-      const { data: metadata, error: metaError } = await supabase.functions.invoke('dropbox-proxy', {
-        body: { action: 'get_metadata', path: projectBasePath }
-      });
-
-      if (metaError || (metadata && metadata.error)) {
-        console.log("Creating folder structure for project:", projectBasePath);
-        await supabase.functions.invoke('dropbox-proxy', {
-          body: { action: 'create_folder', folder: projectBasePath }
-        });
-
-        const subfolders = [
-          '01 - Briefing',
-          '02 - Anteprojeto',
-          '03 - Projeto Executivo',
-          '04 - Acompanhamento de Obra'
-        ];
-
-        for (const sub of subfolders) {
-          await supabase.functions.invoke('dropbox-proxy', {
-            body: { action: 'create_folder', folder: `${projectBasePath}/${sub}` }
-          });
-        }
-      }
-
-      await fetchProjectFiles(projectBasePath);
-    } catch (error) {
-      console.error('Error in checkOrCreateProjectFolders:', error);
-      toast.error('Erro ao verificar/criar pastas no Dropbox');
-    } finally {
-      setDropboxLoading(false);
-    }
+  const handleSelectProjectFolder = async (folder: any) => {
+    setSelectedProjetoArquivos(folder);
+    setSelectedStage(null);
+    await fetchProjectFiles(folder.path_display);
   };
 
   const fetchProjectFiles = async (basePath: string) => {
