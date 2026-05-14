@@ -86,6 +86,10 @@ serve(async (req) => {
       endpoint = 'https://api.dropboxapi.com/2/files/get_metadata';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path });
+    } else if (currentAction === 'download') {
+      endpoint = 'https://content.dropboxapi.com/2/files/download';
+      headers['Dropbox-API-Arg'] = JSON.stringify({ path });
+      body = null;
     }
 
     if (!endpoint) {
