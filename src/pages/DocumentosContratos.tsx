@@ -58,6 +58,7 @@ const DocumentosContratos = () => {
   const [currentPath, setCurrentPath] = useState('');
   const [selectedProjetoArquivos, setSelectedProjetoArquivos] = useState<any>(null);
   const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
+  const [selectedStage, setSelectedStage] = useState<string | null>(null);
   
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
