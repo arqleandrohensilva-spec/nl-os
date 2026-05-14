@@ -237,10 +237,40 @@ const DocumentosContratos = () => {
     }
   };
 
+  const fetchContractTemplate = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        headers: {
+          'x-action': 'download'
+        },
+        body: {
+          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
+        }
+      });
+
+      if (error) throw error;
+      
+      const text = await data.text();
+      // Extract the array from "export const CONTRATO_PARAGRAFOS = [...];"
+      const match = text.match(/export const CONTRATO_PARAGRAFOS = (\[[\s\S]*\]);/);
+      if (match && match[1]) {
+        return JSON.parse(match[1]);
+      }
+      throw new Error('Template format invalid');
+    } catch (error) {
+      console.error('Error fetching template:', error);
+      toast.error('Erro ao carregar template do Dropbox');
+      return null;
+    }
+  };
+
   const handleGenerateContract = async () => {
     try {
       setLoading(true);
-      const doc = generateContractPDF(contractFormData);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const doc = generateContractPDF(contractFormData, paragraphs);
       
       // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
@@ -260,7 +290,7 @@ const DocumentosContratos = () => {
       toast.success('Contrato gerado e registrado com sucesso!');
       
       // Download automatically
-      doc.save(`Contrato_${contractFormData.numero}_${contractFormData.cliente.nome}.pdf`);
+      doc.save(`${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`);
       
       setIsContratoModalOpen(false);
       fetchData();
