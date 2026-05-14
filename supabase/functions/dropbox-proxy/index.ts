@@ -107,9 +107,22 @@ serve(async (req) => {
 
     if (currentAction === 'download') {
       const blob = await response.blob();
+      const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
+      
+      console.log(`Download finalizado. Content-Type: ${contentType}, Size: ${blob.size}`);
+      
+      if (!response.ok) {
+        const errorText = await blob.text();
+        console.error(`Erro no download do Dropbox: ${response.status} - ${errorText}`);
+        return new Response(
+          JSON.stringify({ error: `Dropbox download failed: ${response.status}`, details: errorText }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      }
+
       return new Response(
         blob,
-        { headers: { ...corsHeaders, 'Content-Type': response.headers.get('Content-Type') || 'application/octet-stream' }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': contentType }, status: 200 }
       )
     }
 
