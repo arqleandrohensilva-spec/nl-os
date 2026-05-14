@@ -546,13 +546,18 @@ const DocumentosContratos = () => {
                       </Button>
                     )}
                     {selectedProjetoArquivos && (
-                      <Button 
-                        onClick={() => setIsUploadModalOpen(true)}
-                        size="sm" 
-                        className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest"
-                      >
-                        <Upload size={12} className="mr-2" /> UPLOAD
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => {
+                            setUploadStage('01 - Briefing');
+                            setIsUploadModalOpen(true);
+                          }}
+                          size="sm" 
+                          className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest"
+                        >
+                          <Upload size={12} className="mr-2" /> UPLOAD
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -561,9 +566,22 @@ const DocumentosContratos = () => {
                   {selectedProjetoArquivos ? (
                     Object.entries(projectSubfoldersFiles).map(([stage, files]) => (
                       <div key={stage} className="space-y-3">
-                        <h4 className="text-[10px] uppercase font-bold text-[#8B7355] border-b border-white/5 pb-2">
-                          {stage}
-                        </h4>
+                        <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                          <h4 className="text-[10px] uppercase font-bold text-[#8B7355]">
+                            {stage}
+                          </h4>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setUploadStage(stage);
+                              setIsUploadModalOpen(true);
+                            }}
+                            className="h-6 text-[8px] uppercase tracking-widest text-white/40 hover:text-white"
+                          >
+                            <Upload size={10} className="mr-1" /> UPLOAD
+                          </Button>
+                        </div>
                         <div className="space-y-2">
                           {files.map(file => (
                             <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
