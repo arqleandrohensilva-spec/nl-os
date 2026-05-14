@@ -103,7 +103,8 @@ const DocumentosContratos = () => {
       tipoImovel: 'Residência',
       areaTerreno: '',
       areaConstruida: '',
-      matricula: ''
+      matricula: '',
+      cartorio: ''
     },
     prazos: {
       briefing: '',
@@ -236,10 +237,40 @@ const DocumentosContratos = () => {
     }
   };
 
+  const fetchContractTemplate = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        headers: {
+          'x-action': 'download'
+        },
+        body: {
+          path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
+        }
+      });
+
+      if (error) throw error;
+      
+      const text = await data.text();
+      // Extract the array from "export const CONTRATO_PARAGRAFOS = [...];"
+      const match = text.match(/export const CONTRATO_PARAGRAFOS = (\[[\s\S]*\]);/);
+      if (match && match[1]) {
+        return JSON.parse(match[1]);
+      }
+      throw new Error('Template format invalid');
+    } catch (error) {
+      console.error('Error fetching template:', error);
+      toast.error('Erro ao carregar template do Dropbox');
+      return null;
+    }
+  };
+
   const handleGenerateContract = async () => {
     try {
       setLoading(true);
-      const doc = generateContractPDF(contractFormData);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const doc = generateContractPDF(contractFormData, paragraphs);
       
       // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
@@ -259,7 +290,7 @@ const DocumentosContratos = () => {
       toast.success('Contrato gerado e registrado com sucesso!');
       
       // Download automatically
-      doc.save(`Contrato_${contractFormData.numero}_${contractFormData.cliente.nome}.pdf`);
+      doc.save(`${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`);
       
       setIsContratoModalOpen(false);
       fetchData();
@@ -271,49 +302,68 @@ const DocumentosContratos = () => {
     }
   };
 
-  const handleDownloadExistingContract = (contract: any) => {
-    // Reconstruct data from contract record
-    const data: ContractData = {
-      numero: contract.numero,
-      cliente: contract.dados_gerais,
-      projeto: {
-        tipo: contract.tipo,
-        plano: contract.plano,
-        endereco: contract.dados_gerais.endereco || '',
-        tipoImovel: 'Residência',
-        areaTerreno: '',
-        areaConstruida: '',
-        matricula: ''
-      },
-      prazos: contract.prazos,
-      honorarios: contract.valores,
-      nl: {
-        cauLeandro: 'A203598-7',
-        cauNeandro: 'A203599-5',
-        cpfNeandro: '000.000.000-00'
-      }
-    };
-    
-    const doc = generateContractPDF(data);
-    doc.save(`Contrato_${contract.numero}_${contract.cliente_nome}.pdf`);
+  const handleDownloadExistingContract = async (contract: any) => {
+    try {
+      setLoading(true);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        }
+      };
+      
+      const doc = generateContractPDF(data, paragraphs);
+      doc.save(`${contract.numero} - ${contract.cliente_nome}.pdf`);
+    } catch (error) {
+      console.error('Error downloading contract:', error);
+      toast.error('Erro ao baixar contrato');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveToDropbox = async () => {
     try {
       setLoading(true);
-      const doc = generateContractPDF(contractFormData);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const doc = generateContractPDF(contractFormData, paragraphs);
       const pdfBlob = doc.output('blob');
       
-      // We need a project folder in Dropbox
-      // Search for the project folder or use a default one
-      const folderName = contractFormData.cliente.nome;
-      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contractFormData.numero}.pdf`;
+      const folderName = `${contractFormData.cliente.nome} - ${contractFormData.projeto.tipo}`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+
+      // Create folder if not exists
+      await supabase.functions.invoke('dropbox-proxy', {
+        headers: { 'x-action': 'create_folder' },
+        body: { folder: contractFolder }
+      });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
-        mode: 'add',
-        autorename: true,
+        mode: 'overwrite',
+        autorename: false,
         mute: false,
         strict_conflict: false
       });
@@ -340,8 +390,9 @@ const DocumentosContratos = () => {
   const handleSaveExistingToDropbox = async (contract: any) => {
     try {
       setLoading(true);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
       
-      // Reconstruct data from contract record
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -352,7 +403,8 @@ const DocumentosContratos = () => {
           tipoImovel: 'Residência',
           areaTerreno: '',
           areaConstruida: '',
-          matricula: ''
+          matricula: '',
+          cartorio: ''
         },
         prazos: contract.prazos,
         honorarios: contract.valores,
@@ -363,17 +415,24 @@ const DocumentosContratos = () => {
         }
       };
 
-      const doc = generateContractPDF(data);
+      const doc = generateContractPDF(data, paragraphs);
       const pdfBlob = doc.output('blob');
       
-      const folderName = contract.cliente_nome;
-      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contract.numero}.pdf`;
+      const folderName = `${contract.cliente_nome} - ${contract.tipo}`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.pdf`;
+
+      // Create folder if not exists
+      await supabase.functions.invoke('dropbox-proxy', {
+        headers: { 'x-action': 'create_folder' },
+        body: { folder: contractFolder }
+      });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
-        mode: 'add',
-        autorename: true,
+        mode: 'overwrite',
+        autorename: false,
         mute: false,
         strict_conflict: false
       });
@@ -1209,6 +1268,17 @@ const DocumentosContratos = () => {
                       className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Data de Assinatura</Label>
+                    <Input 
+                      type="text"
+                      placeholder="Ex: 14 de maio de 2026"
+                      value={contractFormData.dataAssinatura || ''}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, dataAssinatura: e.target.value }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
                 </div>
               </section>
 
@@ -1303,10 +1373,19 @@ const DocumentosContratos = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Matrícula nº + Cartório</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nº Matrícula</Label>
                     <Input 
                       value={contractFormData.projeto.matricula}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, matricula: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Cartório</Label>
+                    <Input 
+                      value={contractFormData.projeto.cartorio}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, cartorio: e.target.value } }))}
                       className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>

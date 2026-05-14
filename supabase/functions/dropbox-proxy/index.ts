@@ -86,6 +86,10 @@ serve(async (req) => {
       endpoint = 'https://api.dropboxapi.com/2/files/get_metadata';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path });
+    } else if (currentAction === 'download') {
+      endpoint = 'https://content.dropboxapi.com/2/files/download';
+      headers['Dropbox-API-Arg'] = JSON.stringify({ path });
+      body = null;
     }
 
     if (!endpoint) {
@@ -100,6 +104,14 @@ serve(async (req) => {
       headers,
       body
     });
+
+    if (currentAction === 'download') {
+      const blob = await response.blob();
+      return new Response(
+        blob,
+        { headers: { ...corsHeaders, 'Content-Type': response.headers.get('Content-Type') || 'application/octet-stream' }, status: 200 }
+      )
+    }
 
     const data = await response.json();
 
