@@ -174,6 +174,11 @@ const DocumentosContratos = () => {
 
       setDropboxFiles(data.entries || []);
       setCurrentPath(path);
+      
+      // Sempre que listamos a pasta raiz de projetos, atualizamos a lista lateral
+      if (path === '/NL Arquitetos/07 - Projetos NL OS') {
+        setDropboxProjectsFolders(data.entries.filter((e: any) => e['.tag'] === 'folder') || []);
+      }
     } catch (error: any) {
       console.error('Dropbox error:', error);
       toast.error(error.message || 'Erro ao conectar com Dropbox');
