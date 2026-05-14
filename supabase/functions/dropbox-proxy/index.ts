@@ -78,6 +78,10 @@ serve(async (req) => {
       headers['Dropbox-API-Arg'] = dropboxArg;
       headers['Content-Type'] = 'application/octet-stream';
       body = req.body; // Stream the body directly to Dropbox
+    } else if (currentAction === 'delete') {
+      endpoint = 'https://api.dropboxapi.com/2/files/delete_v2';
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ path });
     } else if (currentAction === 'get_metadata') {
       endpoint = 'https://api.dropboxapi.com/2/files/get_metadata';
       headers['Content-Type'] = 'application/json';
