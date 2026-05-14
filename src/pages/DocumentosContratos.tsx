@@ -186,24 +186,141 @@ const DocumentosContratos = () => {
     }
   };
 
-  const handleGerarContrato = async () => {
-    if (!selectedProjetoId) return;
+  const generateContractNumber = async () => {
+    const year = new Date().getFullYear();
+    const { data: lastContract } = await supabase
+      .from('contratos')
+      .select('numero')
+      .order('criado_em', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastContract && lastContract[0]?.numero) {
+      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+  };
+
+  const handleSelectLeadForContract = (leadId: string) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      setContractFormData(prev => ({
+        ...prev,
+        cliente: {
+          ...prev.cliente,
+          nome: lead.nome || '',
+          endereco: lead.cidade ? `${lead.cidade}${lead.estado ? ` - ${lead.estado}` : ''}` : ''
+        }
+      }));
+    }
+  };
+
+  const handleGenerateContract = async () => {
     try {
+      setLoading(true);
+      const doc = generateContractPDF(contractFormData);
+      
+      // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
-        projeto_id: selectedProjetoId,
-        tipo: tipoContrato,
-        status: 'Gerado',
-        conteudo: `CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ${tipoContrato}`
+        numero: contractFormData.numero,
+        lead_id: selectedLeadId,
+        cliente_nome: contractFormData.cliente.nome,
+        tipo: contractFormData.projeto.tipo,
+        plano: contractFormData.projeto.plano,
+        dados_gerais: contractFormData.cliente,
+        prazos: contractFormData.prazos,
+        valores: contractFormData.honorarios,
+        status: 'Gerado'
       });
 
       if (error) throw error;
-      toast.success('Contrato gerado com sucesso!');
+      
+      toast.success('Contrato gerado e registrado com sucesso!');
+      
+      // Download automatically
+      doc.save(`Contrato_${contractFormData.numero}_${contractFormData.cliente.nome}.pdf`);
+      
       setIsContratoModalOpen(false);
       fetchData();
     } catch (error) {
+      console.error('Error generating contract:', error);
       toast.error('Erro ao gerar contrato');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleDownloadExistingContract = (contract: any) => {
+    // Reconstruct data from contract record
+    const data: ContractData = {
+      numero: contract.numero,
+      cliente: contract.dados_gerais,
+      projeto: {
+        tipo: contract.tipo,
+        plano: contract.plano,
+        endereco: contract.dados_gerais.endereco || '',
+        tipoImovel: 'Residência',
+        areaTerreno: '',
+        areaConstruida: '',
+        matricula: ''
+      },
+      prazos: contract.prazos,
+      honorarios: contract.valores,
+      nl: {
+        cauLeandro: 'A203598-7',
+        cauNeandro: 'A203599-5',
+        cpfNeandro: '000.000.000-00'
+      }
+    };
+    
+    const doc = generateContractPDF(data);
+    doc.save(`Contrato_${contract.numero}_${contract.cliente_nome}.pdf`);
+  };
+
+  const handleSaveToDropbox = async () => {
+    try {
+      setLoading(true);
+      const doc = generateContractPDF(contractFormData);
+      const pdfBlob = doc.output('blob');
+      
+      // We need a project folder in Dropbox
+      // Search for the project folder or use a default one
+      const folderName = contractFormData.cliente.nome;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contractFormData.numero}.pdf`;
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: path,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+      toast.success('Contrato salvo no Dropbox com sucesso!');
+    } catch (error) {
+      console.error('Dropbox save error:', error);
+      toast.error('Erro ao salvar no Dropbox');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
     try {
