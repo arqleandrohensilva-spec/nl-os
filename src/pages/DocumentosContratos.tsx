@@ -1590,7 +1590,7 @@ const DocumentosContratos = () => {
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} className="mr-2" />} GERAR E BAIXAR PDF
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR E BAIXAR DOCX
               </Button>
             </DialogFooter>
           </DialogContent>
