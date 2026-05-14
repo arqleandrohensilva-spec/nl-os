@@ -335,6 +335,8 @@ const DocumentosContratos = () => {
     } finally {
       setLoading(false);
     }
+  };
+
   const handleSaveExistingToDropbox = async (contract: any) => {
     try {
       setLoading(true);
