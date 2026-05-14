@@ -1642,6 +1642,7 @@ const DocumentosContratos = () => {
               </Button>
             </DialogFooter>
           </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
