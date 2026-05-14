@@ -105,6 +105,14 @@ serve(async (req) => {
       body
     });
 
+    if (currentAction === 'download') {
+      const blob = await response.blob();
+      return new Response(
+        blob,
+        { headers: { ...corsHeaders, 'Content-Type': response.headers.get('Content-Type') || 'application/octet-stream' }, status: 200 }
+      )
+    }
+
     const data = await response.json();
 
     return new Response(
