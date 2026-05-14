@@ -205,7 +205,7 @@ export const generateContractPDF = (data: ContractData, paragraphs?: TemplatePar
   });
 
   // Add footer to all pages
-  const totalPages = doc.internal.getNumberOfPages();
+  const totalPages = doc.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     addFooter(i, totalPages);
