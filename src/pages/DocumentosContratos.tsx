@@ -698,7 +698,7 @@ const DocumentosContratos = () => {
                   onClick={handleRefresh} 
                   disabled={dropboxLoading}
                   variant="outline"
-                  className="bg-transparent hover:bg-white/5 text-white border-white/10 rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold"
+                  className="bg-[#2A2825] border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white border rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold transition-colors"
                 >
                   <RefreshCw size={14} className={cn("mr-2", dropboxLoading && "animate-spin")} /> ATUALIZAR
                 </Button>
