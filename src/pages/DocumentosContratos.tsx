@@ -72,11 +72,16 @@ const DocumentosContratos = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadStage, setUploadStage] = useState('01 - Briefing');
   const [uploading, setUploading] = useState(false);
+  
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectClient, setNewProjectClient] = useState('');
   const [newProjectType, setNewProjectType] = useState('');
   const [isCreatingProject, setIsCreatingProject] = useState(false);
+
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [pathToDelete, setPathToDelete] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -351,36 +356,39 @@ const DocumentosContratos = () => {
     }
   };
 
-  const deleteFictitiousData = async () => {
+  const handleDeletePath = async () => {
+    if (!pathToDelete) return;
+    
     try {
-      const pathToDelete = '/NL Arquitetos/07 - Projetos NL OS/Atelier de Projetos · Premium - Arq+Int';
+      setIsDeleting(true);
+      console.log("Deleting path:", pathToDelete);
       
-      // First check if it exists to avoid unnecessary error logs
-      const { data: metadata } = await supabase.functions.invoke('dropbox-proxy', {
-        body: { action: 'get_metadata', path: pathToDelete }
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'delete', path: pathToDelete }
       });
-
-      if (metadata && !metadata.error) {
-        console.log("Deleting fictitious data:", pathToDelete);
-        const { error } = await supabase.functions.invoke('dropbox-proxy', {
-          body: { action: 'delete', path: pathToDelete }
-        });
-        
-        if (!error) {
-          toast.success('Dados fictícios removidos do Dropbox');
-          fetchDropboxFiles();
-        }
+      
+      if (error || (data && data.error)) {
+        throw new Error(data?.error?.summary || error?.message || 'Erro ao excluir');
       }
-    } catch (error) {
-      console.error('Error deleting fictitious data:', error);
+      
+      toast.success('Pasta removida com sucesso. A listagem foi atualizada.');
+      setIsDeleteConfirmOpen(false);
+      
+      // Update the list
+      if (selectedProjetoArquivos) {
+        const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
+        const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+        await fetchProjectFiles(projectBasePath);
+      } else {
+        fetchDropboxFiles(currentPath);
+      }
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      toast.error(`Erro ao excluir: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
-
-  useEffect(() => {
-    if (activeTab === 'arquivos') {
-      deleteFictitiousData();
-    }
-  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'arquivos' && !selectedProjetoArquivos) {
@@ -638,6 +646,17 @@ const DocumentosContratos = () => {
                                   >
                                     <Share2 size={14} />
                                   </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => {
+                                      setPathToDelete(file.path_display);
+                                      setIsDeleteConfirmOpen(true);
+                                    }}
+                                    className="h-7 w-7 text-white/40 hover:text-red-500"
+                                  >
+                                    <Trash2 size={14} />
+                                  </Button>
                                 </div>
                               </div>
                             ))
@@ -716,6 +735,17 @@ const DocumentosContratos = () => {
                             className="h-7 w-7 text-white/40 hover:text-white"
                           >
                             <Share2 size={14} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => {
+                              setPathToDelete(file.path_display);
+                              setIsDeleteConfirmOpen(true);
+                            }}
+                            className="h-7 w-7 text-white/40 hover:text-red-500"
+                          >
+                            <Trash2 size={14} />
                           </Button>
                         </div>
                       </div>
@@ -884,6 +914,43 @@ const DocumentosContratos = () => {
               >
                 {isCreatingProject ? <Loader2 size={16} className="animate-spin mr-2" /> : <Plus size={16} className="mr-2" />}
                 CRIAR E GERAR ESTRUTURA
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <Trash2 size={16} className="text-red-500" /> CONFIRMAR EXCLUSÃO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-6">
+              <p className="text-[11px] text-white/60 leading-relaxed uppercase tracking-wider">
+                Tem certeza que deseja apagar permanentemente este item? 
+              </p>
+              <p className="text-[10px] font-mono mt-4 p-3 bg-black/40 border border-white/5 break-all text-bronze/80">
+                {pathToDelete}
+              </p>
+              <p className="text-[9px] text-red-500/60 mt-4 uppercase tracking-[0.2em] font-bold">
+                ESTA AÇÃO NÃO PODE SER DESFEITA.
+              </p>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button 
+                variant="ghost"
+                onClick={() => setIsDeleteConfirmOpen(false)} 
+                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+              >
+                CANCELAR
+              </Button>
+              <Button 
+                onClick={handleDeletePath} 
+                disabled={isDeleting} 
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+              >
+                {isDeleting ? <Loader2 size={16} className="animate-spin" /> : "EXCLUIR PERMANENTEMENTE"}
               </Button>
             </DialogFooter>
           </DialogContent>
