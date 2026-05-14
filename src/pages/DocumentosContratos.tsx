@@ -58,6 +58,7 @@ const DocumentosContratos = () => {
   const [dropboxLoading, setDropboxLoading] = useState(false);
   const [currentPath, setCurrentPath] = useState('');
   const [selectedProjetoArquivos, setSelectedProjetoArquivos] = useState<any>(null);
+  const [dropboxProjectsFolders, setDropboxProjectsFolders] = useState<any[]>([]);
   const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   
