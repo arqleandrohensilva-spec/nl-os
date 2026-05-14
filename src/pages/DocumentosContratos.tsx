@@ -242,10 +242,8 @@ const DocumentosContratos = () => {
       console.log('Iniciando fetch do template do Dropbox...');
       
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
-        headers: {
-          'x-action': 'download'
-        },
         body: {
+          action: 'download',
           path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/contrato-template.js'
         }
       });
@@ -389,8 +387,10 @@ const DocumentosContratos = () => {
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
-        headers: { 'x-action': 'create_folder' },
-        body: { folder: contractFolder }
+        body: { 
+          action: 'create_folder',
+          folder: contractFolder 
+        }
       });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
@@ -458,8 +458,10 @@ const DocumentosContratos = () => {
 
       // Create folder if not exists
       await supabase.functions.invoke('dropbox-proxy', {
-        headers: { 'x-action': 'create_folder' },
-        body: { folder: contractFolder }
+        body: { 
+          action: 'create_folder',
+          folder: contractFolder 
+        }
       });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
