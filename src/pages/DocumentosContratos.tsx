@@ -142,6 +142,13 @@ const DocumentosContratos = () => {
   const [pathToDelete, setPathToDelete] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [contractToCancel, setContractToCancel] = useState<any>(null);
+  const [motivoCancelamento, setMotivoCancelamento] = useState('');
+  const [categoriaCancelamento, setCategoriaCancelamento] = useState('');
+  const [outroMotivo, setOutroMotivo] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
