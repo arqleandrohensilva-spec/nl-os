@@ -1564,6 +1564,84 @@ const DocumentosContratos = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <Ban size={16} className="text-red-500" /> CANCELAR CONTRATO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4 space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Categoria do Motivo</Label>
+                <RadioGroup 
+                  value={categoriaCancelamento} 
+                  onValueChange={setCategoriaCancelamento}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Cliente desistiu" id="desistiu" className="border-white/20 text-bronze" />
+                    <Label htmlFor="desistiu" className="text-[11px] uppercase tracking-wider cursor-pointer">Cliente desistiu</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Valor não aprovado" id="valor" className="border-white/20 text-bronze" />
+                    <Label htmlFor="valor" className="text-[11px] uppercase tracking-wider cursor-pointer">Valor não aprovado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Concorrente escolhido" id="concorrente" className="border-white/20 text-bronze" />
+                    <Label htmlFor="concorrente" className="text-[11px] uppercase tracking-wider cursor-pointer">Concorrente escolhido</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Projeto inviável" id="inviavel" className="border-white/20 text-bronze" />
+                    <Label htmlFor="inviavel" className="text-[11px] uppercase tracking-wider cursor-pointer">Projeto inviável</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Outro" id="outro" className="border-white/20 text-bronze" />
+                    <Label htmlFor="outro" className="text-[11px] uppercase tracking-wider cursor-pointer">Outro</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {categoriaCancelamento === 'Outro' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-white/40">Especifique o motivo</Label>
+                  <Input 
+                    value={outroMotivo}
+                    onChange={(e) => setOutroMotivo(e.target.value)}
+                    placeholder="Digite a categoria do motivo..."
+                    className="bg-black/40 border-white/10 rounded-none text-[11px] placeholder:text-white/20"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Descrição Detalhada (Obrigatório)</Label>
+                <Textarea 
+                  value={motivoCancelamento}
+                  onChange={(e) => setMotivoCancelamento(e.target.value)}
+                  placeholder="Explique o motivo do cancelamento para o histórico..."
+                  className="bg-black/40 border-white/10 rounded-none min-h-[100px] text-[11px] placeholder:text-white/20"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
+              <Button 
+                variant="ghost"
+                onClick={() => setIsCancelModalOpen(false)} 
+                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+              >
+                MANTER CONTRATO
+              </Button>
+              <Button 
+                onClick={handleCancelContract} 
+                disabled={isCancelling} 
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+              >
+                {isCancelling ? <Loader2 size={16} className="animate-spin" /> : "CONFIRMAR CANCELAMENTO"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
       </main>
     </div>
   );
