@@ -774,14 +774,14 @@ const DocumentosContratos = () => {
                     <Button 
                       variant="outline" 
                       onClick={() => handleDownloadExistingContract(c)}
-                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Download size={12} className="mr-1" /> BAIXAR PDF
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={() => handleSaveExistingToDropbox(c)}
-                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Save size={12} className="mr-1" /> DROPBOX
                     </Button>
@@ -790,7 +790,7 @@ const DocumentosContratos = () => {
                         <TooltipTrigger asChild>
                           <Button 
                             variant="outline" 
-                            className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none opacity-50 cursor-not-allowed"
+                            className="bg-transparent border-[#8B7355]/30 text-[#8B7355]/50 text-[9px] uppercase tracking-widest h-8 rounded-none opacity-50 cursor-not-allowed"
                           >
                             <ExternalLink size={12} className="mr-1" /> ASSINATURA
                           </Button>
@@ -806,7 +806,7 @@ const DocumentosContratos = () => {
                         setContractToCancel(c);
                         setIsCancelModalOpen(true);
                       }}
-                      className="border-red-500/20 hover:bg-red-500/5 text-red-500 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B2020] text-[#8B2020] hover:bg-[#8B2020] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Ban size={12} className="mr-1" /> CANCELAR
                     </Button>
