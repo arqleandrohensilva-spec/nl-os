@@ -335,10 +335,101 @@ const DocumentosContratos = () => {
     } finally {
       setLoading(false);
     }
+  const handleSaveExistingToDropbox = async (contract: any) => {
+    try {
+      setLoading(true);
+      
+      // Reconstruct data from contract record
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        }
+      };
+
+      const doc = generateContractPDF(data);
+      const pdfBlob = doc.output('blob');
+      
+      const folderName = contract.cliente_nome;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contract.numero}.pdf`;
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: path,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+      toast.success('Contrato salvo no Dropbox com sucesso!');
+    } catch (error) {
+      console.error('Dropbox save error:', error);
+      toast.error('Erro ao salvar no Dropbox');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleCancelContract = async () => {
+    if (!contractToCancel || (!categoriaCancelamento) || (categoriaCancelamento === 'Outro' && !outroMotivo) || !motivoCancelamento) {
+      toast.error('Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
 
-  const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
+    try {
+      setIsCancelling(true);
+      const { error } = await supabase
+        .from('contratos')
+        .update({
+          status: 'CANCELADO',
+          motivo_cancelamento: motivoCancelamento,
+          categoria_cancelamento: categoriaCancelamento === 'Outro' ? outroMotivo : categoriaCancelamento,
+          data_cancelamento: new Date().toISOString()
+        })
+        .eq('id', contractToCancel.id);
+
+      if (error) throw error;
+
+      toast.success('Contrato cancelado com sucesso');
+      setIsCancelModalOpen(false);
+      setContractToCancel(null);
+      setMotivoCancelamento('');
+      setCategoriaCancelamento('');
+      setOutroMotivo('');
+      fetchData();
+    } catch (error) {
+      console.error('Error cancelling contract:', error);
+      toast.error('Erro ao cancelar contrato');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
     try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
