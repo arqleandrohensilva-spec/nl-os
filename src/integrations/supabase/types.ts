@@ -90,30 +90,61 @@ export type Database = {
       }
       contratos: {
         Row: {
+          cliente_nome: string | null
           conteudo: string | null
           criado_em: string
+          dados_gerais: Json | null
           id: string
+          lead_id: string | null
+          numero: string | null
+          plano: string | null
+          prazos: Json | null
           projeto_id: string | null
           status: string
           tipo: string
+          updated_at: string | null
+          valores: Json | null
         }
         Insert: {
+          cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
+          dados_gerais?: Json | null
           id?: string
+          lead_id?: string | null
+          numero?: string | null
+          plano?: string | null
+          prazos?: Json | null
           projeto_id?: string | null
           status?: string
           tipo: string
+          updated_at?: string | null
+          valores?: Json | null
         }
         Update: {
+          cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
+          dados_gerais?: Json | null
           id?: string
+          lead_id?: string | null
+          numero?: string | null
+          plano?: string | null
+          prazos?: Json | null
           projeto_id?: string | null
           status?: string
           tipo?: string
+          updated_at?: string | null
+          valores?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "contratos_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contratos_projeto_id_fkey"
             columns: ["projeto_id"]
