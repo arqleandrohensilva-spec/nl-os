@@ -650,23 +650,32 @@ const DocumentosContratos = () => {
                 <div key={c.id} className="bg-[#242220] border border-white/10 p-6 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.projetos?.nome}</h3>
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.tipo} · {c.projetos?.nome_cliente}</p>
+                      <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
                     </div>
                     <Badge className="bg-bronze/10 text-bronze border-bronze/20 text-[8px] uppercase tracking-tighter">
                       {c.status}
                     </Badge>
                   </div>
                   <div className="flex gap-2 mt-2">
-                    <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleDownloadExistingContract(c)}
+                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                    >
                       <Download size={12} className="mr-2" /> PDF
                     </Button>
-                    <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
+                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                    >
                       <ExternalLink size={12} className="mr-2" /> ASSINAR
                     </Button>
                   </div>
                 </div>
               ))}
+
               {contratos.length === 0 && (
                 <div className="col-span-3 bg-[#242220] border border-white/10 p-20 text-center text-white/20 italic">
                   Nenhum contrato gerado.
