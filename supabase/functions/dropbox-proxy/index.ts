@@ -14,11 +14,11 @@ serve(async (req) => {
   try {
     const dropboxToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
     if (!dropboxToken) {
-      throw new Error('DROPBOX_ACCESS_TOKEN not configured');
+      return new Response(JSON.stringify({ error: 'DROPBOX_ACCESS_TOKEN not configured' }), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      });
     }
-
-    const url = new URL(req.url);
-    const action = req.headers.get('x-action');
 
     // For backward compatibility or simpler calls
     let bodyJson: any = {};
@@ -26,8 +26,18 @@ serve(async (req) => {
       bodyJson = await req.json();
     }
 
+    const action = req.headers.get('x-action');
     const currentAction = action || bodyJson.action;
-    const path = bodyJson.path || "";
+
+    if (!currentAction) {
+      return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      });
+    }
+
+    // Default path validation
+    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
     const folder = bodyJson.folder || "";
 
     let endpoint = '';
@@ -74,23 +84,29 @@ serve(async (req) => {
       body = JSON.stringify({ path });
     }
 
+    if (!endpoint) {
+      return new Response(JSON.stringify({ error: `Invalid action or endpoint: ${currentAction}` }), { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200 
+      });
+    }
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers,
       body
     });
 
-    // If it's a 409 (path not found or already exists), Dropbox returns JSON error
     const data = await response.json();
 
     return new Response(
       JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   }
 })
