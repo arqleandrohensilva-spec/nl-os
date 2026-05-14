@@ -269,6 +269,9 @@ const DocumentosContratos = () => {
         text = data;
       } else if (data.text && typeof data.text === 'function') {
         text = await data.text();
+      } else if (data.url) {
+        const fileRes = await fetch(data.url);
+        text = await fileRes.text();
       } else {
         console.error('Tipo de dado inesperado:', typeof data, data);
         text = JSON.stringify(data);
@@ -276,15 +279,12 @@ const DocumentosContratos = () => {
 
       console.log('Conteúdo do arquivo (primeiros 200 chars):', text.substring(0, 200));
 
-      // Extract the array from "export const CONTRATO_PARAGRAFOS = [...];"
-      const match = text.match(/export const CONTRATO_PARAGRAFOS = (\[[\s\S]*\]);/);
+      const match = text.match(/export const CONTRATO_PARAGRAFOS\s*=\s*(\[[\s\S]*\]);/);
       if (match && match[1]) {
         try {
           return JSON.parse(match[1]);
         } catch (parseError) {
           console.error('Erro ao fazer parse do JSON do template:', parseError);
-          // Se falhar o parse direto, tentar limpar comentários ou formatação se necessário
-          // Mas normalmente o Dropbox retorna o texto puro do .js
           throw parseError;
         }
       }
