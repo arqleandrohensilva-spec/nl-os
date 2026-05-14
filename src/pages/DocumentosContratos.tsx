@@ -876,7 +876,7 @@ const DocumentosContratos = () => {
                           parts.pop();
                           fetchDropboxFiles(parts.join('/'));
                         }}
-                        className="border-white/10 hover:bg-white/5 text-white rounded-none text-[9px] uppercase tracking-widest"
+                        className="bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[9px] uppercase tracking-widest transition-colors h-8 px-4"
                       >
                         VOLTAR
                       </Button>
