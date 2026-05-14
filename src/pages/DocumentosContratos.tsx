@@ -698,7 +698,7 @@ const DocumentosContratos = () => {
                   onClick={handleRefresh} 
                   disabled={dropboxLoading}
                   variant="outline"
-                  className="bg-transparent hover:bg-white/5 text-white border-white/10 rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold"
+                  className="bg-[#2A2825] border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white border rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold transition-colors"
                 >
                   <RefreshCw size={14} className={cn("mr-2", dropboxLoading && "animate-spin")} /> ATUALIZAR
                 </Button>
@@ -774,14 +774,14 @@ const DocumentosContratos = () => {
                     <Button 
                       variant="outline" 
                       onClick={() => handleDownloadExistingContract(c)}
-                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Download size={12} className="mr-1" /> BAIXAR PDF
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={() => handleSaveExistingToDropbox(c)}
-                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Save size={12} className="mr-1" /> DROPBOX
                     </Button>
@@ -790,7 +790,7 @@ const DocumentosContratos = () => {
                         <TooltipTrigger asChild>
                           <Button 
                             variant="outline" 
-                            className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none opacity-50 cursor-not-allowed"
+                            className="bg-transparent border-[#8B7355]/30 text-[#8B7355]/50 text-[9px] uppercase tracking-widest h-8 rounded-none opacity-50 cursor-not-allowed"
                           >
                             <ExternalLink size={12} className="mr-1" /> ASSINATURA
                           </Button>
@@ -806,7 +806,7 @@ const DocumentosContratos = () => {
                         setContractToCancel(c);
                         setIsCancelModalOpen(true);
                       }}
-                      className="border-red-500/20 hover:bg-red-500/5 text-red-500 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="bg-transparent border-[#8B2020] text-[#8B2020] hover:bg-[#8B2020] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
                       <Ban size={12} className="mr-1" /> CANCELAR
                     </Button>
@@ -876,7 +876,7 @@ const DocumentosContratos = () => {
                           parts.pop();
                           fetchDropboxFiles(parts.join('/'));
                         }}
-                        className="border-white/10 hover:bg-white/5 text-white rounded-none text-[9px] uppercase tracking-widest"
+                        className="bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[9px] uppercase tracking-widest transition-colors h-8 px-4"
                       >
                         VOLTAR
                       </Button>
@@ -1457,7 +1457,7 @@ const DocumentosContratos = () => {
               <Button 
                 variant="outline"
                 onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
-                className="flex-1 border-white/10 hover:bg-white/5 text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
                 <Send size={16} className="mr-2" /> ENVIAR P/ ASSINATURA
               </Button>
@@ -1465,14 +1465,14 @@ const DocumentosContratos = () => {
                 variant="outline"
                 onClick={handleSaveToDropbox}
                 disabled={loading || !contractFormData.cliente.nome}
-                className="flex-1 border-white/10 hover:bg-white/5 text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Cloud size={16} className="mr-2" />} SALVAR NO DROPBOX
               </Button>
               <Button 
                 onClick={handleGenerateContract} 
                 disabled={loading || !contractFormData.cliente.nome} 
-                className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold"
+                className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} className="mr-2" />} GERAR E BAIXAR PDF
               </Button>
@@ -1550,14 +1550,14 @@ const DocumentosContratos = () => {
               <Button 
                 variant="ghost"
                 onClick={() => setIsDeleteConfirmOpen(false)} 
-                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 CANCELAR
               </Button>
               <Button 
                 onClick={handleDeletePath} 
                 disabled={isDeleting} 
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+                className="flex-1 bg-transparent border border-[#8B2020] text-[#8B2020] hover:bg-[#8B2020] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-10 transition-colors"
               >
                 {isDeleting ? <Loader2 size={16} className="animate-spin" /> : "EXCLUIR PERMANENTEMENTE"}
               </Button>
@@ -1629,14 +1629,14 @@ const DocumentosContratos = () => {
               <Button 
                 variant="ghost"
                 onClick={() => setIsCancelModalOpen(false)} 
-                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 MANTER CONTRATO
               </Button>
               <Button 
                 onClick={handleCancelContract} 
                 disabled={isCancelling} 
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+                className="flex-1 bg-transparent border border-[#8B2020] text-[#8B2020] hover:bg-[#8B2020] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-10 transition-colors"
               >
                 {isCancelling ? <Loader2 size={16} className="animate-spin" /> : "CONFIRMAR CANCELAMENTO"}
               </Button>
