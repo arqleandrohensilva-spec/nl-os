@@ -72,11 +72,16 @@ const DocumentosContratos = () => {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadStage, setUploadStage] = useState('01 - Briefing');
   const [uploading, setUploading] = useState(false);
+  
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectClient, setNewProjectClient] = useState('');
   const [newProjectType, setNewProjectType] = useState('');
   const [isCreatingProject, setIsCreatingProject] = useState(false);
+
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [pathToDelete, setPathToDelete] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -351,36 +356,39 @@ const DocumentosContratos = () => {
     }
   };
 
-  const deleteFictitiousData = async () => {
+  const handleDeletePath = async () => {
+    if (!pathToDelete) return;
+    
     try {
-      const pathToDelete = '/NL Arquitetos/07 - Projetos NL OS/Atelier de Projetos · Premium - Arq+Int';
+      setIsDeleting(true);
+      console.log("Deleting path:", pathToDelete);
       
-      // First check if it exists to avoid unnecessary error logs
-      const { data: metadata } = await supabase.functions.invoke('dropbox-proxy', {
-        body: { action: 'get_metadata', path: pathToDelete }
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'delete', path: pathToDelete }
       });
-
-      if (metadata && !metadata.error) {
-        console.log("Deleting fictitious data:", pathToDelete);
-        const { error } = await supabase.functions.invoke('dropbox-proxy', {
-          body: { action: 'delete', path: pathToDelete }
-        });
-        
-        if (!error) {
-          toast.success('Dados fictícios removidos do Dropbox');
-          fetchDropboxFiles();
-        }
+      
+      if (error || (data && data.error)) {
+        throw new Error(data?.error?.summary || error?.message || 'Erro ao excluir');
       }
-    } catch (error) {
-      console.error('Error deleting fictitious data:', error);
+      
+      toast.success('Exclusão concluída com sucesso');
+      setIsDeleteConfirmOpen(false);
+      
+      // Update the list
+      if (selectedProjetoArquivos) {
+        const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
+        const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+        await fetchProjectFiles(projectBasePath);
+      } else {
+        fetchDropboxFiles(currentPath);
+      }
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      toast.error(`Erro ao excluir: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
-
-  useEffect(() => {
-    if (activeTab === 'arquivos') {
-      deleteFictitiousData();
-    }
-  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'arquivos' && !selectedProjetoArquivos) {
@@ -638,6 +646,17 @@ const DocumentosContratos = () => {
                                   >
                                     <Share2 size={14} />
                                   </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => {
+                                      setPathToDelete(file.path_display);
+                                      setIsDeleteConfirmOpen(true);
+                                    }}
+                                    className="h-7 w-7 text-white/40 hover:text-red-500"
+                                  >
+                                    <Trash2 size={14} />
+                                  </Button>
                                 </div>
                               </div>
                             ))
@@ -716,6 +735,17 @@ const DocumentosContratos = () => {
                             className="h-7 w-7 text-white/40 hover:text-white"
                           >
                             <Share2 size={14} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => {
+                              setPathToDelete(file.path_display);
+                              setIsDeleteConfirmOpen(true);
+                            }}
+                            className="h-7 w-7 text-white/40 hover:text-red-500"
+                          >
+                            <Trash2 size={14} />
                           </Button>
                         </div>
                       </div>
