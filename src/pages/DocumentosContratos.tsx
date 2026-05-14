@@ -25,7 +25,8 @@ import {
   RefreshCw,
   FileCheck,
   Ban,
-  Save
+  Save,
+  FileDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,8 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractPDF, ContractData } from '@/utils/contractTemplates';
+import { ContractData } from '@/utils/contractTemplates';
+import PizZip from 'pizzip';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
