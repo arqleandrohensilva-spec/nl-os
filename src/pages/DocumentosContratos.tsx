@@ -284,7 +284,8 @@ const DocumentosContratos = () => {
         tipoImovel: 'Residência',
         areaTerreno: '',
         areaConstruida: '',
-        matricula: ''
+        matricula: '',
+        cartorio: ''
       },
       prazos: contract.prazos,
       honorarios: contract.valores,
