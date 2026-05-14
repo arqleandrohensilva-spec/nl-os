@@ -367,8 +367,11 @@ const DocumentosContratos = () => {
         body: { action: 'delete', path: pathToDelete }
       });
       
-      if (error || (data && data.error)) {
-        throw new Error(data?.error?.summary || error?.message || 'Erro ao excluir');
+      if (error || (data && (data.error || data.error_summary))) {
+        const errorDetail = data?.error_summary || 
+                           (typeof data?.error === 'string' ? data.error : JSON.stringify(data?.error)) || 
+                           error?.message || 'Erro ao excluir';
+        throw new Error(errorDetail);
       }
       
       toast.success('Pasta removida com sucesso. A listagem foi atualizada.');
