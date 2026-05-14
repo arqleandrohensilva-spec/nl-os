@@ -1268,6 +1268,17 @@ const DocumentosContratos = () => {
                       className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Data de Assinatura</Label>
+                    <Input 
+                      type="text"
+                      placeholder="Ex: 14 de maio de 2026"
+                      value={contractFormData.dataAssinatura || ''}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, dataAssinatura: e.target.value }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
                 </div>
               </section>
 
