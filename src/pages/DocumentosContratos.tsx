@@ -302,50 +302,68 @@ const DocumentosContratos = () => {
     }
   };
 
-  const handleDownloadExistingContract = (contract: any) => {
-    // Reconstruct data from contract record
-    const data: ContractData = {
-      numero: contract.numero,
-      cliente: contract.dados_gerais,
-      projeto: {
-        tipo: contract.tipo,
-        plano: contract.plano,
-        endereco: contract.dados_gerais.endereco || '',
-        tipoImovel: 'Residência',
-        areaTerreno: '',
-        areaConstruida: '',
-        matricula: '',
-        cartorio: ''
-      },
-      prazos: contract.prazos,
-      honorarios: contract.valores,
-      nl: {
-        cauLeandro: 'A203598-7',
-        cauNeandro: 'A203599-5',
-        cpfNeandro: '000.000.000-00'
-      }
-    };
-    
-    const doc = generateContractPDF(data);
-    doc.save(`Contrato_${contract.numero}_${contract.cliente_nome}.pdf`);
+  const handleDownloadExistingContract = async (contract: any) => {
+    try {
+      setLoading(true);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        }
+      };
+      
+      const doc = generateContractPDF(data, paragraphs);
+      doc.save(`${contract.numero} - ${contract.cliente_nome}.pdf`);
+    } catch (error) {
+      console.error('Error downloading contract:', error);
+      toast.error('Erro ao baixar contrato');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveToDropbox = async () => {
     try {
       setLoading(true);
-      const doc = generateContractPDF(contractFormData);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
+
+      const doc = generateContractPDF(contractFormData, paragraphs);
       const pdfBlob = doc.output('blob');
       
-      // We need a project folder in Dropbox
-      // Search for the project folder or use a default one
-      const folderName = contractFormData.cliente.nome;
-      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contractFormData.numero}.pdf`;
+      const folderName = `${contractFormData.cliente.nome} - ${contractFormData.projeto.tipo}`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+
+      // Create folder if not exists
+      await supabase.functions.invoke('dropbox-proxy', {
+        headers: { 'x-action': 'create_folder' },
+        body: { folder: contractFolder }
+      });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
-        mode: 'add',
-        autorename: true,
+        mode: 'overwrite',
+        autorename: false,
         mute: false,
         strict_conflict: false
       });
@@ -372,8 +390,9 @@ const DocumentosContratos = () => {
   const handleSaveExistingToDropbox = async (contract: any) => {
     try {
       setLoading(true);
+      const paragraphs = await fetchContractTemplate();
+      if (!paragraphs) return;
       
-      // Reconstruct data from contract record
       const data: ContractData = {
         numero: contract.numero,
         cliente: contract.dados_gerais,
@@ -396,17 +415,24 @@ const DocumentosContratos = () => {
         }
       };
 
-      const doc = generateContractPDF(data);
+      const doc = generateContractPDF(data, paragraphs);
       const pdfBlob = doc.output('blob');
       
-      const folderName = contract.cliente_nome;
-      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contract.numero}.pdf`;
+      const folderName = `${contract.cliente_nome} - ${contract.tipo}`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.pdf`;
+
+      // Create folder if not exists
+      await supabase.functions.invoke('dropbox-proxy', {
+        headers: { 'x-action': 'create_folder' },
+        body: { folder: contractFolder }
+      });
 
       const arrayBuffer = await pdfBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({
         path: path,
-        mode: 'add',
-        autorename: true,
+        mode: 'overwrite',
+        autorename: false,
         mute: false,
         strict_conflict: false
       });
