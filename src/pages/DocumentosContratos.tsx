@@ -1362,10 +1362,19 @@ const DocumentosContratos = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Matrícula nº + Cartório</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nº Matrícula</Label>
                     <Input 
                       value={contractFormData.projeto.matricula}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, matricula: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Cartório</Label>
+                    <Input 
+                      value={contractFormData.projeto.cartorio}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, cartorio: e.target.value } }))}
                       className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
