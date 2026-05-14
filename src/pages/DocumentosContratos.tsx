@@ -566,20 +566,17 @@ const DocumentosContratos = () => {
                   </div>
                   <div className="h-px bg-white/5 my-4" />
                   <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
-                  {projetos.map(p => (
+                  {dropboxProjectsFolders.map(p => (
                     <div 
                       key={p.id} 
-                      onClick={() => {
-                        setSelectedProjetoArquivos(p);
-                        checkOrCreateProjectFolders(p);
-                      }}
+                      onClick={() => handleSelectProjectFolder(p)}
                       className={cn(
                         "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
                         selectedProjetoArquivos?.id === p.id && "bg-white/5 border-l-2 border-bronze text-bronze font-bold"
                       )}
                     >
                       <Folder size={14} className={selectedProjetoArquivos?.id === p.id ? "text-bronze" : "text-white/40"} />
-                      <span className="truncate">{p.nome}</span>
+                      <span className="truncate">{p.name}</span>
                     </div>
                   ))}
                 </div>
