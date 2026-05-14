@@ -23,7 +23,9 @@ import {
   Cloud,
   Loader2,
   RefreshCw,
-  FileCheck
+  FileCheck,
+  Ban,
+  Save
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,13 @@ import { generateContractPDF, ContractData } from '@/utils/contractTemplates';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import {
   Dialog,
