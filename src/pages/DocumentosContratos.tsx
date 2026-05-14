@@ -163,7 +163,12 @@ const DocumentosContratos = () => {
       });
 
       if (error) throw error;
-      if (data.error) throw new Error(data.error_summary || data.error);
+      
+      if (data && (data.error || data.error_summary)) {
+        const errorDetail = data.error_summary || 
+                           (typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+        throw new Error(errorDetail);
+      }
 
       // Se estivermos na raiz dos projetos, podemos filtrar se necessário, 
       // mas como já estamos apontando para a subpasta correta, resolve o problema.
