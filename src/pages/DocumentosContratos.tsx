@@ -23,7 +23,9 @@ import {
   Cloud,
   Loader2,
   RefreshCw,
-  FileCheck
+  FileCheck,
+  Ban,
+  Save
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -37,6 +39,13 @@ import { generateContractPDF, ContractData } from '@/utils/contractTemplates';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import {
   Dialog,
@@ -132,6 +141,13 @@ const DocumentosContratos = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [pathToDelete, setPathToDelete] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [contractToCancel, setContractToCancel] = useState<any>(null);
+  const [motivoCancelamento, setMotivoCancelamento] = useState('');
+  const [categoriaCancelamento, setCategoriaCancelamento] = useState('');
+  const [outroMotivo, setOutroMotivo] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -321,6 +337,100 @@ const DocumentosContratos = () => {
     }
   };
 
+  const handleSaveExistingToDropbox = async (contract: any) => {
+    try {
+      setLoading(true);
+      
+      // Reconstruct data from contract record
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        }
+      };
+
+      const doc = generateContractPDF(data);
+      const pdfBlob = doc.output('blob');
+      
+      const folderName = contract.cliente_nome;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contract.numero}.pdf`;
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: path,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+      toast.success('Contrato salvo no Dropbox com sucesso!');
+    } catch (error) {
+      console.error('Dropbox save error:', error);
+      toast.error('Erro ao salvar no Dropbox');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelContract = async () => {
+    if (!contractToCancel || (!categoriaCancelamento) || (categoriaCancelamento === 'Outro' && !outroMotivo) || !motivoCancelamento) {
+      toast.error('Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
+
+    try {
+      setIsCancelling(true);
+      const { error } = await supabase
+        .from('contratos')
+        .update({
+          status: 'CANCELADO',
+          motivo_cancelamento: motivoCancelamento,
+          categoria_cancelamento: categoriaCancelamento === 'Outro' ? outroMotivo : categoriaCancelamento,
+          data_cancelamento: new Date().toISOString()
+        })
+        .eq('id', contractToCancel.id);
+
+      if (error) throw error;
+
+      toast.success('Contrato cancelado com sucesso');
+      setIsCancelModalOpen(false);
+      setContractToCancel(null);
+      setMotivoCancelamento('');
+      setCategoriaCancelamento('');
+      setOutroMotivo('');
+      fetchData();
+    } catch (error) {
+      console.error('Error cancelling contract:', error);
+      toast.error('Erro ao cancelar contrato');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
     try {
@@ -653,24 +763,52 @@ const DocumentosContratos = () => {
                       <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
                       <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
                     </div>
-                    <Badge className="bg-bronze/10 text-bronze border-bronze/20 text-[8px] uppercase tracking-tighter">
+                    <Badge className={cn(
+                      "text-[8px] uppercase tracking-tighter",
+                      c.status === 'CANCELADO' ? "bg-red-500/10 text-red-500 border-red-500/20" : "bg-bronze/10 text-bronze border-bronze/20"
+                    )}>
                       {c.status}
                     </Badge>
                   </div>
-                  <div className="flex gap-2 mt-2">
+                  <div className="grid grid-cols-2 gap-2 mt-2">
                     <Button 
                       variant="outline" 
                       onClick={() => handleDownloadExistingContract(c)}
-                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
                     >
-                      <Download size={12} className="mr-2" /> PDF
+                      <Download size={12} className="mr-1" /> BAIXAR PDF
                     </Button>
                     <Button 
                       variant="outline" 
-                      onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
-                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                      onClick={() => handleSaveExistingToDropbox(c)}
+                      className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
                     >
-                      <ExternalLink size={12} className="mr-2" /> ASSINAR
+                      <Save size={12} className="mr-1" /> DROPBOX
+                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            className="border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none opacity-50 cursor-not-allowed"
+                          >
+                            <ExternalLink size={12} className="mr-1" /> ASSINATURA
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-[#1A1816] border-white/10 text-white text-[10px] uppercase tracking-widest">
+                          Integração com ClickSign em breve
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setContractToCancel(c);
+                        setIsCancelModalOpen(true);
+                      }}
+                      className="border-red-500/20 hover:bg-red-500/5 text-red-500 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                    >
+                      <Ban size={12} className="mr-1" /> CANCELAR
                     </Button>
                   </div>
                 </div>
@@ -1422,6 +1560,85 @@ const DocumentosContratos = () => {
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
               >
                 {isDeleting ? <Loader2 size={16} className="animate-spin" /> : "EXCLUIR PERMANENTEMENTE"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <Ban size={16} className="text-red-500" /> CANCELAR CONTRATO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4 space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Categoria do Motivo</Label>
+                <RadioGroup 
+                  value={categoriaCancelamento} 
+                  onValueChange={setCategoriaCancelamento}
+                  className="grid grid-cols-2 gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Cliente desistiu" id="desistiu" className="border-white/20 text-bronze" />
+                    <Label htmlFor="desistiu" className="text-[11px] uppercase tracking-wider cursor-pointer">Cliente desistiu</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Valor não aprovado" id="valor" className="border-white/20 text-bronze" />
+                    <Label htmlFor="valor" className="text-[11px] uppercase tracking-wider cursor-pointer">Valor não aprovado</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Concorrente escolhido" id="concorrente" className="border-white/20 text-bronze" />
+                    <Label htmlFor="concorrente" className="text-[11px] uppercase tracking-wider cursor-pointer">Concorrente escolhido</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Projeto inviável" id="inviavel" className="border-white/20 text-bronze" />
+                    <Label htmlFor="inviavel" className="text-[11px] uppercase tracking-wider cursor-pointer">Projeto inviável</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Outro" id="outro" className="border-white/20 text-bronze" />
+                    <Label htmlFor="outro" className="text-[11px] uppercase tracking-wider cursor-pointer">Outro</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
+              {categoriaCancelamento === 'Outro' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-white/40">Especifique o motivo</Label>
+                  <Input 
+                    value={outroMotivo}
+                    onChange={(e) => setOutroMotivo(e.target.value)}
+                    placeholder="Digite a categoria do motivo..."
+                    className="bg-black/40 border-white/10 rounded-none text-[11px] placeholder:text-white/20"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Descrição Detalhada (Obrigatório)</Label>
+                <Textarea 
+                  value={motivoCancelamento}
+                  onChange={(e) => setMotivoCancelamento(e.target.value)}
+                  placeholder="Explique o motivo do cancelamento para o histórico..."
+                  className="bg-black/40 border-white/10 rounded-none min-h-[100px] text-[11px] placeholder:text-white/20"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
+              <Button 
+                variant="ghost"
+                onClick={() => setIsCancelModalOpen(false)} 
+                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+              >
+                MANTER CONTRATO
+              </Button>
+              <Button 
+                onClick={handleCancelContract} 
+                disabled={isCancelling} 
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+              >
+                {isCancelling ? <Loader2 size={16} className="animate-spin" /> : "CONFIRMAR CANCELAMENTO"}
               </Button>
             </DialogFooter>
           </DialogContent>
