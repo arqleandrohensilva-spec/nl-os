@@ -163,7 +163,12 @@ const DocumentosContratos = () => {
       });
 
       if (error) throw error;
-      if (data.error) throw new Error(data.error_summary || data.error);
+      
+      if (data && (data.error || data.error_summary)) {
+        const errorDetail = data.error_summary || 
+                           (typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+        throw new Error(errorDetail);
+      }
 
       // Se estivermos na raiz dos projetos, podemos filtrar se necessário, 
       // mas como já estamos apontando para a subpasta correta, resolve o problema.
@@ -363,12 +368,18 @@ const DocumentosContratos = () => {
       setIsDeleting(true);
       console.log("Deleting path:", pathToDelete);
       
-      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+      const { data, error: invokeError } = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'delete', path: pathToDelete }
       });
       
-      if (error || (data && data.error)) {
-        throw new Error(data?.error?.summary || error?.message || 'Erro ao excluir');
+      if (invokeError) {
+        throw new Error(invokeError.message);
+      }
+
+      if (data && (data.error || data.error_summary)) {
+        const errorDetail = data.error_summary || 
+                           (typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+        throw new Error(errorDetail);
       }
       
       toast.success('Pasta removida com sucesso. A listagem foi atualizada.');
@@ -380,11 +391,13 @@ const DocumentosContratos = () => {
         const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
         await fetchProjectFiles(projectBasePath);
       } else {
-        fetchDropboxFiles(currentPath);
+        await fetchDropboxFiles(currentPath);
       }
     } catch (error: any) {
       console.error('Delete error:', error);
-      toast.error(`Erro ao excluir: ${error.message}`);
+      toast.error(`Erro ao excluir: ${error.message}. A listagem NÃO foi atualizada.`, {
+        duration: 8000
+      });
     } finally {
       setIsDeleting(false);
     }
