@@ -22,7 +22,8 @@ import {
   Share2,
   Cloud,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,11 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { generateContractPDF, ContractData } from '@/utils/contractTemplates';
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
+
 import {
   Dialog,
   DialogContent,
@@ -68,7 +74,49 @@ const DocumentosContratos = () => {
   
   const [isContratoModalOpen, setIsContratoModalOpen] = useState(false);
   const [selectedProjetoId, setSelectedProjetoId] = useState('');
-  const [tipoContrato, setTipoContrato] = useState('ArqInt');
+  const [tipoContrato, setTipoContrato] = useState('Arquitetura + Interiores');
+  const [planoContrato, setPlanoContrato] = useState('Executivo');
+  
+  const [contractFormData, setContractFormData] = useState<ContractData>({
+    numero: '',
+    cliente: {
+      nome: '',
+      cpf: '',
+      endereco: '',
+      nacionalidade: 'Brasileiro(a)',
+      estadoCivil: 'Solteiro(a)',
+      profissao: ''
+    },
+    projeto: {
+      tipo: 'Arquitetura + Interiores',
+      plano: 'Executivo',
+      endereco: '',
+      tipoImovel: 'Residência',
+      areaTerreno: '',
+      areaConstruida: '',
+      matricula: ''
+    },
+    prazos: {
+      briefing: '',
+      estudo: '',
+      legal: '',
+      executivo: '',
+      total: ''
+    },
+    honorarios: {
+      totalExecutivo: '',
+      totalCompleto: '',
+      marco1: '',
+      marco2: '',
+      marco3: ''
+    },
+    nl: {
+      cauLeandro: 'A203598-7',
+      cauNeandro: 'A203599-5',
+      cpfNeandro: '000.000.000-00'
+    }
+  });
+
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -138,24 +186,141 @@ const DocumentosContratos = () => {
     }
   };
 
-  const handleGerarContrato = async () => {
-    if (!selectedProjetoId) return;
+  const generateContractNumber = async () => {
+    const year = new Date().getFullYear();
+    const { data: lastContract } = await supabase
+      .from('contratos')
+      .select('numero')
+      .order('criado_em', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastContract && lastContract[0]?.numero) {
+      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+  };
+
+  const handleSelectLeadForContract = (leadId: string) => {
+    const lead = leads.find(l => l.id === leadId);
+    if (lead) {
+      setContractFormData(prev => ({
+        ...prev,
+        cliente: {
+          ...prev.cliente,
+          nome: lead.nome || '',
+          endereco: lead.cidade ? `${lead.cidade}${lead.estado ? ` - ${lead.estado}` : ''}` : ''
+        }
+      }));
+    }
+  };
+
+  const handleGenerateContract = async () => {
     try {
+      setLoading(true);
+      const doc = generateContractPDF(contractFormData);
+      
+      // Save to Supabase
       const { error } = await supabase.from('contratos').insert({
-        projeto_id: selectedProjetoId,
-        tipo: tipoContrato,
-        status: 'Gerado',
-        conteudo: `CONTRATO DE PRESTAÇÃO DE SERVIÇOS - ${tipoContrato}`
+        numero: contractFormData.numero,
+        lead_id: selectedLeadId,
+        cliente_nome: contractFormData.cliente.nome,
+        tipo: contractFormData.projeto.tipo,
+        plano: contractFormData.projeto.plano,
+        dados_gerais: contractFormData.cliente,
+        prazos: contractFormData.prazos,
+        valores: contractFormData.honorarios,
+        status: 'Gerado'
       });
 
       if (error) throw error;
-      toast.success('Contrato gerado com sucesso!');
+      
+      toast.success('Contrato gerado e registrado com sucesso!');
+      
+      // Download automatically
+      doc.save(`Contrato_${contractFormData.numero}_${contractFormData.cliente.nome}.pdf`);
+      
       setIsContratoModalOpen(false);
       fetchData();
     } catch (error) {
+      console.error('Error generating contract:', error);
       toast.error('Erro ao gerar contrato');
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleDownloadExistingContract = (contract: any) => {
+    // Reconstruct data from contract record
+    const data: ContractData = {
+      numero: contract.numero,
+      cliente: contract.dados_gerais,
+      projeto: {
+        tipo: contract.tipo,
+        plano: contract.plano,
+        endereco: contract.dados_gerais.endereco || '',
+        tipoImovel: 'Residência',
+        areaTerreno: '',
+        areaConstruida: '',
+        matricula: ''
+      },
+      prazos: contract.prazos,
+      honorarios: contract.valores,
+      nl: {
+        cauLeandro: 'A203598-7',
+        cauNeandro: 'A203599-5',
+        cpfNeandro: '000.000.000-00'
+      }
+    };
+    
+    const doc = generateContractPDF(data);
+    doc.save(`Contrato_${contract.numero}_${contract.cliente_nome}.pdf`);
+  };
+
+  const handleSaveToDropbox = async () => {
+    try {
+      setLoading(true);
+      const doc = generateContractPDF(contractFormData);
+      const pdfBlob = doc.output('blob');
+      
+      // We need a project folder in Dropbox
+      // Search for the project folder or use a default one
+      const folderName = contractFormData.cliente.nome;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato/Contrato_${contractFormData.numero}.pdf`;
+
+      const arrayBuffer = await pdfBlob.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: path,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+      toast.success('Contrato salvo no Dropbox com sucesso!');
+    } catch (error) {
+      console.error('Dropbox save error:', error);
+      toast.error('Erro ao salvar no Dropbox');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
     try {
@@ -409,10 +574,14 @@ const DocumentosContratos = () => {
               </Button>
             )}
             {activeTab === 'contratos' && (
-              <Button onClick={() => setIsContratoModalOpen(true)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
+              <Button onClick={() => {
+                generateContractNumber();
+                setIsContratoModalOpen(true);
+              }} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
                 <Plus size={14} className="mr-2" /> NOVO CONTRATO
               </Button>
             )}
+
             {activeTab === 'arquivos' && (
               <div className="flex gap-2">
                 <Button 
@@ -481,23 +650,32 @@ const DocumentosContratos = () => {
                 <div key={c.id} className="bg-[#242220] border border-white/10 p-6 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.projetos?.nome}</h3>
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.tipo} · {c.projetos?.nome_cliente}</p>
+                      <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
                     </div>
                     <Badge className="bg-bronze/10 text-bronze border-bronze/20 text-[8px] uppercase tracking-tighter">
                       {c.status}
                     </Badge>
                   </div>
                   <div className="flex gap-2 mt-2">
-                    <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleDownloadExistingContract(c)}
+                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                    >
                       <Download size={12} className="mr-2" /> PDF
                     </Button>
-                    <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
+                      className="flex-1 border-white/10 hover:bg-white/5 text-[9px] uppercase tracking-widest h-8 rounded-none"
+                    >
                       <ExternalLink size={12} className="mr-2" /> ASSINAR
                     </Button>
                   </div>
                 </div>
               ))}
+
               {contratos.length === 0 && (
                 <div className="col-span-3 bg-[#242220] border border-white/10 p-20 text-center text-white/20 italic">
                   Nenhum contrato gerado.
@@ -806,45 +984,364 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isContratoModalOpen} onOpenChange={setIsContratoModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-sm font-bold uppercase tracking-widest">GERAR NOVO CONTRATO</DialogTitle>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <FileCheck size={18} className="text-bronze" /> GERAR NOVO CONTRATO - {contractFormData.numero}
+              </DialogTitle>
             </DialogHeader>
-            <div className="py-4 space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">PROJETO</label>
-                <Select onValueChange={setSelectedProjetoId}>
-                  <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
-                    <SelectValue placeholder="Selecione o projeto..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#242220] border-white/10 text-white">
-                    {projetos.map(p => (
-                      <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">TIPO DE CONTRATO</label>
-                <Select value={tipoContrato} onValueChange={setTipoContrato}>
-                  <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#242220] border-white/10 text-white">
-                    <SelectItem value="ArqInt">Contrato ArqInt</SelectItem>
-                    <SelectItem value="Interiores">Contrato Interiores</SelectItem>
-                    <SelectItem value="Comercial">Contrato Comercial</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            
+            <div className="py-4 space-y-8">
+              {/* DADOS DO CLIENTE */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <User size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS DO CLIENTE</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Selecionar Lead</Label>
+                    <Select onValueChange={(val) => {
+                      setSelectedLeadId(val);
+                      handleSelectLeadForContract(val);
+                    }}>
+                      <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10">
+                        <SelectValue placeholder="Selecione um lead para preencher..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#242220] border-white/10 text-white">
+                        {leads.map(l => (
+                          <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nome Completo</Label>
+                    <Input 
+                      value={contractFormData.cliente.nome}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nome: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CPF</Label>
+                    <Input 
+                      value={contractFormData.cliente.cpf}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, cpf: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                      placeholder="000.000.000-00"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Endereço</Label>
+                    <Input 
+                      value={contractFormData.cliente.endereco}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, endereco: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nacionalidade</Label>
+                    <Input 
+                      value={contractFormData.cliente.nacionalidade}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nacionalidade: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Estado Civil</Label>
+                    <Input 
+                      value={contractFormData.cliente.estadoCivil}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, estadoCivil: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Profissão</Label>
+                    <Input 
+                      value={contractFormData.cliente.profissao}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, profissao: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* DADOS DO PROJETO */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <ClipboardList size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS DO PROJETO</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Tipo de Projeto</Label>
+                    <RadioGroup 
+                      value={contractFormData.projeto.tipo} 
+                      onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, tipo: val } }))}
+                      className="flex flex-col gap-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Arquitetura + Interiores" id="arqint" className="border-bronze text-bronze" />
+                        <Label htmlFor="arqint" className="text-[11px] cursor-pointer">Arquitetura + Interiores</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Interiores" id="int" className="border-bronze text-bronze" />
+                        <Label htmlFor="int" className="text-[11px] cursor-pointer">Interiores</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Comercial" id="com" className="border-bronze text-bronze" />
+                        <Label htmlFor="com" className="text-[11px] cursor-pointer">Comercial</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Plano</Label>
+                    <RadioGroup 
+                      value={contractFormData.projeto.plano} 
+                      onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, plano: val } }))}
+                      className="flex flex-col gap-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Executivo" id="exec" className="border-bronze text-bronze" />
+                        <Label htmlFor="exec" className="text-[11px] cursor-pointer">Executivo</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Completo" id="comp" className="border-bronze text-bronze" />
+                        <Label htmlFor="comp" className="text-[11px] cursor-pointer">Completo</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  <div className="space-y-1.5 md:col-span-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Endereço do Imóvel</Label>
+                    <Input 
+                      value={contractFormData.projeto.endereco}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, endereco: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Tipo do Imóvel</Label>
+                    <Select value={contractFormData.projeto.tipoImovel} onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, tipoImovel: val } }))}>
+                      <SelectTrigger className="bg-black/20 border-white/10 rounded-none h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#242220] border-white/10 text-white">
+                        <SelectItem value="Terreno">Terreno</SelectItem>
+                        <SelectItem value="Residência">Residência</SelectItem>
+                        <SelectItem value="Apartamento">Apartamento</SelectItem>
+                        <SelectItem value="Sala Comercial">Sala Comercial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área do Terreno (m²)</Label>
+                    <Input 
+                      value={contractFormData.projeto.areaTerreno}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área Construída Estimada (m²)</Label>
+                    <Input 
+                      value={contractFormData.projeto.areaConstruida}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Matrícula nº + Cartório</Label>
+                    <Input 
+                      value={contractFormData.projeto.matricula}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, matricula: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* PRAZOS POR ETAPA */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <Calendar size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">PRAZOS POR ETAPA (DIAS ÚTEIS)</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Briefing</Label>
+                    <Input 
+                      value={contractFormData.prazos.briefing}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, briefing: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Estudo 3D</Label>
+                    <Input 
+                      value={contractFormData.prazos.estudo}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, estudo: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Projeto Legal</Label>
+                    <Input 
+                      value={contractFormData.prazos.legal}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, legal: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Executivo</Label>
+                    <Input 
+                      value={contractFormData.prazos.executivo}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, executivo: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-4">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Prazo Total (Semanas)</Label>
+                    <Input 
+                      value={contractFormData.prazos.total}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, total: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10 border-bronze/30"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* HONORÁRIOS */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <span className="text-bronze font-bold text-[14px]">R$</span>
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">HONORÁRIOS</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Total Plano Executivo</Label>
+                    <Input 
+                      value={contractFormData.honorarios.totalExecutivo}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, totalExecutivo: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                      placeholder="Ex: 5.000,00"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Total Plano Completo</Label>
+                    <Input 
+                      value={contractFormData.honorarios.totalCompleto}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, totalCompleto: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                      placeholder="Ex: 8.500,00"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 1 — Entrada (30%)</Label>
+                    <Input 
+                      value={contractFormData.honorarios.marco1}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco1: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 2 — Anteprojeto (40%)</Label>
+                    <Input 
+                      value={contractFormData.honorarios.marco2}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco2: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 3 — Executivo (30%)</Label>
+                    <Input 
+                      value={contractFormData.honorarios.marco3}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco3: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* DADOS FIXOS NL */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <MapPin size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS FIXOS NL</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CAU Leandro</Label>
+                    <Input 
+                      value={contractFormData.nl.cauLeandro}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cauLeandro: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CAU Neandro</Label>
+                    <Input 
+                      value={contractFormData.nl.cauNeandro}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cauNeandro: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CPF Neandro</Label>
+                    <Input 
+                      value={contractFormData.nl.cpfNeandro}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cpfNeandro: e.target.value } }))}
+                      className="bg-black/20 border-white/10 rounded-none h-10"
+                    />
+                  </div>
+                </div>
+              </section>
             </div>
-            <DialogFooter>
-              <Button onClick={handleGerarContrato} disabled={!selectedProjetoId} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
-                GERAR CONTRATO
+
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/5">
+              <Button 
+                variant="outline"
+                onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
+                className="flex-1 border-white/10 hover:bg-white/5 text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              >
+                <Send size={16} className="mr-2" /> ENVIAR P/ ASSINATURA
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleSaveToDropbox}
+                disabled={loading || !contractFormData.cliente.nome}
+                className="flex-1 border-white/10 hover:bg-white/5 text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Cloud size={16} className="mr-2" />} SALVAR NO DROPBOX
+              </Button>
+              <Button 
+                onClick={handleGenerateContract} 
+                disabled={loading || !contractFormData.cliente.nome} 
+                className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} className="mr-2" />} GERAR E BAIXAR PDF
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
 
         <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
           <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
