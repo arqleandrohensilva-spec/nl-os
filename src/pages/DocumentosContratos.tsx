@@ -254,8 +254,7 @@ const DocumentosContratos = () => {
 
     try {
       setUploading(true);
-      const projectFolderName = selectedProjetoArquivos.nome === 'Residência Modernista Jardim' ? 'Residência Modernista' : `${selectedProjetoArquivos.nome_cliente || 'Cliente'} - ${selectedProjetoArquivos.tipo || 'Projeto'}`;
-      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}/${uploadStage}/${uploadFile.name}`;
+      const destinationPath = `${selectedProjetoArquivos.path_display}/${uploadStage}/${uploadFile.name}`;
 
       const arrayBuffer = await uploadFile.arrayBuffer();
       const dropboxArg = JSON.stringify({
