@@ -239,6 +239,8 @@ const DocumentosContratos = () => {
 
   const fetchContractTemplate = async () => {
     try {
+      console.log('Iniciando fetch do template do Dropbox...');
+      
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
         headers: {
           'x-action': 'download'
@@ -248,18 +250,50 @@ const DocumentosContratos = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('Response completo da Edge Function:', JSON.stringify({ data, error }));
+
+      if (error) {
+        console.error('Erro retornado pela Edge Function:', error);
+        throw error;
+      }
       
-      const text = await data.text();
+      if (!data) {
+        console.error('Data está vazia no response');
+        throw new Error('Response data is empty');
+      }
+
+      let text = '';
+      if (data instanceof Blob) {
+        text = await data.text();
+      } else if (typeof data === 'string') {
+        text = data;
+      } else if (data.text && typeof data.text === 'function') {
+        text = await data.text();
+      } else {
+        console.error('Tipo de dado inesperado:', typeof data, data);
+        text = JSON.stringify(data);
+      }
+
+      console.log('Conteúdo do arquivo (primeiros 200 chars):', text.substring(0, 200));
+
       // Extract the array from "export const CONTRATO_PARAGRAFOS = [...];"
       const match = text.match(/export const CONTRATO_PARAGRAFOS = (\[[\s\S]*\]);/);
       if (match && match[1]) {
-        return JSON.parse(match[1]);
+        try {
+          return JSON.parse(match[1]);
+        } catch (parseError) {
+          console.error('Erro ao fazer parse do JSON do template:', parseError);
+          // Se falhar o parse direto, tentar limpar comentários ou formatação se necessário
+          // Mas normalmente o Dropbox retorna o texto puro do .js
+          throw parseError;
+        }
       }
+      
+      console.error('Formato do template inválido. Match não encontrado.');
       throw new Error('Template format invalid');
-    } catch (error) {
-      console.error('Error fetching template:', error);
-      toast.error('Erro ao carregar template do Dropbox');
+    } catch (error: any) {
+      console.error('Erro completo ao buscar template:', error);
+      toast.error(`Erro ao carregar template do Dropbox: ${error.message || error}`);
       return null;
     }
   };
