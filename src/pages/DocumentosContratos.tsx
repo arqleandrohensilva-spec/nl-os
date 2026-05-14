@@ -574,10 +574,14 @@ const DocumentosContratos = () => {
               </Button>
             )}
             {activeTab === 'contratos' && (
-              <Button onClick={() => setIsContratoModalOpen(true)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
+              <Button onClick={() => {
+                generateContractNumber();
+                setIsContratoModalOpen(true);
+              }} className="bg-bronze hover:bg-bronze/80 text-white rounded-none h-9 px-6 text-[10px] tracking-widest uppercase">
                 <Plus size={14} className="mr-2" /> NOVO CONTRATO
               </Button>
             )}
+
             {activeTab === 'arquivos' && (
               <div className="flex gap-2">
                 <Button 
