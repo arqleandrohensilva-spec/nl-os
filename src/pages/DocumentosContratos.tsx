@@ -918,6 +918,43 @@ const DocumentosContratos = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <Trash2 size={16} className="text-red-500" /> CONFIRMAR EXCLUSÃO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-6">
+              <p className="text-[11px] text-white/60 leading-relaxed uppercase tracking-wider">
+                Tem certeza que deseja apagar permanentemente este item? 
+              </p>
+              <p className="text-[10px] font-mono mt-4 p-3 bg-black/40 border border-white/5 break-all text-bronze/80">
+                {pathToDelete}
+              </p>
+              <p className="text-[9px] text-red-500/60 mt-4 uppercase tracking-[0.2em] font-bold">
+                ESTA AÇÃO NÃO PODE SER DESFEITA.
+              </p>
+            </div>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button 
+                variant="ghost"
+                onClick={() => setIsDeleteConfirmOpen(false)} 
+                className="flex-1 rounded-none text-[10px] tracking-widest uppercase h-10 text-white/40 hover:text-white"
+              >
+                CANCELAR
+              </Button>
+              <Button 
+                onClick={handleDeletePath} 
+                disabled={isDeleting} 
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-none uppercase text-[10px] tracking-widest h-10"
+              >
+                {isDeleting ? <Loader2 size={16} className="animate-spin" /> : "EXCLUIR PERMANENTEMENTE"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
