@@ -90,12 +90,15 @@ export type Database = {
       }
       contratos: {
         Row: {
+          categoria_cancelamento: string | null
           cliente_nome: string | null
           conteudo: string | null
           criado_em: string
           dados_gerais: Json | null
+          data_cancelamento: string | null
           id: string
           lead_id: string | null
+          motivo_cancelamento: string | null
           numero: string | null
           plano: string | null
           prazos: Json | null
@@ -106,12 +109,15 @@ export type Database = {
           valores: Json | null
         }
         Insert: {
+          categoria_cancelamento?: string | null
           cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
           dados_gerais?: Json | null
+          data_cancelamento?: string | null
           id?: string
           lead_id?: string | null
+          motivo_cancelamento?: string | null
           numero?: string | null
           plano?: string | null
           prazos?: Json | null
@@ -122,12 +128,15 @@ export type Database = {
           valores?: Json | null
         }
         Update: {
+          categoria_cancelamento?: string | null
           cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
           dados_gerais?: Json | null
+          data_cancelamento?: string | null
           id?: string
           lead_id?: string | null
+          motivo_cancelamento?: string | null
           numero?: string | null
           plano?: string | null
           prazos?: Json | null
