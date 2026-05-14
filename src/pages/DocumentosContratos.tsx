@@ -872,7 +872,7 @@ const DocumentosContratos = () => {
                       onClick={() => handleDownloadExistingContract(c)}
                       className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
-                      <Download size={12} className="mr-1" /> BAIXAR PDF
+                      <FileDown size={12} className="mr-1" /> BAIXAR DOCX
                     </Button>
                     <Button 
                       variant="outline" 
