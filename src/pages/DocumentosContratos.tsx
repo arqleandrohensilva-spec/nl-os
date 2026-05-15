@@ -283,16 +283,19 @@ const DocumentosContratos = () => {
       }
 
       // Check for Dropbox errors returned as JSON even if status is 200
-      if (response.data.error) {
+      if (response.data && response.data.error) {
         console.error('Erro retornado pelo Dropbox:', response.data.error);
-        const errorMsg = typeof response.data.error === 'string' 
-          ? response.data.error 
-          : (response.data.error_summary || response.data.error.message || JSON.stringify(response.data.error));
+        const errorData = response.data.error;
+        let errorMsg = typeof errorData === 'string' ? errorData : '';
         
-        if (errorMsg.includes('expired_access_token')) {
-          throw new Error('O token do Dropbox expirou. Por favor, atualize o DROPBOX_ACCESS_TOKEN nas configurações.');
+        if (errorData['.tag'] === 'expired_access_token' || (typeof errorData === 'object' && errorData.error && errorData.error['.tag'] === 'expired_access_token')) {
+          throw new Error('O token do Dropbox expirou. Por favor, atualize o DROPBOX_ACCESS_TOKEN ou configure o Refresh Token nas configurações.');
         }
-        throw new Error(`Erro no Dropbox: ${errorMsg}`);
+        
+        if (!errorMsg && response.data.error_summary) errorMsg = response.data.error_summary;
+        if (!errorMsg && typeof errorData === 'object') errorMsg = JSON.stringify(errorData);
+        
+        throw new Error(`Erro no Dropbox: ${errorMsg || 'Erro desconhecido'}`);
       }
 
       // At this point response.data should be a Blob if everything went well
