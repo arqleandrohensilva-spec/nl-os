@@ -206,7 +206,18 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
         }
       });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Erro na Edge Function:', uploadError);
+        throw new Error(uploadError.message || 'Erro ao processar upload no servidor');
+      }
+
+      if (data && data.error) {
+        const errorMsg = data.error_summary || data.error.message || JSON.stringify(data.error);
+        if (errorMsg.includes('expired_access_token')) {
+          throw new Error('Token do Dropbox expirou. Atualize o DROPBOX_ACCESS_TOKEN.');
+        }
+        throw new Error(`Dropbox: ${errorMsg}`);
+      }
 
       // Update Supabase
       const { error: dbError } = await supabase
