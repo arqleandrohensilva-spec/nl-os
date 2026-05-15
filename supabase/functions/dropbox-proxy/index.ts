@@ -134,7 +134,7 @@ serve(async (req) => {
         console.error(`Erro no download do Dropbox: ${response.status} - ${errorText}`);
         return new Response(
           JSON.stringify({ error: `Dropbox download failed: ${response.status}`, details: errorText }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
         );
       }
 
