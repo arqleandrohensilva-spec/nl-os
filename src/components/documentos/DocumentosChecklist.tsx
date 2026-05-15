@@ -262,6 +262,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
   };
 
   const checkAllCompleted = () => {
+  };
 
   useEffect(() => {
     if (items.length > 0) {
