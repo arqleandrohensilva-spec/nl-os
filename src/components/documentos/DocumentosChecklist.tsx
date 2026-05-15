@@ -206,7 +206,18 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
         }
       });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Erro na Edge Function:', uploadError);
+        throw new Error(uploadError.message || 'Erro ao processar upload no servidor');
+      }
+
+      if (data && data.error) {
+        const errorMsg = data.error_summary || data.error.message || JSON.stringify(data.error);
+        if (errorMsg.includes('expired_access_token')) {
+          throw new Error('Token do Dropbox expirou. Atualize o DROPBOX_ACCESS_TOKEN.');
+        }
+        throw new Error(`Dropbox: ${errorMsg}`);
+      }
 
       // Update Supabase
       const { error: dbError } = await supabase
@@ -246,10 +257,10 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
       return;
     }
 
-    const saudacao = "Olá " + projeto.nome_cliente.split(' ')[0] + ", aqui é da NL Arquitetos.";
-    const introducao = "Para darmos continuidade ao seu projeto " + projeto.nome + ", precisamos dos seguintes documentos pendentes:";
-    const lista = pendentes.map(item => "• " + item).join("\n");
-    const fechamento = "\n\nVocê pode enviar por aqui ou fazer o upload diretamente no nosso portal. Obrigado!";
+    const saudacao = "Olá " + projeto.nome_cliente.split(' ')[0] + "!";
+    const introducao = "Aqui é da NL Arquitetos. Para darmos continuidade ao seu projeto (" + projeto.nome + "), notamos que ainda faltam alguns documentos:";
+    const lista = pendentes.map(item => "▫️ " + item).join("\n");
+    const fechamento = "\n\nVocê pode anexá-los por aqui ou subir diretamente no portal NL. \n\nQualquer dúvida, estamos à disposição!";
     
     const message = `${saudacao}\n\n${introducao}\n${lista}${fechamento}`;
     const encodedMessage = encodeURIComponent(message);
