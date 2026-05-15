@@ -33,6 +33,7 @@ interface Projeto {
   id: string;
   nome: string;
   nome_cliente: string;
+  cliente_id?: string;
 }
 
 const CATEGORIAS = [
@@ -67,10 +68,28 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
   const [uploadingItem, setUploadingItem] = useState<string | null>(null);
   const [savingObs, setSavingObs] = useState<string | null>(null);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
+  const [leadPhone, setLeadPhone] = useState<string | null>(null);
 
   useEffect(() => {
     fetchChecklist();
-  }, [projeto.id]);
+    if (projeto.cliente_id) {
+      fetchLeadPhone();
+    }
+  }, [projeto.id, projeto.cliente_id]);
+
+  const fetchLeadPhone = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('leads')
+        .select('whats')
+        .eq('id', projeto.cliente_id)
+        .single();
+      
+      if (data) setLeadPhone(data.whats);
+    } catch (error) {
+      console.error('Error fetching phone:', error);
+    }
+  };
 
   const fetchChecklist = async () => {
     try {
@@ -220,10 +239,29 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
     }
   };
 
-  const checkAllCompleted = () => {
-    // We check items after state update or using the latest data
-    // This is called after successful status update/upload
+  const handleWhatsAppReminder = () => {
+    const pendentes = items.filter(i => i.status === 'PENDENTE').map(i => i.item);
+    if (pendentes.length === 0) {
+      toast.success("Toda a documentação já foi recebida!");
+      return;
+    }
+
+    const saudacao = "Olá " + projeto.nome_cliente.split(' ')[0] + ", aqui é da NL Arquitetos.";
+    const introducao = "Para darmos continuidade ao seu projeto " + projeto.nome + ", precisamos dos seguintes documentos pendentes:";
+    const lista = pendentes.map(item => "• " + item).join("\n");
+    const fechamento = "\n\nVocê pode enviar por aqui ou fazer o upload diretamente no nosso portal. Obrigado!";
+    
+    const message = `${saudacao}\n\n${introducao}\n${lista}${fechamento}`;
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Clean phone number: remove anything that is not a digit
+    const cleanPhone = leadPhone ? leadPhone.replace(/\D/g, '') : '';
+    const whatsappUrl = `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : '55' + cleanPhone}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
   };
+
+  const checkAllCompleted = () => {
 
   useEffect(() => {
     if (items.length > 0) {
@@ -277,6 +315,17 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
               <span>{Math.round(porcentagem)}%</span>
             </div>
             <Progress value={porcentagem} className="h-1 bg-white/5" indicatorClassName="bg-bronze" />
+          </div>
+          <div className="flex shrink-0">
+            <Button 
+              onClick={handleWhatsAppReminder}
+              disabled={recebidos === total}
+              variant="outline"
+              className="bg-[#25D366]/10 text-[#25D366] border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all text-[10px] uppercase tracking-widest h-10 px-6 rounded-none font-bold"
+            >
+              <MessageSquare size={14} className="mr-2" />
+              Cobrar Pendências
+            </Button>
           </div>
         </div>
       </div>
