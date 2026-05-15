@@ -557,11 +557,15 @@ const DocumentosContratos = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro retornado pela Edge Function (upload existente):', error);
+        throw error;
+      }
       toast.success('Contrato salvo no Dropbox com sucesso!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Dropbox save error:', error);
-      toast.error('Erro ao salvar no Dropbox');
+      const errorMsg = error.message || (typeof error === 'string' ? error : 'Erro desconhecido ao salvar no Dropbox');
+      toast.error(`Erro ao salvar no Dropbox: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
