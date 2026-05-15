@@ -21,7 +21,7 @@ serve(async (req) => {
       console.error('DROPBOX_ACCESS_TOKEN not configured');
       return new Response(JSON.stringify({ error: 'DROPBOX_ACCESS_TOKEN not configured' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 500 
       });
     }
 
@@ -50,7 +50,7 @@ serve(async (req) => {
       console.error('Missing action parameter. Headers:', JSON.stringify(Object.fromEntries(req.headers.entries())));
       return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 400 
       });
     }
 
@@ -113,7 +113,7 @@ serve(async (req) => {
     if (!endpoint) {
       return new Response(JSON.stringify({ error: `Invalid action or endpoint: ${currentAction}` }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 400 
       });
     }
 
@@ -145,15 +145,24 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    
+    if (!response.ok) {
+        console.error(`Dropbox API error: ${response.status}`, JSON.stringify(data));
+        return new Response(
+            JSON.stringify(data),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
+        );
+    }
 
     return new Response(
       JSON.stringify(data),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
+    console.error(`Internal error: ${error.message}`);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
 })
