@@ -72,6 +72,7 @@ const DocumentosContratos = () => {
   const [projetos, setProjetos] = useState<any[]>([]);
   const [briefings, setBriefings] = useState<any[]>([]);
   const [contratos, setContratos] = useState<any[]>([]);
+  const [historico, setHistorico] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dropboxFiles, setDropboxFiles] = useState<any[]>([]);
   const [dropboxLoading, setDropboxLoading] = useState(false);
@@ -165,23 +166,43 @@ const DocumentosContratos = () => {
         { data: lData },
         { data: pData },
         { data: bData },
-        { data: cData }
+        { data: cData },
+        { data: hData }
       ] = await Promise.all([
         supabase.from('leads').select('*').order('nome', { ascending: true }),
         supabase.from('projetos').select('*').order('nome', { ascending: true }),
         supabase.from('briefings').select('*, leads(nome)').order('criado_em', { ascending: false }),
-        supabase.from('contratos').select('*, projetos(nome, nome_cliente)').order('criado_em', { ascending: false })
+        supabase.from('contratos').select('*, projetos(nome, nome_cliente)').order('criado_em', { ascending: false }),
+        supabase.from('contratos_historico').select('*').order('criado_em', { ascending: false }).limit(20)
       ]);
 
       setLeads(lData || []);
       setProjetos(pData || []);
       setBriefings(bData || []);
       setContratos(cData || []);
+      setHistorico(hData || []);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Erro ao carregar documentos');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const logContratoHistorico = async (contratoId: string, numero: string, acao: string, observacao?: string, arquivoUrl?: string) => {
+    try {
+      await supabase.from('contratos_historico').insert({
+        contrato_id: contratoId,
+        numero,
+        acao,
+        observacao,
+        arquivo_url: arquivoUrl
+      });
+      // Refresh history
+      const { data } = await supabase.from('contratos_historico').select('*').order('criado_em', { ascending: false }).limit(20);
+      setHistorico(data || []);
+    } catch (err) {
+      console.error('Error logging history:', err);
     }
   };
 
@@ -372,7 +393,7 @@ const DocumentosContratos = () => {
       if (!docxBlob) return;
 
       // Save to Supabase
-      const { error } = await supabase.from('contratos').insert({
+      const { data: newContract, error } = await supabase.from('contratos').insert({
         numero: contractFormData.numero,
         lead_id: selectedLeadId,
         cliente_nome: contractFormData.cliente.nome,
@@ -382,9 +403,13 @@ const DocumentosContratos = () => {
         prazos: contractFormData.prazos,
         valores: contractFormData.honorarios,
         status: 'Gerado'
-      });
+      }).select().single();
 
       if (error) throw error;
+      
+      if (newContract) {
+        await logContratoHistorico(newContract.id, newContract.numero, 'GERADO', `Contrato gerado para ${newContract.cliente_nome}`);
+      }
       
       toast.success('Contrato gerado e registrado com sucesso!');
       
@@ -441,6 +466,8 @@ const DocumentosContratos = () => {
       a.download = `${contract.numero} - ${contract.cliente_nome}.docx`;
       a.click();
       URL.revokeObjectURL(url);
+      
+      await logContratoHistorico(contract.id, contract.numero, 'DOWNLOAD', `Download do contrato por ${contract.cliente_nome}`);
     } catch (error) {
       console.error('Error downloading contract:', error);
       toast.error('Erro ao baixar contrato');
@@ -489,6 +516,13 @@ const DocumentosContratos = () => {
         console.error('Erro retornado pela Edge Function (upload):', error);
         throw error;
       }
+
+      // Encontrar o contrato correspondente para logar no histórico
+      const contrato = contratos.find(c => c.numero === contractFormData.numero);
+      if (contrato) {
+        await logContratoHistorico(contrato.id, contrato.numero, 'DROPBOX', `Contrato salvo no Dropbox: ${path}`, path);
+      }
+
       toast.success('Contrato salvo no Dropbox com sucesso!');
     } catch (error: any) {
       console.error('Dropbox save error:', error);
@@ -591,7 +625,9 @@ const DocumentosContratos = () => {
         .eq('id', contractToCancel.id);
 
       if (error) throw error;
-
+      
+      await logContratoHistorico(contractToCancel.id, contractToCancel.numero, 'CANCELADO', `Cancelado: ${categoriaCancelamento === 'Outro' ? outroMotivo : categoriaCancelamento} - ${motivoCancelamento}`);
+      
       toast.success('Contrato cancelado com sucesso');
       setIsCancelModalOpen(false);
       setContractToCancel(null);
@@ -1013,6 +1049,80 @@ const DocumentosContratos = () => {
                     Nenhum projeto encontrado para exibir checklist.
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Version Timeline Section */}
+            <div className="mt-16 space-y-8">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <RefreshCw className="text-bronze" size={20} />
+                <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">LINHA DO TEMPO DE VERSÕES</h2>
+              </div>
+              
+              <div className="bg-[#242220] border border-white/10 p-0 overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="border-b border-white/5 bg-white/[0.02]">
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Data/Hora</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Contrato</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Ação</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Detalhes</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40 text-right">Arquivo</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {historico.map((h) => (
+                        <tr key={h.id} className="hover:bg-white/[0.01] transition-colors group">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2 text-[11px] text-white/60">
+                              <Calendar size={12} className="text-white/20" />
+                              {format(new Date(h.criado_em), 'dd/MM/yyyy HH:mm')}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-[11px] font-bold text-bronze uppercase tracking-wider">{h.numero}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Badge className={cn(
+                              "text-[8px] uppercase tracking-widest rounded-none px-2",
+                              h.acao === 'GERADO' && "bg-blue-500/10 text-blue-400 border-blue-500/20",
+                              h.acao === 'DOWNLOAD' && "bg-purple-500/10 text-purple-400 border-purple-500/20",
+                              h.acao === 'DROPBOX' && "bg-green-500/10 text-green-400 border-green-500/20",
+                              h.acao === 'CANCELADO' && "bg-red-500/10 text-red-400 border-red-500/20"
+                            )}>
+                              {h.acao}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-[11px] text-white/50 max-w-xs truncate" title={h.observacao}>
+                              {h.observacao}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {h.arquivo_url && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 text-[9px] uppercase tracking-widest text-bronze hover:text-white hover:bg-bronze px-2"
+                                onClick={() => window.open(`https://www.dropbox.com/home${h.arquivo_url}`, '_blank')}
+                              >
+                                <ExternalLink size={12} className="mr-1.5" /> Ver no Dropbox
+                              </Button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                      {historico.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-12 text-center text-white/20 italic text-[11px]">
+                            Nenhum histórico registrado ainda.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </TabsContent>

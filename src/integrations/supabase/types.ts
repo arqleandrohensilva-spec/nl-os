@@ -163,6 +163,44 @@ export type Database = {
           },
         ]
       }
+      contratos_historico: {
+        Row: {
+          acao: string
+          arquivo_url: string | null
+          contrato_id: string | null
+          criado_em: string
+          id: string
+          numero: string
+          observacao: string | null
+        }
+        Insert: {
+          acao: string
+          arquivo_url?: string | null
+          contrato_id?: string | null
+          criado_em?: string
+          id?: string
+          numero: string
+          observacao?: string | null
+        }
+        Update: {
+          acao?: string
+          arquivo_url?: string | null
+          contrato_id?: string | null
+          criado_em?: string
+          id?: string
+          numero?: string
+          observacao?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_historico_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custos_escritorio: {
         Row: {
           ativo: boolean | null
