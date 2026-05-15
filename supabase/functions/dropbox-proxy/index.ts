@@ -1,10 +1,42 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, dropbox-api-arg, x-action',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+}
+
+async function refreshDropboxToken() {
+  const refreshToken = Deno.env.get('DROPBOX_REFRESH_TOKEN');
+  const clientId = Deno.env.get('DROPBOX_CLIENT_ID');
+  const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET');
+
+  if (!refreshToken || !clientId || !clientSecret) {
+    return null;
+  }
+
+  try {
+    const response = await fetch('https://api.dropbox.com/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+        client_id: clientId,
+        client_secret: clientSecret,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.access_token) {
+      return data.access_token;
+    }
+  } catch (error) {
+    console.error('Error refreshing Dropbox token:', error);
+  }
+  return null;
 }
 
 serve(async (req) => {
@@ -16,45 +48,47 @@ serve(async (req) => {
   }
 
   try {
-    const dropboxToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
+    let dropboxToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
+    
+    // Attempt refresh if token is likely expired or not present
     if (!dropboxToken) {
-      console.error('DROPBOX_ACCESS_TOKEN not configured');
-      return new Response(JSON.stringify({ error: 'DROPBOX_ACCESS_TOKEN not configured' }), { 
+      dropboxToken = await refreshDropboxToken();
+    }
+
+    if (!dropboxToken) {
+      console.error('DROPBOX_ACCESS_TOKEN not configured and could not refresh');
+      return new Response(JSON.stringify({ 
+        error: 'Dropbox access token expired or not configured', 
+        details: 'O token do Dropbox expirou. Por favor, configure DROPBOX_REFRESH_TOKEN, DROPBOX_CLIENT_ID e DROPBOX_CLIENT_SECRET para renovação automática.' 
+      }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 401 
       });
     }
 
     let bodyJson: any = {};
     const contentType = req.headers.get('content-type') || '';
-    console.log(`Content-Type: ${contentType}`);
-
+    
     if (req.method === 'POST') {
       if (contentType.includes('application/json')) {
         try {
           bodyJson = await req.json();
-          console.log('Body JSON carregado:', JSON.stringify(bodyJson));
         } catch (e) {
           console.error('Erro ao ler JSON do body:', e.message);
         }
-      } else if (contentType.includes('application/octet-stream')) {
-        console.log('Recebendo binário (upload)');
       }
     }
 
     const action = req.headers.get('x-action');
     const currentAction = action || bodyJson.action;
-    console.log(`Action detectada: ${currentAction}`);
 
     if (!currentAction) {
-      console.error('Missing action parameter. Headers:', JSON.stringify(Object.fromEntries(req.headers.entries())));
       return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
       });
     }
 
-    // Default path validation
     const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
     const folder = bodyJson.folder || "";
 
@@ -95,7 +129,7 @@ serve(async (req) => {
       
       headers['Dropbox-API-Arg'] = dropboxArg;
       headers['Content-Type'] = 'application/octet-stream';
-      body = req.body; // Stream the body directly to Dropbox
+      body = req.body; 
     } else if (currentAction === 'delete') {
       endpoint = 'https://api.dropboxapi.com/2/files/delete_v2';
       headers['Content-Type'] = 'application/json';
@@ -111,43 +145,58 @@ serve(async (req) => {
     }
 
     if (!endpoint) {
-      return new Response(JSON.stringify({ error: `Invalid action or endpoint: ${currentAction}` }), { 
+      return new Response(JSON.stringify({ error: `Invalid action: ${currentAction}` }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
       });
     }
 
-    const response = await fetch(endpoint, {
+    let response = await fetch(endpoint, {
       method: 'POST',
       headers,
       body
     });
 
+    // If 401, try to refresh once if we have credentials
+    if (response.status === 401) {
+      console.log('Token expired, attempting refresh...');
+      const newToken = await refreshDropboxToken();
+      if (newToken) {
+        console.log('Token refreshed successfully. Retrying request...');
+        headers['Authorization'] = `Bearer ${newToken}`;
+        // Note: For 'upload' with body as stream, retrying might be tricky because the stream might be consumed.
+        // For other actions it's fine.
+        if (currentAction !== 'upload') {
+          response = await fetch(endpoint, {
+            method: 'POST',
+            headers,
+            body
+          });
+        }
+      }
+    }
+
     if (currentAction === 'download') {
       const blob = await response.blob();
-      const contentType = response.headers.get('Content-Type') || 'application/octet-stream';
-      
-      console.log(`Download finalizado. Content-Type: ${contentType}, Size: ${blob.size}`);
+      const responseContentType = response.headers.get('Content-Type') || 'application/octet-stream';
       
       if (!response.ok) {
         const errorText = await blob.text();
-        console.error(`Erro no download do Dropbox: ${response.status} - ${errorText}`);
         return new Response(
-          JSON.stringify({ error: `Dropbox download failed: ${response.status}`, details: errorText }),
+          JSON.stringify({ error: `Dropbox failed: ${response.status}`, details: errorText }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
         );
       }
 
       return new Response(
         blob,
-        { headers: { ...corsHeaders, 'Content-Type': contentType }, status: 200 }
+        { headers: { ...corsHeaders, 'Content-Type': responseContentType }, status: 200 }
       )
     }
 
     const data = await response.json();
     
     if (!response.ok) {
-        console.error(`Dropbox API error: ${response.status}`, JSON.stringify(data));
         return new Response(
             JSON.stringify(data),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
