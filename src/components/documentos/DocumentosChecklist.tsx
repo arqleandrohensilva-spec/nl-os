@@ -228,11 +228,16 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
   useEffect(() => {
     if (items.length > 0) {
       const allReceived = items.every(i => i.status === 'RECEBIDO');
-      if (allReceived) {
+      
+      if (allReceived && !isFirstLoad) {
         toast.info(`Documentação do projeto ${projeto.nome} está completa. Pronto para iniciar.`, {
           duration: 5000,
           icon: <CheckCircle2 className="text-green-500" />
         });
+      }
+      
+      if (isFirstLoad) {
+        setIsFirstLoad(false);
       }
     }
   }, [items]);
