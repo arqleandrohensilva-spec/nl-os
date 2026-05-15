@@ -252,15 +252,40 @@ const DocumentosContratos = () => {
       });
 
       if (response.error) {
-        console.error('Erro retornado pela Edge Function:', response.error);
-        throw response.error;
+        console.error('Erro de rede na Edge Function:', response.error);
+        throw new Error(`Erro de rede: ${response.error.message || 'Falha ao conectar com a Edge Function'}`);
       }
       
       if (!response.data) {
-        throw new Error('Response data is empty');
+        throw new Error('A resposta da Edge Function está vazia');
       }
 
-      const arrayBuffer = await response.data.arrayBuffer();
+      // Check for Dropbox errors returned as JSON even if status is 200
+      if (response.data.error) {
+        console.error('Erro retornado pelo Dropbox:', response.data.error);
+        const errorMsg = typeof response.data.error === 'string' 
+          ? response.data.error 
+          : (response.data.error_summary || response.data.error.message || JSON.stringify(response.data.error));
+        
+        if (errorMsg.includes('expired_access_token')) {
+          throw new Error('O token do Dropbox expirou. Por favor, atualize o DROPBOX_ACCESS_TOKEN nas configurações.');
+        }
+        throw new Error(`Erro no Dropbox: ${errorMsg}`);
+      }
+
+      // At this point response.data should be a Blob if everything went well
+      // because our Edge Function returns a Blob for 'download' action.
+      // However, supabase.functions.invoke might return a Blob or an object.
+      let arrayBuffer: ArrayBuffer;
+      if (response.data instanceof Blob) {
+        arrayBuffer = await response.data.arrayBuffer();
+      } else if (response.data instanceof ArrayBuffer) {
+        arrayBuffer = response.data;
+      } else {
+        console.error('Tipo de dado inesperado recebido:', typeof response.data);
+        throw new Error('Formato de arquivo inválido recebido do Dropbox');
+      }
+
       const zip = new PizZip(arrayBuffer);
       
       // 1. First, perform manual replacement for placeholders that don't follow the {TAG} format
