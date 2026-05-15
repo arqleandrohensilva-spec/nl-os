@@ -57,6 +57,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DocumentosChecklist from '@/components/documentos/DocumentosChecklist';
 import {
   Select,
   SelectContent,
