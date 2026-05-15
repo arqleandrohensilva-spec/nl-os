@@ -296,6 +296,53 @@ export type Database = {
           },
         ]
       }
+      documentos_checklist: {
+        Row: {
+          categoria: string
+          criado_em: string
+          data_recebimento: string | null
+          id: string
+          item: string
+          observacao: string | null
+          projeto_id: string | null
+          status: string
+          updated_at: string
+          url_arquivo: string | null
+        }
+        Insert: {
+          categoria: string
+          criado_em?: string
+          data_recebimento?: string | null
+          id?: string
+          item: string
+          observacao?: string | null
+          projeto_id?: string | null
+          status?: string
+          updated_at?: string
+          url_arquivo?: string | null
+        }
+        Update: {
+          categoria?: string
+          criado_em?: string
+          data_recebimento?: string | null
+          id?: string
+          item?: string
+          observacao?: string | null
+          projeto_id?: string | null
+          status?: string
+          updated_at?: string
+          url_arquivo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_checklist_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       financeiro_parcelas: {
         Row: {
           agendamento_cobranca: Json | null
