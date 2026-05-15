@@ -16,7 +16,8 @@ import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
-
+import DropboxCallback from "./pages/DropboxCallback.tsx";
+import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
 
 const queryClient = new QueryClient();
 
@@ -36,8 +37,9 @@ const App = () => (
         <Route path="/projetos/detalhe/:id" element={<ProtectedRoute><ProjetoDetalhe /></ProtectedRoute>} />
         <Route path="/financeiro/projetos" element={<ProtectedRoute><FinanceiroProjetos /></ProtectedRoute>} />
         <Route path="/propostas/documentos" element={<ProtectedRoute><DocumentosContratos /></ProtectedRoute>} />
-
         <Route path="/propostas/tracking" element={<ProtectedRoute><PropostasTracking /></ProtectedRoute>} />
+        <Route path="/sistema/configuracoes" element={<ProtectedRoute><ConfiguracoesSistema /></ProtectedRoute>} />
+        <Route path="/dropbox-callback" element={<DropboxCallback />} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
       </Routes>
     </BrowserRouter>

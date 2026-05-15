@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3 } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -228,6 +228,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('MARKETING')}
         >
           <div />
+        </SectionAccordion>
+
+        <SectionAccordion 
+          label="SISTEMA" 
+          icon={<Settings size={14} />}
+          isOpen={!!openSections['SISTEMA']}
+          onToggle={() => toggleSection('SISTEMA')}
+        >
+          <NavItem 
+            label="09 · Configurações" 
+            active={location.pathname === '/sistema/configuracoes'} 
+            onClick={() => navigate('/sistema/configuracoes')} 
+          />
         </SectionAccordion>
       </div>
 
