@@ -653,8 +653,9 @@ const DocumentosContratos = () => {
 
       if (error) throw error;
       window.open(data.link, '_blank');
-    } catch (error) {
-      toast.error('Erro ao baixar arquivo do Dropbox');
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast.error(`Erro ao baixar arquivo do Dropbox: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
