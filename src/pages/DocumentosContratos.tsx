@@ -57,6 +57,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import DocumentosChecklist from '@/components/documentos/DocumentosChecklist';
 import {
   Select,
   SelectContent,
@@ -994,6 +995,25 @@ const DocumentosContratos = () => {
                   Nenhum contrato gerado.
                 </div>
               )}
+            </div>
+
+            {/* Checklist de Documentos Section */}
+            <div className="mt-12 space-y-8">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <ClipboardList className="text-bronze" size={20} />
+                <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">CHECKLIST DE DOCUMENTAÇÃO</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-8">
+                {projetos.map((p) => (
+                  <DocumentosChecklist key={p.id} projeto={p} />
+                ))}
+                {projetos.length === 0 && (
+                  <div className="bg-[#242220] border border-white/10 p-10 text-center text-white/20 italic">
+                    Nenhum projeto encontrado para exibir checklist.
+                  </div>
+                )}
+              </div>
             </div>
           </TabsContent>
 
