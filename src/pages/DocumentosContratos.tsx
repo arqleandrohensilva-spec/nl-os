@@ -626,7 +626,7 @@ const DocumentosContratos = () => {
 
       if (error) throw error;
       
-      await logContratoHistorico(contractToCancel.id, contractToCancel.numero, 'CANCELADO', `Cancelado: ${motivoFinal}`);
+      await logContratoHistorico(contractToCancel.id, contractToCancel.numero, 'CANCELADO', `Cancelado: ${categoriaCancelamento === 'Outro' ? outroMotivo : categoriaCancelamento} - ${motivoCancelamento}`);
       
       toast.success('Contrato cancelado com sucesso');
       setIsCancelModalOpen(false);
