@@ -104,6 +104,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
     getAuthUser();
   }, []);
 
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/financeiro/base' || path === '/projetos/horas' || path === '/financeiro/projetos') {
+      setOpenSections(prev => ({ ...prev, 'FINANCEIRO': true }));
+    } else if (path === '/projetos/gestao' || path.startsWith('/projetos/detalhe/')) {
+      setOpenSections(prev => ({ ...prev, 'PROJETOS': true }));
+    } else if (path.startsWith('/propostas/')) {
+      setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
+    } else if (path === '/sistema/configuracoes') {
+      setOpenSections(prev => ({ ...prev, 'SISTEMA': true }));
+    }
+  }, [location.pathname]);
+
   const toggleSection = (section: string) => {
     setOpenSections(prev => {
       const next = { ...prev, [section]: !prev[section] };
