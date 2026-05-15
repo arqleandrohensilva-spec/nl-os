@@ -270,7 +270,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
               <span>Progresso</span>
               <span>{Math.round(porcentagem)}%</span>
             </div>
-            <Progress value={porcentagem} className="h-1 bg-white/5" />
+            <Progress value={porcentagem} className="h-1 bg-white/5" indicatorClassName="bg-bronze" />
           </div>
         </div>
       </div>
