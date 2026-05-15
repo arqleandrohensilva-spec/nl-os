@@ -16,7 +16,8 @@ import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
-
+import DropboxCallback from "./pages/DropboxCallback.tsx";
+import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
 
 const queryClient = new QueryClient();
 
