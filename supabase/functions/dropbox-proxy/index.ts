@@ -18,25 +18,39 @@ serve(async (req) => {
   try {
     const dropboxToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
     if (!dropboxToken) {
+      console.error('DROPBOX_ACCESS_TOKEN not configured');
       return new Response(JSON.stringify({ error: 'DROPBOX_ACCESS_TOKEN not configured' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 500 
       });
     }
 
-    // For backward compatibility or simpler calls
     let bodyJson: any = {};
-    if (req.method === 'POST' && req.headers.get('content-type')?.includes('application/json')) {
-      bodyJson = await req.json();
+    const contentType = req.headers.get('content-type') || '';
+    console.log(`Content-Type: ${contentType}`);
+
+    if (req.method === 'POST') {
+      if (contentType.includes('application/json')) {
+        try {
+          bodyJson = await req.json();
+          console.log('Body JSON carregado:', JSON.stringify(bodyJson));
+        } catch (e) {
+          console.error('Erro ao ler JSON do body:', e.message);
+        }
+      } else if (contentType.includes('application/octet-stream')) {
+        console.log('Recebendo binário (upload)');
+      }
     }
 
     const action = req.headers.get('x-action');
     const currentAction = action || bodyJson.action;
+    console.log(`Action detectada: ${currentAction}`);
 
     if (!currentAction) {
+      console.error('Missing action parameter. Headers:', JSON.stringify(Object.fromEntries(req.headers.entries())));
       return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 400 
       });
     }
 
@@ -99,7 +113,7 @@ serve(async (req) => {
     if (!endpoint) {
       return new Response(JSON.stringify({ error: `Invalid action or endpoint: ${currentAction}` }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+        status: 400 
       });
     }
 
@@ -120,7 +134,7 @@ serve(async (req) => {
         console.error(`Erro no download do Dropbox: ${response.status} - ${errorText}`);
         return new Response(
           JSON.stringify({ error: `Dropbox download failed: ${response.status}`, details: errorText }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
         );
       }
 
@@ -131,15 +145,24 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    
+    if (!response.ok) {
+        console.error(`Dropbox API error: ${response.status}`, JSON.stringify(data));
+        return new Response(
+            JSON.stringify(data),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
+        );
+    }
 
     return new Response(
       JSON.stringify(data),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
+    console.error(`Internal error: ${error.message}`);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
 })
