@@ -95,9 +95,9 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
           .select();
 
         if (insertError) throw insertError;
-        setItems(insertedData || []);
+        setItems((insertedData as ChecklistItem[]) || []);
       } else {
-        setItems(data);
+        setItems(data as ChecklistItem[]);
       }
     } catch (error) {
       console.error('Error fetching checklist:', error);
