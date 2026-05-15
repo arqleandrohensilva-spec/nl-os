@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -6,16 +7,31 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
-async function refreshDropboxToken() {
-  const refreshToken = Deno.env.get('DROPBOX_REFRESH_TOKEN');
+async function getDropboxTokens(supabaseClient: any) {
+  const { data, error } = await supabaseClient
+    .from('dropbox_settings')
+    .select('*')
+    .eq('id', '00000000-0000-0000-0000-000000000001')
+    .single()
+  
+  if (error || !data) {
+    console.error('Error fetching Dropbox tokens from DB:', error)
+    return null
+  }
+  return data
+}
+
+async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
   const clientId = Deno.env.get('DROPBOX_CLIENT_ID');
   const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET');
 
   if (!refreshToken || !clientId || !clientSecret) {
+    console.error('Missing credentials for refresh:', { hasRefreshToken: !!refreshToken, hasClientId: !!clientId, hasClientSecret: !!clientSecret })
     return null;
   }
 
   try {
+    console.log('Refreshing Dropbox token...')
     const response = await fetch('https://api.dropbox.com/oauth2/token', {
       method: 'POST',
       headers: {
@@ -31,7 +47,24 @@ async function refreshDropboxToken() {
 
     const data = await response.json();
     if (data.access_token) {
+      console.log('Token refreshed successfully')
+      // Update database
+      const updateData: any = {
+        access_token: data.access_token,
+        updated_at: new Date().toISOString(),
+      }
+      if (data.expires_in) {
+        updateData.expires_at = new Date(Date.now() + data.expires_in * 1000).toISOString()
+      }
+
+      await supabaseClient
+        .from('dropbox_settings')
+        .update(updateData)
+        .eq('id', '00000000-0000-0000-0000-000000000001')
+
       return data.access_token;
+    } else {
+      console.error('Refresh response did not contain access_token:', data)
     }
   } catch (error) {
     console.error('Error refreshing Dropbox token:', error);
@@ -41,29 +74,39 @@ async function refreshDropboxToken() {
 
 serve(async (req) => {
   const { method, url } = req;
-  console.log(`[${new Date().toISOString()}] Recebendo requisição: ${method} ${url}`);
   
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    let dropboxToken = Deno.env.get('DROPBOX_ACCESS_TOKEN');
-    
-    // Attempt refresh if token is likely expired or not present
-    if (!dropboxToken) {
-      dropboxToken = await refreshDropboxToken();
-    }
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
 
-    if (!dropboxToken) {
-      console.error('DROPBOX_ACCESS_TOKEN not configured and could not refresh');
+    const settings = await getDropboxTokens(supabaseClient)
+    
+    if (!settings?.access_token) {
       return new Response(JSON.stringify({ 
-        error: 'Dropbox access token expired or not configured', 
-        details: 'O token do Dropbox expirou. Por favor, configure DROPBOX_REFRESH_TOKEN, DROPBOX_CLIENT_ID e DROPBOX_CLIENT_SECRET para renovação automática.' 
+        error: 'Dropbox connection not configured', 
+        details: 'Por favor, conecte o Dropbox nas configurações do sistema.' 
       }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401 
       });
+    }
+
+    let dropboxToken = settings.access_token
+
+    // Check if token is expired (buffer of 5 minutes)
+    const isExpired = settings.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000)
+    
+    if (isExpired && settings.refresh_token) {
+      const refreshedToken = await refreshDropboxToken(supabaseClient, settings.refresh_token)
+      if (refreshedToken) {
+        dropboxToken = refreshedToken
+      }
     }
 
     let bodyJson: any = {};
@@ -74,15 +117,14 @@ serve(async (req) => {
         try {
           bodyJson = await req.json();
         } catch (e) {
-          console.error('Erro ao ler JSON do body:', e.message);
+          // Body might not be JSON
         }
       }
     }
 
-    const action = req.headers.get('x-action');
-    const currentAction = action || bodyJson.action;
+    const action = req.headers.get('x-action') || bodyJson.action;
 
-    if (!currentAction) {
+    if (!action) {
       return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
@@ -98,7 +140,7 @@ serve(async (req) => {
       'Authorization': `Bearer ${dropboxToken}`,
     };
 
-    if (currentAction === 'list_folder') {
+    if (action === 'list_folder') {
       endpoint = 'https://api.dropboxapi.com/2/files/list_folder';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({
@@ -110,42 +152,42 @@ serve(async (req) => {
         include_mounted_folders: true,
         include_non_downloadable_files: true
       });
-    } else if (currentAction === 'get_temporary_link') {
+    } else if (action === 'get_temporary_link') {
       endpoint = 'https://api.dropboxapi.com/2/files/get_temporary_link';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path });
-    } else if (currentAction === 'create_folder') {
+    } else if (action === 'create_folder') {
       endpoint = 'https://api.dropboxapi.com/2/files/create_folder_v2';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path: folder || path, autorename: false });
-    } else if (currentAction === 'create_shared_link') {
+    } else if (action === 'create_shared_link') {
       endpoint = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path, settings: { requested_visibility: 'public' } });
-    } else if (currentAction === 'upload') {
+    } else if (action === 'upload') {
       endpoint = 'https://content.dropboxapi.com/2/files/upload';
       const dropboxArg = req.headers.get('dropbox-api-arg');
       if (!dropboxArg) throw new Error('Missing dropbox-api-arg header for upload');
-      
       headers['Dropbox-API-Arg'] = dropboxArg;
       headers['Content-Type'] = 'application/octet-stream';
+      // For upload, we might need to handle the stream carefully if we retry
       body = req.body; 
-    } else if (currentAction === 'delete') {
+    } else if (action === 'delete') {
       endpoint = 'https://api.dropboxapi.com/2/files/delete_v2';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path });
-    } else if (currentAction === 'get_metadata') {
+    } else if (action === 'get_metadata') {
       endpoint = 'https://api.dropboxapi.com/2/files/get_metadata';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path });
-    } else if (currentAction === 'download') {
+    } else if (action === 'download') {
       endpoint = 'https://content.dropboxapi.com/2/files/download';
       headers['Dropbox-API-Arg'] = JSON.stringify({ path });
       body = null;
     }
 
     if (!endpoint) {
-      return new Response(JSON.stringify({ error: `Invalid action: ${currentAction}` }), { 
+      return new Response(JSON.stringify({ error: `Invalid action: ${action}` }), { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
       });
@@ -157,16 +199,13 @@ serve(async (req) => {
       body
     });
 
-    // If 401, try to refresh once if we have credentials
-    if (response.status === 401) {
-      console.log('Token expired, attempting refresh...');
-      const newToken = await refreshDropboxToken();
+    // If 401, try to refresh once
+    if (response.status === 401 && settings.refresh_token) {
+      console.log('Token expired (401), attempting refresh...');
+      const newToken = await refreshDropboxToken(supabaseClient, settings.refresh_token);
       if (newToken) {
-        console.log('Token refreshed successfully. Retrying request...');
         headers['Authorization'] = `Bearer ${newToken}`;
-        // Note: For 'upload' with body as stream, retrying might be tricky because the stream might be consumed.
-        // For other actions it's fine.
-        if (currentAction !== 'upload') {
+        if (action !== 'upload') {
           response = await fetch(endpoint, {
             method: 'POST',
             headers,
@@ -176,7 +215,7 @@ serve(async (req) => {
       }
     }
 
-    if (currentAction === 'download') {
+    if (action === 'download') {
       const blob = await response.blob();
       const responseContentType = response.headers.get('Content-Type') || 'application/octet-stream';
       
@@ -196,16 +235,9 @@ serve(async (req) => {
 
     const data = await response.json();
     
-    if (!response.ok) {
-        return new Response(
-            JSON.stringify(data),
-            { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
-        );
-    }
-
     return new Response(
       JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
     )
   } catch (error) {
     console.error(`Internal error: ${error.message}`);
