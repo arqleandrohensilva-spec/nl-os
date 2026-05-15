@@ -66,6 +66,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
   const [loading, setLoading] = useState(true);
   const [uploadingItem, setUploadingItem] = useState<string | null>(null);
   const [savingObs, setSavingObs] = useState<string | null>(null);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   useEffect(() => {
     fetchChecklist();
