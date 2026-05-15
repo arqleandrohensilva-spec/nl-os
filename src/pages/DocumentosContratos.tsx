@@ -731,9 +731,9 @@ const DocumentosContratos = () => {
       setUploadFile(null);
       
       await fetchProjectFiles(selectedProjetoArquivos.path_display);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error('Erro ao fazer upload do arquivo');
+      toast.error(`Erro ao fazer upload do arquivo: ${error.message || 'Erro desconhecido'}`);
     } finally {
       setUploading(false);
     }
