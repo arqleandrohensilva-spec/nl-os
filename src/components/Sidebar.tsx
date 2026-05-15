@@ -229,6 +229,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         >
           <div />
         </SectionAccordion>
+
+        <SectionAccordion 
+          label="SISTEMA" 
+          icon={<Settings size={14} />}
+          isOpen={!!openSections['SISTEMA']}
+          onToggle={() => toggleSection('SISTEMA')}
+        >
+          <NavItem 
+            label="09 · Configurações" 
+            active={location.pathname === '/sistema/configuracoes'} 
+            onClick={() => navigate('/sistema/configuracoes')} 
+          />
+        </SectionAccordion>
       </div>
 
       <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
