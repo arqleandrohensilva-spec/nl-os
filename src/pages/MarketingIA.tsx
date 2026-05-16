@@ -647,6 +647,45 @@ Retorne APENAS JSON válido neste formato:
                   </CardHeader>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">REFERÊNCIA VISUAL (opcional)</label>
+                      <input 
+                        type="file" 
+                        ref={reelsImageRef} 
+                        className="hidden" 
+                        accept="image/jpeg,image/png,image/webp" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (re) => setReelsImage(re.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                      />
+                      <div 
+                        onClick={() => reelsImageRef.current?.click()} 
+                        className="group relative h-40 border-2 border-dashed border-white/10 hover:border-bronze/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+                      >
+                        {reelsImage ? (
+                          <>
+                            <img src={reelsImage} alt="Preview" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <p className="text-white text-[10px] font-bold uppercase tracking-widest">Alterar Imagem</p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-8 h-8 text-white/20 mb-2 group-hover:text-bronze/50 transition-colors" />
+                            <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest text-center px-4">
+                              Arraste uma foto do ambiente ou clique para selecionar
+                            </p>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-white/20 italic">A IA usa a imagem para contextualizar o roteiro com os detalhes reais do projeto.</p>
+                    </div>
+
+                    <div className="space-y-3">
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">ASSUNTO DO REEL</label>
                       <Textarea 
                         value={reelsSubject} 
