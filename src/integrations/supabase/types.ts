@@ -654,6 +654,7 @@ export type Database = {
           projeto_id: string | null
           respondida_em: string | null
           status: string
+          tipo: string | null
           token: string
           updated_at: string
           video_dropbox_path: string | null
@@ -670,6 +671,7 @@ export type Database = {
           projeto_id?: string | null
           respondida_em?: string | null
           status?: string
+          tipo?: string | null
           token: string
           updated_at?: string
           video_dropbox_path?: string | null
@@ -686,6 +688,7 @@ export type Database = {
           projeto_id?: string | null
           respondida_em?: string | null
           status?: string
+          tipo?: string | null
           token?: string
           updated_at?: string
           video_dropbox_path?: string | null
