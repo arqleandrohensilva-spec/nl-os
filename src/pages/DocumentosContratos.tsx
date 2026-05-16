@@ -799,6 +799,37 @@ const DocumentosContratos = () => {
       toast.error('Erro ao gerar link de compartilhamento');
     }
   };
+  
+  const handleViewFile = async (file: any) => {
+    try {
+      setLoading(true);
+      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+      const isPdf = /\.pdf$/i.test(file.name);
+      
+      if (!isImage && !isPdf) {
+        handleDownloadDropbox(file.path_display);
+        return;
+      }
+      
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_temporary_link', path: file.path_display }
+      });
+      
+      if (error) throw error;
+      
+      setViewerFile({
+        ...file,
+        url: data.link,
+        type: isImage ? 'image' : 'pdf'
+      });
+      setIsViewerOpen(true);
+    } catch (error) {
+      console.error('View error:', error);
+      toast.error('Erro ao abrir visualizador');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateNewProject = async () => {
     if (!newProjectName) return;
