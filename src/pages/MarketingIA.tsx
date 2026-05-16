@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar } from "lucide-react";
+import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
+import { Badge } from "@/components/ui/badge";
 
 interface KnowledgeBaseFile {
   id?: string;
@@ -26,9 +27,21 @@ const MarketingIA = () => {
   const [userInput, setUserInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const [uploading, setUploading] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFileType, setSelectedFileType] = useState<string | null>(null);
   const { toast } = useToast();
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
+
+  const DEFAULT_DOCUMENTS = [
+    { name: "Tom de Voz NL", fileName: "Tom de Voz NL" },
+    { name: "Identidade Cromática", fileName: "Manual de ID Cromática" },
+    { name: "Manual de Tipografia", fileName: "Manuais de Tipografia" },
+    { name: "Perfil do Cliente (Carlos)", fileName: "Meu Cliente (NL)" },
+    { name: "Scripts de Atendimento", fileName: "Scripts - NL" },
+    { name: "Pré-briefing por Linha", fileName: "Pre Briefing - NL" }
+  ];
 
   useEffect(() => {
     fetchKnowledgeBase();
@@ -156,6 +169,73 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         description: error.message
       });
     }
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedFileType) return;
+
+    setUploading(selectedFileType);
+    try {
+      // 1. Upload to Dropbox via proxy
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Content = (e.target?.result as string).split(',')[1];
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+            body: { 
+              action: 'upload',
+              path: `${DROPBOX_PATH}/${file.name}`,
+              content: base64Content
+            }
+          });
+
+          if (error) throw error;
+
+          // 2. Save/Update in Supabase
+          const path = `${DROPBOX_PATH}/${file.name}`.toLowerCase();
+          const { error: dbError } = await supabase
+            .from('base_conhecimento')
+            .upsert({ 
+              file_path: path, 
+              file_name: file.name, 
+              is_active: true 
+            }, { onConflict: 'file_path' });
+
+          if (dbError) throw dbError;
+
+          toast({
+            title: "Arquivo enviado",
+            description: `${file.name} foi carregado e ativado.`
+          });
+
+          fetchKnowledgeBase();
+        } catch (err: any) {
+          toast({
+            variant: "destructive",
+            title: "Erro no upload",
+            description: err.message
+          });
+        } finally {
+          setUploading(null);
+          setSelectedFileType(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro no processamento",
+        description: error.message
+      });
+      setUploading(null);
+    }
+  };
+
+  const triggerUpload = (fileName: string) => {
+    setSelectedFileType(fileName);
+    fileInputRef.current?.click();
   };
 
   const formatSize = (bytes?: number) => {
