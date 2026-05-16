@@ -132,7 +132,7 @@ serve(async (req) => {
       'Authorization': `Bearer ${accessToken}`,
     };
 
-    if (action === 'list_folder') {
+    if (action === 'list_folder' || action === 'list') {
       endpoint = 'https://api.dropboxapi.com/2/files/list_folder';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({
