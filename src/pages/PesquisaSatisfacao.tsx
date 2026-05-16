@@ -159,7 +159,16 @@ const PesquisaSatisfacao = () => {
     );
   }
 
-  if (!survey) return null;
+  if (!survey) {
+    return (
+      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[#242220] p-8 text-center space-y-4 border border-white/5">
+          <h1 className="text-2xl font-bold text-white uppercase tracking-[0.2em] font-cormorant">Link inválido ou expirado</h1>
+          <p className="text-white/40 text-sm uppercase tracking-widest">A pesquisa que você está tentando acessar não existe ou já foi respondida.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#1A1816] text-white font-inter pb-12">
