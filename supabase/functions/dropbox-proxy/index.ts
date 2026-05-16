@@ -228,11 +228,12 @@ serve(async (req) => {
       }
 
       // If 401, try to refresh once
-      if (response.status === 401 && settings.refresh_token) {
+      if (response.status === 401 && refreshToken) {
         console.log('Token expired (401), attempting refresh...');
-        const newToken = await refreshDropboxToken(supabase, settings.refresh_token);
+        const newToken = await refreshDropboxToken(supabase, refreshToken);
         if (newToken) {
           headers['Authorization'] = `Bearer ${newToken}`;
+          // For uploads, we can't easily retry because body is a stream
           if (action !== 'upload') {
             const retryResponse = await fetch(endpoint, {
               method: 'POST',
