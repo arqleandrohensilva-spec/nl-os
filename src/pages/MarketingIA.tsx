@@ -579,6 +579,50 @@ Retorne APENAS JSON válido neste formato:
     }
   };
 
+  const expandContent = async (index: number, originalCaption: string, targetFormat: 'linkedin' | 'blog') => {
+    setExpandingContent(index);
+    try {
+      const systemPrompt = `Você é o CMO virtual da NL Arquitetos. Sua tarefa é transformar uma legenda de Instagram em um ${targetFormat === 'linkedin' ? 'Post de LinkedIn de alta performance' : 'Artigo de Blog otimizado para SEO'}.
+      
+      PARA LINKEDIN:
+      - Tom profissional, executivo e técnico.
+      - Foco em B2B, networking e autoridade de mercado.
+      - Formatação com parágrafos curtos, emojis discretos e bullet points técnicos.
+      
+      PARA BLOG (SEO):
+      - Título atraente com palavras-chave.
+      - Estrutura com Introdução, Desenvolvimento Técnico e Conclusão.
+      - Foco em educar o cliente sobre processos de arquitetura.
+      - Tom de especialista.
+      
+      DIRETRIZES DA NL: ${guidelines}`;
+
+      const prompt = `TRANSFORME ESTA LEGENDA EM UM ${targetFormat.toUpperCase()}:\n\n${originalCaption}`;
+
+      const aiResponse = await supabase.functions.invoke('ai-advisor', {
+        body: { prompt, systemPrompt }
+      });
+
+      if (aiResponse.error) throw new Error(aiResponse.error.message || JSON.stringify(aiResponse.error));
+
+      if (aiResponse.data?.choices?.[0]?.message?.content) {
+        const content = aiResponse.data.choices[0].message.content;
+        setExpandedResults(prev => ({
+          ...prev,
+          [index]: { ...prev[index], [targetFormat]: content }
+        }));
+        toast({
+          title: "Expansão concluída",
+          description: `O conteúdo para ${targetFormat === 'linkedin' ? 'LinkedIn' : 'Blog'} foi gerado.`
+        });
+      }
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Erro na expansão", description: error.message });
+    } finally {
+      setExpandingContent(null);
+    }
+  };
+
   const handleCreateContent = (tema: string, formato: string) => {
     if (formato.toLowerCase().includes('reel')) {
       setReelsSubject(tema);
