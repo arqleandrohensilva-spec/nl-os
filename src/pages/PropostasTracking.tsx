@@ -23,8 +23,13 @@ import {
   LayoutDashboard,
   TrendingUp,
   DollarSign,
-  FileText,
-  Users
+  FileText, 
+  Users,
+  Shield,
+  AlertTriangle,
+  AlertCircle,
+  Ban,
+  ClipboardList
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -32,6 +37,7 @@ import EngagementDashboard from '@/components/EngagementDashboard';
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -95,6 +101,9 @@ const PropostasTracking = () => {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewResult, setReviewResult] = useState<any>(null);
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
@@ -440,6 +449,82 @@ Gere a mensagem de WhatsApp.`;
     setIsDashboardModalOpen(true);
   };
 
+  const handleReviewProposal = async (proposal: Proposal) => {
+    try {
+      setSelectedProposal(proposal);
+      setIsReviewing(true);
+      setReviewResult(null);
+      setIsReviewModalOpen(true);
+
+      const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo e verifique três aspectos:
+
+1. TOM DE VOZ: O texto segue o tom técnico, condutor e centrado no cliente da NL? Identifique trechos que soem como vendedor ansioso, informal ou romantizado.
+
+2. PALAVRAS PROIBIDAS: Verifique se contém alguma dessas palavras ou expressões:
+"casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "design exclusivo", "rapidinho", "baratinho", "método revolucionário", "fórmula secreta", "corre que acaba", "oportunidade única hoje", "sem risco nenhum", "zero problema garantido", "qualquer arquiteto faz isso", "obra sempre tem imprevisto faz parte", "pode confiar a gente resolve"
+
+3. CHECKLIST TÉCNICO: Verifique se a proposta contém:
+- Recapitulação do problema do cliente
+- Solução apresentada claramente  
+- Entregáveis listados
+- Método R.E.S.O.L.V.E. mencionado
+- Investimento apresentado com contexto
+- Próximo passo definido
+- Ausência de urgência artificial ou pressão de venda
+
+PROPOSTA:
+Cliente: ${proposal.cliente}
+Tipo: ${proposal.tipo}
+Objetivo/Conteúdo: ${proposal.objetivo}
+Valor Executivo: R$ ${proposal.valor_executivo}
+Valor Completo: R$ ${proposal.valor_completo}
+
+Retorne APENAS JSON válido:
+{
+  "tom": {
+    "status": "APROVADO" | "ATENÇÃO" | "CORRIGIR",
+    "problemas": [{"trecho": "...", "sugestao": "..."}]
+  },
+  "palavras_proibidas": {
+    "status": "APROVADO" | "ENCONTRADAS",
+    "encontradas": [{"palavra": "...", "contexto": "..."}]
+  },
+  "checklist": {
+    "recapitulacao": true/false,
+    "solucao": true/false,
+    "entregaveis": true/false,
+    "metodo_resolve": true/false,
+    "investimento": true/false,
+    "proximo_passo": true/false,
+    "sem_urgencia": true/false
+  }
+}`;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt, 
+          model: 'claude-sonnet-4-20250514'
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error.message);
+
+      const content = data.choices[0].message.content;
+      // Extract JSON if AI wrapped it in markdown
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content);
+      
+      setReviewResult(result);
+    } catch (error: any) {
+      console.error('Error reviewing proposal:', error);
+      toast.error('Erro ao revisar proposta: ' + error.message);
+      setIsReviewModalOpen(false);
+    } finally {
+      setIsReviewing(false);
+    }
+  };
+
   const toggleEngagement = (id: string) => {
     setExpandedEngagements(prev => ({
       ...prev,
@@ -764,6 +849,14 @@ Gere a mensagem de WhatsApp.`;
 
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
+                        onClick={() => handleReviewProposal(p)}
+                        className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-8 text-[8px] font-bold uppercase tracking-widest shadow-sm"
+                      >
+                        <Shield size={11} className="mr-2" />
+                        Revisar com IA
+                      </Button>
+                      
+                      <Button 
                         variant="outline"
                         size="sm"
                         onClick={() => copyLink(p)}
@@ -772,19 +865,19 @@ Gere a mensagem de WhatsApp.`;
                         <Copy size={11} className="mr-2" />
                         Link
                       </Button>
-                      
-                      <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                        <SelectTrigger className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
-                          <SelectValue placeholder="STATUS" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Enviada">Enviada</SelectItem>
-                          <SelectItem value="Vista">Vista</SelectItem>
-                          <SelectItem value="Aprovada">Aprovada</SelectItem>
-                          <SelectItem value="Recusada">Recusada</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
+                    
+                    <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
+                      <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
+                        <SelectValue placeholder="STATUS" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Enviada">Enviada</SelectItem>
+                        <SelectItem value="Vista">Vista</SelectItem>
+                        <SelectItem value="Aprovada">Aprovada</SelectItem>
+                        <SelectItem value="Recusada">Recusada</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               ))}
@@ -1083,7 +1176,168 @@ Gere a mensagem de WhatsApp.`;
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
+      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-[#E8E4DF]">
+          <DialogHeader className="p-8 bg-graphite text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+              <Shield size={160} />
+            </div>
+            <div className="relative z-10">
+              <p className="text-bronze text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Internal AI Audit</p>
+              <DialogTitle className="text-3xl font-bold font-cormorant uppercase tracking-tight">
+                Revisão de Proposta · NL
+              </DialogTitle>
+              <p className="text-white/50 text-[10px] uppercase tracking-[0.2em] mt-2">
+                Cliente: <span className="text-white">{selectedProposal?.cliente}</span>
+              </p>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8">
+            {isReviewing ? (
+              <div className="py-20 flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="w-10 h-10 text-bronze animate-spin" />
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground animate-pulse">Auditando proposta...</p>
+              </div>
+            ) : reviewResult ? (
+              <>
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <MessageSquare size={14} className="text-bronze" />
+                      Tom de Voz
+                    </h3>
+                    <Badge className={cn(
+                      "rounded-[2px] text-[9px] font-bold uppercase tracking-widest px-2 py-1",
+                      reviewResult.tom.status === 'APROVADO' ? "bg-green-500/10 text-green-600 border-green-500/20" :
+                      reviewResult.tom.status === 'ATENÇÃO' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                      "bg-red-500/10 text-red-600 border-red-500/20"
+                    )}>
+                      {reviewResult.tom.status}
+                    </Badge>
+                  </div>
+                  {reviewResult.tom.problemas.length > 0 ? (
+                    <div className="space-y-3">
+                      {reviewResult.tom.problemas.map((prob: any, i: number) => (
+                        <div key={i} className="bg-white border border-[#F0EDEA] p-4 rounded-[2px] space-y-2">
+                          <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
+                          <p className="text-xs italic text-muted-foreground border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
+                          <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
+                          <p className="text-xs font-medium text-graphite">{prob.sugestao}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">Nenhum desvio de tom encontrado.</p>
+                  )}
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <Ban size={14} className="text-bronze" />
+                      Palavras Proibidas
+                    </h3>
+                    <Badge className={cn(
+                      "rounded-[2px] text-[9px] font-bold uppercase tracking-widest px-2 py-1",
+                      reviewResult.palavras_proibidas.status === 'APROVADO' ? "bg-green-500/10 text-green-600 border-green-500/20" :
+                      "bg-red-500/10 text-red-600 border-red-500/20"
+                    )}>
+                      {reviewResult.palavras_proibidas.status}
+                    </Badge>
+                  </div>
+                  {reviewResult.palavras_proibidas.encontradas.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-2">
+                      {reviewResult.palavras_proibidas.encontradas.map((item: any, i: number) => (
+                        <div key={i} className="flex items-start gap-3 bg-red-50/50 p-3 border border-red-100 rounded-[2px]">
+                          <AlertCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-red-600">"{item.palavra}"</p>
+                            <p className="text-[10px] text-red-400 mt-1">{item.contexto}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">Nenhuma palavra proibida encontrada.</p>
+                  )}
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <ClipboardList size={14} className="text-bronze" />
+                      Checklist Técnico
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      { label: "Recapitulação do problema", key: "recapitulacao" },
+                      { label: "Solução apresentada claramente", key: "solucao" },
+                      { label: "Entregáveis listados", key: "entregaveis" },
+                      { label: "Método R.E.S.O.L.V.E. mencionado", key: "metodo_resolve" },
+                      { label: "Investimento com contexto", key: "investimento" },
+                      { label: "Próximo passo definido", key: "proximo_passo" },
+                      { label: "Sem urgência artificial", key: "sem_urgencia" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-white border border-[#F0EDEA] rounded-[2px]">
+                        <span className="text-[11px] font-medium text-muted-foreground">{item.label}</span>
+                        {reviewResult.checklist[item.key] ? (
+                          <CheckCircle2 size={16} className="text-green-500" />
+                        ) : (
+                          <XCircle size={16} className="text-red-400" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            ) : (
+              <p className="text-center py-10 text-muted-foreground">Erro ao carregar análise.</p>
+            )}
           </div>
+
+          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-[#E8E4DF] flex justify-between items-center sm:justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsReviewModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+            >
+              Fechar
+            </Button>
+            <Button 
+              onClick={() => {
+                if (!reviewResult) return;
+                const text = `RELATÓRIO DE REVISÃO · NL ARQUITETOS
+Cliente: ${selectedProposal?.cliente}
+Data: ${format(new Date(), 'dd/MM/yyyy')}
+
+1. TOM DE VOZ: ${reviewResult.tom.status}
+${reviewResult.tom.problemas.map((p: any) => `- Trecho: "${p.trecho}"\n  Sugestão: ${p.sugestao}`).join('\n')}
+
+2. PALAVRAS PROIBIDAS: ${reviewResult.palavras_proibidas.status}
+${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.palavra}"\n  Contexto: ${p.contexto}`).join('\n')}
+
+3. CHECKLIST TÉCNICO:
+- Recapitulação: ${reviewResult.checklist.recapitulacao ? '✅' : '❌'}
+- Solução: ${reviewResult.checklist.solucao ? '✅' : '❌'}
+- Entregáveis: ${reviewResult.checklist.entregaveis ? '✅' : '❌'}
+- Método R.E.S.O.L.V.E.: ${reviewResult.checklist.metodo_resolve ? '✅' : '❌'}
+- Investimento: ${reviewResult.checklist.investimento ? '✅' : '❌'}
+- Próximo passo: ${reviewResult.checklist.proximo_passo ? '✅' : '❌'}
+- Sem urgência artificial: ${reviewResult.checklist.sem_urgencia ? '✅' : '❌'}`;
+                navigator.clipboard.writeText(text);
+                toast.success('Relatório copiado para a área de transferência');
+              }}
+              disabled={!reviewResult || isReviewing}
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+            >
+              Copiar Relatório
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
         </DialogContent>
       </Dialog>
     </div>
