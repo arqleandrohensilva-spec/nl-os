@@ -295,6 +295,10 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
+      const commonHeaders = {
+        'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
+      };
+
       if (type === 'captions') {
         const currentImage = skipImage ? null : captionImage;
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere 3 opções de legenda para Instagram.
@@ -336,14 +340,11 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
           },
-          headers: {
-            'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
-          }
+          headers: commonHeaders
         });
 
         if (aiResponse.error) {
           const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
-          // If it failed with an image, try one more time without it
           if (currentImage && !skipImage) {
             console.warn("Falha ao processar com imagem, tentando sem imagem...", errorMsg);
             return generateContent(type, true);
@@ -366,7 +367,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
         } else if (aiResponse.data?.error) {
           throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
-          throw new Error("Falha ao gerar legendas. Resposta inválida da IA.");
+          throw new Error("Falha ao gerar legendas.");
         }
       } else if (type === 'reels') {
         const currentImage = skipImage ? null : reelsImage;
@@ -403,9 +404,7 @@ Assunto: ${reelsSubject}`;
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
           },
-          headers: {
-            'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
-          }
+          headers: commonHeaders
         });
 
         if (aiResponse.error) {
@@ -500,8 +499,13 @@ Retorne APENAS JSON válido neste formato:
             systemPrompt, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          }
+          },
+          headers: commonHeaders
         });
+
+        if (aiResponse.error) {
+          throw new Error(`Erro na API: ${aiResponse.error.message || JSON.stringify(aiResponse.error)}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -515,18 +519,27 @@ Retorne APENAS JSON válido neste formato:
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar calendário.");
         }
       } else {
-        const typeLabels: Record<string, string> = {
-          'other': 'Conteúdo Geral'
-        };
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
-        const aiResponse = await supabase.functions.invoke('ai-advisor', { body: { prompt, systemPrompt } });
+        const aiResponse = await supabase.functions.invoke('ai-advisor', { 
+          body: { prompt, systemPrompt },
+          headers: commonHeaders
+        });
+
+        if (aiResponse.error) {
+          throw new Error(`Erro na API: ${aiResponse.error.message || JSON.stringify(aiResponse.error)}`);
+        }
+
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar conteúdo.");
         }
