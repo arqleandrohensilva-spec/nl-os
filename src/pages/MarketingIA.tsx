@@ -71,7 +71,14 @@ const MarketingIA = () => {
   const [calendarFocus, setCalendarFocus] = useState<'CAPTAÇÃO' | 'AUTORIDADE' | 'EDUCAÇÃO' | 'PORTFÓLIO'>('CAPTAÇÃO');
   const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
   const [expandingContent, setExpandingContent] = useState<number | null>(null);
-  const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
+  // History states
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [historyFilter, setHistoryFilter] = useState<'TODOS' | 'LEGENDA' | 'REEL' | 'CALENDARIO'>('TODOS');
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [historySearch, setHistorySearch] = useState("");
+  const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
 
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
