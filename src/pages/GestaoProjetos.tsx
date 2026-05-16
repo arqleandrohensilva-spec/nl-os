@@ -119,6 +119,40 @@ const GestaoProjetos = () => {
     }
   };
 
+  const handleDeleteProject = async (id: string, nomeCliente: string, tipo: string) => {
+    try {
+      setIsDeleting(id);
+      
+      const folderName = `${nomeCliente} - ${tipo}`;
+      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/${folderName}`;
+      
+      console.log("Excluindo pasta do Dropbox:", projectPath);
+      
+      const { error: dropboxError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'delete', path: projectPath }
+      });
+
+      if (dropboxError) {
+        console.warn("Dropbox folder deletion error (might not exist):", dropboxError);
+      }
+
+      const { error } = await supabase
+        .from('projetos')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Projeto excluído com sucesso");
+      fetchData();
+    } catch (error: any) {
+      console.error("Error deleting project:", error);
+      toast.error(`Erro ao excluir projeto: ${error.message}`);
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
   
   const deliveriesThisWeek = Object.values(etapas).flat().filter(e => {
