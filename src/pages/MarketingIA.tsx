@@ -1027,22 +1027,22 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
                                 onClick={() => expandContent(index, option.legenda, 'linkedin')}
                                 disabled={expandingContent !== null}
                               >
-                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
-                                LinkedIn
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3 text-bronze" />}
+                                Expandir para LinkedIn
                               </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
                                 onClick={() => expandContent(index, option.legenda, 'blog')}
                                 disabled={expandingContent !== null}
                               >
-                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
-                                Blog SEO
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3 text-bronze" />}
+                                Criar Artigo de Blog
                               </Button>
                             </div>
                           </div>
