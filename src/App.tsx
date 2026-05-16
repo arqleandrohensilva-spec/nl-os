@@ -21,6 +21,7 @@ import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
 import BriefingPublic from "./pages/BriefingPublic.tsx";
 import SatisfacaoDashboard from "./pages/SatisfacaoDashboard.tsx";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao.tsx";
+import MarketingIA from "./pages/MarketingIA.tsx";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
         <Route path="/briefing/:token" element={<BriefingPublic />} />
         <Route path="/marketing/satisfacao" element={<ProtectedRoute><SatisfacaoDashboard /></ProtectedRoute>} />
         <Route path="/satisfacao/:token" element={<PesquisaSatisfacao />} />
+        <Route path="/marketing/ia" element={<ProtectedRoute><MarketingIA /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
