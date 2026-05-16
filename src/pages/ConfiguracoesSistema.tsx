@@ -51,9 +51,17 @@ const ConfiguracoesSistema = () => {
     
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
     
-    // Usar window.location.href em vez de window.open para garantir o fluxo na mesma aba se preferível,
-    // mas o usuário pediu para "clicar e não ficar branco".
-    window.location.href = authUrl;
+    // Usar window.top.location para evitar problemas de "Refused to connect" em iframes (como o preview)
+    // Se estiver no domínio app.nl.arq.br, window.top é o próprio window.
+    try {
+      if (window.top) {
+        window.top.location.href = authUrl;
+      } else {
+        window.location.href = authUrl;
+      }
+    } catch (e) {
+      window.location.href = authUrl;
+    }
   };
 
   return (
