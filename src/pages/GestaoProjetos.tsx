@@ -374,6 +374,13 @@ const GestaoProjetos = () => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
+
+                <Button 
+                  onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
+                  className="absolute bottom-3 right-3 bg-transparent hover:bg-[#8B7355] hover:text-white text-[#8B7355] border border-[#8B7355]/30 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2"
+                >
+                  <Sparkles size={12} className="fill-current" /> Gerar Conteúdo
+                </Button>
               </div>
             );
           })}
