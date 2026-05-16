@@ -369,6 +369,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
           throw new Error("Falha ao gerar legendas. Resposta inválida da IA.");
         }
       } else if (type === 'reels') {
+        const currentImage = skipImage ? null : reelsImage;
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere um roteiro de Reel para Instagram.
 
 TOM OBRIGATÓRIO: técnico, condutor, direto — nunca romântico ou emocional. O Reel deve educar ou demonstrar autoridade técnica, não vender.
@@ -391,18 +392,30 @@ BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}`;
 
         const prompt = `
-${reelsImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
+${currentImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
 Assunto: ${reelsSubject}`;
 
         const aiResponse = await supabase.functions.invoke('ai-advisor', {
           body: { 
             prompt, 
             systemPrompt, 
-            image: reelsImage,
+            image: currentImage,
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
+          },
+          headers: {
+            'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
           }
         });
+
+        if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar Reel com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(`Erro na API: ${errorMsg}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -412,6 +425,8 @@ Assunto: ${reelsSubject}`;
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar roteiro de Reel.");
         }
