@@ -43,9 +43,7 @@ const ConfiguracoesSistema = () => {
 
   const handleConnectDropbox = () => {
     const clientId = 'zjdj0yszvqy7wvz';
-    // Use the current origin for the redirect URI to support both preview and production
-    const currentOrigin = window.location.origin;
-    const redirectUri = `${currentOrigin}/dropbox-callback`;
+    const redirectUri = 'https://app.nl.arq.br/dropbox-callback';
     
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
     
