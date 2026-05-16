@@ -229,9 +229,44 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
     return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
-  const generateContent = async (type: string) => {
+  const compressImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = () => resolve(base64Str);
+    });
+  };
+
+  const generateContent = async (type: string, skipImage: boolean = false) => {
+    // API Key Check
+    if (!import.meta.env.VITE_ANTHROPIC_API_KEY) {
+      toast({
+        variant: "destructive",
+        title: "Configuração Necessária",
+        description: "Configure a chave VITE_ANTHROPIC_API_KEY nas configurações do projeto."
+      });
+      return;
+    }
+
     setGenerating(true);
-    setGeneratedContent("");
+    if (!skipImage) setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
     if (type === 'reels') setReelsResult(null);
     if (type === 'calendar') setCalendarResult([]);
@@ -261,6 +296,7 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       }
 
       if (type === 'captions') {
+        const currentImage = skipImage ? null : captionImage;
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere 3 opções de legenda para Instagram.
 
 TOM OBRIGATÓRIO: técnico, condutor, centrado no processo — nunca romântico ou emocional. Explique a decisão técnica por trás do projeto, não a estética.
@@ -288,7 +324,7 @@ Retorne APENAS JSON válido neste formato:
 }`;
 
         const prompt = `
-${captionImage ? "Analise a imagem do projeto enviada e baseie a legenda no que você vê — materiais, detalhes construtivos, decisões técnicas visíveis." : ""}
+${currentImage ? "Analise a imagem do projeto enviada e baseie a legenda no que você vê — materiais, detalhes construtivos, decisões técnicas visíveis." : ""}
 ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
 `;
 
@@ -296,11 +332,24 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
           body: { 
             prompt, 
             systemPrompt, 
-            image: captionImage, 
+            image: currentImage, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
+          },
+          headers: {
+            'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
           }
         });
+
+        if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          // If it failed with an image, try one more time without it
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(`Erro na API: ${errorMsg}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -314,8 +363,10 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
-          throw new Error("Falha ao gerar legendas.");
+          throw new Error("Falha ao gerar legendas. Resposta inválida da IA.");
         }
       } else if (type === 'reels') {
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere um roteiro de Reel para Instagram.
