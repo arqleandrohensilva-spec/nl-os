@@ -31,7 +31,7 @@ const DropboxCallback = () => {
           body: { 
             action: 'exchange_token', 
             code,
-            redirectUri: window.location.origin + window.location.pathname
+            redirectUri: 'https://app.nl.arq.br/dropbox-callback'
           }
         });
 
