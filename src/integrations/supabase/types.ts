@@ -334,18 +334,21 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          persona_examples: string | null
           updated_at: string
         }
         Insert: {
           content: string
           created_at?: string
           id?: string
+          persona_examples?: string | null
           updated_at?: string
         }
         Update: {
           content?: string
           created_at?: string
           id?: string
+          persona_examples?: string | null
           updated_at?: string
         }
         Relationships: []

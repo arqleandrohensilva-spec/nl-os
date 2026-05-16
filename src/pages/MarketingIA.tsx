@@ -42,6 +42,7 @@ const MarketingIA = () => {
   const [postType, setPostType] = useState<'FEED' | 'REEL' | 'STORY' | 'CARROSSEL'>('FEED');
   const [captionFocus, setCaptionFocus] = useState<'TÉCNICO' | 'PROCESSO' | 'RESULTADO' | 'EDUCATIVO'>('TÉCNICO');
   const [captionOptions, setCaptionOptions] = useState<Array<{ legenda: string, hashtags: string }>>([]);
+  const [personaExamples, setPersonaExamples] = useState("");
 
   // New states for Reels
   const [reelsSubject, setReelsSubject] = useState("");
@@ -56,6 +57,8 @@ const MarketingIA = () => {
   const [calendarProjects, setCalendarProjects] = useState("");
   const [calendarFocus, setCalendarFocus] = useState<'CAPTAÇÃO' | 'AUTORIDADE' | 'EDUCAÇÃO' | 'PORTFÓLIO'>('CAPTAÇÃO');
   const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
+  const [expandingContent, setExpandingContent] = useState<number | null>(null);
+  const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
 
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
@@ -77,26 +80,28 @@ const MarketingIA = () => {
   const fetchGuidelines = async () => {
     const { data } = await supabase
       .from('diretrizes_marketing')
-      .select('content')
+      .select('content, persona_examples')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (data) {
-      setGuidelines(data.content);
+      setGuidelines(data.content || "");
+      setPersonaExamples(data.persona_examples || "");
     } else {
       const defaultGuidelines = `Nunca usar: casa dos sonhos, projeto dos sonhos, lindo, incrível, luxo, exclusivo.
 Sempre mencionar processo técnico antes de resultado estético.
 Tom: condutor, técnico, direto. Máximo 5 linhas visíveis no Instagram.
 Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       setGuidelines(defaultGuidelines);
+      setPersonaExamples("");
     }
   };
 
   const saveGuidelines = async () => {
     const { error } = await supabase
       .from('diretrizes_marketing')
-      .insert([{ content: guidelines }]);
+      .insert([{ content: guidelines, persona_examples: personaExamples }]);
 
     if (error) {
       toast({
@@ -106,8 +111,8 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       });
     } else {
       toast({
-        title: "Diretrizes salvas",
-        description: "As diretrizes foram atualizadas com sucesso."
+        title: "Configurações salvas",
+        description: "As diretrizes e exemplos de persona foram atualizados."
       });
     }
   };
@@ -302,6 +307,9 @@ REGRAS:
 
 DIRETRIZES DA NL: ${guidelines}
 
+${personaExamples ? `EXEMPLOS DE POSTS QUE DERAM CERTO (SIGA ESTE ESTILO E VOZ):
+${personaExamples}` : ""}
+
 BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}
 
@@ -384,6 +392,9 @@ REGRAS:
 - CTA deve ser consultivo, nunca pressão de venda
 
 DIRETRIZES DA NL: ${guidelines}
+
+${personaExamples ? `EXEMPLOS DE ESTILO (SIGA ESTA VOZ):
+${personaExamples}` : ""}
 
 BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}`;
@@ -568,6 +579,50 @@ Retorne APENAS JSON válido neste formato:
     }
   };
 
+  const expandContent = async (index: number, originalCaption: string, targetFormat: 'linkedin' | 'blog') => {
+    setExpandingContent(index);
+    try {
+      const systemPrompt = `Você é o CMO virtual da NL Arquitetos. Sua tarefa é transformar uma legenda de Instagram em um ${targetFormat === 'linkedin' ? 'Post de LinkedIn de alta performance' : 'Artigo de Blog otimizado para SEO'}.
+      
+      PARA LINKEDIN:
+      - Tom profissional, executivo e técnico.
+      - Foco em B2B, networking e autoridade de mercado.
+      - Formatação com parágrafos curtos, emojis discretos e bullet points técnicos.
+      
+      PARA BLOG (SEO):
+      - Título atraente com palavras-chave.
+      - Estrutura com Introdução, Desenvolvimento Técnico e Conclusão.
+      - Foco em educar o cliente sobre processos de arquitetura.
+      - Tom de especialista.
+      
+      DIRETRIZES DA NL: ${guidelines}`;
+
+      const prompt = `TRANSFORME ESTA LEGENDA EM UM ${targetFormat.toUpperCase()}:\n\n${originalCaption}`;
+
+      const aiResponse = await supabase.functions.invoke('ai-advisor', {
+        body: { prompt, systemPrompt }
+      });
+
+      if (aiResponse.error) throw new Error(aiResponse.error.message || JSON.stringify(aiResponse.error));
+
+      if (aiResponse.data?.choices?.[0]?.message?.content) {
+        const content = aiResponse.data.choices[0].message.content;
+        setExpandedResults(prev => ({
+          ...prev,
+          [index]: { ...prev[index], [targetFormat]: content }
+        }));
+        toast({
+          title: "Expansão concluída",
+          description: `O conteúdo para ${targetFormat === 'linkedin' ? 'LinkedIn' : 'Blog'} foi gerado.`
+        });
+      }
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Erro na expansão", description: error.message });
+    } finally {
+      setExpandingContent(null);
+    }
+  };
+
   const handleCreateContent = (tema: string, formato: string) => {
     if (formato.toLowerCase().includes('reel')) {
       setReelsSubject(tema);
@@ -699,8 +754,21 @@ Retorne APENAS JSON válido neste formato:
                 <Card className="bg-white/[0.02] border-white/5 rounded-none">
                   <CardHeader className="p-4 border-b border-white/5"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Diretrizes Rápidas</CardTitle></CardHeader>
                   <CardContent className="p-4 space-y-4">
-                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Insira as diretrizes para a IA..." className="min-h-[250px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
-                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[11px] font-bold tracking-[0.2em]" onClick={saveGuidelines}>Salvar Diretrizes</Button>
+                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Ex: Nunca usar 'casa dos sonhos', focar no técnico..." className="min-h-[150px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
+                    
+                    <div className="pt-4 border-t border-white/5">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-2 block flex items-center gap-2">
+                        <Sparkles className="w-3 h-3 text-bronze" /> Treinamento de Persona (Exemplos)
+                      </label>
+                      <Textarea 
+                        value={personaExamples} 
+                        onChange={(e) => setPersonaExamples(e.target.value)} 
+                        placeholder="Cole aqui 2 ou 3 posts que performaram muito bem para a IA aprender seu estilo único..." 
+                        className="min-h-[200px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" 
+                      />
+                    </div>
+
+                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[11px] font-bold tracking-[0.2em]" onClick={saveGuidelines}>Salvar Configurações</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -768,7 +836,61 @@ Retorne APENAS JSON válido neste formato:
                       <CardContent className="p-6 pt-8 space-y-4">
                         <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{option.legenda}</div>
                         <div className="text-bronze text-xs font-medium tracking-tight">{option.hashtags}</div>
-                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar</Button></div>
+                        
+                        <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-bold">Expansão Multicanal Premium</span>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                onClick={() => expandContent(index, option.legenda, 'linkedin')}
+                                disabled={expandingContent !== null}
+                              >
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
+                                LinkedIn
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                onClick={() => expandContent(index, option.legenda, 'blog')}
+                                disabled={expandingContent !== null}
+                              >
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
+                                Blog SEO
+                              </Button>
+                            </div>
+                          </div>
+
+                          {expandedResults[index] && (
+                            <div className="space-y-4 animate-in fade-in duration-500">
+                              {expandedResults[index].linkedin && (
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Post para LinkedIn</label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].linkedin!); toast({ title: "Copiado", description: "Post LinkedIn copiado." }); }}>COPIAR</Button>
+                                  </div>
+                                  <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].linkedin}</div>
+                                </div>
+                              )}
+                              {expandedResults[index].blog && (
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Artigo de Blog (SEO)</label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].blog!); toast({ title: "Copiado", description: "Artigo de Blog copiado." }); }}>COPIAR</Button>
+                                  </div>
+                                  <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].blog}</div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex justify-end pt-2 border-t border-white/5">
+                          <Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar Legenda</Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))
