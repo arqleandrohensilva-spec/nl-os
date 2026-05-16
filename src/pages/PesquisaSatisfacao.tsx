@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, Star } from 'lucide-react';
+import { CheckCircle2, Star, Camera, Upload, Square, Play, Trash2, Loader2, Video } from 'lucide-react';
 
 const PesquisaSatisfacao = () => {
   const { token } = useParams();
@@ -19,6 +19,18 @@ const PesquisaSatisfacao = () => {
   const [avaliacaoProcesso, setAvaliacaoProcesso] = useState<string>('');
   const [avaliacaoResultado, setAvaliacaoResultado] = useState<string>('');
   const [comentario, setComentario] = useState('');
+  
+  // Video related state
+  const [isRecording, setIsRecording] = useState(false);
+  const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const videoPreviewRef = React.useRef<HTMLVideoElement>(null);
+  const timerRef = React.useRef<any>(null);
+
 
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -46,7 +58,124 @@ const PesquisaSatisfacao = () => {
     fetchSurvey();
   }, [token, toast]);
 
+  const startRecording = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setStream(mediaStream);
+      
+      const recorder = new MediaRecorder(mediaStream);
+      const chunks: BlobPart[] = [];
+      
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/mp4' });
+        setVideoBlob(blob);
+        setVideoUrl(URL.createObjectURL(blob));
+      };
+      
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => {
+          if (prev >= 60) {
+            stopRecording();
+            return 60;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+
+      if (videoPreviewRef.current) {
+        videoPreviewRef.current.srcObject = mediaStream;
+      }
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      toast({ variant: "destructive", title: "Erro ao acessar câmera", description: "Certifique-se de dar permissão para usar a câmera e o microfone." });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+  };
+
+  const deleteVideo = () => {
+    setVideoBlob(null);
+    setVideoUrl('');
+    setRecordingTime(0);
+  };
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 50 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "Arquivo muito grande", description: "O limite é de 50MB." });
+      return;
+    }
+    
+    setVideoBlob(file);
+    setVideoUrl(URL.createObjectURL(file));
+  };
+
+  const uploadVideoToDropbox = async () => {
+    if (!videoBlob) return { url: null, path: null };
+
+    setIsUploadingVideo(true);
+    try {
+      const fileName = `video_depoimento_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.mp4`;
+      const clientName = survey.cliente_nome || 'Cliente';
+      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${clientName}/06 - Depoimento/${fileName}`;
+
+      const arrayBuffer = await videoBlob.arrayBuffer();
+      const dropboxArg = JSON.stringify({
+        path: destinationPath,
+        mode: 'add',
+        autorename: true,
+        mute: false,
+        strict_conflict: false
+      });
+
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: arrayBuffer,
+        headers: {
+          'x-action': 'upload',
+          'dropbox-api-arg': dropboxArg,
+          'content-type': 'application/octet-stream'
+        }
+      });
+
+      if (error) throw error;
+
+      // Get shared link
+      const { data: shareData, error: shareError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'create_shared_link', path: destinationPath }
+      });
+
+      if (shareError) throw shareError;
+
+      const directUrl = (shareData.url || shareData.link).replace('?dl=0', '?raw=1');
+      
+      return { url: directUrl, path: destinationPath };
+    } catch (error) {
+      console.error('Video upload error:', error);
+      throw error;
+    } finally {
+      setIsUploadingVideo(false);
+    }
+  };
+
   const handleSubmit = async () => {
+
     if (notaGeral === null || !avaliacaoProcesso || !avaliacaoResultado) {
       toast({
         variant: "destructive",
@@ -58,6 +187,15 @@ const PesquisaSatisfacao = () => {
 
     setSubmitting(true);
     try {
+      // 0. Upload video if exists
+      let uploadedVideoUrl = null;
+      let uploadedVideoPath = null;
+      if (videoBlob) {
+        const result = await uploadVideoToDropbox();
+        uploadedVideoUrl = result.url;
+        uploadedVideoPath = result.path;
+      }
+
       // 1. Update survey
       const { error: surveyError } = await supabase
         .from('pesquisas_satisfacao')
@@ -66,6 +204,8 @@ const PesquisaSatisfacao = () => {
           avaliacao_processo: avaliacaoProcesso,
           avaliacao_resultado: avaliacaoResultado,
           comentario,
+          video_url: uploadedVideoUrl,
+          video_dropbox_path: uploadedVideoPath,
           status: 'RESPONDIDA',
           respondida_em: new Date().toISOString()
         })
