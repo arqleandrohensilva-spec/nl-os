@@ -725,35 +725,72 @@ Retorne APENAS JSON válido neste formato:
   const expandContent = async (index: number, originalCaption: string, targetFormat: 'linkedin' | 'blog') => {
     setExpandingContent(index);
     try {
-      const systemPrompt = `Você é o CMO virtual da NL Arquitetos. Sua tarefa é transformar uma legenda de Instagram em um ${targetFormat === 'linkedin' ? 'Post de LinkedIn de alta performance' : 'Artigo de Blog otimizado para SEO'}.
-      
-      PARA LINKEDIN:
-      - Tom profissional, executivo e técnico.
-      - Foco em B2B, networking e autoridade de mercado.
-      - Formatação com parágrafos curtos, emojis discretos e bullet points técnicos.
-      
-      PARA BLOG (SEO):
-      - Título atraente com palavras-chave.
-      - Estrutura com Introdução, Desenvolvimento Técnico e Conclusão.
-      - Foco em educar o cliente sobre processos de arquitetura.
-      - Tom de especialista.
-      
-      DIRETRIZES DA NL: ${guidelines}`;
+      let systemPrompt = "";
+      let prompt = "";
 
-      const prompt = `TRANSFORME ESTA LEGENDA EM UM ${targetFormat.toUpperCase()}:\n\n${originalCaption}`;
+      if (targetFormat === 'linkedin') {
+        systemPrompt = `Você é o CMO virtual da NL Arquitetos. Transforme a legenda do Instagram abaixo em um post profissional para LinkedIn.
+
+DIFERENÇAS DO LINKEDIN:
+- Tom mais formal e analítico que o Instagram
+- Pode ter até 3000 caracteres — desenvolva mais o raciocínio técnico
+- Sem hashtags excessivas — máximo 5, relevantes para arquitetura e mercado imobiliário
+- Abertura forte que gere curiosidade profissional
+- Terminar com pergunta ou reflexão que incentive comentários
+- Público: incorporadoras, investidores, profissionais do setor, clientes de alto padrão
+
+TOM OBRIGATÓRIO: técnico, condutor, autoridade — nunca romantizado.
+DIRETRIZES NL: ${guidelines}`;
+
+        prompt = `LEGENDA INSTAGRAM ORIGINAL:
+${originalCaption}
+
+Gere o post completo para LinkedIn.`;
+      } else {
+        systemPrompt = `Você é o CMO virtual da NL Arquitetos. Transforme a legenda do Instagram abaixo em um artigo técnico para o blog da NL, otimizado para SEO local.
+
+ESTRUTURA DO ARTIGO:
+- Título SEO: incluir "arquiteto São José dos Campos" ou "projeto residencial SJC" naturalmente
+- Introdução: 2 parágrafos expandindo o conceito técnico da legenda
+- Desenvolvimento: 3 seções com subtítulos — aprofunda a decisão técnica, o processo e o resultado
+- Conclusão: reforça o método NL e CTA para contato
+- Meta description: 155 caracteres para SEO
+
+TOM: técnico, educativo, autoridade local. Nunca romantizado.
+PALAVRAS-CHAVE NATURAIS: arquiteto SJC, projeto executivo, compatibilização técnica, São José dos Campos.
+DIRETRIZES NL: ${guidelines}`;
+
+        prompt = `LEGENDA ORIGINAL:
+${originalCaption}
+
+Gere o artigo completo com título, subtítulos e meta description.`;
+      }
 
       const aiResponse = await supabase.functions.invoke('ai-advisor', {
-        body: { prompt, systemPrompt }
+        body: { 
+          prompt, 
+          systemPrompt,
+          model: "claude-sonnet-4-20250514"
+        }
       });
 
       if (aiResponse.error) throw new Error(aiResponse.error.message || JSON.stringify(aiResponse.error));
 
       if (aiResponse.data?.choices?.[0]?.message?.content) {
         const content = aiResponse.data.choices[0].message.content;
+        
         setExpandedResults(prev => ({
           ...prev,
           [index]: { ...prev[index], [targetFormat]: content }
         }));
+
+        setModalContent({
+          title: targetFormat === 'linkedin' ? "Post para LinkedIn" : "Artigo de Blog (SEO)",
+          content: content,
+          type: targetFormat
+        });
+        setShowExpansionModal(true);
+
         toast({
           title: "Expansão concluída",
           description: `O conteúdo para ${targetFormat === 'linkedin' ? 'LinkedIn' : 'Blog'} foi gerado.`
