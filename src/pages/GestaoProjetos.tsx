@@ -163,11 +163,25 @@ const GestaoProjetos = () => {
       if (error) throw error;
 
       if (newStatus === 'Entregue') {
-        toast.success("Projeto entregue!", {
-          description: "Pesquisa de satisfação gerada. Verifique o Módulo 09 para enviar ao cliente."
-        });
+        const projeto = projetos.find(p => p.id === id);
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        
+        const { error: surveyError } = await supabase
+          .from('pesquisas_satisfacao')
+          .insert({
+            projeto_id: id,
+            cliente_nome: projeto?.nome_cliente || 'Cliente',
+            token: token,
+            status: 'PENDENTE'
+          });
+
+        if (!surveyError) {
+          toast.success("Projeto entregue!", {
+            description: "Pesquisa de satisfação gerada. Verifique o Módulo 09 para enviar ao cliente."
+          });
+        }
       }
-      
+
       fetchData();
     } catch (error) {
       console.error('Error updating status:', error);

@@ -211,7 +211,7 @@ const PesquisaSatisfacao = () => {
                 </p>
 
                 <div className="flex gap-3 pt-4 border-t border-white/5">
-                  {dep.status === 'PENDENTE APROVAÇÃO' && (
+                  {dep.status === 'PENDENTE' && (
                     <Button 
                       onClick={() => updateTestimonialStatus(dep.id, 'APROVADO')}
                       className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[9px] font-bold"
