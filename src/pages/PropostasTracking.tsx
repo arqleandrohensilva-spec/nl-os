@@ -24,7 +24,10 @@ import {
   TrendingUp,
   DollarSign,
   FileText,
-  Users
+  Users,
+  Shield,
+  AlertTriangle,
+  AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
