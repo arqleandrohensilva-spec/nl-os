@@ -15,7 +15,8 @@ import {
   MoreVertical,
   Share2,
   ExternalLink,
-  Trash2
+  Trash2,
+  Sparkles
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
