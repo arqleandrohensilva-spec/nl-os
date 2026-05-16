@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, systemPrompt } = await req.json()
+    const { prompt, systemPrompt, image, model, json } = await req.json()
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
 
     if (!LOVABLE_API_KEY) {
@@ -21,6 +21,29 @@ serve(async (req) => {
       )
     }
 
+    const messages = [
+      { role: "system", content: systemPrompt }
+    ];
+
+    if (image) {
+      messages.push({
+        role: "user",
+        content: [
+          { type: "text", text: prompt },
+          {
+            type: "image_url",
+            image_url: {
+              url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
+            }
+          }
+        ]
+      });
+    } else {
+      messages.push({ role: "user", content: prompt });
+    }
+
+    const targetModel = model || "google/gemini-pro"; // Fallback to a stable model
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -28,11 +51,9 @@ serve(async (req) => {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: prompt }
-        ],
+        model: targetModel,
+        messages: messages,
+        ...(json ? { response_format: { type: "json_object" } } : {})
       })
     });
 
