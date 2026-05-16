@@ -40,6 +40,12 @@ const MarketingIA = () => {
   const [captionFocus, setCaptionFocus] = useState<'TÉCNICO' | 'PROCESSO' | 'RESULTADO' | 'EDUCATIVO'>('TÉCNICO');
   const [captionOptions, setCaptionOptions] = useState<Array<{ legenda: string, hashtags: string }>>([]);
 
+  // New states for Reels
+  const [reelsSubject, setReelsSubject] = useState("");
+  const [reelsDuration, setReelsDuration] = useState<'30S' | '60S' | '90S'>('30S');
+  const [reelsFormat, setReelsFormat] = useState<'EDUCATIVO' | 'BASTIDOR' | 'AUTORIDADE'>('EDUCATIVO');
+  const [reelsResult, setReelsResult] = useState<{ gancho: string, desenvolvimento: string[], cta: string } | null>(null);
+
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
 
   const DEFAULT_DOCUMENTS = [
