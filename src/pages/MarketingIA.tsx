@@ -97,7 +97,117 @@ const MarketingIA = () => {
   useEffect(() => {
     fetchKnowledgeBase();
     fetchGuidelines();
+    fetchHistory();
   }, []);
+
+  const fetchHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('historico_conteudo')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setHistoryItems(data || []);
+    } catch (error: any) {
+      console.error("Erro ao buscar histórico:", error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const saveToHistory = async (tipo: 'legenda' | 'reel' | 'calendario', conteudo: any, inputUsado?: string, postTypeUsed?: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('historico_conteudo')
+        .insert([{
+          tipo,
+          conteudo,
+          input_usado: inputUsado,
+          post_type: postTypeUsed,
+          favorito: false
+        }])
+        .select();
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => [data[0], ...prev]);
+      toast({
+        title: "Salvo no histórico",
+        description: "O conteúdo foi guardado na sua biblioteca."
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar no histórico",
+        description: error.message
+      });
+    }
+  };
+
+  const toggleFavorite = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('historico_conteudo')
+        .update({ favorito: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => prev.map(item => 
+        item.id === id ? { ...item, favorito: !currentStatus } : item
+      ));
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao favoritar",
+        description: error.message
+      });
+    }
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('historico_conteudo')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => prev.filter(item => item.id !== id));
+      toast({
+        title: "Item excluído",
+        description: "O conteúdo foi removido do histórico."
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao excluir",
+        description: error.message
+      });
+    }
+  };
+
+  const useAgain = (item: any) => {
+    if (item.tipo === 'legenda') {
+      setCaptionDescription(item.input_usado || "");
+      if (item.post_type) setPostType(item.post_type as any);
+      setCaptionOptions(item.conteudo.opcoes || [item.conteudo]);
+      setActiveTab('captions');
+    } else if (item.tipo === 'reel') {
+      setReelsSubject(item.input_usado || "");
+      setReelsResult(item.conteudo);
+      setActiveTab('reels');
+    }
+    
+    toast({
+      title: "Conteúdo carregado",
+      description: "As configurações foram restauradas na aba correspondente."
+    });
+  };
+
 
   const fetchGuidelines = async () => {
     const { data } = await supabase
