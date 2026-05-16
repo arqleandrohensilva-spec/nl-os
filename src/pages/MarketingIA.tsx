@@ -473,7 +473,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             prompt, 
             systemPrompt, 
             image: currentImage, 
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -549,7 +549,7 @@ Assunto: ${reelsSubject}`;
             prompt, 
             systemPrompt, 
             image: currentImage,
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -658,7 +658,7 @@ Retorne APENAS JSON válido neste formato:
           body: { 
             prompt, 
             systemPrompt, 
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
