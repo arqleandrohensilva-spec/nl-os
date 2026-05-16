@@ -835,6 +835,9 @@ Retorne APENAS JSON válido neste formato:
             <TabsTrigger value="calendar" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <Calendar className="w-3 h-3 mr-2" /> Calendário
             </TabsTrigger>
+            <TabsTrigger value="history" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
+              <History className="w-3 h-3 mr-2" /> Histórico
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="knowledge-base" className="space-y-6 outline-none">
