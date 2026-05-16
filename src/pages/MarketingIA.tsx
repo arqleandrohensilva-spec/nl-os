@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check, Copy, ChevronRight, Clock, Star, Trash2, Search, Filter, ChevronDown, ChevronUp, History } from "lucide-react";
+import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check, Copy, ChevronRight, Clock, Star, Trash2, Search, Filter, ChevronDown, ChevronUp, History, X } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -44,6 +44,37 @@ interface KnowledgeBaseFile {
 
 const MarketingIA = () => {
   const [activeTab, setActiveTab] = useState("knowledge-base");
+  const [marketingContext, setMarketingContext] = useState<any>(null);
+
+  useEffect(() => {
+    const checkContext = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const { data } = await supabase
+        .from('contexto_marketing_ativo')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setMarketingContext(data);
+        if (tabParam === 'captions' || activeTab === 'knowledge-base') {
+          setActiveTab('captions');
+        }
+        
+        // Auto-fill description if it contains context data
+        setCaptionDescription(`Projeto ${data.cliente} · ${data.tipo} · Etapa atual: ${data.etapa_atual} · Status: ${data.status} · Próxima entrega: ${data.proxima_entrega}`);
+      }
+    };
+
+    checkContext();
+  }, []);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<KnowledgeBaseFile[]>([]);
   const [guidelines, setGuidelines] = useState("");
@@ -217,6 +248,26 @@ const MarketingIA = () => {
     });
   };
 
+  const clearMarketingContext = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      await supabase
+        .from('contexto_marketing_ativo')
+        .delete()
+        .eq('user_id', userData.user.id);
+
+      setMarketingContext(null);
+      setCaptionDescription("");
+      toast({
+        title: "Contexto removido",
+        description: "O formulário agora está limpo para novo uso."
+      });
+    } catch (error) {
+      console.error("Erro ao limpar contexto:", error);
+    }
+  };
 
   const fetchGuidelines = async () => {
     const { data } = await supabase
@@ -881,6 +932,22 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           </TabsContent>
 
           <TabsContent value="captions" className="space-y-6 outline-none">
+            {marketingContext && (
+              <div className="bg-[#8B7355] text-white p-4 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-500 mb-6">
+                <div className="flex items-center gap-3">
+                  <Sparkles size={16} className="fill-white" />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em]">
+                    ✦ CONTEXTO CARREGADO · {marketingContext.cliente}
+                  </span>
+                </div>
+                <button 
+                  onClick={clearMarketingContext}
+                  className="hover:bg-white/20 p-1.5 transition-colors rounded-full"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <Card className="bg-white/[0.02] border-white/5 rounded-none">

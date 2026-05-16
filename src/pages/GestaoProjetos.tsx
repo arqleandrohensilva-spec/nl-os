@@ -15,7 +15,8 @@ import {
   MoreVertical,
   Share2,
   ExternalLink,
-  Trash2
+  Trash2,
+  Sparkles
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -188,6 +189,43 @@ const GestaoProjetos = () => {
     }
   };
 
+  const handleGerarConteudo = async (projeto: Projeto, currentEtapaInfo: EtapaInfo | undefined) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const proximaEntregaStr = currentEtapaInfo?.data_entrega 
+        ? format(parseISO(currentEtapaInfo.data_entrega), "dd 'DE' MMM", { locale: ptBR }) 
+        : 'N/A';
+
+      // Clear previous context first
+      await supabase
+        .from('contexto_marketing_ativo')
+        .delete()
+        .eq('user_id', userData.user.id);
+
+      // Insert new context
+      const { error } = await supabase
+        .from('contexto_marketing_ativo')
+        .insert({
+          user_id: userData.user.id,
+          cliente: projeto.nome_cliente,
+          tipo: projeto.tipo,
+          etapa_atual: projeto.etapa_atual,
+          status: currentEtapaInfo?.status || 'Em andamento',
+          proxima_entrega: proximaEntregaStr
+        });
+
+      if (error) throw error;
+
+      navigate('/marketing-ia?tab=captions');
+      toast.success("Contexto enviado para o Marketing IA!");
+    } catch (error: any) {
+      console.error("Erro ao gerar conteúdo:", error);
+      toast.error("Erro ao preparar contexto de marketing");
+    }
+  };
+
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
   
   const deliveriesThisWeek = Object.values(etapas).flat().filter(e => {
@@ -336,6 +374,13 @@ const GestaoProjetos = () => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
+
+                <Button 
+                  onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
+                  className="absolute bottom-3 right-3 bg-transparent hover:bg-[#8B7355] hover:text-white text-[#8B7355] border border-[#8B7355]/30 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2"
+                >
+                  <Sparkles size={12} className="fill-current" /> Gerar Conteúdo
+                </Button>
               </div>
             );
           })}
