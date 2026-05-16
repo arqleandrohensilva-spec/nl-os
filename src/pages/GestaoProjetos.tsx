@@ -174,18 +174,6 @@ const GestaoProjetos = () => {
     }
   };
 
-      if (newStatus === 'Entregue') {
-        toast.success("Projeto entregue!", {
-          description: "Pesquisa de satisfação gerada. Verifique o Módulo 09 para enviar ao cliente."
-        });
-      }
-      
-      fetchData();
-    } catch (error) {
-      console.error('Error updating status:', error);
-    }
-  };
-
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
   
   const deliveriesThisWeek = Object.values(etapas).flat().filter(e => {
