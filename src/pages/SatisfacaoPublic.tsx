@@ -75,7 +75,8 @@ const SatisfacaoPublic = () => {
 
       // 2. Logic for Promoters (>= 9)
       if (notaGeral >= 9) {
-        const textoDepoimento = `"${comentario || 'Sem comentários.'}" — ${survey.cliente_nome}`;
+        const textoDepoimento = `"${comentario || 'Experiência excelente com a NL Arquitetos!'}"\n\n— ${survey.cliente_nome}\n(Avaliação Geral: ${notaGeral}/10)`;
+        
         await supabase.from('depoimentos').insert({
           pesquisa_id: survey.id,
           texto_formatado: textoDepoimento,
