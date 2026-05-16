@@ -472,6 +472,55 @@ Retorne APENAS JSON válido neste formato:
     }
   };
 
+  const handleCreateContent = (tema: string, formato: string) => {
+    if (formato.toLowerCase().includes('reel')) {
+      setReelsSubject(tema);
+      setActiveTab('reels');
+    } else {
+      setCaptionDescription(tema);
+      setActiveTab('captions');
+    }
+    toast({
+      title: "Tema transferido",
+      description: `O tema "${tema}" foi enviado para a aba de ${formato.toLowerCase().includes('reel') ? 'Reels' : 'Legendas'}.`
+    });
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(20);
+    doc.text(`Calendário de Conteúdo - ${calendarMonth}`, 14, 22);
+    doc.setFontSize(12);
+    doc.text(`Foco: ${calendarFocus}`, 14, 30);
+    
+    const tableData = calendarResult.map(s => [
+      `Semana ${s.numero}`,
+      s.tipo,
+      s.tema,
+      s.formato,
+      s.gancho
+    ]);
+
+    (doc as any).autoTable({
+      startY: 40,
+      head: [['Semana', 'Tipo', 'Tema', 'Formato', 'Gancho']],
+      body: tableData,
+      theme: 'striped',
+      headStyles: { fillColor: [139, 115, 85] } // Bronze #8B7355
+    });
+
+    doc.save(`calendario-${calendarMonth.replace(/\s+/g, '-').toLowerCase()}.pdf`);
+    toast({ title: "Sucesso", description: "PDF exportado com sucesso." });
+  };
+
+  const typeColors: Record<string, string> = {
+    'PROJETO': '#8B7355',
+    'PORTFÓLIO': '#8B7355',
+    'EDUCAÇÃO': '#4A7355',
+    'AUTORIDADE': '#3A5A7A',
+    'CAPTAÇÃO': '#7A4A3A'
+  };
+
   return (
     <div className="flex min-h-screen bg-[#0A0A0A]">
       <Sidebar user="Sócio" />
