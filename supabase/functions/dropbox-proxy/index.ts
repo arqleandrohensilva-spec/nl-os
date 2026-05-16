@@ -115,6 +115,9 @@ serve(async (req) => {
     }
 
     const action = req.headers.get('x-action') || bodyJson.action;
+    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    
+    console.log(`Dropbox Proxy Request - Action: ${action}, Path: ${path}`);
 
     if (!action) {
       return new Response(JSON.stringify({ error: 'Missing action parameter' }), { 
