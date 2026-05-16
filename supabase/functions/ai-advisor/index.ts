@@ -34,17 +34,8 @@ serve(async (req) => {
     userContent.push({ type: "text", text: prompt });
     messages.push({ role: "user", content: userContent });
 
-    // Handle model mapping for Claude 3.7 Sonnet
-    let requestedModel = model || "claude-3-7-sonnet-20250219";
-    
-    // Normalize model name (remove prefixes like 'anthropic/')
-    const normalizedModel = requestedModel.split('/').pop() || requestedModel;
-    
-    if (normalizedModel === "claude-sonnet-4-20250514" || normalizedModel === "claude-3-7-sonnet") {
-      requestedModel = "claude-3-7-sonnet-20250219";
-    } else {
-      requestedModel = normalizedModel;
-    }
+    // Handle model mapping
+    const requestedModel = (model || "claude-sonnet-4-20250514").split('/').pop();
     
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
