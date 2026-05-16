@@ -184,11 +184,14 @@ const BriefingPublic = () => {
     <div className="min-h-screen bg-[#1A1816] text-white p-6 md:p-12">
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-12">
-          <h2 className="text-[10px] text-bronze uppercase tracking-[0.4em] font-bold mb-4">Briefing de Projeto</h2>
-          <h1 className="text-3xl font-bold tracking-tight mb-2">NL ARQUITETOS</h1>
-          <p className="text-white/40 text-xs uppercase tracking-widest font-medium">A arquitetura como decisão</p>
+          <div className="mb-6 flex justify-center">
+             <div className="w-16 h-[1px] bg-bronze/50" />
+          </div>
+          <h2 className="text-[10px] text-bronze uppercase tracking-[0.5em] font-bold mb-4">Briefing de Projeto</h2>
+          <h1 className="text-4xl font-light tracking-[0.2em] mb-2 font-cormorant italic">NL ARQUITETOS</h1>
+          <p className="text-white/30 text-[9px] uppercase tracking-[0.4em] font-bold">Atelier de Decisões</p>
           
-          <div className="mt-12 space-y-2">
+          <div className="mt-16 space-y-2 max-w-xs mx-auto">
             <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">
               <span>Etapa {step} de 5</span>
               <span>{Math.round(progress)}% completo</span>
