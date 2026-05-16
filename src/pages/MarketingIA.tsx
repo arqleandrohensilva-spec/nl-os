@@ -326,8 +326,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             image: currentImage, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          },
-          headers: commonHeaders
+          }
         });
 
         if (aiResponse.error) {
