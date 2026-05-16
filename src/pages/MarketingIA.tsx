@@ -357,12 +357,100 @@ ${contextContent}`;
         } else {
           throw new Error("Falha ao gerar roteiro de Reel.");
         }
+      } else if (type === 'calendar') {
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere o calendário de conteúdo para Instagram do mês de ${calendarMonth}.
+
+ESTRUTURA OBRIGATÓRIA — 4 semanas:
+- Semana 1: PROJETO — mostrar um projeto real com decisão técnica
+- Semana 2: EDUCAÇÃO — ensinar algo sobre processo, compatibilização ou planejamento
+- Semana 3: AUTORIDADE — posicionamento, método, diferencial técnico da NL
+- Semana 4: CAPTAÇÃO — conteúdo que gera contato qualificado
+
+PARA CADA SEMANA:
+- Tema específico
+- Formato sugerido (Feed, Reel, Carrossel ou Story)
+- Descrição do que mostrar/falar
+- Gancho sugerido (frase de abertura)
+
+TOM OBRIGATÓRIO: técnico, condutor, direto. Nunca romântico. Nunca "casa dos sonhos".
+Foco do mês: ${calendarFocus}
+Projetos disponíveis: ${calendarProjects}
+
+DIRETRIZES DA NL: ${guidelines}
+
+BASE DE CONHECIMENTO (CONTEXTO):
+${contextContent}
+
+Retorne APENAS JSON válido neste formato:
+{
+  "semanas": [
+    {
+      "numero": 1,
+      "tipo": "PROJETO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 2,
+      "tipo": "EDUCAÇÃO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 3,
+      "tipo": "AUTORIDADE",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 4,
+      "tipo": "CAPTAÇÃO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    }
+  ]
+}`;
+
+        const prompt = `Gere o calendário de conteúdo para o mês de ${calendarMonth}.`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            model: "anthropic/claude-3-5-sonnet-20240620",
+            json: true
+          }
+        });
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.semanas) {
+              setCalendarResult(parsed.semanas);
+            } else {
+              setGeneratedContent(content);
+            }
+          } catch (e) {
+            setGeneratedContent(content);
+          }
+        } else {
+          throw new Error("Falha ao gerar calendário.");
+        }
       } else {
         const typeLabels: Record<string, string> = {
-          'calendar': 'Calendário de Conteúdo Semanal'
+          'other': 'Conteúdo Geral'
         };
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
-        const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.\nInformações do post: ${userInput}`;
+        const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { body: { prompt, systemPrompt } });
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
