@@ -20,7 +20,7 @@ serve(async (req) => {
 
     // Determine which key to use
     // If client provided a key, we should ideally use it if we want to bypass the gateway
-    // But for now, the instruction says "Confirmar que import.meta.env.VITE_ANTHROPIC_API_KEY está sendo usada corretamente na chamada"
+    // But for now, the instruction says "Confirmar que import.meta.env.ANTHROPIC_API_KEY está sendo usada corretamente na chamada"
     // So we will assume the client wants to use their own key if provided.
     
     let apiKey = LOVABLE_API_KEY;
