@@ -136,12 +136,12 @@ const GestaoProjetos = () => {
         console.warn("Dropbox folder deletion error (might not exist):", dropboxError);
       }
 
-      const { error } = await supabase
+      const { error: deleteError } = await supabase
         .from('projetos')
         .delete()
         .eq('id', id);
 
-      if (error) throw error;
+      if (deleteError) throw deleteError;
 
       toast.success("Projeto excluído com sucesso");
       fetchData();
@@ -150,6 +150,27 @@ const GestaoProjetos = () => {
       toast.error(`Erro ao excluir projeto: ${error.message}`);
     } finally {
       setIsDeleting(null);
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('projetos')
+        .update({ status_geral: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      if (newStatus === 'Entregue') {
+        toast.success("Projeto entregue!", {
+          description: "Pesquisa de satisfação gerada. Verifique o Módulo 09 para enviar ao cliente."
+        });
+      }
+      
+      fetchData();
+    } catch (error) {
+      console.error('Error updating status:', error);
     }
   };
 

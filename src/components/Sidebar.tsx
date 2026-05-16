@@ -240,7 +240,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
         >
-          <div />
+          <NavItem 
+            label="09 · Pesquisa de Satisfação" 
+            active={location.pathname === '/marketing/satisfacao'} 
+            onClick={() => navigate('/marketing/satisfacao')} 
+          />
         </SectionAccordion>
 
         <SectionAccordion 
