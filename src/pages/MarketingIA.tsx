@@ -431,6 +431,15 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
+      const extractJSON = (text: string) => {
+        try { return JSON.parse(text); } catch (e) {
+          const match = text.match(/\{[\s\S]*\}/);
+          if (match) {
+            try { return JSON.parse(match[0]); } catch (e2) { return null; }
+          }
+          return null;
+        }
+      };
 
       if (type === 'captions') {
         const currentImage = skipImage ? null : captionImage;
@@ -479,43 +488,127 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
         });
 
         if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(errorMsg);
+        }
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          const parsed = extractJSON(content);
+          if (parsed && parsed.opcoes) {
+            setCaptionOptions(parsed.opcoes);
+          } else {
+            setGeneratedContent(content);
+          }
+        }
+      } else if (type === 'reels') {
+        const currentImage = skipImage ? null : reelsImage;
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere um roteiro de Reel para Instagram.
+
+TOM OBRIGATÓRIO: técnico, condutor, direto — nunca romântico ou emocional. O Reel deve educar ou demonstrar autoridade técnica, não vender.
+
+ESTRUTURA OBRIGATÓRIA:
+1. GANCHO (primeiros 3 segundos): frase que para o scroll. Direto, específico, provoca curiosidade técnica.
+2. DESENVOLVIMENTO: sequência de ${reelsDuration} segundos. Tópicos numerados, cada um com ação visual sugerida entre colchetes.
+3. CTA FINAL: próximo passo claro. Nunca "manda mensagem agora", sempre algo que demonstra método.
+
+REGRAS:
+- Duração: ${reelsDuration}
+- Formato: ${reelsFormat}
+- Sem "casa dos sonhos", "lindo", "incrível", "luxo"
+- Sempre processo técnico antes de resultado estético
+- CTA deve ser consultivo, nunca pressão de venda
+
+DIRETRIZES NL: ${guidelines}
+BASE DE CONHECIMENTO: ${contextContent}`;
+
+        const prompt = `Assunto: ${reelsSubject}`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            image: currentImage,
+            model: "claude-sonnet-4-20250514",
+            json: true
+          }
+        });
+
+        if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar Reel com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(errorMsg);
+        }
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          const parsed = extractJSON(content);
+          if (parsed && (parsed.gancho || parsed.desenvolvimento)) {
+            setReelsResult(parsed);
+          } else {
+            setGeneratedContent(content);
+          }
+        }
+      } else if (type === 'calendar') {
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere o calendário de conteúdo para Instagram do mês de ${calendarMonth}.
+
+ESTRUTURA OBRIGATÓRIA — 4 semanas:
+- Semana 1: PROJETO — mostrar um projeto real com decisão técnica
+- Semana 2: EDUCAÇÃO — ensinar algo sobre processo, compatibilização ou planejamento
+- Semana 3: AUTORIDADE — posicionamento, método, diferencial técnico da NL
+- Semana 4: CAPTAÇÃO — conteúdo que gera contato qualificado
+
+PARA CADA SEMANA:
+- Tema específico
+- Formato sugerido (Feed, Reel, Carrossel ou Story)
+- Descrição do que mostrar/falar
+- Gancho sugerido (frase de abertura)
+
+TOM OBRIGATÓRIO: técnico, condutor, direto. Nunca romântico. Nunca "casa dos sonhos".
+Foco do mês: ${calendarFocus}
+Projetos disponíveis: ${calendarProjects}
+
+DIRETRIZES DA NL: ${guidelines}
+BASE DE CONHECIMENTO: ${contextContent}`;
+
+        const prompt = `Gere o calendário de conteúdo para o mês de ${calendarMonth}.`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            model: "claude-sonnet-4-20250514",
+            json: true
+          }
+        });
+
+        if (aiResponse.error) {
           throw new Error(`Erro na API: ${aiResponse.error.message || JSON.stringify(aiResponse.error)}`);
         }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const extractJSON = (text: string) => {
-              try { return JSON.parse(text); } catch (e) {
-                const match = text.match(/\{[\s\S]*\}/);
-                if (match) {
-                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
-                }
-                return null;
-              }
-            };
-
-            const parsed = extractJSON(content);
-            if (parsed && parsed.semanas) {
-              setCalendarResult(parsed.semanas);
-              // Auto-save calendar
-              saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
-            } else {
-              setGeneratedContent(content);
-            }
-          } catch (e) {
+          const parsed = extractJSON(content);
+          if (parsed && parsed.semanas) {
+            setCalendarResult(parsed.semanas);
+            // Auto-save calendar
+            saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
+          } else {
             setGeneratedContent(content);
           }
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar calendário.");
         }
       } else {
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { 
-          body: { prompt, systemPrompt }
+          body: { prompt, systemPrompt, model: "claude-sonnet-4-20250514" }
         });
 
         if (aiResponse.error) {
@@ -524,10 +617,6 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar conteúdo.");
         }
       }
     } catch (error: any) {
