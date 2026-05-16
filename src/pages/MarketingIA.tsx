@@ -80,26 +80,28 @@ const MarketingIA = () => {
   const fetchGuidelines = async () => {
     const { data } = await supabase
       .from('diretrizes_marketing')
-      .select('content')
+      .select('content, persona_examples')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (data) {
-      setGuidelines(data.content);
+      setGuidelines(data.content || "");
+      setPersonaExamples(data.persona_examples || "");
     } else {
       const defaultGuidelines = `Nunca usar: casa dos sonhos, projeto dos sonhos, lindo, incrível, luxo, exclusivo.
 Sempre mencionar processo técnico antes de resultado estético.
 Tom: condutor, técnico, direto. Máximo 5 linhas visíveis no Instagram.
 Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       setGuidelines(defaultGuidelines);
+      setPersonaExamples("");
     }
   };
 
   const saveGuidelines = async () => {
     const { error } = await supabase
       .from('diretrizes_marketing')
-      .insert([{ content: guidelines }]);
+      .insert([{ content: guidelines, persona_examples: personaExamples }]);
 
     if (error) {
       toast({
@@ -109,8 +111,8 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       });
     } else {
       toast({
-        title: "Diretrizes salvas",
-        description: "As diretrizes foram atualizadas com sucesso."
+        title: "Configurações salvas",
+        description: "As diretrizes e exemplos de persona foram atualizados."
       });
     }
   };
