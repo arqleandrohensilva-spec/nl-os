@@ -341,8 +341,18 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
           try {
-            const parsed = JSON.parse(content);
-            if (parsed.opcoes) {
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
+                }
+                return null;
+              }
+            };
+
+            const parsed = extractJSON(content);
+            if (parsed && parsed.opcoes) {
               setCaptionOptions(parsed.opcoes);
             } else {
               setGeneratedContent(content);
@@ -404,8 +414,22 @@ Assunto: ${reelsSubject}`;
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
           try {
-            const parsed = JSON.parse(content);
-            setReelsResult(parsed);
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
+                }
+                return null;
+              }
+            };
+
+            const parsed = extractJSON(content);
+            if (parsed) {
+              setReelsResult(parsed);
+            } else {
+              setGeneratedContent(content);
+            }
           } catch (e) {
             setGeneratedContent(content);
           }
@@ -494,8 +518,18 @@ Retorne APENAS JSON válido neste formato:
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
           try {
-            const parsed = JSON.parse(content);
-            if (parsed.semanas) {
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
+                }
+                return null;
+              }
+            };
+
+            const parsed = extractJSON(content);
+            if (parsed && parsed.semanas) {
               setCalendarResult(parsed.semanas);
             } else {
               setGeneratedContent(content);
@@ -734,7 +768,7 @@ Retorne APENAS JSON válido neste formato:
                       <CardContent className="p-6 pt-8 space-y-4">
                         <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{option.legenda}</div>
                         <div className="text-bronze text-xs font-medium tracking-tight">{option.hashtags}</div>
-                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><RefreshCcw className="w-3 h-3" /> Copiar</Button></div>
+                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar</Button></div>
                       </CardContent>
                     </Card>
                   ))
