@@ -836,7 +836,61 @@ Retorne APENAS JSON válido neste formato:
                       <CardContent className="p-6 pt-8 space-y-4">
                         <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{option.legenda}</div>
                         <div className="text-bronze text-xs font-medium tracking-tight">{option.hashtags}</div>
-                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar</Button></div>
+                        
+                        <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-bold">Expansão Multicanal Premium</span>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                onClick={() => expandContent(index, option.legenda, 'linkedin')}
+                                disabled={expandingContent !== null}
+                              >
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
+                                LinkedIn
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                onClick={() => expandContent(index, option.legenda, 'blog')}
+                                disabled={expandingContent !== null}
+                              >
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
+                                Blog SEO
+                              </Button>
+                            </div>
+                          </div>
+
+                          {expandedResults[index] && (
+                            <div className="space-y-4 animate-in fade-in duration-500">
+                              {expandedResults[index].linkedin && (
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Post para LinkedIn</label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].linkedin!); toast({ title: "Copiado", description: "Post LinkedIn copiado." }); }}>COPIAR</Button>
+                                  </div>
+                                  <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].linkedin}</div>
+                                </div>
+                              )}
+                              {expandedResults[index].blog && (
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Artigo de Blog (SEO)</label>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].blog!); toast({ title: "Copiado", description: "Artigo de Blog copiado." }); }}>COPIAR</Button>
+                                  </div>
+                                  <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].blog}</div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex justify-end pt-2 border-t border-white/5">
+                          <Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar Legenda</Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))
