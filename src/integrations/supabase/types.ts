@@ -580,6 +580,36 @@ export type Database = {
           },
         ]
       }
+      historico_conteudo: {
+        Row: {
+          conteudo: Json
+          created_at: string
+          favorito: boolean
+          id: string
+          input_usado: string | null
+          post_type: string | null
+          tipo: string
+        }
+        Insert: {
+          conteudo: Json
+          created_at?: string
+          favorito?: boolean
+          id?: string
+          input_usado?: string | null
+          post_type?: string | null
+          tipo: string
+        }
+        Update: {
+          conteudo?: Json
+          created_at?: string
+          favorito?: boolean
+          id?: string
+          input_usado?: string | null
+          post_type?: string | null
+          tipo?: string
+        }
+        Relationships: []
+      }
       knowledge_base_files: {
         Row: {
           created_at: string
