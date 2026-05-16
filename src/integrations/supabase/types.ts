@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      base_conhecimento: {
+        Row: {
+          created_at: string | null
+          file_name: string
+          file_path: string
+          id: string
+          is_active: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_name: string
+          file_path: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string
+          file_path?: string
+          id?: string
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       briefings: {
         Row: {
           criado_em: string
