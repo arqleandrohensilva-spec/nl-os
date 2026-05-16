@@ -1175,7 +1175,168 @@ Retorne APENAS JSON válido:
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
+      <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
+        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-[#E8E4DF]">
+          <DialogHeader className="p-8 bg-graphite text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
+              <Shield size={160} />
+            </div>
+            <div className="relative z-10">
+              <p className="text-bronze text-[10px] uppercase tracking-[0.4em] font-bold mb-2">Internal AI Audit</p>
+              <DialogTitle className="text-3xl font-bold font-cormorant uppercase tracking-tight">
+                Revisão de Proposta · NL
+              </DialogTitle>
+              <p className="text-white/50 text-[10px] uppercase tracking-[0.2em] mt-2">
+                Cliente: <span className="text-white">{selectedProposal?.cliente}</span>
+              </p>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8">
+            {isReviewing ? (
+              <div className="py-20 flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="w-10 h-10 text-bronze animate-spin" />
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-muted-foreground animate-pulse">Auditando proposta...</p>
+              </div>
+            ) : reviewResult ? (
+              <>
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <MessageSquare size={14} className="text-bronze" />
+                      Tom de Voz
+                    </h3>
+                    <Badge className={cn(
+                      "rounded-[2px] text-[9px] font-bold uppercase tracking-widest px-2 py-1",
+                      reviewResult.tom.status === 'APROVADO' ? "bg-green-500/10 text-green-600 border-green-500/20" :
+                      reviewResult.tom.status === 'ATENÇÃO' ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                      "bg-red-500/10 text-red-600 border-red-500/20"
+                    )}>
+                      {reviewResult.tom.status}
+                    </Badge>
+                  </div>
+                  {reviewResult.tom.problemas.length > 0 ? (
+                    <div className="space-y-3">
+                      {reviewResult.tom.problemas.map((prob: any, i: number) => (
+                        <div key={i} className="bg-white border border-[#F0EDEA] p-4 rounded-[2px] space-y-2">
+                          <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
+                          <p className="text-xs italic text-muted-foreground border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
+                          <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
+                          <p className="text-xs font-medium text-graphite">{prob.sugestao}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">Nenhum desvio de tom encontrado.</p>
+                  )}
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <Ban size={14} className="text-bronze" />
+                      Palavras Proibidas
+                    </h3>
+                    <Badge className={cn(
+                      "rounded-[2px] text-[9px] font-bold uppercase tracking-widest px-2 py-1",
+                      reviewResult.palavras_proibidas.status === 'APROVADO' ? "bg-green-500/10 text-green-600 border-green-500/20" :
+                      "bg-red-500/10 text-red-600 border-red-500/20"
+                    )}>
+                      {reviewResult.palavras_proibidas.status}
+                    </Badge>
+                  </div>
+                  {reviewResult.palavras_proibidas.encontradas.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-2">
+                      {reviewResult.palavras_proibidas.encontradas.map((item: any, i: number) => (
+                        <div key={i} className="flex items-start gap-3 bg-red-50/50 p-3 border border-red-100 rounded-[2px]">
+                          <AlertCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
+                          <div>
+                            <p className="text-xs font-bold text-red-600">"{item.palavra}"</p>
+                            <p className="text-[10px] text-red-400 mt-1">{item.contexto}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">Nenhuma palavra proibida encontrada.</p>
+                  )}
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                      <ClipboardList size={14} className="text-bronze" />
+                      Checklist Técnico
+                    </h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      { label: "Recapitulação do problema", key: "recapitulacao" },
+                      { label: "Solução apresentada claramente", key: "solucao" },
+                      { label: "Entregáveis listados", key: "entregaveis" },
+                      { label: "Método R.E.S.O.L.V.E. mencionado", key: "metodo_resolve" },
+                      { label: "Investimento com contexto", key: "investimento" },
+                      { label: "Próximo passo definido", key: "proximo_passo" },
+                      { label: "Sem urgência artificial", key: "sem_urgencia" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-white border border-[#F0EDEA] rounded-[2px]">
+                        <span className="text-[11px] font-medium text-muted-foreground">{item.label}</span>
+                        {reviewResult.checklist[item.key] ? (
+                          <CheckCircle2 size={16} className="text-green-500" />
+                        ) : (
+                          <XCircle size={16} className="text-red-400" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </>
+            ) : (
+              <p className="text-center py-10 text-muted-foreground">Erro ao carregar análise.</p>
+            )}
           </div>
+
+          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-[#E8E4DF] flex justify-between items-center sm:justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsReviewModalOpen(false)}
+              className="rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+            >
+              Fechar
+            </Button>
+            <Button 
+              onClick={() => {
+                if (!reviewResult) return;
+                const text = `RELATÓRIO DE REVISÃO · NL ARQUITETOS
+Cliente: ${selectedProposal?.cliente}
+Data: ${format(new Date(), 'dd/MM/yyyy')}
+
+1. TOM DE VOZ: ${reviewResult.tom.status}
+${reviewResult.tom.problemas.map((p: any) => `- Trecho: "${p.trecho}"\n  Sugestão: ${p.sugestao}`).join('\n')}
+
+2. PALAVRAS PROIBIDAS: ${reviewResult.palavras_proibidas.status}
+${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.palavra}"\n  Contexto: ${p.contexto}`).join('\n')}
+
+3. CHECKLIST TÉCNICO:
+- Recapitulação: ${reviewResult.checklist.recapitulacao ? '✅' : '❌'}
+- Solução: ${reviewResult.checklist.solucao ? '✅' : '❌'}
+- Entregáveis: ${reviewResult.checklist.entregaveis ? '✅' : '❌'}
+- Método R.E.S.O.L.V.E.: ${reviewResult.checklist.metodo_resolve ? '✅' : '❌'}
+- Investimento: ${reviewResult.checklist.investimento ? '✅' : '❌'}
+- Próximo passo: ${reviewResult.checklist.proximo_passo ? '✅' : '❌'}
+- Sem urgência artificial: ${reviewResult.checklist.sem_urgencia ? '✅' : '❌'}`;
+                navigator.clipboard.writeText(text);
+                toast.success('Relatório copiado para a área de transferência');
+              }}
+              disabled={!reviewResult || isReviewing}
+              className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+            >
+              Copiar Relatório
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
         </DialogContent>
       </Dialog>
     </div>
