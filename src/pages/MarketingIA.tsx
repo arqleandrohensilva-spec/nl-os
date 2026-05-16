@@ -431,6 +431,15 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
+      const extractJSON = (text: string) => {
+        try { return JSON.parse(text); } catch (e) {
+          const match = text.match(/\{[\s\S]*\}/);
+          if (match) {
+            try { return JSON.parse(match[0]); } catch (e2) { return null; }
+          }
+          return null;
+        }
+      };
 
       if (type === 'captions') {
         const currentImage = skipImage ? null : captionImage;
@@ -473,7 +482,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             prompt, 
             systemPrompt, 
             image: currentImage, 
-            model: "anthropic/claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -484,35 +493,17 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             console.warn("Falha ao processar com imagem, tentando sem imagem...", errorMsg);
             return generateContent(type, true);
           }
-          throw new Error(`Erro na API: ${errorMsg}`);
+          throw new Error(errorMsg);
         }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const extractJSON = (text: string) => {
-              try { return JSON.parse(text); } catch (e) {
-                const match = text.match(/\{[\s\S]*\}/);
-                if (match) {
-                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
-                }
-                return null;
-              }
-            };
-
-            const parsed = extractJSON(content);
-            if (parsed && parsed.opcoes) {
-              setCaptionOptions(parsed.opcoes);
-            } else {
-              setGeneratedContent(content);
-            }
-          } catch (e) {
+          const parsed = extractJSON(content);
+          if (parsed && parsed.opcoes) {
+            setCaptionOptions(parsed.opcoes);
+          } else {
             setGeneratedContent(content);
           }
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar legendas.");
         }
       } else if (type === 'reels') {
         const currentImage = skipImage ? null : reelsImage;
@@ -532,24 +523,17 @@ REGRAS:
 - Sempre processo técnico antes de resultado estético
 - CTA deve ser consultivo, nunca pressão de venda
 
-DIRETRIZES DA NL: ${guidelines}
+DIRETRIZES NL: ${guidelines}
+BASE DE CONHECIMENTO: ${contextContent}`;
 
-${personaExamples ? `EXEMPLOS DE ESTILO (SIGA ESTA VOZ):
-${personaExamples}` : ""}
-
-BASE DE CONHECIMENTO (CONTEXTO):
-${contextContent}`;
-
-        const prompt = `
-${currentImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
-Assunto: ${reelsSubject}`;
+        const prompt = `Assunto: ${reelsSubject}`;
 
         const aiResponse = await supabase.functions.invoke('ai-advisor', {
           body: { 
             prompt, 
             systemPrompt, 
             image: currentImage,
-            model: "anthropic/claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -560,35 +544,17 @@ Assunto: ${reelsSubject}`;
             console.warn("Falha ao processar Reel com imagem, tentando sem imagem...", errorMsg);
             return generateContent(type, true);
           }
-          throw new Error(`Erro na API: ${errorMsg}`);
+          throw new Error(errorMsg);
         }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const extractJSON = (text: string) => {
-              try { return JSON.parse(text); } catch (e) {
-                const match = text.match(/\{[\s\S]*\}/);
-                if (match) {
-                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
-                }
-                return null;
-              }
-            };
-
-            const parsed = extractJSON(content);
-            if (parsed) {
-              setReelsResult(parsed);
-            } else {
-              setGeneratedContent(content);
-            }
-          } catch (e) {
+          const parsed = extractJSON(content);
+          if (parsed && (parsed.gancho || parsed.desenvolvimento)) {
+            setReelsResult(parsed);
+          } else {
             setGeneratedContent(content);
           }
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar roteiro de Reel.");
         }
       } else if (type === 'calendar') {
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere o calendário de conteúdo para Instagram do mês de ${calendarMonth}.
@@ -610,47 +576,7 @@ Foco do mês: ${calendarFocus}
 Projetos disponíveis: ${calendarProjects}
 
 DIRETRIZES DA NL: ${guidelines}
-
-BASE DE CONHECIMENTO (CONTEXTO):
-${contextContent}
-
-Retorne APENAS JSON válido neste formato:
-{
-  "semanas": [
-    {
-      "numero": 1,
-      "tipo": "PROJETO",
-      "tema": "...",
-      "formato": "...",
-      "descricao": "...",
-      "gancho": "..."
-    },
-    {
-      "numero": 2,
-      "tipo": "EDUCAÇÃO",
-      "tema": "...",
-      "formato": "...",
-      "descricao": "...",
-      "gancho": "..."
-    },
-    {
-      "numero": 3,
-      "tipo": "AUTORIDADE",
-      "tema": "...",
-      "formato": "...",
-      "descricao": "...",
-      "gancho": "..."
-    },
-    {
-      "numero": 4,
-      "tipo": "CAPTAÇÃO",
-      "tema": "...",
-      "formato": "...",
-      "descricao": "...",
-      "gancho": "..."
-    }
-  ]
-}`;
+BASE DE CONHECIMENTO: ${contextContent}`;
 
         const prompt = `Gere o calendário de conteúdo para o mês de ${calendarMonth}.`;
 
@@ -658,7 +584,7 @@ Retorne APENAS JSON válido neste formato:
           body: { 
             prompt, 
             systemPrompt, 
-            model: "anthropic/claude-sonnet-4-20250514",
+            model: "claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -669,38 +595,20 @@ Retorne APENAS JSON válido neste formato:
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const extractJSON = (text: string) => {
-              try { return JSON.parse(text); } catch (e) {
-                const match = text.match(/\{[\s\S]*\}/);
-                if (match) {
-                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
-                }
-                return null;
-              }
-            };
-
-            const parsed = extractJSON(content);
-            if (parsed && parsed.semanas) {
-              setCalendarResult(parsed.semanas);
-              // Auto-save calendar
-              saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
-            } else {
-              setGeneratedContent(content);
-            }
-          } catch (e) {
+          const parsed = extractJSON(content);
+          if (parsed && parsed.semanas) {
+            setCalendarResult(parsed.semanas);
+            // Auto-save calendar
+            saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
+          } else {
             setGeneratedContent(content);
           }
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar calendário.");
         }
       } else {
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { 
-          body: { prompt, systemPrompt }
+          body: { prompt, systemPrompt, model: "claude-sonnet-4-20250514" }
         });
 
         if (aiResponse.error) {
@@ -709,10 +617,6 @@ Retorne APENAS JSON válido neste formato:
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
-        } else if (aiResponse.data?.error) {
-          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
-        } else {
-          throw new Error("Falha ao gerar conteúdo.");
         }
       }
     } catch (error: any) {
