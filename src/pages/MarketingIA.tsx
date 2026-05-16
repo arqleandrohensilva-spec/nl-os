@@ -337,12 +337,15 @@ DIRETRIZES DA NL: ${guidelines}
 BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}`;
 
-        const prompt = `Assunto: ${reelsSubject}`;
+        const prompt = `
+${reelsImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
+Assunto: ${reelsSubject}`;
 
         const aiResponse = await supabase.functions.invoke('ai-advisor', {
           body: { 
             prompt, 
             systemPrompt, 
+            image: reelsImage,
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
           }
