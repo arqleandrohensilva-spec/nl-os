@@ -34,13 +34,11 @@ serve(async (req) => {
     userContent.push({ type: "text", text: prompt });
     messages.push({ role: "user", content: userContent });
 
-    // Use requested model or fallback to sonnet 3.7
-    const requestedModel = model || "claude-3-7-sonnet-20250219";
-    // Map any legacy names to the actual Anthropic model IDs if necessary
-    // claude-sonnet-4-20250514 seems to be a custom identifier used by the user, but likely refers to 3.7 sonnet (current latest)
-    // Actually, Anthropic's latest is claude-3-7-sonnet-20250219. 
-    // The user specifically asked for 'claude-sonnet-4-20250514' in the prompt but in the previous message it was 'claude-sonnet-4-20250514'.
-    // I will use whatever they send, but fallback to a known good one.
+    // Handle model mapping for Claude 3.7 Sonnet
+    let requestedModel = model || "claude-3-7-sonnet-20250219";
+    if (requestedModel === "claude-sonnet-4-20250514") {
+      requestedModel = "claude-3-7-sonnet-20250219";
+    }
     
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
