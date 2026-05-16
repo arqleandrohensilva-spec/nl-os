@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, AlertCircle, CheckCircle2, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const DropboxCallback = () => {
   const navigate = useNavigate();
@@ -17,17 +15,13 @@ const DropboxCallback = () => {
     const errorParam = params.get('error');
     const errorDescription = params.get('error_description');
     
-    console.log('DropboxCallback: Code found:', !!code);
-
     if (errorParam || errorDescription) {
-      console.error('DropboxCallback: Error from URL:', errorParam, errorDescription);
       setError(errorDescription || errorParam || 'Erro retornado pelo Dropbox.');
       setLoading(false);
       return;
     }
 
     if (!code) {
-      console.error('DropboxCallback: No code found in URL');
       setError('Código de autorização não encontrado na URL.');
       setLoading(false);
       return;
@@ -35,7 +29,6 @@ const DropboxCallback = () => {
 
     const exchangeToken = async () => {
       try {
-        console.log('DropboxCallback: Calling dropbox-auth edge function');
         const { data, error: functionError } = await supabase.functions.invoke('dropbox-auth', {
           body: { 
             code: code,
@@ -43,17 +36,9 @@ const DropboxCallback = () => {
           }
         });
 
-        if (functionError) {
-          console.error('DropboxCallback: Edge function error:', functionError);
-          throw new Error(functionError.message || 'Erro ao comunicar com o servidor.');
-        }
+        if (functionError) throw new Error(functionError.message || 'Erro ao comunicar com o servidor.');
+        if (data?.error) throw new Error(data.error);
 
-        if (data?.error) {
-          console.error('DropboxCallback: Data error:', data.error);
-          throw new Error(data.error);
-        }
-
-        console.log('DropboxCallback: Success!');
         setSuccess(true);
         setLoading(false);
         
@@ -71,60 +56,49 @@ const DropboxCallback = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F0F] flex flex-col items-center justify-center text-white p-4">
-      <div className="flex flex-col items-center gap-6 max-w-md text-center">
+    <div style={{ 
+      minHeight: '100 screen', 
+      backgroundColor: '#0F0F0F', 
+      color: 'white', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      fontFamily: 'sans-serif'
+    }}>
+      <div style={{ textAlign: 'center', maxWidth: '400px' }}>
         {loading && (
-          <div className="animate-in fade-in duration-500">
-            <div className="w-16 h-16 bg-bronze/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Loader2 className="text-bronze animate-spin" size={32} />
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-2xl font-cormorant italic">Conectando ao Dropbox...</h1>
-              <p className="text-white/40 text-sm uppercase tracking-[0.2em] font-bold">
-                Processando autorização
-              </p>
-            </div>
+          <div>
+            <h1 style={{ fontSize: '24px' }}>Conectando ao Dropbox...</h1>
+            <p style={{ opacity: 0.6 }}>Processando autorização</p>
           </div>
         )}
 
         {success && (
-          <div className="animate-in zoom-in duration-300">
-            <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <CheckCircle2 className="text-green-500" size={32} />
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-2xl font-cormorant italic">Dropbox conectado com sucesso!</h1>
-              <p className="text-white/40 text-sm">
-                Redirecionando para as configurações...
-              </p>
-            </div>
+          <div style={{ color: '#4ade80' }}>
+            <h1 style={{ fontSize: '24px' }}>Dropbox conectado com sucesso!</h1>
+            <p style={{ color: 'white', opacity: 0.6 }}>Redirecionando...</p>
           </div>
         )}
 
         {error && (
-          <div className="animate-in slide-in-from-bottom-4 duration-300">
-            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <AlertCircle className="text-red-500" size={32} />
-            </div>
-            <div className="space-y-2 mb-6">
-              <h1 className="text-2xl font-cormorant italic text-red-500">Erro na Conexão</h1>
-              <p className="text-white/60 text-sm">
-                {error}
-              </p>
-            </div>
-            <Button 
+          <div style={{ color: '#ef4444' }}>
+            <h1 style={{ fontSize: '24px' }}>Erro na Conexão</h1>
+            <p style={{ color: 'white', opacity: 0.8, marginBottom: '20px' }}>{error}</p>
+            <button 
               onClick={() => navigate('/sistema/configuracoes')}
-              className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8"
+              style={{ 
+                padding: '10px 20px', 
+                backgroundColor: 'rgba(255,255,255,0.1)', 
+                color: 'white', 
+                border: '1px solid rgba(255,255,255,0.2)',
+                cursor: 'pointer'
+              }}
             >
-              <RotateCcw className="mr-2 h-4 w-4" />
               Tentar novamente
-            </Button>
+            </button>
           </div>
         )}
-
-        <p className="text-white/20 text-[10px] leading-relaxed mt-8 max-w-[300px]">
-          Estamos configurando sua conta para garantir que todos os documentos e contratos sejam gerados e armazenados com segurança no NL OS.
-        </p>
       </div>
     </div>
   );
