@@ -113,8 +113,8 @@ const SatisfacaoPublic = () => {
     const isPromoter = (notaGeral ?? 0) >= 9;
 
     const handleIndication = () => {
-      const text = encodeURIComponent(`Olá NL! Gostaria de indicar um amigo que está precisando de um projeto de arquitetura com o padrão de vocês.`);
-      window.open(`https://wa.me/5511999999999?text=${text}`, '_blank');
+      const text = encodeURIComponent(`Olá! Estou finalizando meu projeto com a NL Arquitetos e a experiência foi incrível. Se você estiver pensando em construir ou reformar, recomendo muito o trabalho deles!`);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
     };
 
     return (
