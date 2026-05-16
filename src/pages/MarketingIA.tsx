@@ -229,9 +229,44 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
     return new Date(dateStr).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
-  const generateContent = async (type: string) => {
+  const compressImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.onerror = () => resolve(base64Str);
+    });
+  };
+
+  const generateContent = async (type: string, skipImage: boolean = false) => {
+    // API Key Check
+    if (!import.meta.env.VITE_ANTHROPIC_API_KEY) {
+      toast({
+        variant: "destructive",
+        title: "Configuração Necessária",
+        description: "Configure a chave VITE_ANTHROPIC_API_KEY nas configurações do projeto."
+      });
+      return;
+    }
+
     setGenerating(true);
-    setGeneratedContent("");
+    if (!skipImage) setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
     if (type === 'reels') setReelsResult(null);
     if (type === 'calendar') setCalendarResult([]);
@@ -260,7 +295,12 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
+      const commonHeaders = {
+        'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
+      };
+
       if (type === 'captions') {
+        const currentImage = skipImage ? null : captionImage;
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere 3 opções de legenda para Instagram.
 
 TOM OBRIGATÓRIO: técnico, condutor, centrado no processo — nunca romântico ou emocional. Explique a decisão técnica por trás do projeto, não a estética.
@@ -288,7 +328,7 @@ Retorne APENAS JSON válido neste formato:
 }`;
 
         const prompt = `
-${captionImage ? "Analise a imagem do projeto enviada e baseie a legenda no que você vê — materiais, detalhes construtivos, decisões técnicas visíveis." : ""}
+${currentImage ? "Analise a imagem do projeto enviada e baseie a legenda no que você vê — materiais, detalhes construtivos, decisões técnicas visíveis." : ""}
 ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
 `;
 
@@ -296,11 +336,21 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
           body: { 
             prompt, 
             systemPrompt, 
-            image: captionImage, 
+            image: currentImage, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          }
+          },
+          headers: commonHeaders
         });
+
+        if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(`Erro na API: ${errorMsg}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -314,10 +364,13 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar legendas.");
         }
       } else if (type === 'reels') {
+        const currentImage = skipImage ? null : reelsImage;
         const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere um roteiro de Reel para Instagram.
 
 TOM OBRIGATÓRIO: técnico, condutor, direto — nunca romântico ou emocional. O Reel deve educar ou demonstrar autoridade técnica, não vender.
@@ -340,18 +393,28 @@ BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}`;
 
         const prompt = `
-${reelsImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
+${currentImage ? "Analise a imagem enviada e use os elementos visuais do ambiente — materiais, iluminação, detalhes construtivos — para tornar o roteiro mais específico e autêntico." : ""}
 Assunto: ${reelsSubject}`;
 
         const aiResponse = await supabase.functions.invoke('ai-advisor', {
           body: { 
             prompt, 
             systemPrompt, 
-            image: reelsImage,
+            image: currentImage,
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          }
+          },
+          headers: commonHeaders
         });
+
+        if (aiResponse.error) {
+          const errorMsg = aiResponse.error.message || JSON.stringify(aiResponse.error);
+          if (currentImage && !skipImage) {
+            console.warn("Falha ao processar Reel com imagem, tentando sem imagem...", errorMsg);
+            return generateContent(type, true);
+          }
+          throw new Error(`Erro na API: ${errorMsg}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -361,6 +424,8 @@ Assunto: ${reelsSubject}`;
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar roteiro de Reel.");
         }
@@ -434,8 +499,13 @@ Retorne APENAS JSON válido neste formato:
             systemPrompt, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          }
+          },
+          headers: commonHeaders
         });
+
+        if (aiResponse.error) {
+          throw new Error(`Erro na API: ${aiResponse.error.message || JSON.stringify(aiResponse.error)}`);
+        }
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
@@ -449,18 +519,27 @@ Retorne APENAS JSON válido neste formato:
           } catch (e) {
             setGeneratedContent(content);
           }
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar calendário.");
         }
       } else {
-        const typeLabels: Record<string, string> = {
-          'other': 'Conteúdo Geral'
-        };
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
-        const aiResponse = await supabase.functions.invoke('ai-advisor', { body: { prompt, systemPrompt } });
+        const aiResponse = await supabase.functions.invoke('ai-advisor', { 
+          body: { prompt, systemPrompt },
+          headers: commonHeaders
+        });
+
+        if (aiResponse.error) {
+          throw new Error(`Erro na API: ${aiResponse.error.message || JSON.stringify(aiResponse.error)}`);
+        }
+
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
+        } else if (aiResponse.data?.error) {
+          throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
           throw new Error("Falha ao gerar conteúdo.");
         }
@@ -619,11 +698,14 @@ Retorne APENAS JSON válido neste formato:
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">IMAGEM DO PROJETO</label>
-                      <input type="file" ref={captionImageRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={(e) => {
+                      <input type="file" ref={captionImageRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           const reader = new FileReader();
-                          reader.onload = (re) => setCaptionImage(re.target?.result as string);
+                          reader.onload = async (re) => {
+                            const compressed = await compressImage(re.target?.result as string);
+                            setCaptionImage(compressed);
+                          };
                           reader.readAsDataURL(file);
                         }
                       }} />
@@ -704,11 +786,14 @@ Retorne APENAS JSON válido neste formato:
                         ref={reelsImageRef} 
                         className="hidden" 
                         accept="image/jpeg,image/png,image/webp" 
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
                             const reader = new FileReader();
-                            reader.onload = (re) => setReelsImage(re.target?.result as string);
+                            reader.onload = async (re) => {
+                              const compressed = await compressImage(re.target?.result as string);
+                              setReelsImage(compressed);
+                            };
                             reader.readAsDataURL(file);
                           }
                         }} 
