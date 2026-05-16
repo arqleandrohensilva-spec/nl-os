@@ -46,22 +46,19 @@ const ConfiguracoesSistema = () => {
     const clientId = 'zjdj0yszvqy7wvz';
     const redirectUri = 'https://app.nl.arq.br/dropbox-callback';
     
-    // Mostra loading imediatamente para dar feedback visual
-    setDropboxStatus('loading');
-    
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
     
-    // Usar window.top.location para evitar problemas de "Refused to connect" em iframes (como o preview)
-    // Se estiver no domínio app.nl.arq.br, window.top é o próprio window.
-    try {
-      if (window.top) {
-        window.top.location.href = authUrl;
-      } else {
-        window.location.href = authUrl;
-      }
-    } catch (e) {
-      window.location.href = authUrl;
-    }
+    // Abrir em nova aba é a maneira mais segura de evitar o erro "Refused to connect" (X-Frame-Options) do Dropbox
+    // Isso garante que a autenticação funcione tanto no preview quanto no domínio de produção.
+    window.open(authUrl, '_blank');
+    
+    toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
+    
+    // Opcionalmente, podemos atualizar o status para indicar que estamos aguardando
+    setDropboxStatus('loading');
+    
+    // Verificar o status novamente após alguns segundos para ver se a conexão foi concluída na outra aba
+    setTimeout(fetchDropboxStatus, 10000);
   };
 
   return (
