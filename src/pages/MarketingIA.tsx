@@ -256,11 +256,11 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
 
   const generateContent = async (type: string, skipImage: boolean = false) => {
     // API Key Check
-    if (!import.meta.env.VITE_ANTHROPIC_API_KEY) {
+    if (!import.meta.env.ANTHROPIC_API_KEY) {
       toast({
         variant: "destructive",
         title: "Configuração Necessária",
-        description: "Configure a chave VITE_ANTHROPIC_API_KEY nas configurações do projeto."
+        description: "Configure a chave ANTHROPIC_API_KEY nas configurações do projeto."
       });
       return;
     }
@@ -296,7 +296,7 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       }
 
       const commonHeaders = {
-        'x-anthropic-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY
+        'x-anthropic-api-key': import.meta.env.ANTHROPIC_API_KEY
       };
 
       if (type === 'captions') {
