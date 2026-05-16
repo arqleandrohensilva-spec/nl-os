@@ -1022,7 +1022,8 @@ Retorne APENAS JSON válido neste formato:
                           )}
                         </div>
 
-                        <div className="flex justify-end pt-2 border-t border-white/5">
+                        <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                          <Button variant="ghost" size="sm" className="text-white/40 hover:text-white text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => saveToHistory('legenda', option, captionDescription, postType)}><Star className="w-3 h-3 text-bronze" /> Salvar</Button>
                           <Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar Legenda</Button>
                         </div>
                       </CardContent>
