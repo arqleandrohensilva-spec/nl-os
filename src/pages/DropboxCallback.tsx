@@ -28,7 +28,11 @@ const DropboxCallback = () => {
     const exchangeToken = async () => {
       try {
         const { data, error: functionError } = await supabase.functions.invoke('dropbox-auth', {
-          body: { action: 'exchange_token', code }
+          body: { 
+            action: 'exchange_token', 
+            code,
+            redirectUri: window.location.origin + window.location.pathname
+          }
         });
 
         if (functionError || data.error) {
