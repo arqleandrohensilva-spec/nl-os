@@ -1058,7 +1058,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[9px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA] rounded-none flex items-center gap-2 transition-all duration-200"
+                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA]/50 rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => {
                                   console.log("Clique no botão Blog", { index, legenda: option.legenda });
                                   expandContent(index, option.legenda, 'blog');
