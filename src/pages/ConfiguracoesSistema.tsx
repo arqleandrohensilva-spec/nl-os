@@ -48,17 +48,20 @@ const ConfiguracoesSistema = () => {
     
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
     
-    // Abrir em nova aba é a maneira mais segura de evitar o erro "Refused to connect" (X-Frame-Options) do Dropbox
-    // Isso garante que a autenticação funcione tanto no preview quanto no domínio de produção.
-    window.open(authUrl, '_blank');
+    // Tenta abrir em nova aba
+    const newWindow = window.open(authUrl, '_blank');
     
-    toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
-    
-    // Opcionalmente, podemos atualizar o status para indicar que estamos aguardando
-    setDropboxStatus('loading');
-    
-    // Verificar o status novamente após alguns segundos para ver se a conexão foi concluída na outra aba
-    setTimeout(fetchDropboxStatus, 10000);
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Se o bloqueador de popup estiver ativo, redireciona na mesma aba
+      toast.warning("O bloqueador de popups impediu a abertura automática. Redirecionando nesta aba...");
+      setTimeout(() => {
+        window.location.href = authUrl;
+      }, 2000);
+    } else {
+      toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
+      setDropboxStatus('loading');
+      setTimeout(fetchDropboxStatus, 15000);
+    }
   };
 
   return (
