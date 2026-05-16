@@ -1,0 +1,1 @@
+ALTER TABLE public.dropbox_settings ADD COLUMN IF NOT EXISTS account_id TEXT;
