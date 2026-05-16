@@ -670,11 +670,14 @@ Retorne APENAS JSON válido neste formato:
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">IMAGEM DO PROJETO</label>
-                      <input type="file" ref={captionImageRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={(e) => {
+                      <input type="file" ref={captionImageRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
                           const reader = new FileReader();
-                          reader.onload = (re) => setCaptionImage(re.target?.result as string);
+                          reader.onload = async (re) => {
+                            const compressed = await compressImage(re.target?.result as string);
+                            setCaptionImage(compressed);
+                          };
                           reader.readAsDataURL(file);
                         }
                       }} />
