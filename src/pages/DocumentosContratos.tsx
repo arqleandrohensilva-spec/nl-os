@@ -1309,12 +1309,22 @@ const DocumentosContratos = () => {
                                     </p>
                                   </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => handleViewFile(file)}
+                                    className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Visualizar"
+                                  >
+                                    <Eye size={14} />
+                                  </Button>
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={() => handleDownloadDropbox(file.path_display)}
                                     className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Baixar"
                                   >
                                     <Download size={14} />
                                   </Button>
@@ -1323,6 +1333,7 @@ const DocumentosContratos = () => {
                                     size="icon" 
                                     onClick={() => handleShareFile(file.path_display)}
                                     className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Compartilhar"
                                   >
                                     <Share2 size={14} />
                                   </Button>
