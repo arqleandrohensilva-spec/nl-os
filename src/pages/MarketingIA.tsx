@@ -518,8 +518,18 @@ Retorne APENAS JSON válido neste formato:
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
           try {
-            const parsed = JSON.parse(content);
-            if (parsed.semanas) {
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
+                }
+                return null;
+              }
+            };
+
+            const parsed = extractJSON(content);
+            if (parsed && parsed.semanas) {
               setCalendarResult(parsed.semanas);
             } else {
               setGeneratedContent(content);
