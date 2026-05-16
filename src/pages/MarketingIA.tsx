@@ -909,46 +909,61 @@ Retorne APENAS JSON válido neste formato:
 
               <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 pb-8">
                 {calendarResult.length > 0 ? (
-                  <div className="space-y-4">
-                    {calendarResult.map((semana) => (
-                      <Card key={semana.numero} className="bg-white/[0.02] border-white/10 rounded-none overflow-hidden relative">
-                        <div className="absolute top-4 left-4">
-                          <Badge className="bg-bronze text-white text-[9px] font-bold tracking-widest rounded-none px-2 py-0.5">
-                            SEMANA {semana.numero} — {semana.tipo}
-                          </Badge>
-                        </div>
-                        <CardContent className="p-6 pt-12 space-y-4">
-                          <div className="space-y-1">
-                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Tema:</label>
-                            <p className="text-white text-sm font-medium">{semana.tema}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Formato sugerido:</label>
-                            <p className="text-white/80 text-xs">{semana.formato}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Descrição do post:</label>
-                            <p className="text-white/60 text-xs leading-relaxed">{semana.descricao}</p>
-                          </div>
-                          <div className="space-y-1">
-                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Gancho sugerido:</label>
-                            <p className="text-white/80 text-xs italic">"{semana.gancho}"</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {calendarResult.map((semana) => (
+                        <Card key={semana.numero} 
+                          className="bg-white/[0.02] border-white/10 rounded-none overflow-hidden relative"
+                          style={{ borderLeft: `4px solid ${typeColors[semana.tipo] || '#8B7355'}` }}
+                        >
+                          <CardContent className="p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <Badge className="bg-white/5 text-white/60 text-[8px] font-bold tracking-widest rounded-none px-2 py-0.5 border border-white/10 uppercase">
+                                {semana.tipo}
+                              </Badge>
+                              <span className="text-[10px] text-white/20 font-bold">SEMANA {semana.numero}</span>
+                            </div>
+                            
+                            <div className="space-y-1">
+                              <h4 className="text-white text-sm font-medium leading-tight">{semana.tema}</h4>
+                              <p className="text-bronze text-[10px] uppercase tracking-wider font-bold">{semana.formato}</p>
+                            </div>
+
+                            <p className="text-white/40 text-[10px] italic leading-relaxed line-clamp-2">"{semana.gancho}"</p>
+
+                            <Button 
+                              variant="ghost" 
+                              className="w-full justify-between p-0 h-auto text-[9px] font-bold tracking-widest text-white/60 hover:text-bronze transition-colors group"
+                              onClick={() => handleCreateContent(semana.tema, semana.formato)}
+                            >
+                              <span>→ CRIAR CONTEÚDO</span>
+                              <ChevronRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                     
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-bronze/30 text-bronze hover:bg-bronze/10 rounded-none uppercase text-[10px] font-bold tracking-widest h-10 mt-4"
-                      onClick={() => {
-                        const fullText = calendarResult.map(s => `SEMANA ${s.numero} — ${s.tipo}\nTema: ${s.tema}\nFormato: ${s.formato}\nDescrição: ${s.descricao}\nGancho: ${s.gancho}`).join('\n\n');
-                        navigator.clipboard.writeText(fullText);
-                        toast({ title: "Copiado", description: "Pauta completa copiada para a área de transferência." });
-                      }}
-                    >
-                      <Copy size={14} className="mr-2" /> Copiar Pauta Completa
-                    </Button>
+                    <div className="flex flex-col gap-3">
+                      <Button 
+                        className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] font-bold tracking-widest h-12"
+                        onClick={exportToPDF}
+                      >
+                        <Download size={16} className="mr-2" /> Exportar Pauta PDF
+                      </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        className="w-full border-white/10 text-white/40 hover:bg-white/5 rounded-none uppercase text-[9px] font-bold tracking-widest h-10"
+                        onClick={() => {
+                          const fullText = calendarResult.map(s => `SEMANA ${s.numero} — ${s.tipo}\nTema: ${s.tema}\nFormato: ${s.formato}\nDescrição: ${s.descricao}\nGancho: ${s.gancho}`).join('\n\n');
+                          navigator.clipboard.writeText(fullText);
+                          toast({ title: "Copiado", description: "Pauta completa copiada para a área de transferência." });
+                        }}
+                      >
+                        <Copy size={12} className="mr-2" /> Copiar Pauta Texto
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
