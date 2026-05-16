@@ -1572,6 +1572,35 @@ Gere o artigo completo com título, subtítulos e meta description.`;
             </Card>
           </TabsContent>
         </Tabs>
+        <Dialog open={showExpansionModal} onOpenChange={setShowExpansionModal}>
+          <DialogContent className="bg-[#1A1A1A] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+            <DialogHeader className="border-b border-white/5 pb-4 mb-4">
+              <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-bronze" /> {modalContent.title}
+              </DialogTitle>
+              <DialogDescription className="text-white/40 text-xs">
+                {modalContent.type === 'linkedin' ? 'Post otimizado para networking profissional.' : 'Artigo técnico otimizado para SEO local.'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed bg-white/[0.02] p-6 border border-white/5 italic">
+                {modalContent.content}
+              </div>
+              <Button 
+                className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12"
+                onClick={() => {
+                  navigator.clipboard.writeText(modalContent.content);
+                  toast({
+                    title: "Copiado",
+                    description: `${modalContent.title} copiado com sucesso.`
+                  });
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" /> Copiar para a Área de Transferência
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
