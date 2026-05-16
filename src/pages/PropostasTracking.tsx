@@ -446,6 +446,82 @@ Gere a mensagem de WhatsApp.`;
     setIsDashboardModalOpen(true);
   };
 
+  const handleReviewProposal = async (proposal: Proposal) => {
+    try {
+      setSelectedProposal(proposal);
+      setIsReviewing(true);
+      setReviewResult(null);
+      setIsReviewModalOpen(true);
+
+      const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo e verifique três aspectos:
+
+1. TOM DE VOZ: O texto segue o tom técnico, condutor e centrado no cliente da NL? Identifique trechos que soem como vendedor ansioso, informal ou romantizado.
+
+2. PALAVRAS PROIBIDAS: Verifique se contém alguma dessas palavras ou expressões:
+"casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "design exclusivo", "rapidinho", "baratinho", "método revolucionário", "fórmula secreta", "corre que acaba", "oportunidade única hoje", "sem risco nenhum", "zero problema garantido", "qualquer arquiteto faz isso", "obra sempre tem imprevisto faz parte", "pode confiar a gente resolve"
+
+3. CHECKLIST TÉCNICO: Verifique se a proposta contém:
+- Recapitulação do problema do cliente
+- Solução apresentada claramente  
+- Entregáveis listados
+- Método R.E.S.O.L.V.E. mencionado
+- Investimento apresentado com contexto
+- Próximo passo definido
+- Ausência de urgência artificial ou pressão de venda
+
+PROPOSTA:
+Cliente: ${proposal.cliente}
+Tipo: ${proposal.tipo}
+Objetivo/Conteúdo: ${proposal.objetivo}
+Valor Executivo: R$ ${proposal.valor_executivo}
+Valor Completo: R$ ${proposal.valor_completo}
+
+Retorne APENAS JSON válido:
+{
+  "tom": {
+    "status": "APROVADO" | "ATENÇÃO" | "CORRIGIR",
+    "problemas": [{"trecho": "...", "sugestao": "..."}]
+  },
+  "palavras_proibidas": {
+    "status": "APROVADO" | "ENCONTRADAS",
+    "encontradas": [{"palavra": "...", "contexto": "..."}]
+  },
+  "checklist": {
+    "recapitulacao": true/false,
+    "solucao": true/false,
+    "entregaveis": true/false,
+    "metodo_resolve": true/false,
+    "investimento": true/false,
+    "proximo_passo": true/false,
+    "sem_urgencia": true/false
+  }
+}`;
+
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: { 
+          prompt, 
+          model: 'claude-sonnet-4-20250514'
+        }
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error.message);
+
+      const content = data.choices[0].message.content;
+      // Extract JSON if AI wrapped it in markdown
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content);
+      
+      setReviewResult(result);
+    } catch (error: any) {
+      console.error('Error reviewing proposal:', error);
+      toast.error('Erro ao revisar proposta: ' + error.message);
+      setIsReviewModalOpen(false);
+    } finally {
+      setIsReviewing(false);
+    }
+  };
+
   const toggleEngagement = (id: string) => {
     setExpandedEngagements(prev => ({
       ...prev,
