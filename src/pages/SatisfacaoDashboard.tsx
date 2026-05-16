@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink, FileVideo, Download } from 'lucide-react';
+import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink, FileVideo, Download, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -46,6 +46,7 @@ const SatisfacaoDashboard = () => {
   const [generatedToken, setGeneratedToken] = useState('');
   const [surveysFilter, setSurveysFilter] = useState('TODAS');
   const [testimonialsFilter, setTestimonialsFilter] = useState('TODOS');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [stats, setStats] = useState({
     avg: 0,
@@ -66,7 +67,7 @@ const SatisfacaoDashboard = () => {
       
       const { data: testimonialsData } = await supabase
         .from('depoimentos')
-        .select('*, pesquisa:pesquisas_satisfacao(*)')
+        .select('*, pesquisa:pesquisas_satisfacao(*, projeto:projetos(nome, tipo, cidade))')
         .order('criado_em', { ascending: false });
 
       const { data: projectsData } = await supabase
@@ -261,19 +262,39 @@ const SatisfacaoDashboard = () => {
   };
 
   const filteredSurveys = surveys.filter(s => {
-    if (surveysFilter === 'TODAS') return true;
-    if (surveysFilter === 'AGUARDANDO') return s.status === 'PENDENTE';
-    if (surveysFilter === 'RESPONDIDAS') return s.status === 'RESPONDIDA';
-    if (surveysFilter === 'ARQUIVADAS') return s.status === 'ARQUIVADA';
-    return true;
+    const matchesFilter = 
+      surveysFilter === 'TODAS' || 
+      (surveysFilter === 'AGUARDANDO' && s.status === 'PENDENTE') ||
+      (surveysFilter === 'RESPONDIDAS' && s.status === 'RESPONDIDA') ||
+      (surveysFilter === 'ARQUIVADAS' && s.status === 'ARQUIVADA');
+    
+    if (!matchesFilter) return false;
+
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      s.cliente_nome?.toLowerCase().includes(searchLower) ||
+      s.projeto?.nome?.toLowerCase().includes(searchLower) ||
+      s.projeto?.cidade?.toLowerCase().includes(searchLower)
+    );
   });
 
   const filteredTestimonials = testimonials.filter(t => {
-    if (testimonialsFilter === 'TODOS') return t.status !== 'DESCARTADO';
-    if (testimonialsFilter === 'PENDENTE APROVAÇÃO') return t.status === 'PENDENTE';
-    if (testimonialsFilter === 'APROVADOS') return t.status === 'APROVADO';
-    if (testimonialsFilter === 'PUBLICADOS') return t.status === 'PUBLICADO';
-    return true;
+    const matchesFilter = 
+      testimonialsFilter === 'TODOS' ? t.status !== 'DESCARTADO' :
+      (testimonialsFilter === 'PENDENTE APROVAÇÃO' && t.status === 'PENDENTE') ||
+      (testimonialsFilter === 'APROVADOS' && t.status === 'APROVADO') ||
+      (testimonialsFilter === 'PUBLICADOS' && t.status === 'PUBLICADO');
+      
+    if (!matchesFilter) return false;
+
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      t.pesquisa?.cliente_nome?.toLowerCase().includes(searchLower) ||
+      t.pesquisa?.projeto?.nome?.toLowerCase().includes(searchLower) ||
+      t.pesquisa?.projeto?.cidade?.toLowerCase().includes(searchLower)
+    );
   });
 
   const surveysCount = {
@@ -318,6 +339,16 @@ const SatisfacaoDashboard = () => {
               <Button onClick={() => { setGeneratedToken(''); setIsModalOpen(true); }} className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold">
                 <Plus className="w-4 h-4 mr-2" /> Nova Pesquisa
               </Button>
+            </div>
+
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input 
+                placeholder="BUSCAR POR CLIENTE, PROJETO OU CIDADE..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-[#242220] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
+              />
             </div>
 
             <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
@@ -403,6 +434,16 @@ const SatisfacaoDashboard = () => {
                   )}
                 </div>
               </div>
+            </div>
+
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input 
+                placeholder="BUSCAR POR CLIENTE, PROJETO OU CIDADE..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-[#242220] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
+              />
             </div>
 
             <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
