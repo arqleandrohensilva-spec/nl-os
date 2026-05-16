@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,74 +12,73 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
+    const { code, redirect_uri } = await req.json()
+
+    if (!code) {
+      return new Response(JSON.stringify({ error: 'Código não fornecido' }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    const clientId = Deno.env.get('DROPBOX_CLIENT_ID')
+    const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET')
+
+    if (!clientId || !clientSecret) {
+      return new Response(JSON.stringify({ error: 'Credenciais não configuradas' }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Trocar código por tokens
+    const tokenResponse = await fetch('https://api.dropbox.com/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirect_uri || 'https://app.nl.arq.br/dropbox-callback',
+      }),
+    })
+
+    const tokenData = await tokenResponse.json()
+
+    if (tokenData.error) {
+      return new Response(JSON.stringify({ error: tokenData.error_description || tokenData.error }), {
+        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    // Salvar tokens no Supabase
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { code, action, redirectUri: passedRedirectUri, redirect_uri: passedRedirectUriSnake } = await req.json()
-    const redirectUri = passedRedirectUriSnake || passedRedirectUri || 'https://app.nl.arq.br/dropbox-callback'
-
-    if (action === 'exchange_token' || (code && !action)) {
-      const clientId = Deno.env.get('DROPBOX_CLIENT_ID')
-      const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET')
-      const redirectUri = passedRedirectUri || 'https://app.nl.arq.br/dropbox-callback'
-
-      console.log('Exchanging code for token...')
-      
-      const response = await fetch('https://api.dropbox.com/oauth2/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          code,
-          grant_type: 'authorization_code',
-          client_id: clientId!,
-          client_secret: clientSecret!,
-          redirect_uri: redirectUri,
-        }),
+    const { error: dbError } = await supabase
+      .from('dropbox_settings')
+      .upsert({
+        id: '00000000-0000-0000-0000-000000000001',
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        account_id: tokenData.account_id,
+        updated_at: new Date().toISOString(),
       })
 
-      const data = await response.json()
-
-      if (data.error) {
-        console.error('Dropbox token exchange error:', data)
-        return new Response(JSON.stringify(data), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Store tokens in database
-      const { error: dbError } = await supabaseClient
-        .from('dropbox_settings')
-        .upsert({
-          id: '00000000-0000-0000-0000-000000000001', // Use a fixed ID for single instance settings
-          access_token: data.access_token,
-          refresh_token: data.refresh_token,
-          expires_at: new Date(Date.now() + data.expires_in * 1000).toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-
-      if (dbError) {
-        throw dbError
-      }
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (dbError) {
+      return new Response(JSON.stringify({ error: 'Erro ao salvar tokens: ' + dbError.message }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }
 
-    return new Response(JSON.stringify({ error: 'Invalid action' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    return new Response(JSON.stringify({ success: true, account_id: tokenData.account_id }), {
+      status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
-  } catch (error) {
-    console.error('Error:', error.message)
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 })
