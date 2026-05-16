@@ -110,12 +110,11 @@ serve(async (req) => {
           bodyJson = await req.json();
         } catch (e) {
           // Body might not be JSON
-        }
-      }
     }
 
     const action = req.headers.get('x-action') || bodyJson.action;
-    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    let path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    const folder = bodyJson.folder || "";
     
     console.log(`Dropbox Proxy Request - Action: ${action}, Path: ${path}`);
 
@@ -125,9 +124,6 @@ serve(async (req) => {
         status: 400 
       });
     }
-
-    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
-    const folder = bodyJson.folder || "";
 
     let endpoint = '';
     let body: any = null;
