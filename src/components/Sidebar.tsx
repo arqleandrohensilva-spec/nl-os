@@ -114,6 +114,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
     } else if (path === '/sistema/configuracoes') {
       setOpenSections(prev => ({ ...prev, 'SISTEMA': true }));
+    } else if (path === '/marketing/ia' || path === '/marketing/satisfacao') {
+      setOpenSections(prev => ({ ...prev, 'MARKETING': true }));
     }
   }, [location.pathname]);
 
@@ -244,6 +246,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="09 · Pesquisa de Satisfação" 
             active={location.pathname === '/marketing/satisfacao'} 
             onClick={() => navigate('/marketing/satisfacao')} 
+          />
+          <NavItem 
+            label="11 · Marketing com IA" 
+            active={location.pathname === '/marketing/ia'} 
+            onClick={() => navigate('/marketing/ia')} 
           />
         </SectionAccordion>
 
