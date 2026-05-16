@@ -174,15 +174,6 @@ const GestaoProjetos = () => {
     }
   };
 
-  const handleUpdateStatus = async (id: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('projetos')
-        .update({ status_geral: newStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-
       if (newStatus === 'Entregue') {
         toast.success("Projeto entregue!", {
           description: "Pesquisa de satisfação gerada. Verifique o Módulo 09 para enviar ao cliente."
