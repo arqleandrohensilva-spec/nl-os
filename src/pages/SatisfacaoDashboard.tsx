@@ -285,7 +285,7 @@ const SatisfacaoDashboard = () => {
                         {survey.status}
                       </span>
                       <Button variant="ghost" size="icon" onClick={() => {
-                        const link = `${window.location.origin}/satisfacao/${survey.token}`;
+                        const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
                         navigator.clipboard.writeText(link);
                         toast({ title: "Link copiado!" });
                       }} className="text-white/40 hover:text-white">
@@ -450,9 +450,9 @@ const SatisfacaoDashboard = () => {
               <div className="p-4 bg-bronze/10 border border-bronze/20 space-y-2">
                 <p className="text-[10px] uppercase tracking-widest font-bold text-bronze">Link Gerado:</p>
                 <div className="flex gap-2">
-                  <Input readOnly value={`${window.location.origin}/satisfacao/${generatedToken}`} className="bg-transparent border-white/10 rounded-none text-xs" />
+                  <Input readOnly value={`https://app.nl.arq.br/satisfacao/${generatedToken}`} className="bg-transparent border-white/10 rounded-none text-xs" />
                   <Button size="icon" onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/satisfacao/${generatedToken}`);
+                    navigator.clipboard.writeText(`https://app.nl.arq.br/satisfacao/${generatedToken}`);
                     toast({ title: "Link copiado!" });
                   }} className="bg-bronze hover:bg-bronze/90 rounded-none">
                     <Copy className="w-4 h-4" />
