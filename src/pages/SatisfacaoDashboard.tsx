@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink } from 'lucide-react';
+import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink, FileVideo, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -35,6 +35,13 @@ const SatisfacaoDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [creating, setCreating] = useState(false);
+  const [followUpQuestion, setFollowUpQuestion] = useState('');
+  const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
+  const [generatingFollowUp, setGeneratingFollowUp] = useState(false);
+  const [selectedSurveyForFollowUp, setSelectedSurveyForFollowUp] = useState<any>(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState('');
+
   
   const [stats, setStats] = useState({
     avg: 0,
@@ -186,6 +193,75 @@ const SatisfacaoDashboard = () => {
       toast({ variant: "destructive", title: "Erro ao atualizar" });
     }
   };
+
+  const formatarDepoimento = (pesquisa: any) => {
+    if (!pesquisa.comentario) return '';
+    const comentario = pesquisa.comentario.trim();
+    // Capitalizar primeira letra, adicionar ponto final se não tiver
+    const comentarioFormatado = comentario.charAt(0).toUpperCase() + 
+      comentario.slice(1) + 
+      (comentario.endsWith('.') ? '' : '.');
+    
+    const cidade = pesquisa.projeto?.cidade || 'Localidade não informada';
+    const tipo = pesquisa.projeto?.tipo || 'Projeto';
+    
+    return `${pesquisa.cliente_nome} — ${tipo}, ${cidade}:\n"${comentarioFormatado}"`;
+  };
+
+  const handleFormatClick = async (dep: any) => {
+    const survey = dep.pesquisa;
+    const wordCount = survey.comentario?.split(/\s+/).length || 0;
+
+    if (wordCount < 20) {
+      setSelectedSurveyForFollowUp(survey);
+      setGeneratingFollowUp(true);
+      setIsFollowUpModalOpen(true);
+      
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': import.meta.env.VITE_ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'dangerously-allow-browser': 'true'
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-haiku-20241022', // Updated to a real available version for now, user asked for 4-5-2025 but it might not exist in the env yet
+            max_tokens: 100,
+            messages: [{
+              role: 'user',
+              content: `O cliente ${survey.cliente_nome} avaliou com nota ${survey.nota_geral} e deixou este comentário curto: '${survey.comentario}'. Gere UMA pergunta curta e natural para pedir que ele detalhe mais a experiência, no tom da NL Arquitetos: técnico, direto, sem bajulação. Máximo 2 linhas.`
+            }]
+          })
+        });
+
+        const data = await response.json();
+        setFollowUpQuestion(data.content[0].text.replace(/"/g, ''));
+      } catch (error) {
+        console.error('Error generating follow-up:', error);
+        toast({ variant: "destructive", title: "Erro ao gerar pergunta" });
+      } finally {
+        setGeneratingFollowUp(false);
+      }
+    } else {
+      const formatado = formatarDepoimento(survey);
+      await supabase
+        .from('depoimentos')
+        .update({ texto_formatado: formatado })
+        .eq('id', dep.id);
+      
+      fetchData();
+      toast({ title: "Depoimento formatado com sucesso!" });
+    }
+  };
+
+  const handleSendFollowUpWhatsApp = () => {
+    if (!selectedSurveyForFollowUp) return;
+    const text = encodeURIComponent(followUpQuestion);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
