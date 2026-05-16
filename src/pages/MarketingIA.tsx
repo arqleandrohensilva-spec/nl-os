@@ -259,11 +259,12 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
   const generateContent = async (type: string) => {
     setGenerating(true);
     setGeneratedContent("");
+    if (type === 'captions') setCaptionOptions([]);
+    
     try {
       // 1. Get active files and download their content
       const activeFiles = files.filter(f => f.is_active);
       
-      // Sort by priority as requested
       const priority = [
         "Scripts - NL",
         "Meu Cliente (NL)",
@@ -276,25 +277,18 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
       activeFiles.sort((a, b) => {
         const idxA = priority.findIndex(p => a.file_name.includes(p));
         const idxB = priority.findIndex(p => b.file_name.includes(p));
-        const valA = idxA === -1 ? 999 : idxA;
-        const valB = idxB === -1 ? 999 : idxB;
-        return valA - valB;
+        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
       });
 
       let contextContent = "";
       for (const file of activeFiles) {
         try {
-          const response = await supabase.functions.invoke('dropbox-proxy', {
-            body: { 
-              action: 'download',
-              path: file.file_path
-            }
+          const { data } = await supabase.functions.invoke('dropbox-proxy', {
+            body: { action: 'download', path: file.file_path }
           });
           
-          if (response.data) {
-            // For edge function downloads that return a blob, we might need to handle the response differently
-            // But based on the provided code snippet:
-            const text = await response.data.text();
+          if (data) {
+            const text = await data.text();
             contextContent += `\n--- CONTEXTO: ${file.file_name} ---\n${text}\n`;
           }
         } catch (e) {
@@ -302,13 +296,71 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
-      const typeLabels: Record<string, string> = {
-        'captions': 'Legenda para Instagram',
-        'reels': 'Roteiro para Reels',
-        'calendar': 'Calendário de Conteúdo Semanal'
-      };
+      if (type === 'captions') {
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere 3 opções de legenda para Instagram.
 
-      const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.
+TOM OBRIGATÓRIO: técnico, condutor, centrado no processo — nunca romântico ou emocional. Explique a decisão técnica por trás do projeto, não a estética.
+
+REGRAS:
+- Máximo 5 linhas visíveis antes do "ver mais"
+- Sem "casa dos sonhos", "lindo", "incrível", "luxo", "exclusivo"
+- Sempre mencionar processo técnico antes de resultado estético
+- Hashtags: máximo 10, sempre incluir #NLArquitetos e #ProjetoExecutivo
+- Tipo de post: ${postType}
+- Foco: ${captionFocus}
+
+DIRETRIZES DA NL: ${guidelines}
+
+BASE DE CONHECIMENTO (CONTEXTO):
+${contextContent}
+
+Retorne APENAS JSON válido neste formato:
+{
+  "opcoes": [
+    {"legenda": "texto completo", "hashtags": "#tag1 #tag2..."},
+    {"legenda": "texto completo", "hashtags": "#tag1 #tag2..."},
+    {"legenda": "texto completo", "hashtags": "#tag1 #tag2..."}
+  ]
+}`;
+
+        const prompt = `
+${captionImage ? "Analise a imagem do projeto enviada e baseie a legenda no que você vê — materiais, detalhes construtivos, decisões técnicas visíveis." : ""}
+${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
+`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            image: captionImage, 
+            model: "anthropic/claude-3-5-sonnet-20240620",
+            json: true
+          }
+        });
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.opcoes) {
+              setCaptionOptions(parsed.opcoes);
+            } else {
+              setGeneratedContent(content);
+            }
+          } catch (e) {
+            setGeneratedContent(content);
+          }
+        } else {
+          throw new Error("Falha ao gerar legendas.");
+        }
+      } else {
+        // Logica para Reels e Calendario (mantendo a original mas com melhor contextContent)
+        const typeLabels: Record<string, string> = {
+          'reels': 'Roteiro para Reels',
+          'calendar': 'Calendário de Conteúdo Semanal'
+        };
+
+        const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.
 Seu objetivo é gerar ${typeLabels[type]} seguindo rigorosamente a Base de Conhecimento e as Diretrizes abaixo.
 
 DIRETRIZES RÁPIDAS:
@@ -319,18 +371,19 @@ ${contextContent}
 
 Responda sempre em Português do Brasil. Mantenha o tom de voz definido nos documentos.`;
 
-      const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.
-      
+        const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.
+        
 Informações do post: ${userInput}`;
 
-      const aiResponse = await supabase.functions.invoke('ai-advisor', {
-        body: { prompt, systemPrompt }
-      });
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { prompt, systemPrompt }
+        });
 
-      if (aiResponse.data?.choices?.[0]?.message?.content) {
-        setGeneratedContent(aiResponse.data.choices[0].message.content);
-      } else {
-        throw new Error("Falha ao gerar conteúdo pela IA.");
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          setGeneratedContent(aiResponse.data.choices[0].message.content);
+        } else {
+          throw new Error("Falha ao gerar conteúdo pela IA.");
+        }
       }
 
     } catch (error: any) {
