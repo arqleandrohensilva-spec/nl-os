@@ -7,20 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
-async function getDropboxTokens(supabaseClient: any) {
-  const { data, error } = await supabaseClient
-    .from('dropbox_settings')
-    .select('*')
-    .eq('id', '00000000-0000-0000-0000-000000000001')
-    .single()
-  
-  if (error || !data) {
-    console.error('Error fetching Dropbox tokens from DB:', error)
-    return null
-  }
-  return data
-}
-
 async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
   const clientId = Deno.env.get('DROPBOX_CLIENT_ID');
   const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET');
@@ -48,11 +34,12 @@ async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
     const data = await response.json();
     if (data.access_token) {
       console.log('Token refreshed successfully')
-      // Update database
+      
       const updateData: any = {
         access_token: data.access_token,
         updated_at: new Date().toISOString(),
       }
+      
       if (data.expires_in) {
         updateData.expires_at = new Date(Date.now() + data.expires_in * 1000).toISOString()
       }
@@ -73,21 +60,25 @@ async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
 }
 
 serve(async (req) => {
-  const { method, url } = req;
-  
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const supabaseClient = createClient(
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const settings = await getDropboxTokens(supabaseClient)
+    // Fetch tokens from database instead of environment variables
+    const { data: settings, error: settingsError } = await supabase
+      .from('dropbox_settings')
+      .select('access_token, refresh_token, expires_at')
+      .eq('id', '00000000-0000-0000-0000-000000000001')
+      .single()
     
-    if (!settings?.access_token) {
+    if (settingsError || !settings?.access_token) {
+      console.error('Dropbox settings not found or missing access_token:', settingsError)
       return new Response(JSON.stringify({ 
         error: 'Dropbox connection not configured', 
         details: 'Por favor, conecte o Dropbox nas configurações do sistema.' 
@@ -97,15 +88,16 @@ serve(async (req) => {
       });
     }
 
-    let dropboxToken = settings.access_token
+    let accessToken = settings.access_token
 
     // Check if token is expired (buffer of 5 minutes)
     const isExpired = settings.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000)
     
     if (isExpired && settings.refresh_token) {
-      const refreshedToken = await refreshDropboxToken(supabaseClient, settings.refresh_token)
+      console.log('Token is expired or near expiry, refreshing...')
+      const refreshedToken = await refreshDropboxToken(supabase, settings.refresh_token)
       if (refreshedToken) {
-        dropboxToken = refreshedToken
+        accessToken = refreshedToken
       }
     }
 
@@ -137,7 +129,7 @@ serve(async (req) => {
     let endpoint = '';
     let body: any = null;
     let headers: any = {
-      'Authorization': `Bearer ${dropboxToken}`,
+      'Authorization': `Bearer ${accessToken}`,
     };
 
     if (action === 'list_folder') {
@@ -170,7 +162,6 @@ serve(async (req) => {
       if (!dropboxArg) throw new Error('Missing dropbox-api-arg header for upload');
       headers['Dropbox-API-Arg'] = dropboxArg;
       headers['Content-Type'] = 'application/octet-stream';
-      // For upload, we might need to handle the stream carefully if we retry
       body = req.body; 
     } else if (action === 'delete') {
       endpoint = 'https://api.dropboxapi.com/2/files/delete_v2';
@@ -202,7 +193,7 @@ serve(async (req) => {
     // If 401, try to refresh once
     if (response.status === 401 && settings.refresh_token) {
       console.log('Token expired (401), attempting refresh...');
-      const newToken = await refreshDropboxToken(supabaseClient, settings.refresh_token);
+      const newToken = await refreshDropboxToken(supabase, settings.refresh_token);
       if (newToken) {
         headers['Authorization'] = `Bearer ${newToken}`;
         if (action !== 'upload') {
