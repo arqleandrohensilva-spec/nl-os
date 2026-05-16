@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, systemPrompt, image, model, json } = await req.json()
+    const { prompt, systemPrompt, image, model } = await req.json()
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
 
     if (!LOVABLE_API_KEY) {
@@ -42,7 +42,8 @@ serve(async (req) => {
       messages.push({ role: "user", content: prompt });
     }
 
-    const targetModel = model || "google/gemini-pro"; // Fallback to a stable model
+    // Use requested model or fallback
+    const targetModel = model || "anthropic/claude-3-5-sonnet-20240620";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -53,7 +54,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: targetModel,
         messages: messages,
-        ...(json ? { response_format: { type: "json_object" } } : {})
+        response_format: { type: "json_object" }
       })
     });
 
