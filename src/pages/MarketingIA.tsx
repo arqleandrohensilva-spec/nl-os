@@ -255,16 +255,6 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
   };
 
   const generateContent = async (type: string, skipImage: boolean = false) => {
-    // API Key Check
-    if (!import.meta.env.ANTHROPIC_API_KEY) {
-      toast({
-        variant: "destructive",
-        title: "Configuração Necessária",
-        description: "Configure a chave ANTHROPIC_API_KEY nas configurações do projeto."
-      });
-      return;
-    }
-
     setGenerating(true);
     if (!skipImage) setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
