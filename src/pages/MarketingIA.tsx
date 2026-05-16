@@ -6,10 +6,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check, Copy, ChevronRight } from "lucide-react";
+import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check, Copy, ChevronRight, Clock, Star, Trash2, Search, Filter, ChevronDown, ChevronUp, History } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
@@ -60,6 +73,15 @@ const MarketingIA = () => {
   const [expandingContent, setExpandingContent] = useState<number | null>(null);
   const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
 
+  // History states
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [historyFilter, setHistoryFilter] = useState<'TODOS' | 'LEGENDA' | 'REEL' | 'CALENDARIO'>('TODOS');
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [historySearch, setHistorySearch] = useState("");
+  const [expandedHistoryId, setExpandedHistoryId] = useState<string | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
 
@@ -75,7 +97,117 @@ const MarketingIA = () => {
   useEffect(() => {
     fetchKnowledgeBase();
     fetchGuidelines();
+    fetchHistory();
   }, []);
+
+  const fetchHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('historico_conteudo')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setHistoryItems(data || []);
+    } catch (error: any) {
+      console.error("Erro ao buscar histórico:", error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const saveToHistory = async (tipo: 'legenda' | 'reel' | 'calendario', conteudo: any, inputUsado?: string, postTypeUsed?: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('historico_conteudo')
+        .insert([{
+          tipo,
+          conteudo,
+          input_usado: inputUsado,
+          post_type: postTypeUsed,
+          favorito: false
+        }])
+        .select();
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => [data[0], ...prev]);
+      toast({
+        title: "Salvo no histórico",
+        description: "O conteúdo foi guardado na sua biblioteca."
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao salvar no histórico",
+        description: error.message
+      });
+    }
+  };
+
+  const toggleFavorite = async (id: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('historico_conteudo')
+        .update({ favorito: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => prev.map(item => 
+        item.id === id ? { ...item, favorito: !currentStatus } : item
+      ));
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao favoritar",
+        description: error.message
+      });
+    }
+  };
+
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('historico_conteudo')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setHistoryItems(prev => prev.filter(item => item.id !== id));
+      toast({
+        title: "Item excluído",
+        description: "O conteúdo foi removido do histórico."
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao excluir",
+        description: error.message
+      });
+    }
+  };
+
+  const useAgain = (item: any) => {
+    if (item.tipo === 'legenda') {
+      setCaptionDescription(item.input_usado || "");
+      if (item.post_type) setPostType(item.post_type as any);
+      setCaptionOptions(item.conteudo.opcoes || [item.conteudo]);
+      setActiveTab('captions');
+    } else if (item.tipo === 'reel') {
+      setReelsSubject(item.input_usado || "");
+      setReelsResult(item.conteudo);
+      setActiveTab('reels');
+    }
+    
+    toast({
+      title: "Conteúdo carregado",
+      description: "As configurações foram restauradas na aba correspondente."
+    });
+  };
+
 
   const fetchGuidelines = async () => {
     const { data } = await supabase
@@ -542,6 +674,8 @@ Retorne APENAS JSON válido neste formato:
             const parsed = extractJSON(content);
             if (parsed && parsed.semanas) {
               setCalendarResult(parsed.semanas);
+              // Auto-save calendar
+              saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
             } else {
               setGeneratedContent(content);
             }
@@ -700,6 +834,9 @@ Retorne APENAS JSON válido neste formato:
             </TabsTrigger>
             <TabsTrigger value="calendar" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <Calendar className="w-3 h-3 mr-2" /> Calendário
+            </TabsTrigger>
+            <TabsTrigger value="history" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
+              <History className="w-3 h-3 mr-2" /> Histórico
             </TabsTrigger>
           </TabsList>
 
@@ -888,7 +1025,8 @@ Retorne APENAS JSON válido neste formato:
                           )}
                         </div>
 
-                        <div className="flex justify-end pt-2 border-t border-white/5">
+                        <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                          <Button variant="ghost" size="sm" className="text-white/40 hover:text-white text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => saveToHistory('legenda', option, captionDescription, postType)}><Star className="w-3 h-3 text-bronze" /> Salvar</Button>
                           <Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar Legenda</Button>
                         </div>
                       </CardContent>
@@ -1043,7 +1181,14 @@ Retorne APENAS JSON válido neste formato:
                         <div className="text-white/80 text-sm leading-relaxed">{reelsResult.cta}</div>
                       </div>
 
-                      <div className="p-6 pt-0">
+                      <div className="p-6 pt-0 flex flex-col gap-2">
+                        <Button 
+                          variant="outline"
+                          className="w-full border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
+                          onClick={() => saveToHistory('reel', reelsResult, reelsSubject)}
+                        >
+                          <Star className="w-3 h-3 mr-2 text-bronze" /> Salvar no Histórico
+                        </Button>
                         <Button 
                           className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
                           onClick={() => {
@@ -1198,6 +1343,187 @@ Retorne APENAS JSON válido neste formato:
                 )}
               </div>
             </div>
+          </TabsContent>
+          <TabsContent value="history" className="space-y-6 outline-none">
+            <Card className="bg-white/[0.02] border-white/5 rounded-none">
+              <CardHeader className="p-6 border-b border-white/5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="relative flex-1 max-w-sm">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                      <Input 
+                        placeholder="Buscar no histórico..." 
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        className="pl-10 bg-white/5 border-white/10 text-white rounded-none h-10 focus:border-bronze/50"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox 
+                        id="favorites" 
+                        checked={showOnlyFavorites}
+                        onCheckedChange={(checked) => setShowOnlyFavorites(checked as boolean)}
+                        className="border-white/20 data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
+                      />
+                      <label htmlFor="favorites" className="text-[10px] text-white/40 uppercase font-bold tracking-widest cursor-pointer">Apenas favoritos</label>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                    {(['TODOS', 'LEGENDA', 'REEL', 'CALENDARIO'] as const).map((type) => (
+                      <Button
+                        key={type}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setHistoryFilter(type)}
+                        className={`rounded-none text-[9px] font-bold tracking-widest px-4 h-8 ${historyFilter === type ? 'bg-bronze text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                      >
+                        {type}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                {historyLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <Loader2 className="w-8 h-8 text-bronze animate-spin mb-4" />
+                    <p className="text-white/40 text-sm font-cormorant">Carregando sua biblioteca...</p>
+                  </div>
+                ) : historyItems.filter(item => {
+                  const matchesFilter = historyFilter === 'TODOS' || item.tipo.toUpperCase() === historyFilter;
+                  const matchesFavorite = !showOnlyFavorites || item.favorito;
+                  const searchLower = historySearch.toLowerCase();
+                  const matchesSearch = !historySearch || 
+                    (item.input_usado?.toLowerCase().includes(searchLower)) ||
+                    (item.tipo.toLowerCase().includes(searchLower)) ||
+                    (JSON.stringify(item.conteudo).toLowerCase().includes(searchLower));
+                  return matchesFilter && matchesFavorite && matchesSearch;
+                }).length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20">
+                      <History size={32} />
+                    </div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Nenhum conteúdo encontrado</h3>
+                    <p className="text-white/20 text-xs max-w-[250px]">
+                      {historySearch || showOnlyFavorites || historyFilter !== 'TODOS' 
+                        ? "Tente ajustar seus filtros para encontrar o que procura."
+                        : "Sua biblioteca ainda está vazia. Gere legendas, reels ou calendários para começar a construir seu histórico."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {historyItems.filter(item => {
+                      const matchesFilter = historyFilter === 'TODOS' || item.tipo.toUpperCase() === historyFilter;
+                      const matchesFavorite = !showOnlyFavorites || item.favorito;
+                      const searchLower = historySearch.toLowerCase();
+                      const matchesSearch = !historySearch || 
+                        (item.input_usado?.toLowerCase().includes(searchLower)) ||
+                        (item.tipo.toLowerCase().includes(searchLower)) ||
+                        (JSON.stringify(item.conteudo).toLowerCase().includes(searchLower));
+                      return matchesFilter && matchesFavorite && matchesSearch;
+                    }).map((item) => (
+                      <Card key={item.id} className="bg-white/[0.03] border-white/5 hover:border-bronze/30 transition-all duration-300 rounded-none overflow-hidden group flex flex-col">
+                        <CardHeader className="p-4 flex flex-row items-center justify-between border-b border-white/5">
+                          <Badge variant="outline" className="bg-bronze/10 border-bronze/20 text-bronze text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none">
+                            {item.tipo}
+                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => toggleFavorite(item.id, item.favorito)}
+                              className={`transition-colors ${item.favorito ? 'text-bronze' : 'text-white/20 hover:text-white/40'}`}
+                            >
+                              <Star size={16} fill={item.favorito ? "currentColor" : "none"} />
+                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="text-white/10 hover:text-red-400 transition-colors">
+                                  <Trash2 size={16} />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-[#1A1A1A] border-white/10 rounded-none">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-white font-cormorant">Excluir do Histórico?</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-white/60">
+                                    Esta ação não pode ser desfeita. O conteúdo será removido permanentemente da sua biblioteca.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteHistoryItem(item.id)} className="bg-red-500/80 hover:bg-red-500 text-white rounded-none">Excluir</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+                          <p className="text-[10px] text-white/30 uppercase tracking-tighter">
+                            {formatDate(item.created_at)}
+                          </p>
+                          <h4 className="text-white text-sm font-bold line-clamp-1">{item.input_usado || "Sem descrição"}</h4>
+                          
+                          <div className={`text-white/50 text-[11px] leading-relaxed italic font-light ${expandedHistoryId === item.id ? '' : 'line-clamp-3'}`}>
+                            {item.tipo === 'legenda' ? (item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda) : 
+                             item.tipo === 'reel' ? item.conteudo.gancho : 
+                             `Calendário para ${item.input_usado}`}
+                          </div>
+
+                          {expandedHistoryId === item.id && (
+                            <div className="pt-4 mt-4 border-t border-white/5 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                              {item.tipo === 'legenda' && (
+                                <div className="space-y-2">
+                                  <p className="text-white/80 text-[12px] whitespace-pre-wrap">{item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda}</p>
+                                  <p className="text-bronze text-[11px]">{item.conteudo.hashtags || item.conteudo.opcoes?.[0]?.hashtags}</p>
+                                </div>
+                              )}
+                              {item.tipo === 'reel' && (
+                                <div className="space-y-3 text-[12px]">
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">Gancho:</p>
+                                  <p className="text-white/80">{item.conteudo.gancho}</p>
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">Desenvolvimento:</p>
+                                  <ul className="list-disc pl-4 text-white/60 space-y-1">
+                                    {item.conteudo.desenvolvimento?.map((d: string, i: number) => <li key={i}>{d}</li>)}
+                                  </ul>
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">CTA:</p>
+                                  <p className="text-white/80">{item.conteudo.cta}</p>
+                                </div>
+                              )}
+                              {item.tipo === 'calendario' && (
+                                <div className="space-y-3">
+                                  {item.conteudo.semanas?.map((s: any) => (
+                                    <div key={s.numero} className="p-2 bg-white/5 border-l-2 border-bronze">
+                                      <p className="text-[9px] font-bold text-bronze uppercase">S{s.numero}: {s.tipo}</p>
+                                      <p className="text-white/80 text-[11px] font-medium">{s.tema}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="pt-4 mt-auto flex flex-col gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setExpandedHistoryId(expandedHistoryId === item.id ? null : item.id)}
+                              className="w-full text-white/40 hover:text-white hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest h-8 rounded-none"
+                            >
+                              {expandedHistoryId === item.id ? <><ChevronUp size={12} className="mr-2" /> RECOLHER</> : <><ChevronDown size={12} className="mr-2" /> VER COMPLETO</>}
+                            </Button>
+                            <Button 
+                              onClick={() => useAgain(item)}
+                              className="w-full bg-bronze/10 text-bronze hover:bg-bronze hover:text-white text-[9px] font-bold uppercase tracking-widest h-8 rounded-none transition-all duration-300"
+                            >
+                              USAR NOVAMENTE
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>
