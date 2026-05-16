@@ -231,6 +231,47 @@ export type Database = {
         }
         Relationships: []
       }
+      depoimentos: {
+        Row: {
+          aprovado_em: string | null
+          criado_em: string
+          id: string
+          pesquisa_id: string | null
+          publicado_em: string | null
+          status: string
+          texto_formatado: string
+          updated_at: string
+        }
+        Insert: {
+          aprovado_em?: string | null
+          criado_em?: string
+          id?: string
+          pesquisa_id?: string | null
+          publicado_em?: string | null
+          status?: string
+          texto_formatado: string
+          updated_at?: string
+        }
+        Update: {
+          aprovado_em?: string | null
+          criado_em?: string
+          id?: string
+          pesquisa_id?: string | null
+          publicado_em?: string | null
+          status?: string
+          texto_formatado?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "depoimentos_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "pesquisas_satisfacao"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diagnosticos_ia: {
         Row: {
           conteudo: string
@@ -600,6 +641,59 @@ export type Database = {
           whats?: string
         }
         Relationships: []
+      }
+      pesquisas_satisfacao: {
+        Row: {
+          avaliacao_processo: string | null
+          avaliacao_resultado: string | null
+          cliente_nome: string
+          comentario: string | null
+          criado_em: string
+          id: string
+          nota_geral: number | null
+          projeto_id: string | null
+          respondida_em: string | null
+          status: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          avaliacao_processo?: string | null
+          avaliacao_resultado?: string | null
+          cliente_nome: string
+          comentario?: string | null
+          criado_em?: string
+          id?: string
+          nota_geral?: number | null
+          projeto_id?: string | null
+          respondida_em?: string | null
+          status?: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          avaliacao_processo?: string | null
+          avaliacao_resultado?: string | null
+          cliente_nome?: string
+          comentario?: string | null
+          criado_em?: string
+          id?: string
+          nota_geral?: number | null
+          projeto_id?: string | null
+          respondida_em?: string | null
+          status?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pesquisas_satisfacao_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projeto_checklist: {
         Row: {
