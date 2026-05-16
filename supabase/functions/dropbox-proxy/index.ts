@@ -77,8 +77,11 @@ serve(async (req) => {
       .eq('id', '00000000-0000-0000-0000-000000000001')
       .single()
     
-    if (settingsError || !settings?.access_token) {
-      console.error('Dropbox settings not found or missing access_token:', settingsError)
+    let accessToken = settings?.access_token || Deno.env.get('DROPBOX_ACCESS_TOKEN');
+    const refreshToken = settings?.refresh_token;
+
+    if (!accessToken) {
+      console.error('Dropbox settings not found and no environment variable access_token');
       return new Response(JSON.stringify({ 
         error: 'Dropbox connection not configured', 
         details: 'Por favor, conecte o Dropbox nas configurações do sistema.' 
@@ -88,16 +91,14 @@ serve(async (req) => {
       });
     }
 
-    let accessToken = settings.access_token
-
     // Check if token is expired (buffer of 5 minutes)
-    const isExpired = settings.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000)
+    const isExpired = settings?.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000);
     
-    if (isExpired && settings.refresh_token) {
-      console.log('Token is expired or near expiry, refreshing...')
-      const refreshedToken = await refreshDropboxToken(supabase, settings.refresh_token)
+    if (isExpired && refreshToken) {
+      console.log('Token is expired or near expiry, refreshing...');
+      const refreshedToken = await refreshDropboxToken(supabase, refreshToken);
       if (refreshedToken) {
-        accessToken = refreshedToken
+        accessToken = refreshedToken;
       }
     }
 
