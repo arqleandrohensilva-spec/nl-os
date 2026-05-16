@@ -23,6 +23,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
@@ -72,6 +79,8 @@ const MarketingIA = () => {
   const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
   const [expandingContent, setExpandingContent] = useState<number | null>(null);
   const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
+  const [showExpansionModal, setShowExpansionModal] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", content: "", type: "" as 'linkedin' | 'blog' });
 
   // History states
   const [historyItems, setHistoryItems] = useState<any[]>([]);
@@ -464,7 +473,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             prompt, 
             systemPrompt, 
             image: currentImage, 
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -540,7 +549,7 @@ Assunto: ${reelsSubject}`;
             prompt, 
             systemPrompt, 
             image: currentImage,
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -649,7 +658,7 @@ Retorne APENAS JSON válido neste formato:
           body: { 
             prompt, 
             systemPrompt, 
-            model: "anthropic/claude-3-5-sonnet-20240620",
+            model: "anthropic/claude-sonnet-4-20250514",
             json: true
           }
         });
@@ -716,35 +725,72 @@ Retorne APENAS JSON válido neste formato:
   const expandContent = async (index: number, originalCaption: string, targetFormat: 'linkedin' | 'blog') => {
     setExpandingContent(index);
     try {
-      const systemPrompt = `Você é o CMO virtual da NL Arquitetos. Sua tarefa é transformar uma legenda de Instagram em um ${targetFormat === 'linkedin' ? 'Post de LinkedIn de alta performance' : 'Artigo de Blog otimizado para SEO'}.
-      
-      PARA LINKEDIN:
-      - Tom profissional, executivo e técnico.
-      - Foco em B2B, networking e autoridade de mercado.
-      - Formatação com parágrafos curtos, emojis discretos e bullet points técnicos.
-      
-      PARA BLOG (SEO):
-      - Título atraente com palavras-chave.
-      - Estrutura com Introdução, Desenvolvimento Técnico e Conclusão.
-      - Foco em educar o cliente sobre processos de arquitetura.
-      - Tom de especialista.
-      
-      DIRETRIZES DA NL: ${guidelines}`;
+      let systemPrompt = "";
+      let prompt = "";
 
-      const prompt = `TRANSFORME ESTA LEGENDA EM UM ${targetFormat.toUpperCase()}:\n\n${originalCaption}`;
+      if (targetFormat === 'linkedin') {
+        systemPrompt = `Você é o CMO virtual da NL Arquitetos. Transforme a legenda do Instagram abaixo em um post profissional para LinkedIn.
+
+DIFERENÇAS DO LINKEDIN:
+- Tom mais formal e analítico que o Instagram
+- Pode ter até 3000 caracteres — desenvolva mais o raciocínio técnico
+- Sem hashtags excessivas — máximo 5, relevantes para arquitetura e mercado imobiliário
+- Abertura forte que gere curiosidade profissional
+- Terminar com pergunta ou reflexão que incentive comentários
+- Público: incorporadoras, investidores, profissionais do setor, clientes de alto padrão
+
+TOM OBRIGATÓRIO: técnico, condutor, autoridade — nunca romantizado.
+DIRETRIZES NL: ${guidelines}`;
+
+        prompt = `LEGENDA INSTAGRAM ORIGINAL:
+${originalCaption}
+
+Gere o post completo para LinkedIn.`;
+      } else {
+        systemPrompt = `Você é o CMO virtual da NL Arquitetos. Transforme a legenda do Instagram abaixo em um artigo técnico para o blog da NL, otimizado para SEO local.
+
+ESTRUTURA DO ARTIGO:
+- Título SEO: incluir "arquiteto São José dos Campos" ou "projeto residencial SJC" naturalmente
+- Introdução: 2 parágrafos expandindo o conceito técnico da legenda
+- Desenvolvimento: 3 seções com subtítulos — aprofunda a decisão técnica, o processo e o resultado
+- Conclusão: reforça o método NL e CTA para contato
+- Meta description: 155 caracteres para SEO
+
+TOM: técnico, educativo, autoridade local. Nunca romantizado.
+PALAVRAS-CHAVE NATURAIS: arquiteto SJC, projeto executivo, compatibilização técnica, São José dos Campos.
+DIRETRIZES NL: ${guidelines}`;
+
+        prompt = `LEGENDA ORIGINAL:
+${originalCaption}
+
+Gere o artigo completo com título, subtítulos e meta description.`;
+      }
 
       const aiResponse = await supabase.functions.invoke('ai-advisor', {
-        body: { prompt, systemPrompt }
+        body: { 
+          prompt, 
+          systemPrompt,
+          model: "claude-sonnet-4-20250514"
+        }
       });
 
       if (aiResponse.error) throw new Error(aiResponse.error.message || JSON.stringify(aiResponse.error));
 
       if (aiResponse.data?.choices?.[0]?.message?.content) {
         const content = aiResponse.data.choices[0].message.content;
+        
         setExpandedResults(prev => ({
           ...prev,
           [index]: { ...prev[index], [targetFormat]: content }
         }));
+
+        setModalContent({
+          title: targetFormat === 'linkedin' ? "Post para LinkedIn" : "Artigo de Blog (SEO)",
+          content: content,
+          type: targetFormat
+        });
+        setShowExpansionModal(true);
+
         toast({
           title: "Expansão concluída",
           description: `O conteúdo para ${targetFormat === 'linkedin' ? 'LinkedIn' : 'Blog'} foi gerado.`
@@ -981,22 +1027,22 @@ Retorne APENAS JSON válido neste formato:
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
                                 onClick={() => expandContent(index, option.legenda, 'linkedin')}
                                 disabled={expandingContent !== null}
                               >
-                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
-                                LinkedIn
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3 text-bronze" />}
+                                Expandir para LinkedIn
                               </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-7 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none"
+                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
                                 onClick={() => expandContent(index, option.legenda, 'blog')}
                                 disabled={expandingContent !== null}
                               >
-                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <ChevronRight className="w-3 h-3 mr-1 text-bronze" />}
-                                Blog SEO
+                                {expandingContent === index ? <Loader2 className="w-3 h-3 animate-spin" /> : <ChevronRight className="w-3 h-3 text-bronze" />}
+                                Criar Artigo de Blog
                               </Button>
                             </div>
                           </div>
@@ -1526,6 +1572,35 @@ Retorne APENAS JSON válido neste formato:
             </Card>
           </TabsContent>
         </Tabs>
+        <Dialog open={showExpansionModal} onOpenChange={setShowExpansionModal}>
+          <DialogContent className="bg-[#1A1A1A] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+            <DialogHeader className="border-b border-white/5 pb-4 mb-4">
+              <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-tight flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-bronze" /> {modalContent.title}
+              </DialogTitle>
+              <DialogDescription className="text-white/40 text-xs">
+                {modalContent.type === 'linkedin' ? 'Post otimizado para networking profissional.' : 'Artigo técnico otimizado para SEO local.'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6">
+              <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed bg-white/[0.02] p-6 border border-white/5 italic">
+                {modalContent.content}
+              </div>
+              <Button 
+                className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12"
+                onClick={() => {
+                  navigator.clipboard.writeText(modalContent.content);
+                  toast({
+                    title: "Copiado",
+                    description: `${modalContent.title} copiado com sucesso.`
+                  });
+                }}
+              >
+                <Copy className="w-4 h-4 mr-2" /> Copiar para a Área de Transferência
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
