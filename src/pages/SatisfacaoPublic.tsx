@@ -109,17 +109,50 @@ const SatisfacaoPublic = () => {
   }
 
   if (submitted) {
+    const isPromoter = (notaGeral ?? 0) >= 9;
+
+    const handleIndication = () => {
+      const text = encodeURIComponent(`Olá NL! Gostaria de indicar um amigo que está precisando de um projeto de arquitetura com o padrão de vocês.`);
+      window.open(`https://wa.me/5511999999999?text=${text}`, '_blank');
+    };
+
     return (
       <div className="min-h-screen bg-[#1A1816] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-[#242220] p-8 text-center space-y-6">
-          <div className="w-20 h-20 bg-bronze/20 rounded-full flex items-center justify-center mx-auto">
+        <div className="max-w-md w-full bg-[#242220] p-8 text-center space-y-8 border border-white/5">
+          <div className="w-20 h-20 bg-bronze/20 rounded-full flex items-center justify-center mx-auto mb-2">
             <CheckCircle2 className="text-bronze w-10 h-10" />
           </div>
-          <h1 className="text-2xl font-bold text-white uppercase tracking-wider font-cormorant">Obrigado!</h1>
-          <p className="text-white/70">
+          
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-white uppercase tracking-[0.2em] font-cormorant">Obrigado!</h1>
+            <p className="text-bronze uppercase tracking-[0.1em] text-[10px] font-bold">Avaliação Enviada com Sucesso</p>
+          </div>
+
+          <p className="text-white/70 leading-relaxed font-light">
             Sua opinião é fundamental para mantermos o padrão de excelência da NL Arquitetos.
             Ficamos muito felizes com sua participação.
           </p>
+
+          {isPromoter && (
+            <div className="pt-8 border-t border-white/5 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full">
+                <Star className="w-4 h-4 fill-current" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Você é um Promotor NL</span>
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-sm text-white/90">
+                  Ficamos honrados com sua confiança! Que tal indicar a NL para um amigo que valoriza qualidade e processo técnico?
+                </p>
+                <Button
+                  onClick={handleIndication}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-bold uppercase tracking-widest text-[10px] py-6 rounded-none transition-all"
+                >
+                  Indicar via WhatsApp
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
