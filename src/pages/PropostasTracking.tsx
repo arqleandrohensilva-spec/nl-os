@@ -98,6 +98,9 @@ const PropostasTracking = () => {
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const [expandedEngagements, setExpandedEngagements] = useState<Record<string, boolean>>({});
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
+  const [reviewResult, setReviewResult] = useState<any>(null);
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
