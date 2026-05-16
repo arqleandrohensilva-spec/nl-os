@@ -70,13 +70,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Fetch tokens from database instead of environment variables
-    const { data: settings, error: settingsError } = await supabase
+    // Fetch tokens from database
+    const { data: settings } = await supabase
       .from('dropbox_settings')
       .select('access_token, refresh_token, expires_at')
       .eq('id', '00000000-0000-0000-0000-000000000001')
       .single()
     
+    // Priority: Database -> Environment Secret
     let accessToken = settings?.access_token || Deno.env.get('DROPBOX_ACCESS_TOKEN');
     const refreshToken = settings?.refresh_token;
 
@@ -99,8 +100,9 @@ serve(async (req) => {
       const refreshedToken = await refreshDropboxToken(supabase, refreshToken);
       if (refreshedToken) {
         accessToken = refreshedToken;
-        }
       }
+    }
+
     let bodyJson: any = {};
     const contentType = req.headers.get('content-type') || '';
     
@@ -212,8 +214,8 @@ serve(async (req) => {
             status: 200 
           });
         }
-        if (action === 'list_folder') {
-          console.log(`Path not found for list_folder action, returning empty entries: ${path}`);
+        if (action === 'list_folder' || action === 'list') {
+          console.log(`Path not found for list action, returning empty entries: ${path}`);
           return new Response(JSON.stringify({ entries: [], has_more: false }), { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200 
