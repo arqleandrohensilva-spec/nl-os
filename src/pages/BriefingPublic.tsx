@@ -137,7 +137,7 @@ const BriefingPublic = () => {
       if (briefing.lead_id) {
         await supabase
           .from('leads')
-          .update({ status: 'Briefing Preenchido' })
+          .update({ stage: 'Briefing Preenchido' })
           .eq('id', briefing.lead_id);
       }
 
