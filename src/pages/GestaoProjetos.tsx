@@ -16,7 +16,8 @@ import {
   Share2,
   ExternalLink,
   Trash2,
-  Sparkles
+  Sparkles,
+  Star
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -377,9 +378,9 @@ const GestaoProjetos = () => {
 
                 <Button 
                   onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
-                  className="absolute bottom-3 right-3 bg-transparent hover:bg-[#8B7355] hover:text-white text-[#8B7355] border border-[#8B7355]/30 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2"
+                  className="absolute bottom-4 right-4 bg-[#8B7355] hover:bg-[#8B7355]/80 text-white border border-[#8B7355]/30 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 z-10 shadow-lg"
                 >
-                  <Sparkles size={12} className="fill-current" /> Gerar Conteúdo
+                  <Star size={12} className="fill-current text-white" /> Gerar Conteúdo
                 </Button>
               </div>
             );
