@@ -41,10 +41,17 @@ const MarketingIA = () => {
       .select('content')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     if (data) {
       setGuidelines(data.content);
+    } else {
+      // Pre-preencher com o padrão solicitado
+      const defaultGuidelines = `Nunca usar: casa dos sonhos, projeto dos sonhos, lindo, incrível, luxo, exclusivo.
+Sempre mencionar processo técnico antes de resultado estético.
+Tom: condutor, técnico, direto. Máximo 5 linhas visíveis no Instagram.
+Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
+      setGuidelines(defaultGuidelines);
     }
   };
 
@@ -70,35 +77,36 @@ const MarketingIA = () => {
   const fetchKnowledgeBase = async () => {
     setLoading(true);
     try {
-      // 1. List files from Dropbox
+      // 1. Listar arquivos da pasta Base de Conhecimentos usando dropbox-proxy existente
       const response = await supabase.functions.invoke('dropbox-proxy', {
         body: { 
-          action: 'list_folder',
+          action: 'list',
           path: DROPBOX_PATH
         }
       });
 
-      if (response.error) throw new Error(response.error);
+      if (response.error) throw new Error(response.error.message || response.error);
 
-      const dropboxFiles = response.data.entries || [];
+      const dropboxFiles = response.data?.entries || response.data?.files || [];
 
-      // 2. Fetch active status from Supabase
+      // 2. Fetch active status from Supabase (tabela base_conhecimento)
       const { data: statusData, error: statusError } = await supabase
-        .from('knowledge_base_files')
+        .from('base_conhecimento')
         .select('*');
 
       if (statusError) throw statusError;
 
       const mergedFiles = dropboxFiles
-        .filter((f: any) => f['.tag'] === 'file')
+        .filter((df: any) => df['.tag'] === 'file' || df.name)
         .map((df: any) => {
-          const dbFile = statusData?.find(sf => sf.file_path === df.path_lower);
+          const path = df.path_lower || df.path || "";
+          const dbFile = statusData?.find(sf => sf.file_path === path);
           return {
             id: dbFile?.id,
-            file_path: df.path_lower,
+            file_path: path,
             file_name: df.name,
             is_active: dbFile ? dbFile.is_active : true, // Default to active
-            server_modified: df.server_modified,
+            server_modified: df.server_modified || df.client_modified,
             size: df.size
           };
         });
@@ -121,12 +129,12 @@ const MarketingIA = () => {
     try {
       if (file.id) {
         await supabase
-          .from('knowledge_base_files')
+          .from('base_conhecimento')
           .update({ is_active: newStatus })
           .eq('id', file.id);
       } else {
         await supabase
-          .from('knowledge_base_files')
+          .from('base_conhecimento')
           .insert([{ 
             file_path: file.file_path, 
             file_name: file.file_name, 
@@ -134,6 +142,7 @@ const MarketingIA = () => {
           }]);
       }
       
+      // Refresh local state
       setFiles(files.map(f => f.file_path === file.file_path ? { ...f, is_active: newStatus } : f));
       
       toast({
@@ -327,36 +336,28 @@ Informações do post: ${userInput}`;
                               <div className="p-2 bg-bronze/10 text-bronze rounded">
                                 <FileText size={18} />
                               </div>
-                              <div>
-                                <h3 className="text-white text-sm font-bold truncate max-w-[150px]">{file.file_name}</h3>
+                              <div className="max-w-[150px]">
+                                <h3 className="text-white text-sm font-bold truncate" title={file.file_name}>{file.file_name}</h3>
                                 <p className="text-[10px] text-white/40 uppercase tracking-tighter">
                                   {formatDate(file.server_modified)} · {formatSize(file.size)}
                                 </p>
                               </div>
                             </div>
                             <div className="flex flex-col items-end gap-2">
-                              {file.is_active ? (
-                                <span className="flex items-center gap-1 text-[9px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full uppercase tracking-widest">
-                                  <CheckCircle2 size={10} /> Ativo
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ${file.is_active ? 'text-emerald-400 bg-emerald-400/10' : 'text-white/40 bg-white/5'}`}>
+                                  {file.is_active ? 'ATIVO' : 'INATIVO'}
                                 </span>
-                              ) : (
-                                <span className="flex items-center gap-1 text-[9px] font-bold text-white/40 bg-white/5 px-2 py-0.5 rounded-full uppercase tracking-widest">
-                                  <XCircle size={10} /> Inativo
-                                </span>
-                              )}
+                                <Switch 
+                                  checked={file.is_active} 
+                                  onCheckedChange={() => toggleFileStatus(file)}
+                                  className="data-[state=checked]:bg-emerald-500"
+                                />
+                              </div>
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-[10px] uppercase font-bold tracking-widest text-white/40 hover:text-white"
-                              onClick={() => toggleFileStatus(file)}
-                            >
-                              {file.is_active ? "Desativar" : "Ativar"}
-                            </Button>
-                            
+                          <div className="flex items-center justify-end pt-3 border-t border-white/5">
                             <Button 
                               variant="ghost" 
                               size="sm" 
