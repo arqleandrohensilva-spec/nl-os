@@ -1178,7 +1178,14 @@ Retorne APENAS JSON válido neste formato:
                         <div className="text-white/80 text-sm leading-relaxed">{reelsResult.cta}</div>
                       </div>
 
-                      <div className="p-6 pt-0">
+                      <div className="p-6 pt-0 flex flex-col gap-2">
+                        <Button 
+                          variant="outline"
+                          className="w-full border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
+                          onClick={() => saveToHistory('reel', reelsResult, reelsSubject)}
+                        >
+                          <Star className="w-3 h-3 mr-2 text-bronze" /> Salvar no Histórico
+                        </Button>
                         <Button 
                           className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
                           onClick={() => {
