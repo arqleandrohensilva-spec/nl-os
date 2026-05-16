@@ -436,6 +436,16 @@ const SatisfacaoDashboard = () => {
               </div>
             </div>
 
+            <div className="relative mb-6">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Input 
+                placeholder="BUSCAR POR CLIENTE, PROJETO OU CIDADE..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-[#242220] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
+              />
+            </div>
+
             <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
               {['TODOS', 'PENDENTE APROVAÇÃO', 'APROVADOS', 'PUBLICADOS'].map(f => (
                 <button
