@@ -1998,6 +1998,40 @@ const DocumentosContratos = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        <Dialog open={isBriefingResponseModalOpen} onOpenChange={setIsBriefingResponseModalOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <ClipboardList size={18} className="text-bronze" /> RESPOSTAS DO BRIEFING - {selectedBriefing?.leads?.nome}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-6 space-y-8">
+              {selectedBriefing?.respostas ? (
+                Object.entries(selectedBriefing.respostas).map(([key, value]: [string, any]) => (
+                  <div key={key} className="space-y-1.5 border-b border-white/5 pb-4">
+                    <Label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block mb-2">
+                      {key.replace(/_/g, ' ').toUpperCase()}
+                    </Label>
+                    <p className="text-sm text-white/80 leading-relaxed bg-white/[0.02] p-4 border border-white/5">
+                      {value || <span className="text-white/20 italic">Não informado</span>}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-20 bg-black/20 border border-dashed border-white/10">
+                  <p className="text-sm text-white/40 italic">Aguardando preenchimento do cliente...</p>
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter className="sticky bottom-0 bg-[#1A1816] pt-4 border-t border-white/10">
+              <Button onClick={() => setIsBriefingResponseModalOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
+                FECHAR
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
