@@ -81,6 +81,8 @@ const DocumentosContratos = () => {
   const [dropboxProjectsFolders, setDropboxProjectsFolders] = useState<any[]>([]);
   const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [viewerFile, setViewerFile] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
