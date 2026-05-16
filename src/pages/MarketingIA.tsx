@@ -45,6 +45,8 @@ const MarketingIA = () => {
   const [reelsSubject, setReelsSubject] = useState("");
   const [reelsDuration, setReelsDuration] = useState<'30S' | '60S' | '90S'>('30S');
   const [reelsFormat, setReelsFormat] = useState<'EDUCATIVO' | 'BASTIDOR' | 'AUTORIDADE'>('EDUCATIVO');
+  const [reelsImage, setReelsImage] = useState<string | null>(null);
+  const reelsImageRef = useRef<HTMLInputElement>(null);
   const [reelsResult, setReelsResult] = useState<{ gancho: string, desenvolvimento: string[], cta: string } | null>(null);
   
   // New states for Calendar
