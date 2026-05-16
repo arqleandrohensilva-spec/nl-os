@@ -46,6 +46,13 @@ const MarketingIA = () => {
   const [reelsDuration, setReelsDuration] = useState<'30S' | '60S' | '90S'>('30S');
   const [reelsFormat, setReelsFormat] = useState<'EDUCATIVO' | 'BASTIDOR' | 'AUTORIDADE'>('EDUCATIVO');
   const [reelsResult, setReelsResult] = useState<{ gancho: string, desenvolvimento: string[], cta: string } | null>(null);
+  
+  // New states for Calendar
+  const [calendarMonth, setCalendarMonth] = useState("Junho 2026");
+  const [calendarProjects, setCalendarProjects] = useState("");
+  const [calendarFocus, setCalendarFocus] = useState<'CAPTAÇÃO' | 'AUTORIDADE' | 'EDUCAÇÃO' | 'PORTFÓLIO'>('CAPTAÇÃO');
+  const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
+
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
 
