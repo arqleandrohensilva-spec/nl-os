@@ -484,8 +484,7 @@ Retorne APENAS JSON válido neste formato:
             systemPrompt, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          },
-          headers: commonHeaders
+          }
         });
 
         if (aiResponse.error) {
@@ -513,8 +512,7 @@ Retorne APENAS JSON válido neste formato:
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { 
-          body: { prompt, systemPrompt },
-          headers: commonHeaders
+          body: { prompt, systemPrompt }
         });
 
         if (aiResponse.error) {
