@@ -754,8 +754,21 @@ Retorne APENAS JSON válido neste formato:
                 <Card className="bg-white/[0.02] border-white/5 rounded-none">
                   <CardHeader className="p-4 border-b border-white/5"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Diretrizes Rápidas</CardTitle></CardHeader>
                   <CardContent className="p-4 space-y-4">
-                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Insira as diretrizes para a IA..." className="min-h-[250px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
-                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[11px] font-bold tracking-[0.2em]" onClick={saveGuidelines}>Salvar Diretrizes</Button>
+                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Ex: Nunca usar 'casa dos sonhos', focar no técnico..." className="min-h-[150px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
+                    
+                    <div className="pt-4 border-t border-white/5">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-2 block flex items-center gap-2">
+                        <Sparkles className="w-3 h-3 text-bronze" /> Treinamento de Persona (Exemplos)
+                      </label>
+                      <Textarea 
+                        value={personaExamples} 
+                        onChange={(e) => setPersonaExamples(e.target.value)} 
+                        placeholder="Cole aqui 2 ou 3 posts que performaram muito bem para a IA aprender seu estilo único..." 
+                        className="min-h-[200px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" 
+                      />
+                    </div>
+
+                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[11px] font-bold tracking-[0.2em]" onClick={saveGuidelines}>Salvar Configurações</Button>
                   </CardContent>
                 </Card>
               </div>
