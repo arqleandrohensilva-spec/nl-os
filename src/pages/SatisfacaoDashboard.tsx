@@ -262,19 +262,39 @@ const SatisfacaoDashboard = () => {
   };
 
   const filteredSurveys = surveys.filter(s => {
-    if (surveysFilter === 'TODAS') return true;
-    if (surveysFilter === 'AGUARDANDO') return s.status === 'PENDENTE';
-    if (surveysFilter === 'RESPONDIDAS') return s.status === 'RESPONDIDA';
-    if (surveysFilter === 'ARQUIVADAS') return s.status === 'ARQUIVADA';
-    return true;
+    const matchesFilter = 
+      surveysFilter === 'TODAS' || 
+      (surveysFilter === 'AGUARDANDO' && s.status === 'PENDENTE') ||
+      (surveysFilter === 'RESPONDIDAS' && s.status === 'RESPONDIDA') ||
+      (surveysFilter === 'ARQUIVADAS' && s.status === 'ARQUIVADA');
+    
+    if (!matchesFilter) return false;
+
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      s.cliente_nome?.toLowerCase().includes(searchLower) ||
+      s.projeto?.nome?.toLowerCase().includes(searchLower) ||
+      s.projeto?.cidade?.toLowerCase().includes(searchLower)
+    );
   });
 
   const filteredTestimonials = testimonials.filter(t => {
-    if (testimonialsFilter === 'TODOS') return t.status !== 'DESCARTADO';
-    if (testimonialsFilter === 'PENDENTE APROVAÇÃO') return t.status === 'PENDENTE';
-    if (testimonialsFilter === 'APROVADOS') return t.status === 'APROVADO';
-    if (testimonialsFilter === 'PUBLICADOS') return t.status === 'PUBLICADO';
-    return true;
+    const matchesFilter = 
+      testimonialsFilter === 'TODOS' ? t.status !== 'DESCARTADO' :
+      (testimonialsFilter === 'PENDENTE APROVAÇÃO' && t.status === 'PENDENTE') ||
+      (testimonialsFilter === 'APROVADOS' && t.status === 'APROVADO') ||
+      (testimonialsFilter === 'PUBLICADOS' && t.status === 'PUBLICADO');
+      
+    if (!matchesFilter) return false;
+
+    if (!searchTerm) return true;
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      t.pesquisa?.cliente_nome?.toLowerCase().includes(searchLower) ||
+      t.pesquisa?.projeto?.nome?.toLowerCase().includes(searchLower) ||
+      t.pesquisa?.projeto?.cidade?.toLowerCase().includes(searchLower)
+    );
   });
 
   const surveysCount = {
