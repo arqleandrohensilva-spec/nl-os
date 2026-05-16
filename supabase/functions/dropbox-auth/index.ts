@@ -17,9 +17,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { code, action, redirectUri: passedRedirectUri } = await req.json()
+    const { code, action, redirectUri: passedRedirectUri, redirect_uri: passedRedirectUriSnake } = await req.json()
+    const redirectUri = passedRedirectUriSnake || passedRedirectUri || 'https://app.nl.arq.br/dropbox-callback'
 
-    if (action === 'exchange_token') {
+    if (action === 'exchange_token' || (code && !action)) {
       const clientId = Deno.env.get('DROPBOX_CLIENT_ID')
       const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET')
       const redirectUri = passedRedirectUri || 'https://app.nl.arq.br/dropbox-callback'
