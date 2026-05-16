@@ -1,4 +1,4 @@
-export type Stage = 'Novo Lead' | 'Reunião Agendada' | 'Proposta Enviada' | 'Negociação' | 'Fechado' | 'Perdido';
+export type Stage = 'Novo Lead' | 'Reunião Agendada' | 'Briefing Preenchido' | 'Proposta Enviada' | 'Negociação' | 'Fechado' | 'Perdido';
 export type Temp = 'Quente' | 'Morno' | 'Frio';
 export type Origem = 'Instagram' | 'Indicação' | 'Site' | 'Google' | 'Outro';
 export type TipoProjeto = 'Arq+Int' | 'Interiores' | 'Comercial';

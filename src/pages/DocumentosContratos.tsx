@@ -81,10 +81,14 @@ const DocumentosContratos = () => {
   const [dropboxProjectsFolders, setDropboxProjectsFolders] = useState<any[]>([]);
   const [projectSubfoldersFiles, setProjectSubfoldersFiles] = useState<Record<string, any[]>>({});
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [viewerFile, setViewerFile] = useState<any>(null);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState('');
+  const [selectedBriefing, setSelectedBriefing] = useState<any>(null);
+  const [isBriefingResponseModalOpen, setIsBriefingResponseModalOpen] = useState(false);
   
   const [isContratoModalOpen, setIsContratoModalOpen] = useState(false);
   const [selectedProjetoId, setSelectedProjetoId] = useState('');
@@ -795,6 +799,37 @@ const DocumentosContratos = () => {
       toast.error('Erro ao gerar link de compartilhamento');
     }
   };
+  
+  const handleViewFile = async (file: any) => {
+    try {
+      setLoading(true);
+      const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+      const isPdf = /\.pdf$/i.test(file.name);
+      
+      if (!isImage && !isPdf) {
+        handleDownloadDropbox(file.path_display);
+        return;
+      }
+      
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_temporary_link', path: file.path_display }
+      });
+      
+      if (error) throw error;
+      
+      setViewerFile({
+        ...file,
+        url: data.link,
+        type: isImage ? 'image' : 'pdf'
+      });
+      setIsViewerOpen(true);
+    } catch (error) {
+      console.error('View error:', error);
+      toast.error('Erro ao abrir visualizador');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateNewProject = async () => {
     if (!newProjectName) return;
@@ -949,9 +984,34 @@ const DocumentosContratos = () => {
                             {b.status}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <Button variant="ghost" size="sm" className="text-bronze hover:text-white hover:bg-bronze h-7 text-[9px]">
-                            VER RESPOSTAS
+                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setSelectedBriefing(b);
+                              setIsBriefingResponseModalOpen(true);
+                            }}
+                            className="text-bronze hover:text-white hover:bg-bronze h-7 text-[9px] uppercase tracking-widest font-bold"
+                          >
+                            <Eye size={12} className="mr-1" /> VER RESPOSTAS
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              const lead = leads.find(l => l.id === b.lead_id);
+                              const whatsapp = lead?.whats?.replace(/\D/g, '');
+                              if (whatsapp) {
+                                const url = `https://wa.me/55${whatsapp}?text=${encodeURIComponent(`Olá! Aqui é da NL Arquitetos. Segue o link do seu briefing para preenchimento: ${window.location.origin}/briefing/${b.token}`)}`;
+                                window.open(url, '_blank');
+                              } else {
+                                toast.error('WhatsApp não cadastrado para este lead');
+                              }
+                            }}
+                            className="text-green-500 hover:text-white hover:bg-green-600 h-7 text-[9px] uppercase tracking-widest font-bold"
+                          >
+                            <Send size={12} className="mr-1" /> ENVIAR LINK
                           </Button>
                         </td>
                       </tr>
@@ -1249,12 +1309,22 @@ const DocumentosContratos = () => {
                                     </p>
                                   </div>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-1">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    onClick={() => handleViewFile(file)}
+                                    className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Visualizar"
+                                  >
+                                    <Eye size={14} />
+                                  </Button>
                                   <Button 
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={() => handleDownloadDropbox(file.path_display)}
                                     className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Baixar"
                                   >
                                     <Download size={14} />
                                   </Button>
@@ -1263,6 +1333,7 @@ const DocumentosContratos = () => {
                                     size="icon" 
                                     onClick={() => handleShareFile(file.path_display)}
                                     className="h-7 w-7 text-white/40 hover:text-white"
+                                    title="Compartilhar"
                                   >
                                     <Share2 size={14} />
                                   </Button>
@@ -1968,6 +2039,80 @@ const DocumentosContratos = () => {
               >
                 {isCancelling ? <Loader2 size={16} className="animate-spin" /> : "CONFIRMAR CANCELAMENTO"}
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isBriefingResponseModalOpen} onOpenChange={setIsBriefingResponseModalOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                <ClipboardList size={18} className="text-bronze" /> RESPOSTAS DO BRIEFING - {selectedBriefing?.leads?.nome}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-6 space-y-8">
+              {selectedBriefing?.respostas ? (
+                Object.entries(selectedBriefing.respostas).map(([key, value]: [string, any]) => (
+                  <div key={key} className="space-y-1.5 border-b border-white/5 pb-4">
+                    <Label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block mb-2">
+                      {key.replace(/_/g, ' ').toUpperCase()}
+                    </Label>
+                    <p className="text-sm text-white/80 leading-relaxed bg-white/[0.02] p-4 border border-white/5">
+                      {value || <span className="text-white/20 italic">Não informado</span>}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-20 bg-black/20 border border-dashed border-white/10">
+                  <p className="text-sm text-white/40 italic">Aguardando preenchimento do cliente...</p>
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter className="sticky bottom-0 bg-[#1A1816] pt-4 border-t border-white/10">
+              <Button onClick={() => setIsBriefingResponseModalOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
+                FECHAR
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
+            <DialogHeader className="p-4 border-b border-white/5 flex flex-row items-center justify-between">
+              <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                <Eye size={14} className="text-bronze" /> {viewerFile?.name}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden bg-black/40 relative">
+              {viewerFile?.type === 'image' ? (
+                <div className="w-full h-full flex items-center justify-center p-4">
+                  <img src={viewerFile.url} alt={viewerFile.name} className="max-w-full max-h-full object-contain shadow-2xl" />
+                </div>
+              ) : (
+                <iframe 
+                  src={`${viewerFile?.url}#toolbar=0`} 
+                  className="w-full h-full border-none" 
+                  title={viewerFile?.name}
+                />
+              )}
+            </div>
+            <DialogFooter className="p-4 border-t border-white/5 flex justify-between items-center sm:justify-between">
+              <p className="text-[9px] text-white/40 uppercase tracking-widest">
+                Modificado em: {viewerFile?.client_modified && format(parseISO(viewerFile.client_modified), 'dd/MM/yyyy HH:mm')}
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => window.open(viewerFile?.url, '_blank')} 
+                  variant="outline" 
+                  className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest h-8"
+                >
+                  <ExternalLink size={12} className="mr-2" /> ABRIR ORIGINAL
+                </Button>
+                <Button onClick={() => setIsViewerOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest h-8">
+                  FECHAR
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>

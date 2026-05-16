@@ -54,6 +54,7 @@ interface Projeto {
   id: string;
   nome: string;
   nome_cliente: string;
+  cliente_id?: string;
   valor_total?: number;
   tipo: string;
   cidade: string;
@@ -906,9 +907,36 @@ const ProjetoDetalhe = () => {
                       <AccordionContent className="pb-8 pt-4 border-t border-white/5">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                           <div>
-                            <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold mb-4 flex items-center gap-2">
-                              <CheckCircle2 size={12} /> Checklist
-                            </h4>
+                            <div className="flex justify-between items-center mb-4">
+                              <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold flex items-center gap-2">
+                                <CheckCircle2 size={12} /> Checklist
+                              </h4>
+                              {stageChecklist.some(i => !i.concluido) && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  onClick={async () => {
+                                    if (!projeto?.cliente_id) {
+                                      toast.error("Cliente não vinculado a este projeto");
+                                      return;
+                                    }
+                                    const { data: lead } = await supabase.from('leads').select('whats').eq('id', projeto.cliente_id).single();
+                                    const whatsapp = lead?.whats?.replace(/\D/g, '');
+                                    
+                                    if (whatsapp) {
+                                      const pendencias = stageChecklist.filter(i => !i.concluido).map(i => `· ${i.item}`).join('\n');
+                                      const message = `Olá! Aqui é da NL Arquitetos. Gostaríamos de lembrar das seguintes pendências para a etapa ${config.label}:\n\n${pendencias}\n\nPodemos ajudar com algo?`;
+                                      window.open(`https://wa.me/55${whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+                                    } else {
+                                      toast.error("WhatsApp do cliente não encontrado");
+                                    }
+                                  }}
+                                  className="h-6 text-[8px] uppercase tracking-widest text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/5 border border-[#8B7355]/20 rounded-none font-bold"
+                                >
+                                  Cobrar Pendências
+                                </Button>
+                              )}
+                            </div>
                             <div className="space-y-3">
                               {stageChecklist.map((item) => (
                                 <div key={item.id} className="flex items-start gap-3 group">

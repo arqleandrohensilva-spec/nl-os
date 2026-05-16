@@ -65,6 +65,7 @@ import {
 const STAGES: Stage[] = [
   'Novo Lead', 
   'Reunião Agendada', 
+  'Briefing Preenchido',
   'Proposta Enviada', 
   'Negociação', 
   'Fechado', 

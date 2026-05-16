@@ -18,6 +18,7 @@ import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 import DropboxCallback from "./pages/DropboxCallback.tsx";
 import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
+import BriefingPublic from "./pages/BriefingPublic.tsx";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
         <Route path="/sistema/configuracoes" element={<ProtectedRoute><ConfiguracoesSistema /></ProtectedRoute>} />
         <Route path="/dropbox-callback" element={<DropboxCallback />} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
+        <Route path="/briefing/:token" element={<BriefingPublic />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

@@ -15,6 +15,7 @@ interface KanbanColumnProps {
 const STAGE_THEME: Record<Stage, { indicator: string, bg: string }> = {
   'Novo Lead': { indicator: '#8B7355', bg: 'bg-bronze/5' },
   'Reunião Agendada': { indicator: '#3A7BD5', bg: 'bg-blue-500/5' },
+  'Briefing Preenchido': { indicator: '#D4A017', bg: 'bg-yellow-500/5' },
   'Proposta Enviada': { indicator: '#7B55D5', bg: 'bg-purple-500/5' },
   'Negociação': { indicator: '#C49A2A', bg: 'bg-amber/5' },
   'Fechado': { indicator: '#2E7D52', bg: 'bg-green-600/5' },
