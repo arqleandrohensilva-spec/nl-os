@@ -248,6 +248,26 @@ const MarketingIA = () => {
     });
   };
 
+  const clearMarketingContext = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      await supabase
+        .from('contexto_marketing_ativo')
+        .delete()
+        .eq('user_id', userData.user.id);
+
+      setMarketingContext(null);
+      setCaptionDescription("");
+      toast({
+        title: "Contexto removido",
+        description: "O formulário agora está limpo para novo uso."
+      });
+    } catch (error) {
+      console.error("Erro ao limpar contexto:", error);
+    }
+  };
 
   const fetchGuidelines = async () => {
     const { data } = await supabase
