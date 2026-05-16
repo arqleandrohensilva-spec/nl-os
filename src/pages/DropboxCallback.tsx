@@ -24,7 +24,19 @@ export default function DropboxCallback() {
         setErrorMsg(error?.message || data?.error || 'Erro desconhecido');
       } else {
         setStatus('success');
-        setTimeout(() => navigate('/sistema/configuracoes'), 2000);
+        setTimeout(() => {
+          if (window.opener) {
+            // Se foi aberto em uma nova aba (popup), avisa a aba principal e fecha
+            try {
+              window.opener.location.reload();
+            } catch (e) {
+              console.error("Não foi possível recarregar a aba principal", e);
+            }
+            window.close();
+          } else {
+            navigate('/sistema/configuracoes');
+          }
+        }, 2000);
       }
     }).catch((err) => {
       setStatus('error');
