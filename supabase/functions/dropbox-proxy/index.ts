@@ -70,15 +70,19 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Fetch tokens from database instead of environment variables
-    const { data: settings, error: settingsError } = await supabase
+    // Fetch tokens from database
+    const { data: settings } = await supabase
       .from('dropbox_settings')
       .select('access_token, refresh_token, expires_at')
       .eq('id', '00000000-0000-0000-0000-000000000001')
       .single()
     
-    if (settingsError || !settings?.access_token) {
-      console.error('Dropbox settings not found or missing access_token:', settingsError)
+    // Priority: Database -> Environment Secret
+    let accessToken = settings?.access_token || Deno.env.get('DROPBOX_ACCESS_TOKEN');
+    const refreshToken = settings?.refresh_token;
+
+    if (!accessToken) {
+      console.error('Dropbox settings not found and no environment variable access_token');
       return new Response(JSON.stringify({ 
         error: 'Dropbox connection not configured', 
         details: 'Por favor, conecte o Dropbox nas configurações do sistema.' 
@@ -88,16 +92,14 @@ serve(async (req) => {
       });
     }
 
-    let accessToken = settings.access_token
-
     // Check if token is expired (buffer of 5 minutes)
-    const isExpired = settings.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000)
+    const isExpired = settings?.expires_at && new Date(settings.expires_at).getTime() < (Date.now() + 5 * 60 * 1000);
     
-    if (isExpired && settings.refresh_token) {
-      console.log('Token is expired or near expiry, refreshing...')
-      const refreshedToken = await refreshDropboxToken(supabase, settings.refresh_token)
+    if (isExpired && refreshToken) {
+      console.log('Token is expired or near expiry, refreshing...');
+      const refreshedToken = await refreshDropboxToken(supabase, refreshToken);
       if (refreshedToken) {
-        accessToken = refreshedToken
+        accessToken = refreshedToken;
       }
     }
 
@@ -115,7 +117,8 @@ serve(async (req) => {
     }
 
     const action = req.headers.get('x-action') || bodyJson.action;
-    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    let path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    const folder = bodyJson.folder || "";
     
     console.log(`Dropbox Proxy Request - Action: ${action}, Path: ${path}`);
 
@@ -126,16 +129,13 @@ serve(async (req) => {
       });
     }
 
-    const path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
-    const folder = bodyJson.folder || "";
-
     let endpoint = '';
     let body: any = null;
     let headers: any = {
       'Authorization': `Bearer ${accessToken}`,
     };
 
-    if (action === 'list_folder') {
+    if (action === 'list_folder' || action === 'list') {
       endpoint = 'https://api.dropboxapi.com/2/files/list_folder';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({
@@ -214,8 +214,8 @@ serve(async (req) => {
             status: 200 
           });
         }
-        if (action === 'list_folder') {
-          console.log(`Path not found for list_folder action, returning empty entries: ${path}`);
+        if (action === 'list_folder' || action === 'list') {
+          console.log(`Path not found for list action, returning empty entries: ${path}`);
           return new Response(JSON.stringify({ entries: [], has_more: false }), { 
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 200 
@@ -231,11 +231,12 @@ serve(async (req) => {
       }
 
       // If 401, try to refresh once
-      if (response.status === 401 && settings.refresh_token) {
+      if (response.status === 401 && refreshToken) {
         console.log('Token expired (401), attempting refresh...');
-        const newToken = await refreshDropboxToken(supabase, settings.refresh_token);
+        const newToken = await refreshDropboxToken(supabase, refreshToken);
         if (newToken) {
           headers['Authorization'] = `Bearer ${newToken}`;
+          // For uploads, we can't easily retry because body is a stream
           if (action !== 'upload') {
             const retryResponse = await fetch(endpoint, {
               method: 'POST',
