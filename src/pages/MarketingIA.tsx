@@ -723,6 +723,7 @@ Retorne APENAS JSON válido neste formato:
   };
 
   const expandContent = async (index: number, originalCaption: string, targetFormat: 'linkedin' | 'blog') => {
+    console.log(`Iniciando expansão multicanal: ${targetFormat} para index ${index}`);
     setExpandingContent(index);
     try {
       let systemPrompt = "";
@@ -766,7 +767,8 @@ ${originalCaption}
 Gere o artigo completo com título, subtítulos e meta description.`;
       }
 
-      const aiResponse = await supabase.functions.invoke('ai-advisor', {
+      console.log("Chamando Edge Function ai-advisor...");
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
           prompt, 
           systemPrompt,
@@ -774,10 +776,19 @@ Gere o artigo completo com título, subtítulos e meta description.`;
         }
       });
 
-      if (aiResponse.error) throw new Error(aiResponse.error.message || JSON.stringify(aiResponse.error));
+      if (error) {
+        console.error("Erro no invoke da função:", error);
+        throw new Error(error.message || "Falha na comunicação com a Edge Function");
+      }
 
-      if (aiResponse.data?.choices?.[0]?.message?.content) {
-        const content = aiResponse.data.choices[0].message.content;
+      if (data?.error) {
+        console.error("Erro retornado pela IA:", data.error);
+        throw new Error(data.error.message || "Erro interno da IA");
+      }
+
+      if (data?.choices?.[0]?.message?.content) {
+        const content = data.choices[0].message.content;
+        console.log("Conteúdo gerado com sucesso");
         
         setExpandedResults(prev => ({
           ...prev,
@@ -795,9 +806,16 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           title: "Expansão concluída",
           description: `O conteúdo para ${targetFormat === 'linkedin' ? 'LinkedIn' : 'Blog'} foi gerado.`
         });
+      } else {
+        throw new Error("Resposta da IA veio vazia ou em formato inesperado");
       }
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erro na expansão", description: error.message });
+      console.error("Erro geral na expansão:", error);
+      toast({ 
+        variant: "destructive", 
+        title: "Erro na expansão", 
+        description: error.message || "Ocorreu um erro inesperado ao gerar o conteúdo."
+      });
     } finally {
       setExpandingContent(null);
     }
