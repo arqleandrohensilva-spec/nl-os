@@ -115,6 +115,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contexto_marketing_ativo: {
+        Row: {
+          cliente: string
+          created_at: string | null
+          etapa_atual: string | null
+          id: string
+          proxima_entrega: string | null
+          status: string | null
+          tipo: string | null
+          user_id: string
+        }
+        Insert: {
+          cliente: string
+          created_at?: string | null
+          etapa_atual?: string | null
+          id?: string
+          proxima_entrega?: string | null
+          status?: string | null
+          tipo?: string | null
+          user_id: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string | null
+          etapa_atual?: string | null
+          id?: string
+          proxima_entrega?: string | null
+          status?: string | null
+          tipo?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       contratos: {
         Row: {
           categoria_cancelamento: string | null
