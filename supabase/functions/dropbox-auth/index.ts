@@ -17,12 +17,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    const { code, action } = await req.json()
+    const { code, action, redirectUri: passedRedirectUri } = await req.json()
 
     if (action === 'exchange_token') {
       const clientId = Deno.env.get('DROPBOX_CLIENT_ID')
       const clientSecret = Deno.env.get('DROPBOX_CLIENT_SECRET')
-      const redirectUri = 'https://app.nl.arq.br/dropbox-callback'
+      const redirectUri = passedRedirectUri || 'https://app.nl.arq.br/dropbox-callback'
 
       console.log('Exchanging code for token...')
       
