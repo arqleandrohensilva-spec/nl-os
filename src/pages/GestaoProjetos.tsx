@@ -329,28 +329,36 @@ const GestaoProjetos = () => {
                   </span>
                 </div>
 
-                <div className="w-full md:w-auto flex flex-col md:flex-row gap-3">
+                <div className="w-full md:w-auto flex flex-row items-center gap-2 ml-auto">
                   <Button 
                     onClick={() => {
                       toast.success("Link da Experiência Concierge copiado!", {
                         description: "O cliente receberá o acesso ao Atelier Visual."
                       });
                     }}
-                    className="bg-white/5 hover:bg-white/10 text-[#8B7355] border border-[#8B7355]/20 rounded-none px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
+                    className="bg-white/5 hover:bg-white/10 text-[#8B7355] border border-[#8B7355]/20 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
                   >
                     <Share2 size={12} className="mr-2" /> Compartilhar
                   </Button>
                   <Button 
                     onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                    className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300"
+                    className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none h-9 px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
                   >
                     Abrir projeto
                   </Button>
+                  
+                  <Button 
+                    onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
+                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white border border-[#8B7355]/30 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 shadow-lg whitespace-nowrap"
+                  >
+                    <Star size={12} className="fill-current text-white" /> Gerar Conteúdo
+                  </Button>
+
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button 
                         disabled={isDeleting === projeto.id}
-                        className="bg-white/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-none px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
+                        className="bg-white/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
                       >
                         <Trash2 size={12} className={cn(isDeleting === projeto.id && "animate-spin")} />
                       </Button>
@@ -375,13 +383,6 @@ const GestaoProjetos = () => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-
-                <Button 
-                  onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
-                  className="absolute bottom-4 right-4 bg-[#8B7355] hover:bg-[#8B7355]/80 text-white border border-[#8B7355]/30 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 z-10 shadow-lg"
-                >
-                  <Star size={12} className="fill-current text-white" /> Gerar Conteúdo
-                </Button>
               </div>
             );
           })}
