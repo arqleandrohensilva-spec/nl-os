@@ -230,6 +230,7 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
     setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
     if (type === 'reels') setReelsResult(null);
+    if (type === 'calendar') setCalendarResult([]);
     
     try {
       const activeFiles = files.filter(f => f.is_active);
