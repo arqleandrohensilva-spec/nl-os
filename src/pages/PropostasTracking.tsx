@@ -846,6 +846,14 @@ Retorne APENAS JSON válido:
 
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
+                        onClick={() => handleReviewProposal(p)}
+                        className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-8 text-[8px] font-bold uppercase tracking-widest shadow-sm"
+                      >
+                        <Shield size={11} className="mr-2" />
+                        Revisar com IA
+                      </Button>
+                      
+                      <Button 
                         variant="outline"
                         size="sm"
                         onClick={() => copyLink(p)}
@@ -854,19 +862,19 @@ Retorne APENAS JSON válido:
                         <Copy size={11} className="mr-2" />
                         Link
                       </Button>
-                      
-                      <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                        <SelectTrigger className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
-                          <SelectValue placeholder="STATUS" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Enviada">Enviada</SelectItem>
-                          <SelectItem value="Vista">Vista</SelectItem>
-                          <SelectItem value="Aprovada">Aprovada</SelectItem>
-                          <SelectItem value="Recusada">Recusada</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
+                    
+                    <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
+                      <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
+                        <SelectValue placeholder="STATUS" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Enviada">Enviada</SelectItem>
+                        <SelectItem value="Vista">Vista</SelectItem>
+                        <SelectItem value="Aprovada">Aprovada</SelectItem>
+                        <SelectItem value="Recusada">Recusada</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               ))}
