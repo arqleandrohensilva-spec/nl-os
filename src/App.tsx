@@ -18,6 +18,7 @@ import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 import DropboxCallback from "./pages/DropboxCallback.tsx";
 import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
+import BriefingPublic from "./pages/BriefingPublic.tsx";
 
 const queryClient = new QueryClient();
 
