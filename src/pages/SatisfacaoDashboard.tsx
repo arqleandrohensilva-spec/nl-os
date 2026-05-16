@@ -67,7 +67,7 @@ const SatisfacaoDashboard = () => {
       
       const { data: testimonialsData } = await supabase
         .from('depoimentos')
-        .select('*, pesquisa:pesquisas_satisfacao(*)')
+        .select('*, pesquisa:pesquisas_satisfacao(*, projeto:projetos(nome, tipo, cidade))')
         .order('criado_em', { ascending: false });
 
       const { data: projectsData } = await supabase
