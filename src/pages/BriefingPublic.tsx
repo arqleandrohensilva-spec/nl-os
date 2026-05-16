@@ -93,8 +93,7 @@ const BriefingPublic = () => {
         setFormData(prev => ({
           ...prev,
           nome_completo: data.leads.nome || '',
-          email: data.leads.email || '',
-          whatsapp: data.leads.telefone || ''
+          whatsapp: data.leads.whats || ''
         }));
       }
     } catch (error) {
