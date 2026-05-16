@@ -828,56 +828,59 @@ Retorne APENAS JSON válido:
                     )}
                   </div>
 
-                  <div className="px-6 py-4 bg-[#242220] border-t border-white/10 space-y-3">
+                  <div className="px-6 py-4 bg-[#242220] border-t border-white/10 space-y-2">
+                    {/* Linha 1: VER DASHBOARD · GERAR FOLLOW-UP */}
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => handleOpenDashboard(p)}
-                        className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
-                        <LayoutDashboard size={12} className="mr-2" />
+                        <LayoutDashboard size={14} className="mr-2" />
                         Ver Dashboard
                       </Button>
                       
                       <Button 
                         onClick={() => handleGenerateFollowup(p)}
-                        className="bg-white/10 hover:bg-white/20 text-white rounded-[2px] h-9 text-[9px] font-bold uppercase tracking-widest shadow-sm"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
-                        <MessageSquare size={12} className="mr-2" />
+                        <MessageSquare size={14} className="mr-2" />
                         Gerar Follow-up
                       </Button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        onClick={() => handleReviewProposal(p)}
-                        className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] h-8 text-[8px] font-bold uppercase tracking-widest shadow-sm"
-                      >
-                        <Shield size={11} className="mr-2" />
-                        Revisar com IA
-                      </Button>
-                      
+                    {/* Linha 2: REVISAR COM IA */}
+                    <Button 
+                      onClick={() => handleReviewProposal(p)}
+                      className="w-full bg-[#8B7355] hover:bg-[#8B7355]/90 text-white rounded-[2px] h-[44px] text-[10px] font-bold uppercase tracking-widest shadow-sm transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <Shield size={16} />
+                      Revisar com IA
+                    </Button>
+                    
+                    {/* Outras ações */}
+                    <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/5">
                       <Button 
                         variant="outline"
                         size="sm"
                         onClick={() => copyLink(p)}
-                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] text-muted-foreground hover:text-graphite"
+                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA] hover:text-white hover:border-bronze"
                       >
                         <Copy size={11} className="mr-2" />
                         Link
                       </Button>
+                      
+                      <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
+                        <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA]">
+                          <SelectValue placeholder="STATUS" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Enviada">Enviada</SelectItem>
+                          <SelectItem value="Vista">Vista</SelectItem>
+                          <SelectItem value="Aprovada">Aprovada</SelectItem>
+                          <SelectItem value="Recusada">Recusada</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    
-                    <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                      <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-[#E8E4DF] bg-white text-muted-foreground">
-                        <SelectValue placeholder="STATUS" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Enviada">Enviada</SelectItem>
-                        <SelectItem value="Vista">Vista</SelectItem>
-                        <SelectItem value="Aprovada">Aprovada</SelectItem>
-                        <SelectItem value="Recusada">Recusada</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
               ))}
