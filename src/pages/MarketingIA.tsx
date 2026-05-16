@@ -44,6 +44,37 @@ interface KnowledgeBaseFile {
 
 const MarketingIA = () => {
   const [activeTab, setActiveTab] = useState("knowledge-base");
+  const [marketingContext, setMarketingContext] = useState<any>(null);
+
+  useEffect(() => {
+    const checkContext = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const { data } = await supabase
+        .from('contexto_marketing_ativo')
+        .select('*')
+        .eq('user_id', userData.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setMarketingContext(data);
+        if (tabParam === 'captions' || activeTab === 'knowledge-base') {
+          setActiveTab('captions');
+        }
+        
+        // Auto-fill description if it contains context data
+        setCaptionDescription(`Projeto ${data.cliente} · ${data.tipo} · Etapa atual: ${data.etapa_atual} · Status: ${data.status} · Próxima entrega: ${data.proxima_entrega}`);
+      }
+    };
+
+    checkContext();
+  }, []);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<KnowledgeBaseFile[]>([]);
   const [guidelines, setGuidelines] = useState("");
