@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,9 +88,11 @@ const PesquisaSatisfacao = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1816] text-white p-8">
-      {/* Header */}
-      <div className="mb-10">
+    <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
+      <Sidebar user="Equipe NL" />
+      <main className="flex-1 ml-[230px] p-12">
+        {/* Header */}
+        <div className="mb-10">
         <h1 className="text-3xl font-bold uppercase tracking-[0.2em] font-cormorant">09 · Pesquisa de Satisfação</h1>
         <p className="text-bronze uppercase tracking-widest text-[10px] font-bold mt-1">PÓS-ENTREGA · DEPOIMENTOS · PAINEL NPS</p>
       </div>
@@ -282,6 +285,7 @@ const PesquisaSatisfacao = () => {
           </div>
         </TabsContent>
       </Tabs>
+      </main>
     </div>
   );
 };
