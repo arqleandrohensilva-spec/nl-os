@@ -14,7 +14,8 @@ import {
   List,
   MoreVertical,
   Share2,
-  ExternalLink
+  ExternalLink,
+  Trash2
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -24,6 +25,17 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Projeto {
   id: string;
@@ -51,6 +63,7 @@ const GestaoProjetos = () => {
   const [etapas, setEtapas] = useState<Record<string, EtapaInfo[]>>({});
   const [loading, setLoading] = useState(true);
   const [totalHorasMes, setTotalHorasMes] = useState(0);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -225,6 +238,34 @@ const GestaoProjetos = () => {
                   >
                     Abrir projeto
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        disabled={isDeleting === projeto.id}
+                        className="bg-white/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-none px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
+                      >
+                        <Trash2 size={12} className={cn(isDeleting === projeto.id && "animate-spin")} />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-[#1A1816] border border-white/10 text-white">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-cormorant italic text-2xl">Excluir Projeto?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-white/60 font-inter text-sm">
+                          Tem certeza que deseja excluir o projeto de <span className="text-white font-bold">{projeto.nome_cliente}</span>? 
+                          Esta ação removerá o projeto do sistema e a pasta correspondente no Dropbox.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleDeleteProject(projeto.id, projeto.nome_cliente, projeto.tipo)}
+                          className="bg-rose-500 hover:bg-rose-600 text-white rounded-none"
+                        >
+                          Confirmar Exclusão
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             );
