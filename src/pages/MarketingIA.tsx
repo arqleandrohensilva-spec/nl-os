@@ -23,6 +23,7 @@ const MarketingIA = () => {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<KnowledgeBaseFile[]>([]);
   const [guidelines, setGuidelines] = useState("");
+  const [userInput, setUserInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const { toast } = useToast();
@@ -229,7 +230,9 @@ ${contextContent}
 
 Responda sempre em Português do Brasil. Mantenha o tom de voz definido nos documentos.`;
 
-      const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.`;
+      const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.
+      
+Informações do post: ${userInput}`;
 
       const aiResponse = await supabase.functions.invoke('ai-advisor', {
         body: { prompt, systemPrompt }
@@ -431,6 +434,8 @@ Responda sempre em Português do Brasil. Mantenha o tom de voz definido nos docu
                       <div className="space-y-3">
                         <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">O que você quer postar?</label>
                         <Textarea 
+                          value={userInput}
+                          onChange={(e) => setUserInput(e.target.value)}
                           placeholder="Ex: Foto de obra finalizada em Moema, estilo minimalista..."
                           className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none"
                         />
