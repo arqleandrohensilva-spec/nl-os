@@ -402,67 +402,83 @@ Informações do post: ${userInput}`;
           <TabsContent value="knowledge-base" className="space-y-6 outline-none">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2 space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {loading ? (
-                    Array(4).fill(0).map((_, i) => (
-                      <Card key={i} className="bg-white/[0.02] border-white/5 animate-pulse h-32"></Card>
-                    ))
-                  ) : (
-                    files.map((file) => (
-                      <Card key={file.file_path} className="bg-white/[0.02] border-white/5 hover:border-bronze/30 transition-all duration-300">
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="p-2 bg-bronze/10 text-bronze rounded">
-                                <FileText size={18} />
+                <div>
+                  <h2 className="text-xl font-cormorant font-bold text-white mb-1 uppercase tracking-tight">DOCUMENTOS DA NL</h2>
+                  <p className="text-white/40 text-xs mb-6">A IA usa estes documentos como contexto em todo conteúdo gerado</p>
+                  
+                  <div className="space-y-3">
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      onChange={handleFileUpload}
+                      accept=".pdf,.docx,.txt"
+                    />
+                    
+                    {DEFAULT_DOCUMENTS.map((doc) => {
+                      const file = files.find(f => f.file_name.toLowerCase().includes(doc.fileName.toLowerCase()));
+                      const isActive = file?.is_active;
+                      const isPending = !file;
+                      
+                      return (
+                        <Card key={doc.name} className="bg-white/[0.02] border-white/5 hover:border-bronze/30 transition-all duration-300 rounded-none">
+                          <CardContent className="p-4 flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`p-2 rounded ${isPending ? 'bg-white/5 text-white/20' : 'bg-bronze/10 text-bronze'}`}>
+                                <FileText size={20} />
                               </div>
-                              <div className="max-w-[150px]">
-                                <h3 className="text-white text-sm font-bold truncate" title={file.file_name}>{file.file_name}</h3>
-                                <p className="text-[10px] text-white/40 uppercase tracking-tighter">
-                                  {formatDate(file.server_modified)} · {formatSize(file.size)}
-                                </p>
+                              <div>
+                                <h3 className="text-white text-sm font-bold">{doc.name}</h3>
+                                {file && (
+                                  <p className="text-[10px] text-white/40 uppercase tracking-tighter">
+                                    {formatSize(file.size)} · {formatDate(file.server_modified)}
+                                  </p>
+                                )}
                               </div>
                             </div>
-                            <div className="flex flex-col items-end gap-2">
-                              <div className="flex items-center gap-2">
-                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest ${file.is_active ? 'text-emerald-400 bg-emerald-400/10' : 'text-white/40 bg-white/5'}`}>
-                                  {file.is_active ? 'ATIVO' : 'INATIVO'}
-                                </span>
-                                <Switch 
-                                  checked={file.is_active} 
-                                  onCheckedChange={() => toggleFileStatus(file)}
-                                  className="data-[state=checked]:bg-emerald-500"
-                                />
+                            
+                            <div className="flex items-center gap-6">
+                              <div className="flex items-center gap-2 min-w-[100px] justify-end">
+                                {isPending ? (
+                                  <Badge variant="outline" className="bg-white/5 border-white/10 text-white/40 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none flex items-center gap-1">
+                                    <div className="w-2 h-2 border border-white/20"></div>
+                                    PENDENTE
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="bg-emerald-400/10 border-emerald-400/20 text-emerald-400 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none flex items-center gap-1">
+                                    <Check size={10} />
+                                    ATIVO
+                                  </Badge>
+                                )}
                               </div>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-end pt-3 border-t border-white/5">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="text-bronze hover:text-bronze/80 p-0 h-auto"
-                              asChild
-                            >
-                              <a 
-                                href="#" 
-                                onClick={async (e) => {
-                                  e.preventDefault();
-                                  const resp = await supabase.functions.invoke('dropbox-proxy', {
-                                    body: { action: 'get_temporary_link', path: file.file_path }
-                                  });
-                                  if (resp.data?.link) window.open(resp.data.link, '_blank');
-                                }}
+                              
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className={`rounded-none uppercase text-[10px] font-bold tracking-widest h-8 px-4 ${isPending ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-bronze/10 border-bronze/20 text-bronze hover:bg-bronze/20'}`}
+                                onClick={() => triggerUpload(doc.fileName)}
+                                disabled={uploading === doc.fileName}
                               >
-                                <Download size={14} className="mr-1" />
-                                <span className="text-[10px] uppercase font-bold tracking-widest">Baixar</span>
-                              </a>
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  )}
+                                {uploading === doc.fileName ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : isPending ? (
+                                  <>
+                                    <Upload size={12} className="mr-2" />
+                                    Upload
+                                  </>
+                                ) : (
+                                  <>
+                                    <RefreshCcw size={12} className="mr-2" />
+                                    Atualizar
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
