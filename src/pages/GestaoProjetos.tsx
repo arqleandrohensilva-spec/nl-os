@@ -219,7 +219,7 @@ const GestaoProjetos = () => {
 
       if (error) throw error;
 
-      navigate('/marketing-ia?tab=captions');
+      navigate('/marketing/ia?tab=captions');
       toast.success("Contexto enviado para o Marketing IA!");
     } catch (error: any) {
       console.error("Erro ao gerar conteúdo:", error);
