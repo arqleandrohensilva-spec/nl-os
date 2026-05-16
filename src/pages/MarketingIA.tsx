@@ -255,16 +255,6 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
   };
 
   const generateContent = async (type: string, skipImage: boolean = false) => {
-    // API Key Check
-    if (!import.meta.env.ANTHROPIC_API_KEY) {
-      toast({
-        variant: "destructive",
-        title: "Configuração Necessária",
-        description: "Configure a chave ANTHROPIC_API_KEY nas configurações do projeto."
-      });
-      return;
-    }
-
     setGenerating(true);
     if (!skipImage) setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
@@ -295,9 +285,6 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
-      const commonHeaders = {
-        'x-anthropic-api-key': import.meta.env.ANTHROPIC_API_KEY
-      };
 
       if (type === 'captions') {
         const currentImage = skipImage ? null : captionImage;
@@ -339,8 +326,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
             image: currentImage, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          },
-          headers: commonHeaders
+          }
         });
 
         if (aiResponse.error) {
@@ -403,8 +389,7 @@ Assunto: ${reelsSubject}`;
             image: currentImage,
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          },
-          headers: commonHeaders
+          }
         });
 
         if (aiResponse.error) {
@@ -499,8 +484,7 @@ Retorne APENAS JSON válido neste formato:
             systemPrompt, 
             model: "anthropic/claude-3-5-sonnet-20240620",
             json: true
-          },
-          headers: commonHeaders
+          }
         });
 
         if (aiResponse.error) {
@@ -528,8 +512,7 @@ Retorne APENAS JSON válido neste formato:
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
         const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { 
-          body: { prompt, systemPrompt },
-          headers: commonHeaders
+          body: { prompt, systemPrompt }
         });
 
         if (aiResponse.error) {

@@ -154,29 +154,25 @@ const SatisfacaoDashboard = () => {
       setIsFollowUpModalOpen(true);
       
       try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': import.meta.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'dangerously-allow-browser': 'true'
-          },
-          body: JSON.stringify({
-            model: 'claude-3-5-haiku-20241022',
-            max_tokens: 100,
-            messages: [{
-              role: 'user',
-              content: `O cliente ${survey.cliente_nome} avaliou com nota ${survey.nota_geral} e deixou este comentário curto: '${survey.comentario}'. Gere UMA pergunta curta e natural para pedir que ele detalhe mais a experiência, no tom da NL Arquitetos: técnico, direto, sem bajulação. Máximo 2 linhas.`
-            }]
-          })
+        const { data: aiResponse, error } = await supabase.functions.invoke('ai-advisor', {
+          body: {
+            prompt: `O cliente ${survey.cliente_nome} avaliou com nota ${survey.nota_geral} e deixou este comentário curto: '${survey.comentario}'. Gere UMA pergunta curta e natural para pedir que ele detalhe mais a experiência, no tom da NL Arquitetos: técnico, direto, sem bajulação. Máximo 2 linhas.`,
+            systemPrompt: "Você é um assistente da NL Arquitetos especializado em feedback de clientes.",
+            model: 'anthropic/claude-3-5-haiku-20241022'
+          }
         });
 
-        const data = await response.json();
-        setFollowUpQuestion(data.content[0].text.replace(/"/g, ''));
-      } catch (error) {
+        if (error) throw error;
+        
+        const text = aiResponse.choices?.[0]?.message?.content || "";
+        setFollowUpQuestion(text.replace(/"/g, ''));
+      } catch (error: any) {
         console.error('Error generating follow-up:', error);
-        toast({ variant: "destructive", title: "Erro ao gerar pergunta" });
+        toast({ 
+          variant: "destructive", 
+          title: "Erro ao gerar pergunta",
+          description: error.message || "Ocorreu um erro desconhecido"
+        });
       } finally {
         setGeneratingFollowUp(false);
       }
