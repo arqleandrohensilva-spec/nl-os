@@ -166,9 +166,13 @@ const SatisfacaoDashboard = () => {
         
         const text = aiResponse.choices?.[0]?.message?.content || "";
         setFollowUpQuestion(text.replace(/"/g, ''));
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error generating follow-up:', error);
-        toast({ variant: "destructive", title: "Erro ao gerar pergunta" });
+        toast({ 
+          variant: "destructive", 
+          title: "Erro ao gerar pergunta",
+          description: error.message || "Ocorreu um erro desconhecido"
+        });
       } finally {
         setGeneratingFollowUp(false);
       }
