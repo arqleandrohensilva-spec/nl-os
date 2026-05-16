@@ -99,18 +99,8 @@ serve(async (req) => {
       const refreshedToken = await refreshDropboxToken(supabase, refreshToken);
       if (refreshedToken) {
         accessToken = refreshedToken;
+        }
       }
-    }
-
-    let bodyJson: any = {};
-    const contentType = req.headers.get('content-type') || '';
-    
-    if (req.method === 'POST') {
-      if (contentType.includes('application/json')) {
-        try {
-          bodyJson = await req.json();
-        } catch (e) {
-          // Body might not be JSON
     }
 
     const action = req.headers.get('x-action') || bodyJson.action;
