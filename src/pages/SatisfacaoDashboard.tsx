@@ -44,6 +44,8 @@ const SatisfacaoDashboard = () => {
   const [currentVideoUrl, setCurrentVideoUrl] = useState('');
   const [selectedType, setSelectedType] = useState('Pós-Entrega');
   const [generatedToken, setGeneratedToken] = useState('');
+  const [surveysFilter, setSurveysFilter] = useState('TODAS');
+  const [testimonialsFilter, setTestimonialsFilter] = useState('TODOS');
   
   const [stats, setStats] = useState({
     avg: 0,
@@ -239,6 +241,51 @@ const SatisfacaoDashboard = () => {
     }
   };
 
+  const archivarPesquisa = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('pesquisas_satisfacao')
+        .update({ status: 'ARQUIVADA' })
+        .eq('id', id);
+      if (error) throw error;
+      fetchData();
+      toast({ title: "Pesquisa arquivada" });
+    } catch (error) {
+      toast({ variant: "destructive", title: "Erro ao arquivar" });
+    }
+  };
+
+  const handleCopyText = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Texto copiado para a área de transferência" });
+  };
+
+  const filteredSurveys = surveys.filter(s => {
+    if (surveysFilter === 'TODAS') return true;
+    if (surveysFilter === 'AGUARDANDO') return s.status === 'PENDENTE';
+    if (surveysFilter === 'RESPONDIDAS') return s.status === 'RESPONDIDA';
+    if (surveysFilter === 'ARQUIVADAS') return s.status === 'ARQUIVADA';
+    return true;
+  });
+
+  const filteredTestimonials = testimonials.filter(t => {
+    if (testimonialsFilter === 'TODOS') return t.status !== 'DESCARTADO';
+    if (testimonialsFilter === 'PENDENTE APROVAÇÃO') return t.status === 'PENDENTE';
+    if (testimonialsFilter === 'APROVADOS') return t.status === 'APROVADO';
+    if (testimonialsFilter === 'PUBLICADOS') return t.status === 'PUBLICADO';
+    return true;
+  });
+
+  const surveysCount = {
+    aguardando: surveys.filter(s => s.status === 'PENDENTE').length,
+    respondidas: surveys.filter(s => s.status === 'RESPONDIDA').length
+  };
+
+  const testimonialsCount = {
+    pendentes: testimonials.filter(t => t.status === 'PENDENTE').length,
+    aprovados: testimonials.filter(t => t.status === 'APROVADO').length
+  };
+
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
       <Sidebar user="Equipe NL" />
@@ -257,20 +304,53 @@ const SatisfacaoDashboard = () => {
 
           <TabsContent value="pesquisas">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Listagem de Pesquisas</h2>
+              <div className="space-y-1">
+                <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Listagem de Pesquisas</h2>
+                <div className="flex gap-4">
+                  {surveysCount.aguardando > 0 && (
+                    <span className="text-[9px] uppercase tracking-widest font-bold text-amber-500">{surveysCount.aguardando} AGUARDANDO RESPOSTA</span>
+                  )}
+                  {surveysCount.respondidas > 0 && (
+                    <span className="text-[9px] uppercase tracking-widest font-bold text-bronze">{surveysCount.respondidas} RESPONDIDAS PENDENTES</span>
+                  )}
+                </div>
+              </div>
               <Button onClick={() => { setGeneratedToken(''); setIsModalOpen(true); }} className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold">
                 <Plus className="w-4 h-4 mr-2" /> Nova Pesquisa
               </Button>
             </div>
 
+            <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
+              {['TODAS', 'AGUARDANDO', 'RESPONDIDAS', 'ARQUIVADAS'].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setSurveysFilter(f)}
+                  className={cn(
+                    "text-[9px] uppercase tracking-widest font-bold px-4 py-2 border border-white/5 transition-all",
+                    surveysFilter === f ? "bg-bronze text-white border-bronze" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
             <div className="grid gap-4">
-              {surveys.length === 0 ? (
+              {filteredSurveys.length === 0 ? (
                 <div className="bg-[#242220] p-12 border border-white/5 text-center">
-                  <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa gerada ainda.</p>
+                  <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa encontrada para este filtro.</p>
                 </div>
               ) : (
-                surveys.map((survey) => (
-                  <div key={survey.id} className="bg-[#242220] p-6 border border-white/5 flex justify-between items-center">
+                filteredSurveys.map((survey) => (
+                  <div 
+                    key={survey.id} 
+                    className={cn(
+                      "bg-[#242220] p-6 border transition-all flex justify-between items-center",
+                      survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
+                      survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
+                      survey.status === 'ARQUIVADA' && "border-white/5 opacity-50"
+                    )}
+                  >
                     <div>
                       <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
                       <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
@@ -280,17 +360,29 @@ const SatisfacaoDashboard = () => {
                     <div className="flex items-center gap-4">
                       <span className={cn(
                         "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
-                        survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
+                        survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : 
+                        survey.status === 'ARQUIVADA' ? "bg-white/10 text-white/40" : "bg-yellow-500/20 text-yellow-400"
                       )}>
                         {survey.status}
                       </span>
-                      <Button variant="ghost" size="icon" onClick={() => {
-                        const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
-                        navigator.clipboard.writeText(link);
-                        toast({ title: "Link copiado!" });
-                      }} className="text-white/40 hover:text-white">
-                        <Copy className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        {survey.status === 'RESPONDIDA' && (
+                          <Button 
+                            onClick={() => archivarPesquisa(survey.id)}
+                            variant="outline" 
+                            className="h-8 border-white/10 bg-transparent text-[9px] uppercase font-bold tracking-widest rounded-none hover:bg-white/5"
+                          >
+                            Arquivar
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => {
+                          const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
+                          navigator.clipboard.writeText(link);
+                          toast({ title: "Link copiado!" });
+                        }} className="text-white/40 hover:text-white">
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -298,55 +390,111 @@ const SatisfacaoDashboard = () => {
             </div>
           </TabsContent>
           <TabsContent value="depoimentos">
-          <div className="grid gap-6">
-            {testimonials.map((dep) => (
-              <div key={dep.id} className="bg-[#242220] p-8 border border-white/5 space-y-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.pesquisa?.cliente_nome}</h3>
-                      {dep.pesquisa?.video_url && (
-                        <span className="flex items-center gap-1 text-[9px] px-2 py-0.5 bg-bronze/20 text-bronze font-bold uppercase tracking-widest border border-bronze/30">
-                          <FileVideo className="w-3 h-3" /> COM VÍDEO
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">Nota {dep.pesquisa?.nota_geral} · {(dep.pesquisa?.nota_geral || 0) >= 9 ? 'Promotor' : 'Neutro/Detrator'}</p>
-                  </div>
-                  <span className={cn(
-                    "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
-                    dep.status === 'PUBLICADO' ? "bg-green-500/20 text-green-400" : 
-                    dep.status === 'APROVADO' ? "bg-blue-500/20 text-blue-400" : "bg-yellow-500/20 text-yellow-400"
-                  )}>
-                    {dep.status}
-                  </span>
-                </div>
-                <p className="text-white/70 italic text-lg font-cormorant leading-relaxed">
-                  {dep.texto_formatado}
-                </p>
-                <div className="flex gap-3 pt-4 border-t border-white/5">
-                  {dep.status === 'PENDENTE' && (
-                    <Button onClick={() => updateTestimonialStatus(dep.id, 'APROVADO')} className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[9px] font-bold">Aprovar</Button>
+          <div className="space-y-6">
+            <div className="flex justify-between items-end mb-4">
+              <div className="space-y-1">
+                <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Depoimentos dos Clientes</h2>
+                <div className="flex gap-4">
+                  {testimonialsCount.pendentes > 0 && (
+                    <span className="text-[9px] uppercase tracking-widest font-bold text-amber-500">{testimonialsCount.pendentes} PENDENTES DE APROVAÇÃO</span>
                   )}
-                  {dep.status === 'APROVADO' && (
-                    <Button onClick={() => updateTestimonialStatus(dep.id, 'PUBLICADO')} className="bg-green-600 hover:bg-green-700 rounded-none uppercase tracking-widest text-[9px] font-bold">Marcar como Publicado</Button>
-                  )}
-                  <Button variant="outline" onClick={() => handleFormatClick(dep)} className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
-                    <MessageSquare className="w-3 h-3 mr-2" /> Formatar Depoimento
-                  </Button>
-                  {dep.pesquisa?.video_url && (
-                    <>
-                      <Button variant="outline" onClick={() => { setCurrentVideoUrl(dep.pesquisa.video_url); setIsVideoModalOpen(true); }} className="border-bronze/30 bg-bronze/5 text-bronze hover:bg-bronze/10 rounded-none uppercase tracking-widest text-[9px] font-bold">
-                        <FileVideo className="w-3 h-3 mr-2" /> Ver Vídeo
-                      </Button>
-                      <Button variant="ghost" onClick={() => window.open(dep.pesquisa.video_url, '_blank')} className="text-white/40 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
-                        <Download className="w-3 h-3 mr-2" /> Baixar
-                      </Button>
-                    </>
+                  {testimonialsCount.aprovados > 0 && (
+                    <span className="text-[9px] uppercase tracking-widest font-bold text-bronze">{testimonialsCount.aprovados} PRONTOS PARA PUBLICAR</span>
                   )}
                 </div>
               </div>
-            ))}
+            </div>
+
+            <div className="flex gap-2 mb-8 border-b border-white/5 pb-4 overflow-x-auto">
+              {['TODOS', 'PENDENTE APROVAÇÃO', 'APROVADOS', 'PUBLICADOS'].map(f => (
+                <button
+                  key={f}
+                  onClick={() => setTestimonialsFilter(f)}
+                  className={cn(
+                    "text-[9px] uppercase tracking-widest font-bold px-4 py-2 border border-white/5 transition-all",
+                    testimonialsFilter === f ? "bg-bronze text-white border-bronze" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid gap-6">
+              {filteredTestimonials.length === 0 ? (
+                <div className="bg-[#242220] p-12 border border-white/5 text-center">
+                  <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhum depoimento encontrado para este filtro.</p>
+                </div>
+              ) : (
+                filteredTestimonials.map((dep) => (
+                  <div key={dep.id} className="bg-[#242220] p-8 border border-white/5 space-y-6">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.pesquisa?.cliente_nome}</h3>
+                          {dep.pesquisa?.video_url && (
+                            <span className="flex items-center gap-1 text-[9px] px-2 py-0.5 bg-bronze/20 text-bronze font-bold uppercase tracking-widest border border-bronze/30">
+                              <FileVideo className="w-3 h-3" /> COM VÍDEO
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">Nota {dep.pesquisa?.nota_geral} · {(dep.pesquisa?.nota_geral || 0) >= 9 ? 'Promotor' : 'Neutro/Detrator'}</p>
+                      </div>
+                      <span className={cn(
+                        "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
+                        dep.status === 'PUBLICADO' ? "bg-green-500/20 text-green-400" : 
+                        dep.status === 'APROVADO' ? "bg-blue-500/20 text-blue-400" : 
+                        dep.status === 'DESCARTADO' ? "bg-red-500/20 text-red-400" : "bg-yellow-500/20 text-yellow-400"
+                      )}>
+                        {dep.status === 'PENDENTE' ? 'PENDENTE APROVAÇÃO' : dep.status}
+                      </span>
+                    </div>
+                    <p className="text-white/70 italic text-lg font-cormorant leading-relaxed">
+                      {dep.texto_formatado || dep.pesquisa?.comentario || "Nenhum comentário preenchido."}
+                    </p>
+                    <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
+                      {dep.status === 'PENDENTE' && (
+                        <>
+                          <Button onClick={() => updateTestimonialStatus(dep.id, 'APROVADO')} className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[9px] font-bold">Aprovar</Button>
+                          <Button onClick={() => updateTestimonialStatus(dep.id, 'DESCARTADO')} variant="ghost" className="text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-none uppercase tracking-widest text-[9px] font-bold">Descartar</Button>
+                        </>
+                      )}
+                      
+                      {dep.status === 'APROVADO' && (
+                        <>
+                          <Button onClick={() => handleCopyText(dep.texto_formatado)} variant="outline" className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">Copiar Texto</Button>
+                          <Button onClick={() => updateTestimonialStatus(dep.id, 'PUBLICADO')} className="bg-green-600 hover:bg-green-700 rounded-none uppercase tracking-widest text-[9px] font-bold">Marcar como Publicado</Button>
+                          <Button onClick={() => window.open('https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', '_blank')} variant="ghost" className="text-bronze hover:bg-bronze/5 rounded-none uppercase tracking-widest text-[9px] font-bold">Solicitar Avaliação Google</Button>
+                        </>
+                      )}
+
+                      {dep.status === 'PUBLICADO' && (
+                        <div className="flex items-center gap-2 text-green-400 text-[9px] uppercase font-bold tracking-widest bg-green-400/10 px-3 py-1">
+                          <Check className="w-3 h-3" /> Publicado
+                        </div>
+                      )}
+                      
+                      {(dep.status === 'PENDENTE' || dep.status === 'APROVADO') && (
+                        <Button variant="outline" onClick={() => handleFormatClick(dep)} className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
+                          <MessageSquare className="w-3 h-3 mr-2" /> {dep.texto_formatado ? 'Re-formatar' : 'Formatar Depoimento'}
+                        </Button>
+                      )}
+
+                      {dep.pesquisa?.video_url && (
+                        <>
+                          <Button variant="outline" onClick={() => { setCurrentVideoUrl(dep.pesquisa.video_url); setIsVideoModalOpen(true); }} className="border-bronze/30 bg-bronze/5 text-bronze hover:bg-bronze/10 rounded-none uppercase tracking-widest text-[9px] font-bold">
+                            <FileVideo className="w-3 h-3 mr-2" /> Ver Vídeo
+                          </Button>
+                          <Button variant="ghost" onClick={() => window.open(dep.pesquisa.video_url, '_blank')} className="text-white/40 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
+                            <Download className="w-3 h-3 mr-2" /> Baixar
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
           </TabsContent>
 
