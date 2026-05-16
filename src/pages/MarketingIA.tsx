@@ -1027,7 +1027,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
+                                className="h-8 text-[9px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => expandContent(index, option.legenda, 'linkedin')}
                                 disabled={expandingContent !== null}
                               >
@@ -1037,7 +1037,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 text-white/60 hover:border-bronze/50 hover:text-white rounded-none flex items-center gap-2"
+                                className="h-8 text-[9px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => expandContent(index, option.legenda, 'blog')}
                                 disabled={expandingContent !== null}
                               >

@@ -11,14 +11,15 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, systemPrompt, image, json } = await req.json();
+    const body = await req.json();
+    const { prompt, systemPrompt, image, json, model } = body;
 
     const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
     if (!apiKey) {
       console.error("ANTHROPIC_API_KEY not found in environment variables");
       return new Response(
         JSON.stringify({ error: { message: "ANTHROPIC_API_KEY não configurada" } }), 
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -33,6 +34,12 @@ serve(async (req) => {
     userContent.push({ type: "text", text: prompt });
     messages.push({ role: "user", content: userContent });
 
+    // Handle model mapping for Claude 3.7 Sonnet
+    let requestedModel = model || "claude-3-7-sonnet-20250219";
+    if (requestedModel === "claude-sonnet-4-20250514") {
+      requestedModel = "claude-3-7-sonnet-20250219";
+    }
+    
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -41,8 +48,8 @@ serve(async (req) => {
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 2048,
+        model: requestedModel,
+        max_tokens: 4096,
         system: systemPrompt,
         messages
       })
@@ -54,23 +61,23 @@ serve(async (req) => {
       console.error("Anthropic API Error:", data.error);
       return new Response(
         JSON.stringify({ error: data.error }), 
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const content = data.content?.[0]?.text || "";
     
-    // Return in the format the frontend expects (matching OpenAI structure for compatibility if needed, but primarily choice structure)
     return new Response(JSON.stringify({
       choices: [{ message: { content } }]
     }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" }
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Internal Function Error:", error);
     return new Response(
-      JSON.stringify({ error: { message: error.message } }), 
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: { message: error.message || "Erro interno na Edge Function" } }), 
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
