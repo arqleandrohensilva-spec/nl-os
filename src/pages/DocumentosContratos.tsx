@@ -951,9 +951,34 @@ const DocumentosContratos = () => {
                             {b.status}
                           </Badge>
                         </td>
-                        <td className="px-6 py-4 text-right">
-                          <Button variant="ghost" size="sm" className="text-bronze hover:text-white hover:bg-bronze h-7 text-[9px]">
-                            VER RESPOSTAS
+                        <td className="px-6 py-4 text-right flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              setSelectedBriefing(b);
+                              setIsBriefingResponseModalOpen(true);
+                            }}
+                            className="text-bronze hover:text-white hover:bg-bronze h-7 text-[9px] uppercase tracking-widest font-bold"
+                          >
+                            <Eye size={12} className="mr-1" /> VER RESPOSTAS
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => {
+                              const lead = leads.find(l => l.id === b.lead_id);
+                              const whatsapp = lead?.whats?.replace(/\D/g, '');
+                              if (whatsapp) {
+                                const url = `https://wa.me/55${whatsapp}?text=${encodeURIComponent(`Olá! Aqui é da NL Arquitetos. Segue o link do seu briefing para preenchimento: ${window.location.origin}/briefing/${b.token}`)}`;
+                                window.open(url, '_blank');
+                              } else {
+                                toast.error('WhatsApp não cadastrado para este lead');
+                              }
+                            }}
+                            className="text-green-500 hover:text-white hover:bg-green-600 h-7 text-[9px] uppercase tracking-widest font-bold"
+                          >
+                            <Send size={12} className="mr-1" /> ENVIAR LINK
                           </Button>
                         </td>
                       </tr>
