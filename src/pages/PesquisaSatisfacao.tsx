@@ -336,12 +336,12 @@ const PesquisaSatisfacao = () => {
             <p className="text-lg font-medium">5. Quer deixar um vídeo-depoimento? (opcional)</p>
             {!videoUrl ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button onClick={startRecording} disabled={isRecording} variant="outline" className="bg-white/5 border-white/10 h-24 flex flex-col gap-2">
+                <Button onClick={startRecording} disabled={isRecording} variant="outline" className="bg-white/5 border-white/10 h-24 flex flex-col gap-2 text-white hover:bg-white/10 hover:text-white">
                   <Camera className="w-6 h-6 text-bronze" /> <span className="text-[10px] uppercase font-bold">Gravar Vídeo</span>
                 </Button>
                 <div className="relative">
                   <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" id="video-upload" />
-                  <Button onClick={() => document.getElementById('video-upload')?.click()} variant="outline" className="w-full bg-white/5 border-white/10 h-24 flex flex-col gap-2">
+                  <Button onClick={() => document.getElementById('video-upload')?.click()} variant="outline" className="w-full bg-white/5 border-white/10 h-24 flex flex-col gap-2 text-white hover:bg-white/10 hover:text-white">
                     <Upload className="w-6 h-6 text-bronze" /> <span className="text-[10px] uppercase font-bold">Enviar Arquivo</span>
                   </Button>
                 </div>
