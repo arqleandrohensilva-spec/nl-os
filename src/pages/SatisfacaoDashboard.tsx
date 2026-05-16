@@ -46,6 +46,7 @@ const SatisfacaoDashboard = () => {
   const [generatedToken, setGeneratedToken] = useState('');
   const [surveysFilter, setSurveysFilter] = useState('TODAS');
   const [testimonialsFilter, setTestimonialsFilter] = useState('TODOS');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [stats, setStats] = useState({
     avg: 0,
