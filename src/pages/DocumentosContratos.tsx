@@ -85,6 +85,8 @@ const DocumentosContratos = () => {
   // Modals
   const [isBriefingModalOpen, setIsBriefingModalOpen] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState('');
+  const [selectedBriefing, setSelectedBriefing] = useState<any>(null);
+  const [isBriefingResponseModalOpen, setIsBriefingResponseModalOpen] = useState(false);
   
   const [isContratoModalOpen, setIsContratoModalOpen] = useState(false);
   const [selectedProjetoId, setSelectedProjetoId] = useState('');
