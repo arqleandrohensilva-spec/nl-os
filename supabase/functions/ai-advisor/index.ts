@@ -1,91 +1,76 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-anthropic-api-key',
-}
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { prompt, systemPrompt, image, model, json } = await req.json()
-    
-    // Check if the client passed an Anthropic API Key
-    const clientAnthropicKey = req.headers.get('x-anthropic-api-key')
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
-    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+    const { prompt, systemPrompt, image, json } = await req.json();
 
-    // Determine which key to use
-    // If client provided a key, we should ideally use it if we want to bypass the gateway
-    // But for now, the instruction says "Confirmar que import.meta.env.ANTHROPIC_API_KEY está sendo usada corretamente na chamada"
-    // So we will assume the client wants to use their own key if provided.
-    
-    let apiKey = LOVABLE_API_KEY;
-    let apiUrl = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-    // If clientAnthropicKey is provided, we could call Anthropic directly
-    // However, calling the gateway with the user's key is also an option if supported.
-    // For simplicity and following the intent of "using the key in the call", 
-    // we'll check if we should use the gateway or direct.
-    
-    const messages = [
-      { role: "system", content: systemPrompt }
-    ];
-
-    if (image) {
-      messages.push({
-        role: "user",
-        content: [
-          { type: "text", text: prompt },
-          {
-            type: "image_url",
-            image_url: {
-              url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
-            }
-          }
-        ]
-      });
-    } else {
-      messages.push({ role: "user", content: prompt });
+    const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!apiKey) {
+      console.error("ANTHROPIC_API_KEY not found in environment variables");
+      return new Response(
+        JSON.stringify({ error: { message: "ANTHROPIC_API_KEY não configurada" } }), 
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    const targetModel = model || "google/gemini-pro";
+    const messages: any[] = [];
+    
+    const userContent: any[] = [];
+    if (image) {
+      const base64Data = image.split(',')[1];
+      const mediaType = image.startsWith('data:image/png') ? 'image/png' : 'image/jpeg';
+      userContent.push({ type: "image", source: { type: "base64", media_type: mediaType, data: base64Data } });
+    }
+    userContent.push({ type: "text", text: prompt });
+    messages.push({ role: "user", content: userContent });
 
-    const response = await fetch(apiUrl, {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: targetModel,
-        messages: messages,
-        ...(json ? { response_format: { type: "json_object" } } : {})
+        model: "claude-3-5-sonnet-20240620",
+        max_tokens: 2048,
+        system: systemPrompt,
+        messages
       })
     });
 
     const data = await response.json();
     
-    if (!response.ok) {
-      console.error("AI Provider Error:", data);
+    if (data.error) {
+      console.error("Anthropic API Error:", data.error);
       return new Response(
-        JSON.stringify({ error: data.error || data }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+        JSON.stringify({ error: data.error }), 
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    return new Response(
-      JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    const content = data.content?.[0]?.text || "";
+    
+    // Return in the format the frontend expects (matching OpenAI structure for compatibility if needed, but primarily choice structure)
+    return new Response(JSON.stringify({
+      choices: [{ message: { content } }]
+    }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
   } catch (error) {
-    console.error("Function Error:", error);
+    console.error("Internal Function Error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+      JSON.stringify({ error: { message: error.message } }), 
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
-})
+});
