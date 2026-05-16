@@ -6,9 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check } from "lucide-react";
+import { Loader2, FileText, CheckCircle2, XCircle, RefreshCcw, Download, Sparkles, Video, Calendar, Upload, Check, Copy } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface KnowledgeBaseFile {
   id?: string;
@@ -45,6 +46,13 @@ const MarketingIA = () => {
   const [reelsDuration, setReelsDuration] = useState<'30S' | '60S' | '90S'>('30S');
   const [reelsFormat, setReelsFormat] = useState<'EDUCATIVO' | 'BASTIDOR' | 'AUTORIDADE'>('EDUCATIVO');
   const [reelsResult, setReelsResult] = useState<{ gancho: string, desenvolvimento: string[], cta: string } | null>(null);
+  
+  // New states for Calendar
+  const [calendarMonth, setCalendarMonth] = useState("Junho 2026");
+  const [calendarProjects, setCalendarProjects] = useState("");
+  const [calendarFocus, setCalendarFocus] = useState<'CAPTAÇÃO' | 'AUTORIDADE' | 'EDUCAÇÃO' | 'PORTFÓLIO'>('CAPTAÇÃO');
+  const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
+
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
 
@@ -222,6 +230,7 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
     setGeneratedContent("");
     if (type === 'captions') setCaptionOptions([]);
     if (type === 'reels') setReelsResult(null);
+    if (type === 'calendar') setCalendarResult([]);
     
     try {
       const activeFiles = files.filter(f => f.is_active);
@@ -348,12 +357,100 @@ ${contextContent}`;
         } else {
           throw new Error("Falha ao gerar roteiro de Reel.");
         }
+      } else if (type === 'calendar') {
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere o calendário de conteúdo para Instagram do mês de ${calendarMonth}.
+
+ESTRUTURA OBRIGATÓRIA — 4 semanas:
+- Semana 1: PROJETO — mostrar um projeto real com decisão técnica
+- Semana 2: EDUCAÇÃO — ensinar algo sobre processo, compatibilização ou planejamento
+- Semana 3: AUTORIDADE — posicionamento, método, diferencial técnico da NL
+- Semana 4: CAPTAÇÃO — conteúdo que gera contato qualificado
+
+PARA CADA SEMANA:
+- Tema específico
+- Formato sugerido (Feed, Reel, Carrossel ou Story)
+- Descrição do que mostrar/falar
+- Gancho sugerido (frase de abertura)
+
+TOM OBRIGATÓRIO: técnico, condutor, direto. Nunca romântico. Nunca "casa dos sonhos".
+Foco do mês: ${calendarFocus}
+Projetos disponíveis: ${calendarProjects}
+
+DIRETRIZES DA NL: ${guidelines}
+
+BASE DE CONHECIMENTO (CONTEXTO):
+${contextContent}
+
+Retorne APENAS JSON válido neste formato:
+{
+  "semanas": [
+    {
+      "numero": 1,
+      "tipo": "PROJETO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 2,
+      "tipo": "EDUCAÇÃO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 3,
+      "tipo": "AUTORIDADE",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    },
+    {
+      "numero": 4,
+      "tipo": "CAPTAÇÃO",
+      "tema": "...",
+      "formato": "...",
+      "descricao": "...",
+      "gancho": "..."
+    }
+  ]
+}`;
+
+        const prompt = `Gere o calendário de conteúdo para o mês de ${calendarMonth}.`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            model: "anthropic/claude-3-5-sonnet-20240620",
+            json: true
+          }
+        });
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.semanas) {
+              setCalendarResult(parsed.semanas);
+            } else {
+              setGeneratedContent(content);
+            }
+          } catch (e) {
+            setGeneratedContent(content);
+          }
+        } else {
+          throw new Error("Falha ao gerar calendário.");
+        }
       } else {
         const typeLabels: Record<string, string> = {
-          'calendar': 'Calendário de Conteúdo Semanal'
+          'other': 'Conteúdo Geral'
         };
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
-        const prompt = `Gere ${typeLabels[type]} seguindo o estilo da NL Arquitetos.\nInformações do post: ${userInput}`;
+        const prompt = `Gere conteúdo seguindo o estilo da NL Arquitetos.\nInformações: ${userInput}`;
         const aiResponse = await supabase.functions.invoke('ai-advisor', { body: { prompt, systemPrompt } });
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           setGeneratedContent(aiResponse.data.choices[0].message.content);
@@ -656,31 +753,113 @@ ${contextContent}`;
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <Card className="bg-white/[0.02] border-white/5 rounded-none">
-                  <CardHeader className="p-6 border-b border-white/5"><CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Calendário</CardTitle></CardHeader>
+                  <CardHeader className="p-6 border-b border-white/5">
+                    <CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Calendário de Conteúdo</CardTitle>
+                  </CardHeader>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">O que você quer postar?</label>
-                      <Textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder={`Ex: Calendário de conteúdo semanal focado em obras...`} className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" />
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">MÊS DE REFERÊNCIA</label>
+                      <Select value={calendarMonth} onValueChange={setCalendarMonth}>
+                        <SelectTrigger className="w-full bg-white/[0.03] border-white/5 text-white rounded-none h-10">
+                          <SelectValue placeholder="Selecione o mês" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-none">
+                          {[
+                            "Janeiro 2026", "Fevereiro 2026", "Março 2026", "Abril 2026", 
+                            "Maio 2026", "Junho 2026", "Julho 2026", "Agosto 2026", 
+                            "Setembro 2026", "Outubro 2026", "Novembro 2026", "Dezembro 2026"
+                          ].map((m) => (
+                            <SelectItem key={m} value={m} className="focus:bg-bronze focus:text-white cursor-pointer">{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12" onClick={() => generateContent('calendar')} disabled={generating || !userInput}>
-                      {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Consultando Base...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar com IA</>}
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">PROJETOS PARA DESTACAR (opcional)</label>
+                      <Textarea 
+                        value={calendarProjects} 
+                        onChange={(e) => setCalendarProjects(e.target.value)} 
+                        placeholder="Ex: Apartamento Moema 120m², Casa SJC estilo contemporâneo..." 
+                        className="min-h-[100px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" 
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FOCO DO MÊS</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(['CAPTAÇÃO', 'AUTORIDADE', 'EDUCAÇÃO', 'PORTFÓLIO'] as const).map((focus) => (
+                          <Button 
+                            key={focus} 
+                            variant="outline" 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${calendarFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            onClick={() => setCalendarFocus(focus)}
+                          >
+                            {focus}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button 
+                      className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12" 
+                      onClick={() => generateContent('calendar')} 
+                      disabled={generating}
+                    >
+                      {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Gerando Calendário...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar Calendário com IA</>}
                     </Button>
                   </CardContent>
                 </Card>
               </div>
-              <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2">
-                {generatedContent ? (
-                  <Card className="bg-white/[0.02] border-bronze/30 rounded-none">
-                    <CardHeader className="p-6 border-b border-white/5 flex flex-row items-center justify-between">
-                      <CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Resultado Sugerido</CardTitle>
-                      <Button variant="ghost" size="sm" className="text-bronze text-[10px] uppercase font-bold tracking-widest p-0 h-auto" onClick={() => { navigator.clipboard.writeText(generatedContent); toast({ title: "Copiado", description: "Conteúdo copiado." }); }}>Copiar Texto</Button>
-                    </CardHeader>
-                    <CardContent className="p-6"><div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{generatedContent}</div></CardContent>
-                  </Card>
+
+              <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 pb-8">
+                {calendarResult.length > 0 ? (
+                  <div className="space-y-4">
+                    {calendarResult.map((semana) => (
+                      <Card key={semana.numero} className="bg-white/[0.02] border-white/10 rounded-none overflow-hidden relative">
+                        <div className="absolute top-4 left-4">
+                          <Badge className="bg-bronze text-white text-[9px] font-bold tracking-widest rounded-none px-2 py-0.5">
+                            SEMANA {semana.numero} — {semana.tipo}
+                          </Badge>
+                        </div>
+                        <CardContent className="p-6 pt-12 space-y-4">
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Tema:</label>
+                            <p className="text-white text-sm font-medium">{semana.tema}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Formato sugerido:</label>
+                            <p className="text-white/80 text-xs">{semana.formato}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Descrição do post:</label>
+                            <p className="text-white/60 text-xs leading-relaxed">{semana.descricao}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Gancho sugerido:</label>
+                            <p className="text-white/80 text-xs italic">"{semana.gancho}"</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-bronze/30 text-bronze hover:bg-bronze/10 rounded-none uppercase text-[10px] font-bold tracking-widest h-10 mt-4"
+                      onClick={() => {
+                        const fullText = calendarResult.map(s => `SEMANA ${s.numero} — ${s.tipo}\nTema: ${s.tema}\nFormato: ${s.formato}\nDescrição: ${s.descricao}\nGancho: ${s.gancho}`).join('\n\n');
+                        navigator.clipboard.writeText(fullText);
+                        toast({ title: "Copiado", description: "Pauta completa copiada para a área de transferência." });
+                      }}
+                    >
+                      <Copy size={14} className="mr-2" /> Copiar Pauta Completa
+                    </Button>
+                  </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
                     <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Calendar size={32} /></div>
                     <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                    <p className="text-white/20 text-xs max-w-[200px]">Selecione o mês e o foco para gerar o seu planejamento estratégico.</p>
                   </div>
                 )}
               </div>
