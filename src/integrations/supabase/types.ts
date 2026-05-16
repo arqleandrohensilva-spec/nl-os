@@ -656,6 +656,8 @@ export type Database = {
           status: string
           token: string
           updated_at: string
+          video_dropbox_path: string | null
+          video_url: string | null
         }
         Insert: {
           avaliacao_processo?: string | null
@@ -670,6 +672,8 @@ export type Database = {
           status?: string
           token: string
           updated_at?: string
+          video_dropbox_path?: string | null
+          video_url?: string | null
         }
         Update: {
           avaliacao_processo?: string | null
@@ -684,6 +688,8 @@ export type Database = {
           status?: string
           token?: string
           updated_at?: string
+          video_dropbox_path?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
