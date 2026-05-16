@@ -1344,6 +1344,187 @@ Retorne APENAS JSON válido neste formato:
               </div>
             </div>
           </TabsContent>
+          <TabsContent value="history" className="space-y-6 outline-none">
+            <Card className="bg-white/[0.02] border-white/5 rounded-none">
+              <CardHeader className="p-6 border-b border-white/5">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="relative flex-1 max-w-sm">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                      <Input 
+                        placeholder="Buscar no histórico..." 
+                        value={historySearch}
+                        onChange={(e) => setHistorySearch(e.target.value)}
+                        className="pl-10 bg-white/5 border-white/10 text-white rounded-none h-10 focus:border-bronze/50"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox 
+                        id="favorites" 
+                        checked={showOnlyFavorites}
+                        onCheckedChange={(checked) => setShowOnlyFavorites(checked as boolean)}
+                        className="border-white/20 data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
+                      />
+                      <label htmlFor="favorites" className="text-[10px] text-white/40 uppercase font-bold tracking-widest cursor-pointer">Apenas favoritos</label>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+                    {(['TODOS', 'LEGENDA', 'REEL', 'CALENDARIO'] as const).map((type) => (
+                      <Button
+                        key={type}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setHistoryFilter(type)}
+                        className={`rounded-none text-[9px] font-bold tracking-widest px-4 h-8 ${historyFilter === type ? 'bg-bronze text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+                      >
+                        {type}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                {historyLoading ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <Loader2 className="w-8 h-8 text-bronze animate-spin mb-4" />
+                    <p className="text-white/40 text-sm font-cormorant">Carregando sua biblioteca...</p>
+                  </div>
+                ) : historyItems.filter(item => {
+                  const matchesFilter = historyFilter === 'TODOS' || item.tipo.toUpperCase() === historyFilter;
+                  const matchesFavorite = !showOnlyFavorites || item.favorito;
+                  const searchLower = historySearch.toLowerCase();
+                  const matchesSearch = !historySearch || 
+                    (item.input_usado?.toLowerCase().includes(searchLower)) ||
+                    (item.tipo.toLowerCase().includes(searchLower)) ||
+                    (JSON.stringify(item.conteudo).toLowerCase().includes(searchLower));
+                  return matchesFilter && matchesFavorite && matchesSearch;
+                }).length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20">
+                      <History size={32} />
+                    </div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Nenhum conteúdo encontrado</h3>
+                    <p className="text-white/20 text-xs max-w-[250px]">
+                      {historySearch || showOnlyFavorites || historyFilter !== 'TODOS' 
+                        ? "Tente ajustar seus filtros para encontrar o que procura."
+                        : "Sua biblioteca ainda está vazia. Gere legendas, reels ou calendários para começar a construir seu histórico."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {historyItems.filter(item => {
+                      const matchesFilter = historyFilter === 'TODOS' || item.tipo.toUpperCase() === historyFilter;
+                      const matchesFavorite = !showOnlyFavorites || item.favorito;
+                      const searchLower = historySearch.toLowerCase();
+                      const matchesSearch = !historySearch || 
+                        (item.input_usado?.toLowerCase().includes(searchLower)) ||
+                        (item.tipo.toLowerCase().includes(searchLower)) ||
+                        (JSON.stringify(item.conteudo).toLowerCase().includes(searchLower));
+                      return matchesFilter && matchesFavorite && matchesSearch;
+                    }).map((item) => (
+                      <Card key={item.id} className="bg-white/[0.03] border-white/5 hover:border-bronze/30 transition-all duration-300 rounded-none overflow-hidden group flex flex-col">
+                        <CardHeader className="p-4 flex flex-row items-center justify-between border-b border-white/5">
+                          <Badge variant="outline" className="bg-bronze/10 border-bronze/20 text-bronze text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none">
+                            {item.tipo}
+                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => toggleFavorite(item.id, item.favorito)}
+                              className={`transition-colors ${item.favorito ? 'text-bronze' : 'text-white/20 hover:text-white/40'}`}
+                            >
+                              <Star size={16} fill={item.favorito ? "currentColor" : "none"} />
+                            </button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="text-white/10 hover:text-red-400 transition-colors">
+                                  <Trash2 size={16} />
+                                </button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="bg-[#1A1A1A] border-white/10 rounded-none">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-white font-cormorant">Excluir do Histórico?</AlertDialogTitle>
+                                  <AlertDialogDescription className="text-white/60">
+                                    Esta ação não pode ser desfeita. O conteúdo será removido permanentemente da sua biblioteca.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteHistoryItem(item.id)} className="bg-red-500/80 hover:bg-red-500 text-white rounded-none">Excluir</AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+                          <p className="text-[10px] text-white/30 uppercase tracking-tighter">
+                            {formatDate(item.created_at)}
+                          </p>
+                          <h4 className="text-white text-sm font-bold line-clamp-1">{item.input_usado || "Sem descrição"}</h4>
+                          
+                          <div className={`text-white/50 text-[11px] leading-relaxed italic font-light ${expandedHistoryId === item.id ? '' : 'line-clamp-3'}`}>
+                            {item.tipo === 'legenda' ? (item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda) : 
+                             item.tipo === 'reel' ? item.conteudo.gancho : 
+                             `Calendário para ${item.input_usado}`}
+                          </div>
+
+                          {expandedHistoryId === item.id && (
+                            <div className="pt-4 mt-4 border-t border-white/5 space-y-4 animate-in slide-in-from-top-2 duration-300">
+                              {item.tipo === 'legenda' && (
+                                <div className="space-y-2">
+                                  <p className="text-white/80 text-[12px] whitespace-pre-wrap">{item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda}</p>
+                                  <p className="text-bronze text-[11px]">{item.conteudo.hashtags || item.conteudo.opcoes?.[0]?.hashtags}</p>
+                                </div>
+                              )}
+                              {item.tipo === 'reel' && (
+                                <div className="space-y-3 text-[12px]">
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">Gancho:</p>
+                                  <p className="text-white/80">{item.conteudo.gancho}</p>
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">Desenvolvimento:</p>
+                                  <ul className="list-disc pl-4 text-white/60 space-y-1">
+                                    {item.conteudo.desenvolvimento?.map((d: string, i: number) => <li key={i}>{d}</li>)}
+                                  </ul>
+                                  <p className="text-bronze font-bold uppercase tracking-widest text-[9px]">CTA:</p>
+                                  <p className="text-white/80">{item.conteudo.cta}</p>
+                                </div>
+                              )}
+                              {item.tipo === 'calendario' && (
+                                <div className="space-y-3">
+                                  {item.conteudo.semanas?.map((s: any) => (
+                                    <div key={s.numero} className="p-2 bg-white/5 border-l-2 border-bronze">
+                                      <p className="text-[9px] font-bold text-bronze uppercase">S{s.numero}: {s.tipo}</p>
+                                      <p className="text-white/80 text-[11px] font-medium">{s.tema}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="pt-4 mt-auto flex flex-col gap-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setExpandedHistoryId(expandedHistoryId === item.id ? null : item.id)}
+                              className="w-full text-white/40 hover:text-white hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest h-8 rounded-none"
+                            >
+                              {expandedHistoryId === item.id ? <><ChevronUp size={12} className="mr-2" /> RECOLHER</> : <><ChevronDown size={12} className="mr-2" /> VER COMPLETO</>}
+                            </Button>
+                            <Button 
+                              onClick={() => useAgain(item)}
+                              className="w-full bg-bronze/10 text-bronze hover:bg-bronze hover:text-white text-[9px] font-bold uppercase tracking-widest h-8 rounded-none transition-all duration-300"
+                            >
+                              USAR NOVAMENTE
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
