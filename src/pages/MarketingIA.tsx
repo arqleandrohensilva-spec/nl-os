@@ -393,6 +393,9 @@ REGRAS:
 
 DIRETRIZES DA NL: ${guidelines}
 
+${personaExamples ? `EXEMPLOS DE ESTILO (SIGA ESTA VOZ):
+${personaExamples}` : ""}
+
 BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}`;
 
