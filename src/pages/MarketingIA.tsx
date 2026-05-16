@@ -340,31 +340,26 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          const extractJSON = (text: string) => {
-            try {
-              return JSON.parse(text);
-            } catch (e) {
-              const match = text.match(/\{[\s\S]*\}/);
-              if (match) {
-                try {
-                  return JSON.parse(match[0]);
-                } catch (e2) {
-                  return null;
+          try {
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
                 }
+                return null;
               }
-              return null;
-            }
-          };
+            };
 
-          const parsed = extractJSON(content);
-          if (parsed && parsed.opcoes) {
-            setCaptionOptions(parsed.opcoes);
-          } else {
+            const parsed = extractJSON(content);
+            if (parsed && parsed.opcoes) {
+              setCaptionOptions(parsed.opcoes);
+            } else {
+              setGeneratedContent(content);
+            }
+          } catch (e) {
             setGeneratedContent(content);
           }
-        } catch (e) {
-          setGeneratedContent(content);
-        }
         } else if (aiResponse.data?.error) {
           throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
@@ -418,31 +413,26 @@ Assunto: ${reelsSubject}`;
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          const extractJSON = (text: string) => {
-            try {
-              return JSON.parse(text);
-            } catch (e) {
-              const match = text.match(/\{[\s\S]*\}/);
-              if (match) {
-                try {
-                  return JSON.parse(match[0]);
-                } catch (e2) {
-                  return null;
+          try {
+            const extractJSON = (text: string) => {
+              try { return JSON.parse(text); } catch (e) {
+                const match = text.match(/\{[\s\S]*\}/);
+                if (match) {
+                  try { return JSON.parse(match[0]); } catch (e2) { return null; }
                 }
+                return null;
               }
-              return null;
-            }
-          };
+            };
 
-          const parsed = extractJSON(content);
-          if (parsed) {
-            setReelsResult(parsed);
-          } else {
+            const parsed = extractJSON(content);
+            if (parsed) {
+              setReelsResult(parsed);
+            } else {
+              setGeneratedContent(content);
+            }
+          } catch (e) {
             setGeneratedContent(content);
           }
-        } catch (e) {
-          setGeneratedContent(content);
-        }
         } else if (aiResponse.data?.error) {
           throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
