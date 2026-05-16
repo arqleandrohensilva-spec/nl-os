@@ -41,6 +41,7 @@ const App = () => (
         <Route path="/sistema/configuracoes" element={<ProtectedRoute><ConfiguracoesSistema /></ProtectedRoute>} />
         <Route path="/dropbox-callback" element={<DropboxCallback />} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   </QueryClientProvider>
