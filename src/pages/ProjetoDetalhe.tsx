@@ -54,6 +54,7 @@ interface Projeto {
   id: string;
   nome: string;
   nome_cliente: string;
+  cliente_id?: string;
   valor_total?: number;
   tipo: string;
   cidade: string;
