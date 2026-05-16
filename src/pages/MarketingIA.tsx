@@ -536,42 +536,156 @@ ${contextContent}`;
             </div>
           </TabsContent>
 
-          {["reels", "calendar"].map((type) => (
-            <TabsContent key={type} value={type} className="space-y-6 outline-none">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <Card className="bg-white/[0.02] border-white/5 rounded-none">
-                    <CardHeader className="p-6 border-b border-white/5"><CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de {type === 'reels' ? 'Reels' : 'Calendário'}</CardTitle></CardHeader>
-                    <CardContent className="p-6 space-y-6">
-                      <div className="space-y-3">
-                        <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">O que você quer postar?</label>
-                        <Textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder={`Ex: Roteiro para mostrar a iluminação de um living...`} className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" />
+          <TabsContent value="reels" className="space-y-6 outline-none">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-6 border-b border-white/5">
+                    <CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Roteiro de Reel</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">ASSUNTO DO REEL</label>
+                      <Textarea 
+                        value={reelsSubject} 
+                        onChange={(e) => setReelsSubject(e.target.value)} 
+                        placeholder="Ex: Mostrar o processo de compatibilização técnica antes da obra começar..." 
+                        className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" 
+                      />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">DURAÇÃO</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['30S', '60S', '90S'] as const).map((duration) => (
+                          <Button 
+                            key={duration} 
+                            variant="outline" 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsDuration === duration ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            onClick={() => setReelsDuration(duration)}
+                          >
+                            {duration}
+                          </Button>
+                        ))}
                       </div>
-                      <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12" onClick={() => generateContent(type)} disabled={generating || !userInput}>
-                        {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Consultando Base...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar com IA</>}
-                      </Button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FORMATO</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['EDUCATIVO', 'BASTIDOR', 'AUTORIDADE'] as const).map((format) => (
+                          <Button 
+                            key={format} 
+                            variant="outline" 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsFormat === format ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            onClick={() => setReelsFormat(format)}
+                          >
+                            {format}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Button 
+                      className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12" 
+                      onClick={() => generateContent('reels')} 
+                      disabled={generating || !reelsSubject}
+                    >
+                      {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Consultando Base...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar Roteiro com IA</>}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2">
+                {reelsResult ? (
+                  <Card className="bg-white/[0.02] border-bronze/30 rounded-none overflow-hidden">
+                    <CardContent className="p-0 flex flex-col">
+                      <div className="p-6 space-y-2">
+                        <label className="text-[10px] text-bronze uppercase tracking-widest font-bold">[ GANCHO — primeiros 3 segundos ]</label>
+                        <div className="text-white text-sm font-medium leading-relaxed">{reelsResult.gancho}</div>
+                      </div>
+                      
+                      <div className="h-[1px] bg-[#3A3836] w-full" />
+                      
+                      <div className="p-6 space-y-4">
+                        <label className="text-[10px] text-bronze uppercase tracking-widest font-bold">[ DESENVOLVIMENTO ]</label>
+                        <div className="space-y-3">
+                          {reelsResult.desenvolvimento.map((item, i) => (
+                            <div key={i} className="flex gap-3">
+                              <span className="text-bronze font-bold text-sm">{i + 1}.</span>
+                              <p className="text-white/80 text-sm leading-relaxed">{item}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="h-[1px] bg-[#3A3836] w-full" />
+
+                      <div className="p-6 space-y-2">
+                        <label className="text-[10px] text-bronze uppercase tracking-widest font-bold">[ CTA FINAL ]</label>
+                        <div className="text-white/80 text-sm leading-relaxed">{reelsResult.cta}</div>
+                      </div>
+
+                      <div className="p-6 pt-0">
+                        <Button 
+                          className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
+                          onClick={() => {
+                            const fullText = `GANCHO:\n${reelsResult.gancho}\n\nDESENVOLVIMENTO:\n${reelsResult.desenvolvimento.map((d, i) => `${i + 1}. ${d}`).join('\n')}\n\nCTA FINAL:\n${reelsResult.cta}`;
+                            navigator.clipboard.writeText(fullText);
+                            toast({ title: "Copiado", description: "Roteiro completo copiado." });
+                          }}
+                        >
+                          Copiar Roteiro Completo
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
-                </div>
-                <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2">
-                  {generatedContent ? (
-                    <Card className="bg-white/[0.02] border-bronze/30 rounded-none">
-                      <CardHeader className="p-6 border-b border-white/5 flex flex-row items-center justify-between">
-                        <CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Resultado Sugerido</CardTitle>
-                        <Button variant="ghost" size="sm" className="text-bronze text-[10px] uppercase font-bold tracking-widest p-0 h-auto" onClick={() => { navigator.clipboard.writeText(generatedContent); toast({ title: "Copiado", description: "Conteúdo copiado." }); }}>Copiar Texto</Button>
-                      </CardHeader>
-                      <CardContent className="p-6"><div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{generatedContent}</div></CardContent>
-                    </Card>
-                  ) : (
-                    <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
-                      <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Sparkles size={32} /></div>
-                      <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
-                    </div>
-                  )}
-                </div>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Video size={32} /></div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                    <p className="text-white/20 text-xs max-w-[200px]">Preencha os campos ao lado e clique em gerar para ver o roteiro.</p>
+                  </div>
+                )}
               </div>
-            </TabsContent>
-          ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="calendar" className="space-y-6 outline-none">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-6 border-b border-white/5"><CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Calendário</CardTitle></CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">O que você quer postar?</label>
+                      <Textarea value={userInput} onChange={(e) => setUserInput(e.target.value)} placeholder={`Ex: Calendário de conteúdo semanal focado em obras...`} className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" />
+                    </div>
+                    <Button className="w-full bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-xs font-bold tracking-[0.2em] h-12" onClick={() => generateContent('calendar')} disabled={generating || !userInput}>
+                      {generating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Consultando Base...</> : <><Sparkles className="w-4 h-4 mr-2" /> Gerar com IA</>}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2">
+                {generatedContent ? (
+                  <Card className="bg-white/[0.02] border-bronze/30 rounded-none">
+                    <CardHeader className="p-6 border-b border-white/5 flex flex-row items-center justify-between">
+                      <CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Resultado Sugerido</CardTitle>
+                      <Button variant="ghost" size="sm" className="text-bronze text-[10px] uppercase font-bold tracking-widest p-0 h-auto" onClick={() => { navigator.clipboard.writeText(generatedContent); toast({ title: "Copiado", description: "Conteúdo copiado." }); }}>Copiar Texto</Button>
+                    </CardHeader>
+                    <CardContent className="p-6"><div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{generatedContent}</div></CardContent>
+                  </Card>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Calendar size={32} /></div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                  </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
