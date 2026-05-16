@@ -285,9 +285,6 @@ Hashtags: máximo 10, sempre #NLArquitetos e #ProjetoExecutivo.`;
         }
       }
 
-      const commonHeaders = {
-        'x-anthropic-api-key': import.meta.env.ANTHROPIC_API_KEY
-      };
 
       if (type === 'captions') {
         const currentImage = skipImage ? null : captionImage;
