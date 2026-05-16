@@ -18,7 +18,8 @@ import {
   ExternalLink,
   Image as ImageIcon,
   Check,
-  DollarSign
+  DollarSign,
+  Trash2
 } from 'lucide-react';
 import { format, parseISO, isBefore, startOfDay, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -37,6 +38,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Projeto {
   id: string;
@@ -230,6 +242,7 @@ const ProjetoDetalhe = () => {
   const [clientMode, setClientMode] = useState(false);
   const [generatingPDF, setGeneratingPDF] = useState(false);
   const [issAliquota, setIssAliquota] = useState<number>(2);
+  const [isDeleting, setIsDeleting] = useState(false);
 
 
   const generatePDFReport = async () => {
@@ -436,6 +449,45 @@ const ProjetoDetalhe = () => {
     if (cData) setChecklist(cData);
   };
 
+  const handleDeleteProject = async () => {
+    if (!projeto) return;
+    
+    try {
+      setIsDeleting(true);
+      
+      // 1. Delete folder from Dropbox
+      const folderName = `${projeto.nome_cliente} - ${projeto.tipo}`;
+      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/${folderName}`;
+      
+      console.log("Excluindo pasta do Dropbox:", projectPath);
+      
+      const { data: dropboxData, error: dropboxError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'delete', path: projectPath }
+      });
+
+      if (dropboxError) {
+        console.warn("Aviso: Erro ao excluir do Dropbox (pode ser que a pasta não exista):", dropboxError);
+      }
+
+      // 2. Delete project from database (cascading deletes will handle related tables if configured, 
+      // but let's check foreign keys. We saw ON DELETE CASCADE in the schema check)
+      const { error: dbError } = await supabase
+        .from('projetos')
+        .delete()
+        .eq('id', projeto.id);
+
+      if (dbError) throw dbError;
+
+      toast.success('Projeto e pasta do Dropbox excluídos com sucesso');
+      navigate('/projetos/gestao');
+    } catch (error: any) {
+      console.error('Erro ao excluir projeto:', error);
+      toast.error(`Erro ao excluir projeto: ${error.message || 'Erro desconhecido'}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const updateEtapaStatus = async (etapaId: string, newStatus: string, approverName?: string) => {
     try {
       const updateData: any = { status: newStatus };
@@ -562,6 +614,34 @@ const ProjetoDetalhe = () => {
                 <span className="flex items-center gap-2 italic"><Eye size={14} /> Modo Concierge (Cliente)</span>
               )}
             </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  disabled={isDeleting}
+                  className="bg-transparent hover:bg-rose-500/10 text-rose-500 border border-rose-500/20 rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500"
+                >
+                  <Trash2 size={14} className="mr-2" /> {isDeleting ? "EXCLUINDO..." : "EXCLUIR PROJETO"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="bg-[#1A1816] border border-white/10 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-cormorant italic text-2xl">Confirmar exclusão?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-white/60 font-inter text-sm">
+                    Esta ação é irreversível. O projeto será removido do NL OS e a pasta correspondente no Dropbox será permanentemente excluída.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleDeleteProject}
+                    className="bg-rose-500 hover:bg-rose-600 text-white rounded-none"
+                  >
+                    Confirmar Exclusão
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
 
