@@ -440,7 +440,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">TIPO DE POST</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['FEED', 'REEL', 'STORY', 'CARROSSEL'] as const).map((type) => (
-                          <Button key={type} variant="outline" className={`rounded-none border-white/10 text-[10px] font-bold tracking-widest h-10 ${postType === type ? 'bg-bronze text-white border-bronze' : 'text-white/40 hover:bg-white/5'}`} onClick={() => setPostType(type)}>{type}</Button>
+                          <Button key={type} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${postType === type ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setPostType(type)}>{type}</Button>
                         ))}
                       </div>
                     </div>
@@ -448,7 +448,7 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FOCO</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['TÉCNICO', 'PROCESSO', 'RESULTADO', 'EDUCATIVO'] as const).map((focus) => (
-                          <Button key={focus} variant="outline" className={`rounded-none border-white/10 text-[10px] font-bold tracking-widest h-10 ${captionFocus === focus ? 'bg-bronze text-white border-bronze' : 'text-white/40 hover:bg-white/5'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
+                          <Button key={focus} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${captionFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
                         ))}
                       </div>
                     </div>
