@@ -2076,6 +2076,46 @@ const DocumentosContratos = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
+          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
+            <DialogHeader className="p-4 border-b border-white/5 flex flex-row items-center justify-between">
+              <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
+                <Eye size={14} className="text-bronze" /> {viewerFile?.name}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden bg-black/40 relative">
+              {viewerFile?.type === 'image' ? (
+                <div className="w-full h-full flex items-center justify-center p-4">
+                  <img src={viewerFile.url} alt={viewerFile.name} className="max-w-full max-h-full object-contain shadow-2xl" />
+                </div>
+              ) : (
+                <iframe 
+                  src={`${viewerFile?.url}#toolbar=0`} 
+                  className="w-full h-full border-none" 
+                  title={viewerFile?.name}
+                />
+              )}
+            </div>
+            <DialogFooter className="p-4 border-t border-white/5 flex justify-between items-center sm:justify-between">
+              <p className="text-[9px] text-white/40 uppercase tracking-widest">
+                Modificado em: {viewerFile?.client_modified && format(parseISO(viewerFile.client_modified), 'dd/MM/yyyy HH:mm')}
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => window.open(viewerFile?.url, '_blank')} 
+                  variant="outline" 
+                  className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest h-8"
+                >
+                  <ExternalLink size={12} className="mr-2" /> ABRIR ORIGINAL
+                </Button>
+                <Button onClick={() => setIsViewerOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none text-[9px] uppercase tracking-widest h-8">
+                  FECHAR
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
