@@ -42,6 +42,7 @@ const MarketingIA = () => {
   const [postType, setPostType] = useState<'FEED' | 'REEL' | 'STORY' | 'CARROSSEL'>('FEED');
   const [captionFocus, setCaptionFocus] = useState<'TÉCNICO' | 'PROCESSO' | 'RESULTADO' | 'EDUCATIVO'>('TÉCNICO');
   const [captionOptions, setCaptionOptions] = useState<Array<{ legenda: string, hashtags: string }>>([]);
+  const [personaExamples, setPersonaExamples] = useState("");
 
   // New states for Reels
   const [reelsSubject, setReelsSubject] = useState("");
@@ -56,6 +57,8 @@ const MarketingIA = () => {
   const [calendarProjects, setCalendarProjects] = useState("");
   const [calendarFocus, setCalendarFocus] = useState<'CAPTAÇÃO' | 'AUTORIDADE' | 'EDUCAÇÃO' | 'PORTFÓLIO'>('CAPTAÇÃO');
   const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
+  const [expandingContent, setExpandingContent] = useState<number | null>(null);
+  const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
 
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
