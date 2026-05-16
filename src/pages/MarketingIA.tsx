@@ -340,16 +340,31 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const parsed = JSON.parse(content);
-            if (parsed.opcoes) {
-              setCaptionOptions(parsed.opcoes);
-            } else {
-              setGeneratedContent(content);
+          const extractJSON = (text: string) => {
+            try {
+              return JSON.parse(text);
+            } catch (e) {
+              const match = text.match(/\{[\s\S]*\}/);
+              if (match) {
+                try {
+                  return JSON.parse(match[0]);
+                } catch (e2) {
+                  return null;
+                }
+              }
+              return null;
             }
-          } catch (e) {
+          };
+
+          const parsed = extractJSON(content);
+          if (parsed && parsed.opcoes) {
+            setCaptionOptions(parsed.opcoes);
+          } else {
             setGeneratedContent(content);
           }
+        } catch (e) {
+          setGeneratedContent(content);
+        }
         } else if (aiResponse.data?.error) {
           throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
@@ -403,12 +418,31 @@ Assunto: ${reelsSubject}`;
 
         if (aiResponse.data?.choices?.[0]?.message?.content) {
           const content = aiResponse.data.choices[0].message.content;
-          try {
-            const parsed = JSON.parse(content);
+          const extractJSON = (text: string) => {
+            try {
+              return JSON.parse(text);
+            } catch (e) {
+              const match = text.match(/\{[\s\S]*\}/);
+              if (match) {
+                try {
+                  return JSON.parse(match[0]);
+                } catch (e2) {
+                  return null;
+                }
+              }
+              return null;
+            }
+          };
+
+          const parsed = extractJSON(content);
+          if (parsed) {
             setReelsResult(parsed);
-          } catch (e) {
+          } else {
             setGeneratedContent(content);
           }
+        } catch (e) {
+          setGeneratedContent(content);
+        }
         } else if (aiResponse.data?.error) {
           throw new Error(`Erro na IA: ${aiResponse.data.error.message || aiResponse.data.error}`);
         } else {
@@ -734,7 +768,7 @@ Retorne APENAS JSON válido neste formato:
                       <CardContent className="p-6 pt-8 space-y-4">
                         <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{option.legenda}</div>
                         <div className="text-bronze text-xs font-medium tracking-tight">{option.hashtags}</div>
-                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><RefreshCcw className="w-3 h-3" /> Copiar</Button></div>
+                        <div className="flex justify-end"><Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar</Button></div>
                       </CardContent>
                     </Card>
                   ))
