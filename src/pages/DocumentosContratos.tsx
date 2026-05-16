@@ -289,7 +289,7 @@ const DocumentosContratos = () => {
         let errorMsg = typeof errorData === 'string' ? errorData : '';
         
         if (errorData['.tag'] === 'expired_access_token' || (typeof errorData === 'object' && errorData.error && errorData.error['.tag'] === 'expired_access_token')) {
-          throw new Error('O token do Dropbox expirou. Por favor, atualize o DROPBOX_ACCESS_TOKEN ou configure o Refresh Token nas configurações.');
+          throw new Error('A conexão com o Dropbox expirou. Por favor, reconecte o Dropbox nas configurações do sistema.');
         }
         
         if (!errorMsg && response.data.error_summary) errorMsg = response.data.error_summary;
