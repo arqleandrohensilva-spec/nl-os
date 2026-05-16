@@ -758,11 +758,14 @@ Retorne APENAS JSON válido neste formato:
                         ref={reelsImageRef} 
                         className="hidden" 
                         accept="image/jpeg,image/png,image/webp" 
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
                             const reader = new FileReader();
-                            reader.onload = (re) => setReelsImage(re.target?.result as string);
+                            reader.onload = async (re) => {
+                              const compressed = await compressImage(re.target?.result as string);
+                              setReelsImage(compressed);
+                            };
                             reader.readAsDataURL(file);
                           }
                         }} 
