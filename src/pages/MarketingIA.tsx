@@ -304,9 +304,52 @@ ${captionDescription ? `Contexto fornecido: ${captionDescription}` : ""}
         } else {
           throw new Error("Falha ao gerar legendas.");
         }
+      } else if (type === 'reels') {
+        const systemPrompt = `Você é o CMO virtual da NL Arquitetos, escritório de arquitetura premium em São José dos Campos. Gere um roteiro de Reel para Instagram.
+
+TOM OBRIGATÓRIO: técnico, condutor, direto — nunca romântico ou emocional. O Reel deve educar ou demonstrar autoridade técnica, não vender.
+
+ESTRUTURA OBRIGATÓRIA:
+1. GANCHO (primeiros 3 segundos): frase que para o scroll. Direto, específico, provoca curiosidade técnica.
+2. DESENVOLVIMENTO: sequência de ${reelsDuration} segundos. Tópicos numerados, cada um com ação visual sugerida entre colchetes.
+3. CTA FINAL: próximo passo claro. Nunca "manda mensagem agora", sempre algo que demonstra método.
+
+REGRAS:
+- Duração: ${reelsDuration}
+- Formato: ${reelsFormat}
+- Sem "casa dos sonhos", "lindo", "incrível", "luxo"
+- Sempre processo técnico antes de resultado estético
+- CTA deve ser consultivo, nunca pressão de venda
+
+DIRETRIZES DA NL: ${guidelines}
+
+BASE DE CONHECIMENTO (CONTEXTO):
+${contextContent}`;
+
+        const prompt = `Assunto: ${reelsSubject}`;
+
+        const aiResponse = await supabase.functions.invoke('ai-advisor', {
+          body: { 
+            prompt, 
+            systemPrompt, 
+            model: "anthropic/claude-3-5-sonnet-20240620",
+            json: true
+          }
+        });
+
+        if (aiResponse.data?.choices?.[0]?.message?.content) {
+          const content = aiResponse.data.choices[0].message.content;
+          try {
+            const parsed = JSON.parse(content);
+            setReelsResult(parsed);
+          } catch (e) {
+            setGeneratedContent(content);
+          }
+        } else {
+          throw new Error("Falha ao gerar roteiro de Reel.");
+        }
       } else {
         const typeLabels: Record<string, string> = {
-          'reels': 'Roteiro para Reels',
           'calendar': 'Calendário de Conteúdo Semanal'
         };
         const systemPrompt = `Você é um especialista em marketing para arquitetos, focado no escritório NL Arquitetos.\nDIRETRIZES RÁPIDAS:\n${guidelines}\nBASE DE CONHECIMENTO:\n${contextContent}`;
