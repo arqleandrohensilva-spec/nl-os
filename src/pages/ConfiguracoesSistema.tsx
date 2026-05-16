@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 const ConfiguracoesSistema = () => {
   const [dropboxStatus, setDropboxStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
   const [lastSync, setLastSync] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
@@ -45,10 +46,14 @@ const ConfiguracoesSistema = () => {
     const clientId = 'zjdj0yszvqy7wvz';
     const redirectUri = 'https://app.nl.arq.br/dropbox-callback';
     
+    // Mostra loading imediatamente para dar feedback visual
+    setDropboxStatus('loading');
+    
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
     
-    // Open in a new window to avoid iframe restrictions (Dropbox refuses to load in iframes)
-    window.open(authUrl, '_blank');
+    // Usar window.location.href em vez de window.open para garantir o fluxo na mesma aba se preferível,
+    // mas o usuário pediu para "clicar e não ficar branco".
+    window.location.href = authUrl;
   };
 
   return (
