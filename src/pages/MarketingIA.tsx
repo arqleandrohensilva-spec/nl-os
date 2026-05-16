@@ -307,6 +307,9 @@ REGRAS:
 
 DIRETRIZES DA NL: ${guidelines}
 
+${personaExamples ? `EXEMPLOS DE POSTS QUE DERAM CERTO (SIGA ESTE ESTILO E VOZ):
+${personaExamples}` : ""}
+
 BASE DE CONHECIMENTO (CONTEXTO):
 ${contextContent}
 
