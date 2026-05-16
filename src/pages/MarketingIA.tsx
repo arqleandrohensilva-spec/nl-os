@@ -674,6 +674,8 @@ Retorne APENAS JSON válido neste formato:
             const parsed = extractJSON(content);
             if (parsed && parsed.semanas) {
               setCalendarResult(parsed.semanas);
+              // Auto-save calendar
+              saveToHistory('calendario', parsed, `Calendário de ${calendarMonth} - Foco: ${calendarFocus}`);
             } else {
               setGeneratedContent(content);
             }
