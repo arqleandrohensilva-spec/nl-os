@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const SatisfacaoDashboard = () => {
   const { toast } = useToast();
@@ -41,6 +42,8 @@ const SatisfacaoDashboard = () => {
   const [selectedSurveyForFollowUp, setSelectedSurveyForFollowUp] = useState<any>(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [currentVideoUrl, setCurrentVideoUrl] = useState('');
+  const [selectedType, setSelectedType] = useState('Pós-Entrega');
+  const [generatedToken, setGeneratedToken] = useState('');
   
   const [stats, setStats] = useState({
     avg: 0,
@@ -206,6 +209,36 @@ const SatisfacaoDashboard = () => {
     }
   };
 
+  const handleGenerateLink = async () => {
+    if (!selectedProjectId) return;
+    setCreating(true);
+    const token = crypto.randomUUID();
+    const project = projects.find(p => p.id === selectedProjectId);
+    
+    try {
+      const { error } = await supabase
+        .from('pesquisas_satisfacao')
+        .insert({
+          projeto_id: selectedProjectId,
+          cliente_nome: project?.nome_cliente || 'Cliente',
+          token,
+          status: 'PENDENTE',
+          tipo: selectedType
+        });
+        
+      if (error) throw error;
+      
+      setGeneratedToken(token);
+      toast({ title: "Pesquisa gerada com sucesso!" });
+      fetchData();
+    } catch (error) {
+      console.error(error);
+      toast({ variant: "destructive", title: "Erro ao gerar pesquisa" });
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
       <Sidebar user="Equipe NL" />
@@ -215,12 +248,55 @@ const SatisfacaoDashboard = () => {
           <p className="text-bronze uppercase tracking-widest text-[10px] font-bold mt-1">PÓS-ENTREGA · DEPOIMENTOS · PAINEL NPS</p>
         </div>
 
-        <Tabs defaultValue="depoimentos" className="space-y-6">
+        <Tabs defaultValue="pesquisas" className="space-y-6">
           <TabsList className="bg-[#242220] border-white/5 rounded-none p-0 h-auto">
             <TabsTrigger value="pesquisas" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Pesquisas</TabsTrigger>
             <TabsTrigger value="depoimentos" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Depoimentos</TabsTrigger>
             <TabsTrigger value="nps" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Painel NPS</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="pesquisas">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Listagem de Pesquisas</h2>
+              <Button onClick={() => { setGeneratedToken(''); setIsModalOpen(true); }} className="bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold">
+                <Plus className="w-4 h-4 mr-2" /> Nova Pesquisa
+              </Button>
+            </div>
+
+            <div className="grid gap-4">
+              {surveys.length === 0 ? (
+                <div className="bg-[#242220] p-12 border border-white/5 text-center">
+                  <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa gerada ainda.</p>
+                </div>
+              ) : (
+                surveys.map((survey) => (
+                  <div key={survey.id} className="bg-[#242220] p-6 border border-white/5 flex justify-between items-center">
+                    <div>
+                      <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
+                      <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
+                        {survey.cliente_nome} · {survey.tipo || 'Pós-Entrega'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className={cn(
+                        "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
+                        survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : "bg-yellow-500/20 text-yellow-400"
+                      )}>
+                        {survey.status}
+                      </span>
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        const link = `${window.location.origin}/satisfacao/${survey.token}`;
+                        navigator.clipboard.writeText(link);
+                        toast({ title: "Link copiado!" });
+                      }} className="text-white/40 hover:text-white">
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </TabsContent>
           <TabsContent value="depoimentos">
           <div className="grid gap-6">
             {testimonials.map((dep) => (
@@ -273,6 +349,52 @@ const SatisfacaoDashboard = () => {
             ))}
           </div>
           </TabsContent>
+
+          <TabsContent value="nps">
+            {stats.total === 0 ? (
+              <div className="bg-[#242220] p-24 border border-white/5 text-center">
+                <p className="text-white/40 uppercase tracking-widest text-[12px] font-bold">Nenhuma pesquisa respondida ainda.</p>
+              </div>
+            ) : (
+              <div className="space-y-12">
+                <div className="grid grid-cols-4 gap-6">
+                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                    <p className="text-bronze text-[10px] uppercase tracking-widest font-bold mb-2">Nota Média Geral</p>
+                    <h4 className="text-6xl font-bold font-cormorant text-bronze">{stats.avg.toFixed(1)}</h4>
+                  </div>
+                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                    <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2">Total Respondidas</p>
+                    <h4 className="text-6xl font-bold font-cormorant">{stats.total}</h4>
+                  </div>
+                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                    <p className="text-green-500/60 text-[10px] uppercase tracking-widest font-bold mb-2">Promotores (≥ 9)</p>
+                    <h4 className="text-6xl font-bold font-cormorant text-green-500">{stats.promoters}</h4>
+                  </div>
+                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                    <p className="text-red-500/60 text-[10px] uppercase tracking-widest font-bold mb-2">Detratores (≤ 6)</p>
+                    <h4 className="text-6xl font-bold font-cormorant text-red-500">{stats.detractors}</h4>
+                  </div>
+                </div>
+
+                <div className="bg-[#242220] p-10 border border-white/5">
+                  <h3 className="text-xl font-bold font-cormorant uppercase tracking-[0.2em] mb-8">Benchmark por Categoria</h3>
+                  <div className="space-y-6">
+                    {stats.categoryAverages.map((cat) => (
+                      <div key={cat.label} className="space-y-2">
+                        <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold">
+                          <span>{cat.label}</span>
+                          <span className="text-bronze">{cat.val.toFixed(1)} / 10.0</span>
+                        </div>
+                        <div className="h-1 bg-white/5 w-full">
+                          <div className="h-full bg-bronze" style={{ width: `${cat.val * 10}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </main>
       <Dialog open={isFollowUpModalOpen} onOpenChange={setIsFollowUpModalOpen}>
@@ -285,6 +407,63 @@ const SatisfacaoDashboard = () => {
           <DialogFooter>
             <Button onClick={handleSendFollowUpWhatsApp} disabled={generatingFollowUp || !followUpQuestion} className="w-full bg-green-600 hover:bg-green-700 rounded-none uppercase tracking-widest text-[10px] font-bold py-6">
               <Send className="w-4 h-4 mr-2" /> ENVIAR NO WHATSAPP
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-[#242220] border-white/10 text-white rounded-none">
+          <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Gerar Nova Pesquisa</DialogTitle></DialogHeader>
+          <div className="py-6 space-y-6">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Projeto</Label>
+              <Select onValueChange={setSelectedProjectId} value={selectedProjectId}>
+                <SelectTrigger className="bg-transparent border-white/10 rounded-none">
+                  <SelectValue placeholder="Selecione um projeto" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#242220] border-white/10 text-white">
+                  {projects.map(p => (
+                    <SelectItem key={p.id} value={p.id}>{p.nome} — {p.nome_cliente}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-3">
+              <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Tipo de Pesquisa</Label>
+              <RadioGroup value={selectedType} onValueChange={setSelectedType} className="flex flex-col space-y-1">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Pós-Briefing" id="briefing" />
+                  <Label htmlFor="briefing" className="text-sm">Pós-Briefing</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Pós-Anteprojeto" id="anteprojeto" />
+                  <Label htmlFor="anteprojeto" className="text-sm">Pós-Anteprojeto</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="Pós-Entrega" id="entrega" />
+                  <Label htmlFor="entrega" className="text-sm">Pós-Entrega</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            
+            {generatedToken && (
+              <div className="p-4 bg-bronze/10 border border-bronze/20 space-y-2">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-bronze">Link Gerado:</p>
+                <div className="flex gap-2">
+                  <Input readOnly value={`${window.location.origin}/satisfacao/${generatedToken}`} className="bg-transparent border-white/10 rounded-none text-xs" />
+                  <Button size="icon" onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/satisfacao/${generatedToken}`);
+                    toast({ title: "Link copiado!" });
+                  }} className="bg-bronze hover:bg-bronze/90 rounded-none">
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={handleGenerateLink} disabled={!selectedProjectId || creating} className="w-full bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold py-6">
+              {creating ? "GERANDO..." : "GERAR LINK"}
             </Button>
           </DialogFooter>
         </DialogContent>
