@@ -188,6 +188,43 @@ const GestaoProjetos = () => {
     }
   };
 
+  const handleGerarConteudo = async (projeto: Projeto, currentEtapaInfo: EtapaInfo | undefined) => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+
+      const proximaEntregaStr = currentEtapaInfo?.data_entrega 
+        ? format(parseISO(currentEtapaInfo.data_entrega), "dd 'DE' MMM", { locale: ptBR }) 
+        : 'N/A';
+
+      // Clear previous context first
+      await supabase
+        .from('contexto_marketing_ativo')
+        .delete()
+        .eq('user_id', userData.user.id);
+
+      // Insert new context
+      const { error } = await supabase
+        .from('contexto_marketing_ativo')
+        .insert({
+          user_id: userData.user.id,
+          cliente: projeto.nome_cliente,
+          tipo: projeto.tipo,
+          etapa_atual: projeto.etapa_atual,
+          status: currentEtapaInfo?.status || 'Em andamento',
+          proxima_entrega: proximaEntregaStr
+        });
+
+      if (error) throw error;
+
+      navigate('/marketing-ia?tab=captions');
+      toast.success("Contexto enviado para o Marketing IA!");
+    } catch (error: any) {
+      console.error("Erro ao gerar conteúdo:", error);
+      toast.error("Erro ao preparar contexto de marketing");
+    }
+  };
+
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
   
   const deliveriesThisWeek = Object.values(etapas).flat().filter(e => {
