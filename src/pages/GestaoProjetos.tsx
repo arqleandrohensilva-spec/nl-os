@@ -329,7 +329,7 @@ const GestaoProjetos = () => {
                   </span>
                 </div>
 
-                <div className="w-full md:w-auto flex flex-row items-center gap-2 ml-auto">
+                <div className="w-full md:w-auto flex flex-row items-center justify-end gap-2 ml-auto">
                   <Button 
                     onClick={() => {
                       toast.success("Link da Experiência Concierge copiado!", {
