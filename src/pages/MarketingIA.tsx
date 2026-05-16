@@ -79,6 +79,8 @@ const MarketingIA = () => {
   const [calendarResult, setCalendarResult] = useState<Array<{ numero: number, tipo: string, tema: string, formato: string, descricao: string, gancho: string }>>([]);
   const [expandingContent, setExpandingContent] = useState<number | null>(null);
   const [expandedResults, setExpandedResults] = useState<Record<number, { linkedin?: string, blog?: string }>>({});
+  const [showExpansionModal, setShowExpansionModal] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", content: "", type: "" as 'linkedin' | 'blog' });
 
   // History states
   const [historyItems, setHistoryItems] = useState<any[]>([]);
