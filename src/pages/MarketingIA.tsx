@@ -29,8 +29,16 @@ const MarketingIA = () => {
   const [generatedContent, setGeneratedContent] = useState("");
   const [uploading, setUploading] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionImageRef = useRef<HTMLInputElement>(null);
   const [selectedFileType, setSelectedFileType] = useState<string | null>(null);
   const { toast } = useToast();
+
+  // New states for captions
+  const [captionImage, setCaptionImage] = useState<string | null>(null);
+  const [captionDescription, setCaptionDescription] = useState("");
+  const [postType, setPostType] = useState<'FEED' | 'REEL' | 'STORY' | 'CARROSSEL'>('FEED');
+  const [captionFocus, setCaptionFocus] = useState<'TÉCNICO' | 'PROCESSO' | 'RESULTADO' | 'EDUCATIVO'>('TÉCNICO');
+  const [captionOptions, setCaptionOptions] = useState<Array<{ legenda: string, hashtags: string }>>([]);
 
   const DROPBOX_PATH = '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Base de Conhecimentos';
 
