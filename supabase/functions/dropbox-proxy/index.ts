@@ -190,34 +190,76 @@ serve(async (req) => {
       body
     });
 
-    // If 401, try to refresh once
-    if (response.status === 401 && settings.refresh_token) {
-      console.log('Token expired (401), attempting refresh...');
-      const newToken = await refreshDropboxToken(supabase, settings.refresh_token);
-      if (newToken) {
-        headers['Authorization'] = `Bearer ${newToken}`;
-        if (action !== 'upload') {
-          response = await fetch(endpoint, {
-            method: 'POST',
-            headers,
-            body
+    // Handle non-OK responses
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        const text = await response.text();
+        errorData = { error: text };
+      }
+
+      const errorSummary = errorData?.error_summary || '';
+      const isPathNotFound = errorSummary.includes('path/not_found');
+      
+      if (isPathNotFound) {
+        if (action === 'delete') {
+          console.log(`Path not found for delete action, treating as success: ${path}`);
+          return new Response(JSON.stringify({ success: true, message: 'Path already gone or never existed' }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
+          });
+        }
+        if (action === 'list_folder') {
+          console.log(`Path not found for list_folder action, returning empty entries: ${path}`);
+          return new Response(JSON.stringify({ entries: [], has_more: false }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200 
+          });
+        }
+        if (action === 'get_metadata') {
+          console.log(`Path not found for get_metadata action, returning 404: ${path}`);
+          return new Response(JSON.stringify({ error: 'not_found', path }), { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 404
           });
         }
       }
+
+      // If 401, try to refresh once
+      if (response.status === 401 && settings.refresh_token) {
+        console.log('Token expired (401), attempting refresh...');
+        const newToken = await refreshDropboxToken(supabase, settings.refresh_token);
+        if (newToken) {
+          headers['Authorization'] = `Bearer ${newToken}`;
+          if (action !== 'upload') {
+            const retryResponse = await fetch(endpoint, {
+              method: 'POST',
+              headers,
+              body
+            });
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              return new Response(JSON.stringify(retryData), { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200 
+              });
+            }
+          }
+        }
+      }
+
+      return new Response(
+        JSON.stringify(errorData),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
+      );
     }
 
     if (action === 'download') {
       const blob = await response.blob();
       const responseContentType = response.headers.get('Content-Type') || 'application/octet-stream';
       
-      if (!response.ok) {
-        const errorText = await blob.text();
-        return new Response(
-          JSON.stringify({ error: `Dropbox failed: ${response.status}`, details: errorText }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
-        );
-      }
-
       return new Response(
         blob,
         { headers: { ...corsHeaders, 'Content-Type': responseContentType }, status: 200 }
@@ -228,7 +270,7 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify(data),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
     console.error(`Internal error: ${error.message}`);
