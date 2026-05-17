@@ -170,6 +170,11 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             active={location.pathname === '/'} 
             onClick={() => navigate('/')} 
           />
+          <NavItem 
+            label="12 · Scripts de Atendimento" 
+            active={location.pathname === '/scripts-atendimento'} 
+            onClick={() => navigate('/scripts-atendimento')} 
+          />
         </SectionAccordion>
 
         <SectionAccordion 
