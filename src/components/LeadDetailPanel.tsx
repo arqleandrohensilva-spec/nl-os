@@ -100,7 +100,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
       <div className="absolute inset-0 bg-graphite/40 backdrop-blur-[8px]" onClick={onClose} />
-      <div className="relative w-[500px] h-full bg-white shadow-[-30px_0_60px_rgba(0,0,0,0.15)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
+      <div className="relative w-[500px] h-full bg-[#111111] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
         <div className="p-10 border-b border-white/10 relative">
           <button onClick={onClose} className="absolute right-8 top-8 text-white/40 hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
           <div className="flex items-center gap-3 mb-2">
@@ -112,7 +112,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             </span>
             <span className="text-[10px] text-white/40 font-mono">#{lead.id}</span>
           </div>
-          <h2 className="text-4xl font-cormorant text-graphite mb-6 leading-none">{lead.nome}</h2>
+          <h2 className="text-4xl font-cormorant text-white mb-6 leading-none">{lead.nome}</h2>
           <div className="flex flex-wrap gap-2">
             {STAGES.map(s => (
               <button 
@@ -120,7 +120,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                 onClick={() => onUpdateStage(lead.id, s)}
                 className={cn(
                   "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-[2px] transition-all",
-                  lead.stage === s ? "bg-graphite text-white border-graphite" : "border-white/10 text-white/40 hover:border-bronze hover:text-bronze"
+                  lead.stage === s ? "bg-bronze text-white border-bronze" : "border-white/10 text-white/40 hover:border-bronze hover:text-bronze"
                 )}
               >
                 {s}
