@@ -94,10 +94,20 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
             {lead.temp}
           </div>
 
-          {/* Score */}
-          <div className="flex items-center gap-1 text-bronze">
-            <span className="text-[9px] font-bold uppercase">Sc.</span>
-            <span className="text-sm font-bold">{score}</span>
+          {/* Score & Stagnation Icon */}
+          <div className="flex items-center gap-2 text-bronze">
+            {isGhosting && (
+              <div 
+                className="text-red-400" 
+                title={`Sem contato há ${daysSinceLastContact} dias`}
+              >
+                <Clock size={12} className="animate-pulse" />
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] font-bold uppercase">Sc.</span>
+              <span className="text-sm font-bold">{score}</span>
+            </div>
           </div>
         </div>
         
