@@ -334,7 +334,20 @@ const Dashboard = () => {
     });
   }, [leads, projetos, parcelas]);
 
-  // AI Logic
+  const aiGreeting = React.useMemo(() => {
+    const urgentItems = actions.filter(a => a.type === 'urgent').length;
+    const todayItems = actions.filter(a => a.type === 'today').length;
+    const totalItems = actions.length;
+
+    if (urgentItems > 0) {
+      return `Você tem ${urgentItems} ação${urgentItems > 1 ? 'ões' : 'ão'} urgente${urgentItems > 1 ? 's' : ''} pendente${urgentItems > 1 ? 's' : ''} hoje.`;
+    }
+    if (totalItems > 0) {
+      return `Você tem ${totalItems} compromisso${totalItems > 1 ? 's' : ''} para hoje.`;
+    }
+    return "Agenda limpa hoje. Bom momento para prospectar.";
+  }, [actions]);
+
   useEffect(() => {
     const generateAIContent = async () => {
       if (leads.length === 0 && projetos.length === 0) return;
@@ -354,16 +367,6 @@ const Dashboard = () => {
       const satisfacaoResumo = pulse[3].subtext;
 
       try {
-        // Greeting context
-        const greetingPrompt = `Gere uma frase curta de contexto (máximo 10 palavras) para o dashboard de um sócio de escritório de arquitetura.
-        Dados atuais: ${actions.filter(a => a.type === 'urgent').length} ações urgentes, ${actions.filter(a => a.type === 'today').length} para hoje.
-        Exemplo: "Você tem 2 ações urgentes e 4 compromissos para hoje."`;
-
-        const { data: gData } = await supabase.functions.invoke('ai-advisor', {
-          body: { prompt: greetingPrompt, systemPrompt: "Você é um assistente executivo conciso." }
-        });
-        setAiGreeting((gData?.choices?.[0]?.message?.content || "").replace(/^["']|["']$/g, ''));
-
         // Insight
         const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
         Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
