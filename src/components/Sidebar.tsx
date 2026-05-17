@@ -157,11 +157,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
               {location.pathname === '/financeiro/base' ? 'Módulo Financeiro' : 'Módulo Pipeline'}
             </p>
           </div>
-
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
+        <div className="mb-2">
+          <NavItem 
+            label="COMMAND CENTER" 
+            icon={<LayoutGrid size={12} />}
+            active={location.pathname === '/dashboard'} 
+            onClick={() => navigate('/dashboard')} 
+          />
+        </div>
+
         <SectionAccordion 
           label="LEADS" 
           icon={<LayoutGrid size={14} />}
@@ -170,8 +178,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         >
           <NavItem 
             label="01 · Pipeline de Leads" 
-            active={location.pathname === '/'} 
-            onClick={() => navigate('/')} 
+            active={location.pathname === '/pipeline'} 
+            onClick={() => navigate('/pipeline')} 
           />
           <NavItem 
             label="Scripts de Atendimento" 
