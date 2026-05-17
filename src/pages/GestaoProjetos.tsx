@@ -50,6 +50,7 @@ interface Projeto {
   status_geral: string;
   data_inicio: string;
   prazo_final: string;
+  token_cliente?: string;
 }
 
 interface EtapaInfo {
@@ -331,20 +332,40 @@ const GestaoProjetos = () => {
 
                 <div className="w-full md:w-auto flex flex-row items-center justify-end gap-2 ml-auto">
                   <Button 
-                    onClick={() => {
-                      toast.success("Link da Experiência Concierge copiado!", {
-                        description: "O cliente receberá o acesso ao Atelier Visual."
-                      });
+                    onClick={async () => {
+                      try {
+                        let token = projeto.token_cliente;
+                        
+                        if (!token) {
+                          const { data, error } = await supabase
+                            .from('projetos')
+                            .update({ token_cliente: crypto.randomUUID() })
+                            .eq('id', projeto.id)
+                            .select('token_cliente')
+                            .single();
+                          
+                          if (error) throw error;
+                          token = data.token_cliente;
+                        }
+
+                        const url = `${window.location.origin}/cliente/${token}`;
+                        await navigator.clipboard.writeText(url);
+                        
+                        toast.success("Link copiado. Compartilhe com o cliente.");
+                      } catch (error) {
+                        console.error("Erro ao gerar link:", error);
+                        toast.error("Erro ao gerar link do cliente");
+                      }
                     }}
-                    className="bg-white/5 hover:bg-white/10 text-[#8B7355] border border-[#8B7355]/20 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
+                    className="bg-white/5 border border-white/10 text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/link"
                   >
-                    <Share2 size={12} className="mr-2" /> Compartilhar
+                    <Share2 size={12} className="mr-2 group-hover/link:text-bronze" /> COPIAR LINK DO CLIENTE
                   </Button>
                   <Button 
                     onClick={() => navigate(`/apresentacao/${projeto.id}`)}
-                    className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/pres"
+                    className="bg-white/5 border border-white/10 text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/pres"
                   >
-                    <Monitor size={12} className="mr-2 group-hover/pres:text-bronze transition-colors" /> Modo Apresentação
+                    <Monitor size={12} className="mr-2 group-hover/pres:text-bronze transition-colors" /> MODO APRESENTAÇÃO
                   </Button>
                   <Button 
                     onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
