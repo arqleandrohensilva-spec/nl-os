@@ -24,6 +24,8 @@ const ScriptsAtendimento = () => {
   const [leadAtivo, setLeadAtivo] = useState<Lead | null>(null);
   const [mensagemCliente, setMensagemCliente] = useState('');
   const [mensagemDetector, setMensagemDetector] = useState('');
+  const [descricaoObjecao, setDescricaoObjecao] = useState('');
+  const [etapaAtualObjecao, setEtapaAtualObjecao] = useState('');
   const [sugestaoIA, setSugestaoIA] = useState<{ resposta: string; tom: string; proximo_passo: string } | null>(null);
   const [resultadoDetector, setResultadoDetector] = useState<{
     etapa_numero: number;
@@ -32,8 +34,13 @@ const ScriptsAtendimento = () => {
     motivo: string;
     script_recomendado: string;
   } | null>(null);
+  const [resultadoObjecao, setResultadoObjecao] = useState<{
+    script: string;
+    estrategia: string;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [isGeneratingObjecao, setIsGeneratingObjecao] = useState(false);
   const [openEtapa, setOpenEtapa] = useState<string | null>(null);
 
   useEffect(() => {
@@ -117,6 +124,50 @@ Analise a mensagem e retorne APENAS JSON válido:
       toast.error("Erro ao identificar etapa");
     } finally {
       setIsDetecting(false);
+    }
+  };
+
+  const gerarScriptObjecao = async () => {
+    if (!leadAtivo || !descricaoObjecao || !etapaAtualObjecao) return;
+    setIsGeneratingObjecao(true);
+    toast.info("Gerando script...");
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-completions', {
+        body: {
+          model: 'claude-sonnet-4-20250514',
+          prompt: `Você é o assistente comercial da NL Arquitetos. Gere um script de resposta para a objeção ou situação abaixo.
+
+CONTEXTO DA NL:
+- Tom: profissional, condutor, sem pressão de venda
+- Nunca confrontar o cliente — redirecionar com método
+- Sempre centrado no problema do cliente, não na defesa da NL
+- Sem "casa dos sonhos", "lindo", "incrível", urgência artificial
+- Resposta curta quando possível, completa quando necessário
+- Sempre com próximo passo claro
+
+PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
+
+LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
+ETAPA ATUAL: ${etapaAtualObjecao}
+
+OBJEÇÃO / SITUAÇÃO:
+${descricaoObjecao}
+
+Gere uma resposta no tom NL para essa situação específica.
+
+Retorne APENAS JSON válido:
+{
+  "script": "texto completo da resposta pronta para enviar",
+  "estrategia": "explicação em 1 linha do que foi feito — ex: Reconheceu o ponto e redirecionou para o valor do projeto executivo"
+}`
+        }
+      });
+      if (error) throw error;
+      setResultadoObjecao(data);
+    } catch (e) {
+      toast.error("Erro ao gerar script");
+    } finally {
+      setIsGeneratingObjecao(false);
     }
   };
 
@@ -339,6 +390,87 @@ Analise a mensagem e retorne APENAS JSON válido:
                 >
                   IR PARA ESTA ETAPA
                 </Button>
+              </div>
+            )}
+          </div>
+
+          {/* BLOCO — GERADOR DE OBJEÇÃO */}
+          <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-bronze">
+                <Bot size={16} />
+                <p className="text-[10px] uppercase font-bold tracking-widest">OBJEÇÃO NÃO MAPEADA · IA</p>
+              </div>
+              <p className="text-[10px] text-white/30 italic">Situação fora dos scripts padrão? A IA gera a resposta certa no tom NL</p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-[9px] uppercase tracking-widest text-white/40 block">O QUE O CLIENTE DISSE</label>
+                <Textarea 
+                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[80px] focus-visible:ring-bronze text-xs" 
+                  placeholder="Ex: Cliente disse que vai construir com o cunhado que é engenheiro e não precisa de arquiteto..."
+                  value={descricaoObjecao}
+                  onChange={(e) => setDescricaoObjecao(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] uppercase tracking-widest text-white/40 block">ETAPA ATUAL</label>
+                <Select onValueChange={setEtapaAtualObjecao} value={etapaAtualObjecao}>
+                  <SelectTrigger className="bg-[#0F0F0F] border-white/5 text-white h-9 text-xs">
+                    <SelectValue placeholder="Selecione a etapa..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#141414] border-white/10 text-white">
+                    {scriptsContent.map((etapa) => (
+                      <SelectItem key={etapa.id} value={etapa.titulo} className="focus:bg-bronze/20 focus:text-white text-xs">
+                        {etapa.id} - {etapa.titulo}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <Button 
+              className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
+              onClick={gerarScriptObjecao}
+              disabled={isGeneratingObjecao || !leadAtivo || !descricaoObjecao || !etapaAtualObjecao}
+            >
+              {isGeneratingObjecao ? "GERANDO..." : "GERAR SCRIPT · IA"}
+            </Button>
+
+            {resultadoObjecao && (
+              <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between">
+                  <span className="text-[8px] px-2 py-0.5 font-bold bg-bronze text-black uppercase tracking-widest font-mono">SCRIPT GERADO · NL</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 text-white/40 hover:text-white"
+                    onClick={() => copyToClipboard(resultadoObjecao.script)}
+                  >
+                    <Copy size={12} />
+                  </Button>
+                </div>
+                
+                <p className="text-[13px] text-[#CCCCCC] leading-relaxed whitespace-pre-wrap font-sans">
+                  {resultadoObjecao.script}
+                </p>
+
+                <div className="pt-2 border-t border-white/5 space-y-3">
+                  <div>
+                    <p className="text-[8px] text-white/40 uppercase tracking-widest mb-0.5">ESTRATÉGIA USADA</p>
+                    <p className="text-[10px] text-white/60 italic leading-tight">{resultadoObjecao.estrategia}</p>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => copyToClipboard(resultadoObjecao.script)}
+                    className="w-full bg-bronze/10 text-bronze hover:bg-bronze hover:text-black border border-bronze/20 h-9 text-[10px] font-bold tracking-wider"
+                  >
+                    COPIAR SCRIPT
+                  </Button>
+                </div>
               </div>
             )}
           </div>
