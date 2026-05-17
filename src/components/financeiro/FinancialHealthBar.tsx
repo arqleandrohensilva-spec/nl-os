@@ -65,7 +65,7 @@ const FinancialHealthBar: React.FC<FinancialHealthBarProps> = ({
       </TooltipProvider>
       
       <div className="mt-1">
-        <span className="text-[10px] font-dm-mono text-muted">{percentage}% do mercado premium {marketName}</span>
+        <span className="text-[10px] font-dm-mono text-white/40">{percentage}% do mercado premium {marketName}</span>
       </div>
     </div>
   );

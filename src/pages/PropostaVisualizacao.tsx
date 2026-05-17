@@ -91,7 +91,7 @@ const PropostaVisualizacao = () => {
             <div className="flex items-center gap-4 bg-[#F8F9FA] p-4 border border-[#F0EDEA]">
               {getIcon()}
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Tipo de Projeto</p>
+                <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Tipo de Projeto</p>
                 <p className="font-bold text-sm">{getTipoLabel()}</p>
               </div>
             </div>
@@ -103,7 +103,7 @@ const PropostaVisualizacao = () => {
               
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-white/40 mb-1">
                     <MapPin size={14} className="text-bronze" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">Localização</span>
                   </div>
@@ -111,7 +111,7 @@ const PropostaVisualizacao = () => {
                 </div>
                 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-white/40 mb-1">
                     <Maximize2 size={14} className="text-bronze" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">Área Estimada</span>
                   </div>
@@ -119,7 +119,7 @@ const PropostaVisualizacao = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-white/40 mb-1">
                     <Calendar size={14} className="text-bronze" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">Data da Proposta</span>
                   </div>
@@ -129,7 +129,7 @@ const PropostaVisualizacao = () => {
                 </div>
 
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2 text-white/40 mb-1">
                     <Clock size={14} className="text-bronze" />
                     <span className="text-[10px] uppercase tracking-widest font-bold">Validade</span>
                   </div>
@@ -138,7 +138,7 @@ const PropostaVisualizacao = () => {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                <div className="flex items-center gap-2 text-white/40 mb-1">
                   <Target size={14} className="text-bronze" />
                   <span className="text-[10px] uppercase tracking-widest font-bold">Objetivo do Projeto</span>
                 </div>
@@ -153,12 +153,12 @@ const PropostaVisualizacao = () => {
               
               <div className="space-y-6">
                 <div className="bg-[#F8F9FA] p-6 border border-[#F0EDEA] relative overflow-hidden group hover:border-bronze/30 transition-all">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-2 font-bold">Pacote Executivo</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-2 font-bold">Pacote Executivo</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-xs font-bold text-bronze">R$</span>
                     <h4 className="text-3xl font-bold text-graphite">{Number(proposalData.valor_executivo).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h4>
                   </div>
-                  <p className="text-[9px] text-muted-foreground mt-2 uppercase tracking-wider italic">*Projeto técnico e detalhamento para execução.</p>
+                  <p className="text-[9px] text-white/40 mt-2 uppercase tracking-wider italic">*Projeto técnico e detalhamento para execução.</p>
                 </div>
 
                 <div className="bg-[#1A1A1A] p-6 border border-transparent relative overflow-hidden group">
@@ -190,14 +190,14 @@ const PropostaVisualizacao = () => {
               >
                 Falar com Consultor
               </a>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
+              <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">
                 Ref: {proposalData.id?.substring(0, 8)}
               </p>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground mt-8 uppercase tracking-[0.3em] font-bold">
+        <p className="text-center text-[10px] text-white/40 mt-8 uppercase tracking-[0.3em] font-bold">
           © {new Date().getFullYear()} NL Arquitetura & Design · Todos os direitos reservados
         </p>
       </div>

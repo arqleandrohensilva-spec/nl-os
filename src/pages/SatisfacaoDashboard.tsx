@@ -304,7 +304,7 @@ const SatisfacaoDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white font-inter">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Equipe NL" />
       <main className="flex-1 ml-[230px] p-12">
         <div className="mb-10">
@@ -313,7 +313,7 @@ const SatisfacaoDashboard = () => {
         </div>
 
         <Tabs defaultValue="pesquisas" className="space-y-6">
-          <TabsList className="bg-[#242220] border-white/5 rounded-none p-0 h-auto">
+          <TabsList className="bg-white/[0.03] border-white/5 rounded-none p-0 h-auto">
             <TabsTrigger value="pesquisas" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Pesquisas</TabsTrigger>
             <TabsTrigger value="depoimentos" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Depoimentos</TabsTrigger>
             <TabsTrigger value="nps" className="rounded-none py-4 px-8 data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest font-bold">Painel NPS</TabsTrigger>
@@ -343,7 +343,7 @@ const SatisfacaoDashboard = () => {
                 placeholder="BUSCAR POR CLIENTE, PROJETO OU CIDADE..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-[#242220] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
+                className="bg-white/[0.03] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
               />
             </div>
 
@@ -364,7 +364,7 @@ const SatisfacaoDashboard = () => {
 
             <div className="grid gap-4">
               {filteredSurveys.length === 0 ? (
-                <div className="bg-[#242220] p-12 border border-white/5 text-center">
+                <div className="bg-white/[0.03] p-12 border border-white/5 text-center">
                   <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa encontrada para este filtro.</p>
                 </div>
               ) : (
@@ -372,7 +372,7 @@ const SatisfacaoDashboard = () => {
                   <div 
                     key={survey.id} 
                     className={cn(
-                      "bg-[#242220] p-6 border transition-all flex justify-between items-center",
+                      "bg-white/[0.03] p-6 border transition-all flex justify-between items-center",
                       survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
                       survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
                       survey.status === 'ARQUIVADA' && "border-white/5 opacity-50"
@@ -438,7 +438,7 @@ const SatisfacaoDashboard = () => {
                 placeholder="BUSCAR POR CLIENTE, PROJETO OU CIDADE..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-[#242220] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
+                className="bg-white/[0.03] border-white/5 rounded-none pl-10 uppercase tracking-widest text-[10px] font-bold h-12 focus-visible:ring-bronze"
               />
             </div>
 
@@ -459,12 +459,12 @@ const SatisfacaoDashboard = () => {
 
             <div className="grid gap-6">
               {filteredTestimonials.length === 0 ? (
-                <div className="bg-[#242220] p-12 border border-white/5 text-center">
+                <div className="bg-white/[0.03] p-12 border border-white/5 text-center">
                   <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhum depoimento encontrado para este filtro.</p>
                 </div>
               ) : (
                 filteredTestimonials.map((dep) => (
-                  <div key={dep.id} className="bg-[#242220] p-8 border border-white/5 space-y-6">
+                  <div key={dep.id} className="bg-white/[0.03] p-8 border border-white/5 space-y-6">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-3">
@@ -537,31 +537,31 @@ const SatisfacaoDashboard = () => {
 
           <TabsContent value="nps">
             {stats.total === 0 ? (
-              <div className="bg-[#242220] p-24 border border-white/5 text-center">
+              <div className="bg-white/[0.03] p-24 border border-white/5 text-center">
                 <p className="text-white/40 uppercase tracking-widest text-[12px] font-bold">Nenhuma pesquisa respondida ainda.</p>
               </div>
             ) : (
               <div className="space-y-12">
                 <div className="grid grid-cols-4 gap-6">
-                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                  <div className="bg-white/[0.03] p-8 border border-white/5 text-center">
                     <p className="text-bronze text-[10px] uppercase tracking-widest font-bold mb-2">Nota Média Geral</p>
                     <h4 className="text-6xl font-bold font-cormorant text-bronze">{stats.avg.toFixed(1)}</h4>
                   </div>
-                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                  <div className="bg-white/[0.03] p-8 border border-white/5 text-center">
                     <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold mb-2">Total Respondidas</p>
                     <h4 className="text-6xl font-bold font-cormorant">{stats.total}</h4>
                   </div>
-                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                  <div className="bg-white/[0.03] p-8 border border-white/5 text-center">
                     <p className="text-green-500/60 text-[10px] uppercase tracking-widest font-bold mb-2">Promotores (≥ 9)</p>
                     <h4 className="text-6xl font-bold font-cormorant text-green-500">{stats.promoters}</h4>
                   </div>
-                  <div className="bg-[#242220] p-8 border border-white/5 text-center">
+                  <div className="bg-white/[0.03] p-8 border border-white/5 text-center">
                     <p className="text-red-500/60 text-[10px] uppercase tracking-widest font-bold mb-2">Detratores (≤ 6)</p>
                     <h4 className="text-6xl font-bold font-cormorant text-red-500">{stats.detractors}</h4>
                   </div>
                 </div>
 
-                <div className="bg-[#242220] p-10 border border-white/5">
+                <div className="bg-white/[0.03] p-10 border border-white/5">
                   <h3 className="text-xl font-bold font-cormorant uppercase tracking-[0.2em] mb-8">Benchmark por Categoria</h3>
                   <div className="space-y-6">
                     {stats.categoryAverages.map((cat) => (
@@ -583,7 +583,7 @@ const SatisfacaoDashboard = () => {
         </Tabs>
       </main>
       <Dialog open={isFollowUpModalOpen} onOpenChange={setIsFollowUpModalOpen}>
-        <DialogContent className="bg-[#242220] border-white/10 text-white rounded-none">
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
           <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Follow-up Personalizado</DialogTitle></DialogHeader>
           <div className="py-6 space-y-4">
             <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Comentário curto detectado. Sugestão de aprofundamento:</p>
@@ -597,7 +597,7 @@ const SatisfacaoDashboard = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#242220] border-white/10 text-white rounded-none">
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
           <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Gerar Nova Pesquisa</DialogTitle></DialogHeader>
           <div className="py-6 space-y-6">
             <div className="space-y-2">
@@ -606,7 +606,7 @@ const SatisfacaoDashboard = () => {
                 <SelectTrigger className="bg-transparent border-white/10 rounded-none">
                   <SelectValue placeholder="Selecione um projeto" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#242220] border-white/10 text-white">
+                <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                   {projects.map(p => (
                     <SelectItem key={p.id} value={p.id}>{p.nome} — {p.nome_cliente}</SelectItem>
                   ))}

@@ -60,7 +60,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group relative bg-white border border-beige p-5 cursor-pointer transition-all duration-500 hover:border-bronze hover:shadow-[0_25px_50px_-12px_rgba(139,115,85,0.15)]",
+        "group relative bg-white/[0.03] border border-white/10 p-5 cursor-pointer transition-all duration-500 hover:border-bronze hover:shadow-[0_25px_50px_-12px_rgba(139,115,85,0.15)]",
         "min-h-[230px] flex flex-col justify-between",
         lead.score >= 8 && "border-t-[4px] border-t-bronze",
         isDragging && "shadow-2xl ring-2 ring-bronze/30 scale-[1.05] rotate-2",
@@ -87,24 +87,24 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
                 </span>
               )}
             </div>
-            <h3 className="text-[17px] font-cormorant text-graphite leading-tight group-hover:text-bronze transition-colors truncate">
+            <h3 className="text-[17px] font-cormorant text-white leading-tight group-hover:text-bronze transition-colors truncate">
               {lead.nome}
             </h3>
           </div>
           <div className="ml-3">
-            <div className="w-9 h-9 border border-beige rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
-              <span className="text-[7px] text-muted font-bold leading-none uppercase mb-0.5">Sc.</span>
-              <span className="text-graphite font-bold">{score}</span>
+            <div className="w-9 h-9 border border-white/10 rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
+              <span className="text-[7px] text-white/40 font-bold leading-none uppercase mb-0.5">Sc.</span>
+              <span className="text-white font-bold">{score}</span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-y-3 gap-x-4 mb-4">
-          <div className="flex items-center gap-2 text-muted">
+          <div className="flex items-center gap-2 text-white/40">
             <MapPin size={12} className="opacity-50" />
             <span className="text-[10px] font-medium tracking-tight truncate">{lead.cidade}</span>
           </div>
-          <div className="flex items-center gap-2 text-muted">
+          <div className="flex items-center gap-2 text-white/40">
             <Maximize2 size={12} className="opacity-50" />
             <span className="text-[10px] font-medium tracking-tight">{lead.area} m²</span>
           </div>
@@ -112,7 +112,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
             <DollarSign size={14} className="text-bronze/60" />
             <span className={cn(
               "text-[15px] font-bold tracking-tight",
-              lead.orcamento > 0 ? "text-bronze" : "text-muted opacity-40"
+              lead.orcamento > 0 ? "text-bronze" : "text-white/20"
             )}>
               {formatCurrency(lead.orcamento)}
             </span>
@@ -126,7 +126,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
               <p className="text-[8px] font-bold text-bronze uppercase tracking-widest leading-none">
                 Próxima: {lead.proxima_acao_tipo} · {lead.proxima_acao_data}
               </p>
-              <p className="text-[9px] text-graphite/70 line-clamp-1 leading-tight italic">
+              <p className="text-[9px] text-white/70 line-clamp-1 leading-tight italic">
                 "{lead.proxima_acao_nota}"
               </p>
             </div>
@@ -137,22 +137,22 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
           <span className="px-2 py-0.5 bg-bronze/5 text-bronze border border-bronze/10 text-[8px] font-bold uppercase tracking-widest">
             {lead.tipo}
           </span>
-          <span className="px-2 py-0.5 border border-beige text-muted text-[8px] font-bold uppercase tracking-widest">
+          <span className="px-2 py-0.5 border border-white/10 text-white/40 text-[8px] font-bold uppercase tracking-widest">
             {lead.origem}
           </span>
         </div>
       </div>
 
-      <div className="pt-4 border-t border-beige min-h-[40px] relative">
+      <div className="pt-4 border-t border-white/10 min-h-[40px] relative">
         <div className="flex items-center justify-between transition-opacity duration-150 group-hover:opacity-0">
           <div className={cn(
             "flex items-center gap-2 text-[10px] font-mono",
-            daysInStage > 5 ? "text-red font-bold" : "text-muted"
+            daysInStage > 5 ? "text-red font-bold" : "text-white/40"
           )}>
             {daysInStage > 5 && <span className="w-1 h-1 bg-red rounded-full animate-ping" />}
             <span>há {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'}</span>
           </div>
-          <ArrowUpRight size={14} className="text-muted" />
+          <ArrowUpRight size={14} className="text-white/40" />
         </div>
 
         <div className="absolute inset-x-0 bottom-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 py-1 bg-white">

@@ -237,7 +237,7 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
@@ -363,7 +363,7 @@ const GestaoProjetos = () => {
                         <Trash2 size={12} className={cn(isDeleting === projeto.id && "animate-spin")} />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#1A1816] border border-white/10 text-white">
+                    <AlertDialogContent className="bg-[#0A0A0A] border border-white/10 text-white">
                       <AlertDialogHeader>
                         <AlertDialogTitle className="font-cormorant italic text-2xl">Excluir Projeto?</AlertDialogTitle>
                         <AlertDialogDescription className="text-white/60 font-inter text-sm">

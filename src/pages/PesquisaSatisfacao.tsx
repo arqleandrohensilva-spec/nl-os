@@ -238,7 +238,7 @@ const PesquisaSatisfacao = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bronze"></div>
       </div>
     );
@@ -252,8 +252,8 @@ const PesquisaSatisfacao = () => {
     };
 
     return (
-      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-[#242220] p-8 text-center space-y-8 border border-white/5">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center space-y-8 border border-white/5">
           <div className="w-20 h-20 bg-bronze/20 rounded-full flex items-center justify-center mx-auto mb-2">
             <CheckCircle2 className="text-bronze w-10 h-10" />
           </div>
@@ -282,8 +282,8 @@ const PesquisaSatisfacao = () => {
 
   if (!survey) {
     return (
-      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-[#242220] p-8 text-center border border-white/5">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center border border-white/5">
           <h1 className="text-2xl font-bold text-white uppercase tracking-[0.2em] font-cormorant">Link inválido ou expirado</h1>
         </div>
       </div>
@@ -291,7 +291,7 @@ const PesquisaSatisfacao = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A1816] text-white font-inter pb-12">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-inter pb-12">
       <div className="max-w-2xl mx-auto px-6 py-12 space-y-12">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-bronze flex items-center justify-center text-white font-cormorant text-2xl mx-auto shadow-lg mb-6">NL</div>
@@ -299,7 +299,7 @@ const PesquisaSatisfacao = () => {
           <p className="text-bronze uppercase tracking-widest text-xs font-bold">NL Arquitetos · Pós-Entrega</p>
         </div>
 
-        <div className="bg-[#242220] p-8 space-y-10">
+        <div className="bg-white/[0.03] p-8 space-y-10">
           <div className="space-y-6">
             <p className="text-lg font-medium">1. De 0 a 10, como você avalia sua experiência com a NL Arquitetos?</p>
             <div className="flex justify-between gap-1">

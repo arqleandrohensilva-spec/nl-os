@@ -525,12 +525,12 @@ Máximo 3 linhas. Sem markdown. Em português.
   if (isLoading) return <div className="flex h-screen items-center justify-center">Carregando...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user || ''} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#1A1816] z-10">
+        <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
           <div className="px-10 py-6 border-b border-white/10">
             <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">
@@ -542,7 +542,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 size="sm" 
                 onClick={exportReport}
                 disabled={isExporting}
-                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-beige/10 flex items-center gap-2"
+                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-white/5/10 flex items-center gap-2"
               >
                 {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
                 Exportar Relatório
@@ -588,7 +588,7 @@ Máximo 3 linhas. Sem markdown. Em português.
 
               <div className="flex items-center gap-4">
                 {lastAiAnalysis && (
-                  <p className="text-[9px] text-muted font-dm-mono italic">
+                  <p className="text-[9px] text-white/40 font-dm-mono italic">
                     Última análise: {lastAiAnalysis.toLocaleTimeString()}
                   </p>
                 )}
@@ -600,7 +600,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       e.stopPropagation();
                       getAIDiagnostic();
                     }}
-                    className="h-8 text-[9px] uppercase tracking-widest text-muted hover:text-bronze flex items-center gap-2"
+                    className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-bronze flex items-center gap-2"
                   >
                     <RotateCcw size={10} /> Atualizar
                   </Button>
@@ -610,7 +610,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         e.stopPropagation();
                         setIsAiExpanded(false);
                       }}
-                      className="p-1 text-muted hover:text-graphite transition-colors"
+                      className="p-1 text-white/40 hover:text-white transition-colors"
                     >
                       <ChevronUp size={16} />
                     </button>
@@ -624,7 +624,7 @@ Máximo 3 linhas. Sem markdown. Em português.
               isAiExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
             )}>
               {isAiLoading ? (
-                <div className="flex items-center gap-2 text-muted text-xs font-dm-mono py-4">
+                <div className="flex items-center gap-2 text-white/40 text-xs font-dm-mono py-4">
                   <Loader2 size={14} className="animate-spin" /> Analisando dados...
                 </div>
               ) : (
@@ -635,15 +635,15 @@ Máximo 3 linhas. Sem markdown. Em português.
 
                   {/* History Section */}
                   <div className="space-y-4">
-                    <h4 className="text-[9px] font-bold text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+                    <h4 className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
                       <Target size={12} /> Histórico de Análises
                     </h4>
                     <div className="space-y-2">
                       {aiHistory.map((item) => (
-                        <div key={item.id} className="bg-[#242220] p-3 border border-white/10 rounded-[2px] space-y-2">
+                        <div key={item.id} className="bg-white/[0.03] p-3 border border-white/10 rounded-[2px] space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <span className="text-[9px] font-dm-mono text-muted">
+                              <span className="text-[9px] font-dm-mono text-white/40">
                                 {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                               </span>
                               <span className={cn(
@@ -657,7 +657,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                             </div>
                             <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
                           </div>
-                          <p className="text-[10px] font-dm-mono text-graphite/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+                          <p className="text-[10px] font-dm-mono text-white/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
                             {item.conteudo}
                           </p>
                         </div>
@@ -676,7 +676,7 @@ Máximo 3 linhas. Sem markdown. Em português.
           {/* Top Result Cards */}
           <div className="grid grid-cols-2 gap-6">
             {/* Card 1: Custo/Hora Real */}
-            <div className="bg-[#242220] p-8 border border-white/10 border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
+            <div className="bg-white/[0.03] p-8 border border-white/10 border-b-2 border-b-bronze rounded-[4px] relative overflow-hidden group min-h-[160px] flex flex-col justify-center">
               <div className="space-y-1">
                 <p className="text-[9px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold">CUSTO/HORA REAL</p>
                 <div className="flex items-baseline gap-2">
@@ -687,7 +687,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </span>
                 </div>
-                <p className="text-[10px] text-muted">baseado nos seus custos cadastrados</p>
+                <p className="text-[10px] text-white/40">baseado nos seus custos cadastrados</p>
               </div>
               {calculations.costPerHour === 0 && (
                 <div className="absolute top-4 right-4 flex items-center gap-2 text-bronze animate-pulse">
@@ -698,10 +698,10 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
 
             {/* Card 2: Preço Sugerido */}
-            <div className="bg-[#242220] p-8 border border-white/10 border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
+            <div className="bg-white/[0.03] p-8 border border-white/10 border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                  <p className="text-[9px] font-dm-mono text-white uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -719,12 +719,12 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </span>
                 </div>
-                <p className="text-[10px] text-muted">custo + {config?.margem_lucro}% de margem</p>
+                <p className="text-[10px] text-white/40">custo + {config?.margem_lucro}% de margem</p>
               </div>
               <div className="mt-6 space-y-2">
-                <div className="flex justify-between items-center text-[10px] font-dm-mono uppercase tracking-widest text-muted">
+                <div className="flex justify-between items-center text-[10px] font-dm-mono uppercase tracking-widest text-white/40">
                   <span>Margem de Lucro</span>
-                  <span className="text-graphite font-bold">{config?.margem_lucro}%</span>
+                  <span className="text-white font-bold">{config?.margem_lucro}%</span>
                 </div>
                 <Slider 
                   value={[config?.margem_lucro || 0]} 
@@ -738,44 +738,44 @@ Máximo 3 linhas. Sem markdown. Em português.
           </div>
 
           {/* Configuração de Horas Produtivas */}
-          <div className="bg-[#242220] p-8 border border-white/10 rounded-[4px]">
+          <div className="bg-white/[0.03] p-8 border border-white/10 rounded-[4px]">
             <div className="flex flex-col gap-8">
               <div className="flex items-center justify-between">
                 <div className="grid grid-cols-5 gap-8 flex-1">
                   <div className="space-y-3">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Horas por dia</label>
+                    <label className="text-[9px] font-dm-mono text-white/40 uppercase tracking-widest">Horas por dia</label>
                     <Input 
                       type="number" 
                       value={config?.horas_dia} 
                       onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Dias úteis/mês</label>
+                    <label className="text-[9px] font-dm-mono text-white/40 uppercase tracking-widest">Dias úteis/mês</label>
                     <Input 
                       type="number" 
                       value={config?.dias_mes} 
                       onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">% Produtivo</label>
+                    <label className="text-[9px] font-dm-mono text-white/40 uppercase tracking-widest">% Produtivo</label>
                     <Input 
                       type="number" 
                       value={config?.percentual_produtivo} 
                       onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[9px] font-dm-mono text-muted uppercase tracking-widest">Nº Arquitetos</label>
+                    <label className="text-[9px] font-dm-mono text-white/40 uppercase tracking-widest">Nº Arquitetos</label>
                     <Input 
                       type="number" 
                       value={config?.num_arquitetos} 
                       onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                      className="h-9 border-beige text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
                     />
                   </div>
                   <div className="space-y-3">
@@ -790,11 +790,11 @@ Máximo 3 linhas. Sem markdown. Em português.
                   </div>
                 </div>
                 
-                <div className="ml-8 pl-8 border-l border-beige text-right">
+                <div className="ml-8 pl-8 border-l border-white/10 text-right">
                   <p className="text-3xl font-cormorant font-bold text-bronze">
                     = <CountUp value={calculations.faturableHours} />h
                   </p>
-                  <p className="text-[10px] text-muted uppercase tracking-widest">faturáveis/mês</p>
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest">faturáveis/mês</p>
                 </div>
               </div>
 
@@ -802,26 +802,26 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className="bg-bronze/5 p-6 rounded-[4px] border border-bronze/20 space-y-4 animate-in fade-in slide-in-from-left-4">
                   <div className="flex items-center gap-2">
                     <Target size={14} className="text-bronze" />
-                    <span className="text-[10px] font-dm-mono font-bold text-graphite uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
+                    <span className="text-[10px] font-dm-mono font-bold text-white uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
                   </div>
                   <div className="grid grid-cols-3 gap-6">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-graphite uppercase">A) Reduzir Custos</p>
-                      <p className="text-[10px] text-muted leading-relaxed">
+                      <p className="text-[10px] font-bold text-white uppercase">A) Reduzir Custos</p>
+                      <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês 
                         ({Math.round(((calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)) / calculations.monthlyCosts) * 100)}% dos custos)
                       </p>
                     </div>
                     <div className="space-y-1 border-x border-bronze/10 px-6">
                       <p className="text-[10px] font-bold text-bronze uppercase">B) Aumentar Horas (Recomendado)</p>
-                      <p className="text-[10px] text-muted leading-relaxed">
+                      <p className="text-[10px] text-white/40 leading-relaxed">
                         Aumentar para {Math.round(calculations.monthlyCosts / config.meta_custo_hora)}h/mês 
                         (+{Math.round(((calculations.monthlyCosts / config.meta_custo_hora) / calculations.faturableHours - 1) * 100)}%)
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-graphite uppercase">C) Combinar Estratégias</p>
-                      <p className="text-[10px] text-muted leading-relaxed">
+                      <p className="text-[10px] font-bold text-white uppercase">C) Combinar Estratégias</p>
+                      <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
                       </p>
                     </div>
@@ -830,11 +830,11 @@ Máximo 3 linhas. Sem markdown. Em português.
               )}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-beige border-dashed">
-              <p className="text-[10px] font-dm-mono text-muted">
+            <div className="mt-8 pt-6 border-t border-white/10 border-dashed">
+              <p className="text-[10px] font-dm-mono text-white/40">
                 {config?.horas_dia}h × {config?.dias_mes} dias × {config?.percentual_produtivo}% × {config?.num_arquitetos} arquitetos = {Math.round(calculations.faturableHours)}h faturáveis/mês
               </p>
-              <p className="text-[10px] font-dm-mono text-muted mt-1">
+              <p className="text-[10px] font-dm-mono text-white/40 mt-1">
                 Total de custos R$ <CountUp value={calculations.monthlyCosts} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} /> ÷ {Math.round(calculations.faturableHours)}h = R$ <CountUp value={calculations.costPerHour} formatter={(val) => val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} />/hora
               </p>
             </div>
@@ -852,23 +852,23 @@ Máximo 3 linhas. Sem markdown. Em português.
                 const mostExpensive = [...catCosts].sort((a, b) => b.valor - a.valor)[0];
 
                 return (
-                  <div key={cat.id} className="border border-beige rounded-[4px] overflow-hidden bg-white group/cat">
+                  <div key={cat.id} className="border border-white/10 rounded-[4px] overflow-hidden bg-white group/cat">
                     <TooltipProvider>
                       <Tooltip delayDuration={300}>
                         <TooltipTrigger asChild>
                           <button 
                             id={`accordion-trigger-${cat.id}`}
                             onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
-                            className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+                            className="w-full flex items-center justify-between p-5 hover:bg-white/5/10 transition-colors"
                           >
                             <div className="flex items-center gap-4">
                               <div 
-                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}
+                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-white/5/30 text-white/40")}
                                 style={isOpen ? {} : { backgroundColor: `${cat.color}15`, color: cat.color }}
                               >
                                 <cat.icon size={16} />
                               </div>
-                              <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
+                              <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">{cat.label}</span>
                             </div>
                             <div className="flex items-center gap-6">
                               <span className="text-xs font-dm-mono text-bronze font-bold">
@@ -877,7 +877,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                                   : `R$ ${totalCat.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
                                 }
                               </span>
-                              {isOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+                              {isOpen ? <ChevronDown size={14} className="text-white/40" /> : <ChevronRight size={14} className="text-white/40" />}
                             </div>
                           </button>
                         </TooltipTrigger>
@@ -895,21 +895,21 @@ Máximo 3 linhas. Sem markdown. Em português.
                         {catCosts.map((item) => {
                           const isNew = new Date(item.criado_em).toDateString() === new Date().toDateString();
                           return (
-                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-beige/50 last:border-0 hover:bg-beige/5 px-2 -mx-2 transition-colors">
+                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-white/10/50 last:border-0 hover:bg-white/5/5 px-2 -mx-2 transition-colors">
                               <div className="flex items-center gap-3">
-                                <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
+                                <span className="text-xs font-dm-mono text-white">{item.nome}</span>
                                 {isNew && (
                                   <span className="text-[8px] font-bold text-bronze bg-bronze/10 px-1.5 py-0.5 rounded-[2px] uppercase">Novo hoje</span>
                                 )}
                                 <div className="flex items-center gap-2">
                                   <span className={cn(
                                     "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
-                                    item.frequencia === 'mensal' ? "bg-beige/30 text-muted" : "bg-bronze/10 text-bronze"
+                                    item.frequencia === 'mensal' ? "bg-white/5/30 text-white/40" : "bg-bronze/10 text-bronze"
                                   )}>
                                     {item.frequencia}
                                   </span>
                                   {item.frequencia === 'anual' && (
-                                    <span className="text-[10px] text-muted italic">
+                                    <span className="text-[10px] text-white/40 italic">
                                       (R$ {(item.valor / 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês)
                                     </span>
                                   )}
@@ -932,8 +932,8 @@ Máximo 3 linhas. Sem markdown. Em português.
                       </div>
 
                       {cat.id !== 'impostos' && (
-                        <div className="mt-4 pt-3 border-t border-beige border-dashed">
-                          <p className="text-[10px] font-dm-mono text-muted italic uppercase tracking-wider">
+                        <div className="mt-4 pt-3 border-t border-white/10 border-dashed">
+                          <p className="text-[10px] font-dm-mono text-white/40 italic uppercase tracking-wider">
                             Impacto anual: R$ {(totalCat * 12).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
                           </p>
                         </div>
@@ -946,7 +946,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         <DialogTrigger asChild>
                           <Button 
                             variant="ghost" 
-                            className="w-full mt-4 h-10 border border-dashed border-beige hover:border-bronze hover:bg-bronze/5 text-[10px] tracking-widest text-muted hover:text-bronze uppercase flex items-center gap-2"
+                            className="w-full mt-4 h-10 border border-dashed border-white/10 hover:border-bronze hover:bg-bronze/5 text-[10px] tracking-widest text-white/40 hover:text-bronze uppercase flex items-center gap-2"
                           >
                             <Plus size={12} />
                             Adicionar item
@@ -954,36 +954,36 @@ Máximo 3 linhas. Sem markdown. Em português.
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px] bg-white border-none rounded-[4px]">
                           <DialogHeader>
-                            <DialogTitle className="font-cormorant text-xl font-bold text-graphite uppercase tracking-tight">Novo Item — {cat.label}</DialogTitle>
+                            <DialogTitle className="font-cormorant text-xl font-bold text-white uppercase tracking-tight">Novo Item — {cat.label}</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-6 py-4">
                             <div className="space-y-2">
-                              <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Nome do Custo</label>
+                              <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Nome do Custo</label>
                               <Input 
                                 value={newItem.nome} 
                                 onChange={(e) => setNewItem({ ...newItem, nome: e.target.value })}
                                 placeholder="ex: Aluguel"
-                                className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                                className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                               />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Valor R$</label>
+                                <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Valor R$</label>
                                 <Input 
                                   type="number" 
                                   value={newItem.valor} 
                                   onChange={(e) => setNewItem({ ...newItem, valor: e.target.value })}
                                   placeholder="0.00"
-                                  className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                                  className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                                 />
                               </div>
                               <div className="space-y-2">
-                                <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Frequência</label>
+                                <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Frequência</label>
                                 <Select 
                                   value={newItem.frequencia} 
                                   onValueChange={(val) => setNewItem({ ...newItem, frequencia: val })}
                                 >
-                                  <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                                  <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -1042,24 +1042,24 @@ Máximo 3 linhas. Sem markdown. Em português.
           </div>
 
           {/* Evolução do Custo/Hora Section */}
-          <div className="border border-beige rounded-[4px] overflow-hidden bg-white">
+          <div className="border border-white/10 rounded-[4px] overflow-hidden bg-white">
             <button 
               onClick={() => setIsEvolucaoOpen(!isEvolucaoOpen)}
-              className="w-full flex items-center justify-between p-5 hover:bg-beige/10 transition-colors"
+              className="w-full flex items-center justify-between p-5 hover:bg-white/5/10 transition-colors"
             >
               <div className="flex items-center gap-4">
-                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-beige/30 text-muted")}>
+                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-white/5/30 text-white/40")}>
                   <History size={16} />
                 </div>
-                <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">Evolução do Custo/Hora</span>
+                <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">Evolução do Custo/Hora</span>
               </div>
-              {isEvolucaoOpen ? <ChevronDown size={14} className="text-muted" /> : <ChevronRight size={14} className="text-muted" />}
+              {isEvolucaoOpen ? <ChevronDown size={14} className="text-white/40" /> : <ChevronRight size={14} className="text-white/40" />}
             </button>
             
             {isEvolucaoOpen && (
               <div className="p-8 h-[350px] animate-in fade-in slide-in-from-top-2 duration-300">
                 {aiHistory.length < 2 ? (
-                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-muted">
+                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-white/40">
                     Histórico disponível após 30 dias de uso (mínimo 2 diagnósticos salvos)
                   </div>
                 ) : (
@@ -1115,13 +1115,13 @@ Máximo 3 linhas. Sem markdown. Em português.
 
           {/* AI Suggestions Section */}
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] flex items-center gap-2">
+            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
               <Sparkles size={12} className="text-bronze" /> Sugestões da IA · Custos Possivelmente Esquecidos
             </h3>
             <div className="grid grid-cols-3 gap-6">
               {isAiSuggestionsLoading ? (
                 Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="h-24 bg-white border border-beige border-dashed rounded-[4px] animate-pulse" />
+                  <div key={i} className="h-24 bg-white/5 border border-white/10 border-dashed rounded-[4px] animate-pulse" />
                 ))
               ) : aiSuggestions.length > 0 ? (
                 aiSuggestions.map((s, i) => (
@@ -1130,18 +1130,18 @@ Máximo 3 linhas. Sem markdown. Em português.
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Lightbulb size={12} className="text-bronze" />
-                          <span className="text-[10px] font-bold text-graphite uppercase font-dm-mono">{s.nome}</span>
+                          <span className="text-[10px] font-bold text-white uppercase font-dm-mono">{s.nome}</span>
                         </div>
-                        <p className="text-[9px] text-muted leading-relaxed">{s.motivo}</p>
+                        <p className="text-[9px] text-white/40 leading-relaxed">{s.motivo}</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-beige/30">
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10/30">
                       <span className="text-[10px] font-dm-mono font-bold text-bronze">Est. R$ {s.valor_estimado.toLocaleString('pt-BR')}</span>
                       <div className="flex gap-2">
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="h-6 text-[8px] uppercase font-bold text-muted hover:text-red-500"
+                          className="h-6 text-[8px] uppercase font-bold text-white/40 hover:text-red-500"
                           onClick={() => setAiSuggestions(prev => prev.filter((_, idx) => idx !== i))}
                         >
                           Ignorar
@@ -1162,14 +1162,14 @@ Máximo 3 linhas. Sem markdown. Em português.
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-[10px] font-dm-mono text-muted text-center py-4">
+                <div className="col-span-3 text-[10px] font-dm-mono text-white/40 text-center py-4">
                   Nenhuma sugestão adicional no momento.
                 </div>
               )}
             </div>
           </div>
           {/* Simulator Section */}
-          <div className="border-t border-beige pt-8 space-y-6">
+          <div className="border-t border-white/10 pt-8 space-y-6">
             <button 
               onClick={() => setIsSimulatorOpen(!isSimulatorOpen)}
               className="flex items-center gap-2 text-[10px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold hover:opacity-70 transition-opacity"
@@ -1179,21 +1179,21 @@ Máximo 3 linhas. Sem markdown. Em português.
             </button>
 
             {isSimulatorOpen && (
-              <div className="bg-white p-8 border border-beige rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 text-xs font-dm-mono text-graphite">
+              <div className="bg-white p-8 border border-white/10 rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
+                <div className="flex items-center gap-4 text-xs font-dm-mono text-white">
                   <span>Se fechar</span>
                   <Input 
                     type="number" 
                     value={simNumProjetos}
                     onChange={(e) => setSimNumProjetos(parseInt(e.target.value) || 0)}
-                    className="w-16 h-8 text-center border-beige focus:border-bronze"
+                    className="w-16 h-8 text-center border-white/10 focus:border-bronze"
                   />
                   <span>projetos de</span>
                   <Input 
                     type="number" 
                     value={simHorasPorProjeto}
                     onChange={(e) => setSimHorasPorProjeto(parseInt(e.target.value) || 0)}
-                    className="w-20 h-8 text-center border-beige focus:border-bronze"
+                    className="w-20 h-8 text-center border-white/10 focus:border-bronze"
                   />
                   <span>horas este mês:</span>
                 </div>
@@ -1201,24 +1201,24 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className="grid grid-cols-2 gap-12">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-muted">Receita bruta estimada:</span>
-                      <span className="font-bold text-graphite">
+                      <span className="text-white/40">Receita bruta estimada:</span>
+                      <span className="font-bold text-white">
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-muted">(-) Custos totais mensais:</span>
+                      <span className="text-white/40">(-) Custos totais mensais:</span>
                       <span className="text-red-400">
                         R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-muted">(-) Impostos estimados:</span>
+                      <span className="text-white/40">(-) Impostos estimados:</span>
                       <span className="text-red-400">
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice * (costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0) / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="pt-4 border-t border-beige flex justify-between items-center">
+                    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
                       <span className="text-xs font-dm-mono font-bold uppercase tracking-widest">(=) Lucro estimado:</span>
                       <span className={cn(
                         "text-xl font-cormorant font-bold",
@@ -1227,18 +1227,18 @@ Máximo 3 linhas. Sem markdown. Em português.
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <p className="text-[10px] text-muted font-dm-mono uppercase tracking-tighter">
+                    <p className="text-[10px] text-white/40 font-dm-mono uppercase tracking-tighter">
                       Isso representa {(( (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) / (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice || 1) ) * 100).toFixed(1)}% de margem líquida.
                     </p>
                   </div>
 
-                  <div className="bg-[#E8E4DF]/20 p-6 rounded-[4px] border border-beige/50 flex flex-col justify-between">
+                  <div className="bg-[#E8E4DF]/20 p-6 rounded-[4px] border border-white/10/50 flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-bronze">
                         <Sparkles size={14} />
                         <span className="text-[9px] font-bold uppercase tracking-widest font-dm-mono">Análise de Viabilidade</span>
                       </div>
-                      <p className="text-[11px] font-dm-mono text-graphite leading-relaxed italic">
+                      <p className="text-[11px] font-dm-mono text-white leading-relaxed italic">
                         {simAnalysis || "Configure seu cenário e clique em analisar para uma avaliação da IA."}
                       </p>
                     </div>
@@ -1262,9 +1262,9 @@ Máximo 3 linhas. Sem markdown. Em português.
 
         {/* Comparison Panel */}
         <Dialog open={isComparingCenários} onOpenChange={setIsComparingCenários}>
-          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-beige bg-white animate-in slide-in-from-right duration-500">
-            <DialogHeader className="border-b border-beige pb-6">
-              <DialogTitle className="font-cormorant text-2xl font-bold text-graphite uppercase tracking-tight">Comparador de Margem</DialogTitle>
+          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-white/10 bg-white animate-in slide-in-from-right duration-500">
+            <DialogHeader className="border-b border-white/10 pb-6">
+              <DialogTitle className="font-cormorant text-2xl font-bold text-white uppercase tracking-tight">Comparador de Margem</DialogTitle>
             </DialogHeader>
             
             <div className="py-8 space-y-12 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
@@ -1274,7 +1274,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="space-y-2">
                     <p className="text-[10px] font-dm-mono text-bronze uppercase font-bold tracking-widest">Cenário A</p>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-muted">Margem:</span>
+                      <span className="text-white/40">Margem:</span>
                       <span className="font-bold">{cenarioAMargem}%</span>
                     </div>
                     <Slider 
@@ -1285,21 +1285,21 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </div>
                   
-                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                  <div className="space-y-4 pt-4 border-t border-white/10/50">
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="pt-4 space-y-1">
-                      <p className="text-[9px] text-muted uppercase font-bold text-bronze">Lucro/mês*:</p>
+                      <p className="text-[9px] text-white/40 uppercase font-bold text-bronze">Lucro/mês*:</p>
                       <p className="text-base font-dm-mono font-bold text-bronze">R$ {( (calculations.costPerHour * (1 + cenarioAMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                   </div>
@@ -1319,9 +1319,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                 {/* Cenário B */}
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-dm-mono text-graphite uppercase font-bold tracking-widest">Cenário B</p>
+                    <p className="text-[10px] font-dm-mono text-white uppercase font-bold tracking-widest">Cenário B</p>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-muted">Margem:</span>
+                      <span className="text-white/40">Margem:</span>
                       <span className="font-bold">{cenarioBMargem}%</span>
                     </div>
                     <Slider 
@@ -1332,22 +1332,22 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-beige/50">
+                  <div className="space-y-4 pt-4 border-t border-white/10/50">
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Preço/hora:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Proj. 200h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Proj. 200h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] text-muted uppercase">Proj. 300h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase">Proj. 300h:</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="pt-4 space-y-1">
-                      <p className="text-[9px] text-muted uppercase font-bold text-graphite">Lucro/mês*:</p>
-                      <p className="text-base font-dm-mono font-bold text-graphite">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase font-bold text-white">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-white">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                   </div>
 
@@ -1364,15 +1364,15 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               </div>
 
-              <div className="mt-8 p-4 bg-beige/10 border border-beige/30 rounded-[4px]">
-                <p className="text-[9px] text-muted font-dm-mono italic">*Estimado para 2 projetos de 250h/mês totais. O lucro líquido real depende da eficiência produtiva e dos impostos variáveis.</p>
+              <div className="mt-8 p-4 bg-white/5/10 border border-white/10/30 rounded-[4px]">
+                <p className="text-[9px] text-white/40 font-dm-mono italic">*Estimado para 2 projetos de 250h/mês totais. O lucro líquido real depende da eficiência produtiva e dos impostos variáveis.</p>
               </div>
             </div>
           </DialogContent>
         </Dialog>
-        <div className="flex-shrink-0 bg-white border-t border-beige px-10 py-4 flex justify-between items-center">
-          <p className="text-[9px] text-muted uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
-          <p className="text-[9px] text-muted uppercase tracking-widest">São José dos Campos SP · 2026</p>
+        <div className="flex-shrink-0 bg-white border-t border-white/10 px-10 py-4 flex justify-between items-center">
+          <p className="text-[9px] text-white/40 uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
+          <p className="text-[9px] text-white/40 uppercase tracking-widest">São José dos Campos SP · 2026</p>
         </div>
       </main>
     </div>

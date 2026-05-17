@@ -911,7 +911,7 @@ const DocumentosContratos = () => {
   }, [activeTab, selectedProjetoArquivos]);
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-10">
@@ -922,10 +922,10 @@ const DocumentosContratos = () => {
 
         <Tabs defaultValue="briefing" className="space-y-6" onValueChange={setActiveTab}>
           <div className="flex justify-between items-center">
-            <TabsList className="bg-[#242220] border border-white/10 p-1">
-              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#1A1816] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
-              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#1A1816] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
-              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#1A1816] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
+            <TabsList className="bg-white/[0.03] border border-white/10 p-1">
+              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
+              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
+              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
             </TabsList>
 
             {activeTab === 'briefing' && (
@@ -960,7 +960,7 @@ const DocumentosContratos = () => {
           </div>
 
           <TabsContent value="briefing">
-            <div className="bg-[#242220] border border-white/10">
+            <div className="bg-white/[0.03] border border-white/10">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11px]">
                   <thead className="bg-black/20 text-white/40 uppercase tracking-widest border-b border-white/5">
@@ -1032,7 +1032,7 @@ const DocumentosContratos = () => {
           <TabsContent value="contratos">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {contratos.map((c) => (
-                <div key={c.id} className="bg-[#242220] border border-white/10 p-6 flex flex-col gap-4">
+                <div key={c.id} className="bg-white/[0.03] border border-white/10 p-6 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
@@ -1070,7 +1070,7 @@ const DocumentosContratos = () => {
                             <ExternalLink size={12} className="mr-1" /> ASSINATURA
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-[#1A1816] border-white/10 text-white text-[10px] uppercase tracking-widest">
+                        <TooltipContent className="bg-[#0A0A0A] border-white/10 text-white text-[10px] uppercase tracking-widest">
                           Integração com ClickSign em breve
                         </TooltipContent>
                       </Tooltip>
@@ -1090,7 +1090,7 @@ const DocumentosContratos = () => {
               ))}
 
               {contratos.length === 0 && (
-                <div className="col-span-3 bg-[#242220] border border-white/10 p-20 text-center text-white/20 italic">
+                <div className="col-span-3 bg-white/[0.03] border border-white/10 p-20 text-center text-white/20 italic">
                   Nenhum contrato gerado.
                 </div>
               )}
@@ -1108,7 +1108,7 @@ const DocumentosContratos = () => {
                   <DocumentosChecklist key={p.id} projeto={p} />
                 ))}
                 {projetos.length === 0 && (
-                  <div className="bg-[#242220] border border-white/10 p-10 text-center text-white/20 italic">
+                  <div className="bg-white/[0.03] border border-white/10 p-10 text-center text-white/20 italic">
                     Nenhum projeto encontrado para exibir checklist.
                   </div>
                 )}
@@ -1122,7 +1122,7 @@ const DocumentosContratos = () => {
                 <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">LINHA DO TEMPO DE VERSÕES</h2>
               </div>
               
-              <div className="bg-[#242220] border border-white/10 p-0 overflow-hidden shadow-2xl">
+              <div className="bg-white/[0.03] border border-white/10 p-0 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
@@ -1192,7 +1192,7 @@ const DocumentosContratos = () => {
 
           <TabsContent value="arquivos">
             <div className="flex gap-6 min-h-[600px]">
-              <div className="w-64 bg-[#242220] border border-white/10 p-4 flex flex-col">
+              <div className="w-64 bg-white/[0.03] border border-white/10 p-4 flex flex-col">
                 <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-4">Dropbox Integration</h3>
                 <div className="flex-1 overflow-y-auto space-y-1">
                   <div 
@@ -1226,7 +1226,7 @@ const DocumentosContratos = () => {
                 </div>
               </div>
               
-              <div className="flex-1 bg-[#242220] border border-white/10 p-6 overflow-y-auto">
+              <div className="flex-1 bg-white/[0.03] border border-white/10 p-6 overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-bold uppercase tracking-tight">
@@ -1432,7 +1432,7 @@ const DocumentosContratos = () => {
         </Tabs>
 
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">UPLOAD DE ARQUIVO</DialogTitle>
             </DialogHeader>
@@ -1451,7 +1451,7 @@ const DocumentosContratos = () => {
                   <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#242220] border-white/10 text-white">
+                  <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                     <SelectItem value="01 - Briefing">01 - Briefing</SelectItem>
                     <SelectItem value="02 - Anteprojeto">02 - Anteprojeto</SelectItem>
                     <SelectItem value="03 - Projeto Executivo">03 - Projeto Executivo</SelectItem>
@@ -1473,7 +1473,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isBriefingModalOpen} onOpenChange={setIsBriefingModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">GERAR LINK DE BRIEFING</DialogTitle>
             </DialogHeader>
@@ -1484,7 +1484,7 @@ const DocumentosContratos = () => {
                   <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
                     <SelectValue placeholder="Escolha um lead..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#242220] border-white/10 text-white">
+                  <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                     {leads.map(l => (
                       <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>
                     ))}
@@ -1501,7 +1501,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isContratoModalOpen} onOpenChange={setIsContratoModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <FileCheck size={18} className="text-bronze" /> GERAR NOVO CONTRATO - {contractFormData.numero}
@@ -1526,7 +1526,7 @@ const DocumentosContratos = () => {
                       <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10">
                         <SelectValue placeholder="Selecione um lead para preencher..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#242220] border-white/10 text-white">
+                      <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                         {leads.map(l => (
                           <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>
                         ))}
@@ -1665,7 +1665,7 @@ const DocumentosContratos = () => {
                       <SelectTrigger className="bg-black/20 border-white/10 rounded-none h-10">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#242220] border-white/10 text-white">
+                      <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                         <SelectItem value="Terreno">Terreno</SelectItem>
                         <SelectItem value="Residência">Residência</SelectItem>
                         <SelectItem value="Apartamento">Apartamento</SelectItem>
@@ -1881,7 +1881,7 @@ const DocumentosContratos = () => {
 
 
         <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">NOVO PROJETO NO DROPBOX</DialogTitle>
             </DialogHeader>
@@ -1928,7 +1928,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-md">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-md">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Trash2 size={16} className="text-red-500" /> CONFIRMAR EXCLUSÃO
@@ -1965,7 +1965,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-lg">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-lg">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Ban size={16} className="text-red-500" /> CANCELAR CONTRATO
@@ -2043,7 +2043,7 @@ const DocumentosContratos = () => {
           </DialogContent>
         </Dialog>
         <Dialog open={isBriefingResponseModalOpen} onOpenChange={setIsBriefingResponseModalOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <ClipboardList size={18} className="text-bronze" /> RESPOSTAS DO BRIEFING - {selectedBriefing?.leads?.nome}
@@ -2069,7 +2069,7 @@ const DocumentosContratos = () => {
               )}
             </div>
             
-            <DialogFooter className="sticky bottom-0 bg-[#1A1816] pt-4 border-t border-white/10">
+            <DialogFooter className="sticky bottom-0 bg-[#0A0A0A] pt-4 border-t border-white/10">
               <Button onClick={() => setIsBriefingResponseModalOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
                 FECHAR
               </Button>
@@ -2078,7 +2078,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
-          <DialogContent className="bg-[#1A1816] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
             <DialogHeader className="p-4 border-b border-white/5 flex flex-row items-center justify-between">
               <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                 <Eye size={14} className="text-bronze" /> {viewerFile?.name}
