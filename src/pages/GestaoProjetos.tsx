@@ -341,12 +341,18 @@ const GestaoProjetos = () => {
                     <Share2 size={12} className="mr-2" /> Compartilhar
                   </Button>
                   <Button 
+                    onClick={() => navigate(`/apresentacao/${projeto.id}`)}
+                    className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/pres"
+                  >
+                    <Monitor size={12} className="mr-2 group-hover/pres:text-bronze transition-colors" /> Modo Apresentação
+                  </Button>
+                  <Button 
                     onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
                     className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none h-9 px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
                   >
                     Abrir projeto
                   </Button>
-                  
+
                   <Button 
                     onClick={() => handleGerarConteudo(projeto, currentEtapaInfo)}
                     className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white border border-[#8B7355]/30 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 flex items-center gap-2 shadow-lg whitespace-nowrap"

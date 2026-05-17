@@ -616,6 +616,13 @@ const ProjetoDetalhe = () => {
               )}
             </Button>
 
+            <Button 
+              onClick={() => navigate(`/apresentacao/${id}`)}
+              className="bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 hover:border-bronze rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500 flex items-center gap-2 group/pres"
+            >
+              <Monitor size={14} className="group-hover/pres:text-bronze transition-colors" /> Modo Apresentação
+            </Button>
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button 

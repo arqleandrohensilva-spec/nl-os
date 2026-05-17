@@ -24,6 +24,7 @@ import SatisfacaoDashboard from "./pages/SatisfacaoDashboard.tsx";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao.tsx";
 import MarketingIA from "./pages/MarketingIA.tsx";
 import ScriptsAtendimento from "./pages/ScriptsAtendimento.tsx";
+import ModoApresentacao from "./pages/ModoApresentacao.tsx";
 
 const queryClient = new QueryClient();
 
