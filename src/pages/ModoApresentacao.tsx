@@ -487,43 +487,62 @@ const ModoApresentacao = () => {
         <section className="space-y-12">
           <p className="text-bronze text-sm uppercase tracking-[0.4em] font-bold">APROVAÇÕES PENDENTES</p>
           
-          {etapas.filter(e => e.status === 'Aguardando aprovação').length > 0 ? (
+          {etapas.filter(e => e.status === 'Aguardando aprovação' || e.status === 'Aprovado').length > 0 ? (
             <div className="space-y-8">
-              {etapas.filter(e => e.status === 'Aguardando aprovação').map(e => (
-                <div key={e.id} className="bg-white/[0.03] border border-bronze p-12 space-y-10 animate-pulse-subtle">
-                  <div className="flex items-center gap-4 text-bronze uppercase tracking-[0.3em] font-bold text-sm">
-                    <Clock size={18} /> AGUARDANDO SUA APROVAÇÃO
+              {etapas.filter(e => e.status === 'Aguardando aprovação' || e.status === 'Aprovado').map(e => (
+                <div key={e.id} className={cn(
+                  "bg-white/[0.03] border p-12 space-y-10 transition-all duration-500",
+                  e.status === 'Aguardando aprovação' ? "border-bronze animate-pulse-subtle" : "border-white/10 opacity-60"
+                )}>
+                  <div className={cn(
+                    "flex items-center gap-4 uppercase tracking-[0.3em] font-bold text-sm",
+                    e.status === 'Aprovado' ? "text-emerald-500" : "text-bronze"
+                  )}>
+                    {e.status === 'Aprovado' ? <Check size={18} /> : <Clock size={18} />} 
+                    {e.status === 'Aprovado' ? 'APROVADO FORMALMENTE' : 'AGUARDANDO SUA APROVAÇÃO'}
                   </div>
                   
                   <div className="space-y-4">
                     <h3 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">{e.etapa}</h3>
-                    <p className="text-white/40 text-sm">Enviado em {e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}</p>
+                    <p className="text-white/40 text-sm">
+                      {e.status === 'Aprovado' 
+                        ? `Aprovado por ${e.aprovado_por} em ${e.data_aprovacao ? format(parseISO(e.data_aprovacao), 'dd/MM/yyyy') : ''}`
+                        : `Enviado em ${e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM/yyyy') : 'A definir'}`}
+                    </p>
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-6">
                     <Button 
+                      disabled={e.status === 'Aprovado'}
                       onClick={() => setApprovalModal({ open: true, etapa: e })}
-                      className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all"
+                      className={cn(
+                        "flex-1 rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all",
+                        e.status === 'Aprovado' 
+                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
+                          : "bg-bronze hover:bg-bronze/80 text-white"
+                      )}
                     >
-                      APROVAR
+                      {e.status === 'Aprovado' ? '✅ APROVADO' : 'APROVAR'}
                     </Button>
-                    <Button 
-                      onClick={async () => {
-                        const { error } = await supabase
-                          .from('projeto_etapas')
-                          .update({ status: 'Ajuste Solicitado' })
-                          .eq('id', e.id);
-                        
-                        if (!error) {
-                          toast.success("Solicitação de ajuste enviada para a NL.");
-                          fetchData();
-                        }
-                      }}
-                      variant="ghost"
-                      className="flex-1 border border-white/10 hover:bg-white/5 text-white/60 hover:text-white rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all"
-                    >
-                      SOLICITAR AJUSTE
-                    </Button>
+                    {e.status !== 'Aprovado' && (
+                      <Button 
+                        onClick={async () => {
+                          const { error } = await supabase
+                            .from('projeto_etapas')
+                            .update({ status: 'Ajuste Solicitado' })
+                            .eq('id', e.id);
+                          
+                          if (!error) {
+                            toast.success("Solicitação de ajuste enviada para a NL.");
+                            fetchData();
+                          }
+                        }}
+                        variant="ghost"
+                        className="flex-1 border border-white/10 hover:bg-white/5 text-white/60 hover:text-white rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all"
+                      >
+                        SOLICITAR AJUSTE
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
