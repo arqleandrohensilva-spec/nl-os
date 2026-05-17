@@ -252,6 +252,8 @@ Retorne APENAS JSON válido:
     } finally {
       setIsGeneratingObjecao(false);
     }
+  };
+
   const adaptarTom = async () => {
     if (!scriptParaAdaptar || !perfilCliente) return;
     setIsAdaptando(true);
@@ -710,6 +712,14 @@ Retorne APENAS JSON válido:
                           </p>
                           <Button 
                             variant="ghost" 
+                            className="absolute bottom-4 left-4 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-7 border border-bronze/20"
+                            onClick={() => abrirModalAdaptar(script.situacao, script.texto)}
+                          >
+                            <Sparkles size={12} className="mr-2" />
+                            ADAPTAR TOM · IA
+                          </Button>
+                          <Button 
+                            variant="ghost" 
                             className="absolute bottom-4 right-4 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-7"
                             onClick={() => copyToClipboard(replaceVariables(script.texto))}
                           >
@@ -725,6 +735,105 @@ Retorne APENAS JSON válido:
             ))}
           </div>
         </div>
+
+        {/* MODAL ADAPTADOR DE TOM */}
+        <Dialog open={modalAdaptarAberto} onOpenChange={setModalAdaptarAberto}>
+          <DialogContent className="bg-[#0F0F0F] border-bronze/20 text-white max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-cormorant text-bronze uppercase tracking-widest">
+                ADAPTAR TOM · {scriptParaAdaptar?.situacao}
+              </DialogTitle>
+              <DialogDescription className="text-white/40 text-[10px] uppercase tracking-widest">
+                Ajuste a abordagem do script para o perfil do cliente
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6 py-4">
+              <div className="space-y-3">
+                <label className="text-[10px] uppercase tracking-widest text-white/40 block font-bold">COMO ESSE CLIENTE SE COMUNICA?</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {['TÉCNICO', 'EMOCIONAL', 'DESCONFIADO', 'INDECISO'].map((perfil) => (
+                    <Button
+                      key={perfil}
+                      variant="ghost"
+                      onClick={() => setPerfilCliente(perfil)}
+                      className={cn(
+                        "h-10 text-[10px] font-bold tracking-widest uppercase border",
+                        perfilCliente === perfil 
+                          ? "bg-bronze text-black border-bronze hover:bg-bronze hover:text-black" 
+                          : "border-white/5 text-white/60 hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      {perfil}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase tracking-widest text-white/40 block font-bold">OBSERVAÇÃO SOBRE O CLIENTE (OPCIONAL)</label>
+                <Textarea
+                  value={obsCliente}
+                  onChange={(e) => setObsCliente(e.target.value)}
+                  placeholder="Ex: Cliente tem muita pressa / Já teve problema com outro arquiteto..."
+                  className="bg-black/50 border-white/5 text-white text-xs min-h-[60px]"
+                />
+              </div>
+
+              {resultadoAdaptacao && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="p-5 bg-bronze/5 border border-bronze/20 space-y-3 relative group">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] uppercase tracking-widest font-bold text-bronze font-mono">SCRIPT ADAPTADO · NL IA</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-white/40 hover:text-white"
+                        onClick={() => copyToClipboard(resultadoAdaptacao.script_adaptado)}
+                      >
+                        <Copy size={12} />
+                      </Button>
+                    </div>
+                    <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">
+                      {resultadoAdaptacao.script_adaptado}
+                    </p>
+                    <div className="pt-2 border-t border-white/5">
+                      <p className="text-[9px] text-white/40 uppercase tracking-widest">
+                        O que mudou: <span className="text-bronze italic lowercase">{resultadoAdaptacao.o_que_mudou}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setModalAdaptarAberto(false)}
+                  className="flex-1 text-[10px] font-bold tracking-widest uppercase text-white/40 hover:text-white"
+                >
+                  CANCELAR
+                </Button>
+                {resultadoAdaptacao ? (
+                  <Button
+                    onClick={() => copyToClipboard(resultadoAdaptacao.script_adaptado)}
+                    className="flex-1 bg-bronze text-black hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest"
+                  >
+                    COPIAR ADAPTAÇÃO
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={adaptarTom}
+                    disabled={isAdaptando || !perfilCliente}
+                    className="flex-1 bg-bronze text-black hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest"
+                  >
+                    {isAdaptando ? "ADAPTANDO..." : "GERAR ADAPTAÇÃO · IA"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
