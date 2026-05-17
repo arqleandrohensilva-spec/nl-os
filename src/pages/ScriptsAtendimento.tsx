@@ -48,7 +48,7 @@ const ScriptsAtendimento = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [isGeneratingObjecao, setIsGeneratingObjecao] = useState(false);
-  const [openEtapa, setOpenEtapa] = useState<string | null>(null);
+  const [selectedEtapaId, setSelectedEtapaId] = useState<string | null>(null);
   const [modalAdaptarAberto, setModalAdaptarAberto] = useState(false);
   const [scriptParaAdaptar, setScriptParaAdaptar] = useState<{ situacao: string; texto: string } | null>(null);
   const [perfilCliente, setPerfilCliente] = useState<string>('');
@@ -56,7 +56,7 @@ const ScriptsAtendimento = () => {
   const [isAdaptando, setIsAdaptando] = useState(false);
   const [resultadoAdaptacao, setResultadoAdaptacao] = useState<{ script_adaptado: string; o_que_mudou: string } | null>(null);
 
-  const [activeIABlock, setActiveIABlock] = useState<string | null>(null);
+  const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchLeads = async () => {
