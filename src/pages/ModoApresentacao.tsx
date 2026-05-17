@@ -199,7 +199,7 @@ const ModoApresentacao = () => {
         titulo: 'Nova mensagem do cliente',
         descricao: `Mensagem de ${projeto.nome_cliente} para o projeto ${projeto.tipo}`,
         modulo: 'Gestão de Projetos',
-        tipo: 'ALERTA'
+        tipo: 'projeto'
       });
 
       toast.success("Mensagem enviada. A NL retornará em breve.");
@@ -256,7 +256,7 @@ const ModoApresentacao = () => {
         titulo: 'Etapa Aprovada',
         descricao: `✅ ${aprovadorNome} aprovou ${approvalModal.etapa.etapa} — ${format(new Date(), 'dd/MM')}`,
         modulo: 'Gestão de Projetos',
-        tipo: 'SUCESSO'
+        tipo: 'projeto'
       });
 
       toast.success("Aprovação registrada com sucesso.");
