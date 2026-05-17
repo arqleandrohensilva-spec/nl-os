@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
-import MetricsBar from '@/components/MetricsBar';
+
 import KanbanColumn from '@/components/KanbanColumn';
 import LeadDetailPanel from '@/components/LeadDetailPanel';
 import { Button } from '@/components/ui/button';
@@ -51,7 +51,6 @@ import {
 } from '@dnd-kit/sortable';
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { toast } from "sonner";
-import OriginBreakdown from '@/components/OriginBreakdown';
 import LeadCard from '@/components/LeadCard';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -813,8 +812,7 @@ const Index = () => {
             </div>
           </div>
 
-          <MetricsBar leads={leads} />
-          <OriginBreakdown leads={leads} />
+          {/* MetricsBar and OriginBreakdown removed as per request - now in Command Center */}
 
           <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
