@@ -80,6 +80,18 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
         return;
       }
 
+      const gerarSlug = (nome: string) => {
+        return nome
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .trim();
+      };
+
+      const slugCliente = gerarSlug(lead.nome);
+
       const { data: newProject, error } = await supabase
         .from('projetos')
         .insert({
@@ -91,7 +103,8 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           area_m2: lead.area,
           etapa_atual: 'BRIEFING',
           status_geral: 'ativo',
-          horas_estimadas: horasEstimadas
+          horas_estimadas: horasEstimadas,
+          slug_cliente: slugCliente
         })
         .select()
         .single();
