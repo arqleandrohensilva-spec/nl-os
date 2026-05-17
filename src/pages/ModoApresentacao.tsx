@@ -312,8 +312,9 @@ const ModoApresentacao = () => {
       </div>
 
       {/* FOOTER DISCRETO */}
-      <footer className="mt-auto pt-20 border-t border-white/5 flex justify-between text-[10px] text-white/20 uppercase tracking-[0.5em] font-bold">
+      <footer className="mt-auto pt-20 border-t border-white/5 flex justify-center items-center gap-4 text-xs text-white/20 uppercase tracking-widest font-bold">
         <span>PATRIMÔNIO EM EVOLUÇÃO</span>
+        <span>·</span>
         <span>MODO APRESENTAÇÃO ATIVO</span>
       </footer>
     </div>
