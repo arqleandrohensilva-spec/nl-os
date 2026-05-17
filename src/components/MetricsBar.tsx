@@ -119,9 +119,10 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
       </div>
       <div className="flex">
         <MetricCard 
-          label="LEADS ATIVOS" 
-          value={activeLeads} 
+          label="VALOR EM NEGOCIAÇÃO" 
+          value={formatCleanValue(inNegotiationValue)} 
         />
+
         <MetricCard 
           label="TICKET MÉDIO" 
           value={formatCleanValue(averageTicket)}
