@@ -51,6 +51,7 @@ interface Projeto {
   data_inicio: string;
   prazo_final: string;
   token_cliente?: string;
+  slug_cliente?: string;
 }
 
 interface EtapaInfo {
@@ -334,24 +335,41 @@ const GestaoProjetos = () => {
                   <Button 
                     onClick={async () => {
                       try {
+                        const gerarSlug = (nome: string) => {
+                          return nome
+                            .toLowerCase()
+                            .normalize('NFD')
+                            .replace(/[\u0300-\u036f]/g, '')
+                            .replace(/[^a-z0-9\s-]/g, '')
+                            .replace(/\s+/g, '-')
+                            .trim();
+                        };
+
                         let token = projeto.token_cliente;
+                        let slug = projeto.slug_cliente;
                         
-                        if (!token) {
-                          const { data, error } = await supabase
+                        if (!token || !slug) {
+                          const novoToken = token || crypto.randomUUID();
+                          const novoSlug = slug || gerarSlug(projeto.nome_cliente);
+                          
+                          const { error } = await supabase
                             .from('projetos')
-                            .update({ token_cliente: crypto.randomUUID() })
-                            .eq('id', projeto.id)
-                            .select('token_cliente')
-                            .single();
+                            .update({ 
+                              token_cliente: novoToken,
+                              slug_cliente: novoSlug 
+                            })
+                            .eq('id', projeto.id);
                           
                           if (error) throw error;
-                          token = data.token_cliente;
+                          token = novoToken;
+                          slug = novoSlug;
                         }
 
-                        const url = `${window.location.origin}/cliente/${token}`;
+                        const baseUrl = 'https://app.nl.arq.br';
+                        const url = `${baseUrl}/cliente/${slug}`;
                         await navigator.clipboard.writeText(url);
                         
-                        toast.success("Link copiado. Compartilhe com o cliente.");
+                        toast.success("Link amigável copiado para área de transferência.");
                       } catch (error) {
                         console.error("Erro ao gerar link:", error);
                         toast.error("Erro ao gerar link do cliente");

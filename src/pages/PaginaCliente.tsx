@@ -27,7 +27,8 @@ const ETAPAS_JORNADA = [
 ];
 
 export default function PaginaCliente() {
-  const { token } = useParams();
+  const { id } = useParams();
+  const param = id;
   const [projeto, setProjeto] = useState<any>(null);
   const [etapas, setEtapas] = useState<any[]>([]);
   const [arquivos, setArquivos] = useState<any[]>([]);
@@ -46,7 +47,7 @@ export default function PaginaCliente() {
 
   useEffect(() => {
     fetchProjeto();
-  }, [token]);
+  }, [param]);
 
   async function fetchProjeto() {
     try {
@@ -54,7 +55,7 @@ export default function PaginaCliente() {
       const { data: proj, error: projError } = await (supabase
         .from('projetos') as any)
         .select('*')
-        .eq('token_cliente', token || '')
+        .or(`token_cliente.eq.${param},slug_cliente.eq.${param}`)
         .maybeSingle();
 
       if (projError || !proj) {
@@ -150,7 +151,7 @@ export default function PaginaCliente() {
     try {
       await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
-        token_cliente: token,
+        token_cliente: projeto.token_cliente,
         mensagem: textoAjuste,
         tipo: 'ajuste'
       });
@@ -178,7 +179,7 @@ export default function PaginaCliente() {
     try {
       await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
-        token_cliente: token,
+        token_cliente: projeto.token_cliente,
         nome_remetente: nomeMensagem,
         mensagem: textoMensagem,
         tipo: 'mensagem'

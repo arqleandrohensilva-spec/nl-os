@@ -1111,6 +1111,7 @@ export type Database = {
           nome: string
           nome_cliente: string | null
           prazo_final: string | null
+          slug_cliente: string | null
           status_geral: string | null
           tipo: string | null
           token_cliente: string | null
@@ -1139,6 +1140,7 @@ export type Database = {
           nome: string
           nome_cliente?: string | null
           prazo_final?: string | null
+          slug_cliente?: string | null
           status_geral?: string | null
           tipo?: string | null
           token_cliente?: string | null
@@ -1167,6 +1169,7 @@ export type Database = {
           nome?: string
           nome_cliente?: string | null
           prazo_final?: string | null
+          slug_cliente?: string | null
           status_geral?: string | null
           tipo?: string | null
           token_cliente?: string | null
