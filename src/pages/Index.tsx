@@ -818,7 +818,7 @@ const Index = () => {
               >
                 <Settings2 size={14} />
               </button>
-              <div className="flex items-center gap-1 bg-white/5/20 p-1 rounded-[2px]">
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
@@ -827,7 +827,7 @@ const Index = () => {
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
                 <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Responsável:</span>
-                <div className="flex items-center gap-1 bg-white/5/20 p-1 rounded-[2px]">
+                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                   {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
                     <button 
                       key={resp} 
