@@ -90,7 +90,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           cidade: lead.cidade,
           area_m2: lead.area,
           etapa_atual: 'BRIEFING',
-          status_geral: 'Em andamento',
+          status_geral: 'ativo',
           horas_estimadas: horasEstimadas
         })
         .select()
