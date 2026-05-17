@@ -7,7 +7,7 @@ const LoginPage = () => {
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
   const location = useLocation();
-  const from = (location.state as any)?.from?.pathname || '/';
+  const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
