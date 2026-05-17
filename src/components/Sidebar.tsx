@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { supabase } from '@/integrations/supabase/client';
 
@@ -293,9 +294,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
     // 5. Nota baixa <= 6
     const { data: satisfacaoBaixa } = await supabase
       .from('pesquisas_satisfacao')
-      .select('id, nota_geral, created_at')
+      .select('id, nota_geral, respondida_em')
       .lte('nota_geral', 6)
-      .gt('created_at', sevenDaysAgo);
+      .gt('respondida_em', sevenDaysAgo);
 
     for (const sat of (satisfacaoBaixa || [])) {
       if (!hasRecent('satisfacao', '/marketing/satisfacao')) {
