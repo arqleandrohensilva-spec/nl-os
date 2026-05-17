@@ -209,7 +209,16 @@ serve(async (req) => {
 
       const errorSummary = errorData?.error_summary || '';
       const isPathNotFound = errorSummary.includes('path/not_found');
+      const isPathConflict = errorSummary.includes('path/conflict');
       
+      if (isPathConflict && (action === 'create_folder' || action === 'create_folder_v2')) {
+        console.log(`Path conflict for create_folder action, treating as success: ${path}`);
+        return new Response(JSON.stringify({ success: true, message: 'Folder already exists' }), { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        });
+      }
+
       if (isPathNotFound) {
         if (action === 'delete') {
           console.log(`Path not found for delete action, treating as success: ${path}`);
