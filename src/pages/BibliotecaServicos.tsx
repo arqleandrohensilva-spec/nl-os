@@ -343,7 +343,7 @@ const BibliotecaServicos = () => {
                       }
                     ].map((group, idx) => (
                       <div key={idx}>
-                        <h4 className="text-[9px] font-bold uppercase tracking-[0.25em] text-bronze mb-4 flex items-center gap-2">
+                        <h4 className="text-[10px] font-bold uppercase tracking-[0.25em] text-bronze mb-4 flex items-center gap-2">
                           <div className="h-[1px] w-4 bg-bronze/30" />
                           {group.title}
                         </h4>
@@ -354,11 +354,14 @@ const BibliotecaServicos = () => {
                               href={item.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-between group/link p-3 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-bronze/30 transition-all rounded-[1px]"
+                              className="flex items-center justify-between group/link p-4 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-bronze/30 transition-all rounded-[1px]"
                             >
-                              <span className="text-[10px] font-medium tracking-wide text-white/80 group-hover/link:text-white transition-colors">
-                                {item.name}
-                              </span>
+                              <div className="flex items-center gap-3">
+                                <FileText size={14} className="text-bronze/60 group-hover/link:text-bronze transition-colors" />
+                                <span className="text-[11px] font-bold tracking-widest text-white/80 uppercase group-hover/link:text-white transition-colors">
+                                  {item.name}
+                                </span>
+                              </div>
                               <ExternalLink size={12} className="text-white/20 group-hover/link:text-bronze transition-colors" />
                             </a>
                           ))}
