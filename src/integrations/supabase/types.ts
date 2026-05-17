@@ -1059,6 +1059,7 @@ export type Database = {
           criado_em: string | null
           criado_por: string | null
           data_inicio: string | null
+          dropbox_folder: string | null
           etapa_atual: string | null
           horas_acompanhamento: number | null
           horas_anteprojeto: number | null
@@ -1086,6 +1087,7 @@ export type Database = {
           criado_em?: string | null
           criado_por?: string | null
           data_inicio?: string | null
+          dropbox_folder?: string | null
           etapa_atual?: string | null
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null
@@ -1113,6 +1115,7 @@ export type Database = {
           criado_em?: string | null
           criado_por?: string | null
           data_inicio?: string | null
+          dropbox_folder?: string | null
           etapa_atual?: string | null
           horas_acompanhamento?: number | null
           horas_anteprojeto?: number | null

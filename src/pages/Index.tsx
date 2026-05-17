@@ -118,6 +118,47 @@ const Index = () => {
     detalhamento: 60,
     acompanhamento: 40
   });
+  const criarPastasDropbox = async (nomeCliente: string, tipo: string) => {
+    const pastaBase = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipo}`;
+    
+    const subpastas = [
+      '01 - Briefing',
+      '02 - Conceito', 
+      '03 - Estudo Preliminar',
+      '04 - Projeto Executivo',
+      '05 - Detalhamento',
+      '06 - Obra',
+      '07 - Marketing',
+      '08 - Contrato'
+    ];
+
+    try {
+      console.log("Iniciando criação de pastas no Dropbox:", pastaBase);
+      // Criar pasta principal
+      const { error: mainFolderError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'create_folder', path: pastaBase }
+      });
+
+      if (mainFolderError) {
+        console.warn("Aviso ao criar pasta principal (pode já existir):", mainFolderError);
+      }
+
+      // Criar subpastas
+      for (const subpasta of subpastas) {
+        const { error: subFolderError } = await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', path: `${pastaBase}/${subpasta}` }
+        });
+        if (subFolderError) {
+          console.warn(`Aviso ao criar subpasta ${subpasta}:`, subFolderError);
+        }
+      }
+      
+      return pastaBase;
+    } catch (error) {
+      console.error("Erro fatal ao criar pastas no Dropbox:", error);
+      throw error;
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1225,6 +1266,18 @@ const Index = () => {
                   onClick={async () => {
                     if (!conversionLead) return;
                     try {
+                      toast.loading("Configurando projeto e pastas no Dropbox...", { id: "create-project" });
+                      
+                      const tokenCliente = crypto.randomUUID();
+                      let dropboxFolder = "";
+                      
+                      try {
+                        dropboxFolder = await criarPastasDropbox(conversionLead.nome, conversionLead.tipo);
+                      } catch (dbErr) {
+                        console.error("Dropbox error:", dbErr);
+                        // Se falhou o Dropbox, continuamos para criar o projeto mas avisaremos no final
+                      }
+
                       const { error } = await supabase.from('projetos').insert({
                         nome: conversionLead.nome,
                         nome_cliente: conversionLead.nome,
@@ -1232,20 +1285,34 @@ const Index = () => {
                         tipo: conversionLead.tipo,
                         area_m2: conversionLead.area,
                         valor_proposta: conversionLead.orcamento,
-                        horas_estimadas: conversionHours.briefing + conversionHours.conceito + conversionHours.estudo + conversionHours.executivo + conversionHours.detalhamento + conversionHours.acompanhamento,
+                        horas_estimadas: (conversionHours.briefing || 0) + (conversionHours.conceito || 0) + (conversionHours.estudo || 0) + (conversionHours.executivo || 0) + (conversionHours.detalhamento || 0) + (conversionHours.acompanhamento || 0),
                         horas_briefing: conversionHours.briefing,
                         horas_conceito: conversionHours.conceito,
                         horas_anteprojeto: conversionHours.estudo,
                         horas_executivo: conversionHours.executivo,
                         horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
-                        status_geral: 'ativo'
+                        status_geral: 'ativo',
+                        token_cliente: tokenCliente,
+                        dropbox_folder: dropboxFolder || null
                       });
+
                       if (error) throw error;
-                      toast.success("Projeto criado no Controle de Horas!");
+
+                      if (dropboxFolder) {
+                        toast.success("Projeto criado e pastas no Dropbox configuradas!", { id: "create-project" });
+                      } else {
+                        toast.error("Projeto criado. Pastas no Dropbox não foram criadas — tente sincronizar manualmente.", { 
+                          id: "create-project",
+                          duration: 6000 
+                        });
+                      }
+                      
                       setShowProjectConversion(false);
+                      fetchLeads(); // Refresh list
                     } catch (err) {
-                      toast.error("Erro ao criar projeto");
+                      console.error("Error creating project:", err);
+                      toast.error("Erro ao criar projeto", { id: "create-project" });
                     }
                   }}
                   className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest"

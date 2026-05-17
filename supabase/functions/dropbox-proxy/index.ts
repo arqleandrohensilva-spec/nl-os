@@ -155,6 +155,10 @@ serve(async (req) => {
       endpoint = 'https://api.dropboxapi.com/2/files/create_folder_v2';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path: folder || path, autorename: false });
+    } else if (action === 'create_folder_batch') {
+      endpoint = 'https://api.dropboxapi.com/2/files/create_folder_batch';
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ paths: bodyJson.paths, autorename: false, force_async: false });
     } else if (action === 'create_shared_link') {
       endpoint = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
       headers['Content-Type'] = 'application/json';
@@ -205,7 +209,16 @@ serve(async (req) => {
 
       const errorSummary = errorData?.error_summary || '';
       const isPathNotFound = errorSummary.includes('path/not_found');
+      const isPathConflict = errorSummary.includes('path/conflict');
       
+      if (isPathConflict && (action === 'create_folder' || action === 'create_folder_v2')) {
+        console.log(`Path conflict for create_folder action, treating as success: ${path}`);
+        return new Response(JSON.stringify({ success: true, message: 'Folder already exists' }), { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        });
+      }
+
       if (isPathNotFound) {
         if (action === 'delete') {
           console.log(`Path not found for delete action, treating as success: ${path}`);
