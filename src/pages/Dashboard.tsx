@@ -493,7 +493,7 @@ const Dashboard = () => {
                   <div className="relative">
                     <button 
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white/80 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
                     >
                       <Bell size={14} />
                       {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'}
