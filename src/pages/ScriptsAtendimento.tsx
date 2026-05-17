@@ -23,8 +23,17 @@ const ScriptsAtendimento = () => {
   const [selectedLeadId, setSelectedLeadId] = useState<string>('');
   const [leadAtivo, setLeadAtivo] = useState<Lead | null>(null);
   const [mensagemCliente, setMensagemCliente] = useState('');
+  const [mensagemDetector, setMensagemDetector] = useState('');
   const [sugestaoIA, setSugestaoIA] = useState<{ resposta: string; tom: string; proximo_passo: string } | null>(null);
+  const [resultadoDetector, setResultadoDetector] = useState<{
+    etapa_numero: number;
+    etapa_nome: string;
+    confianca: string;
+    motivo: string;
+    script_recomendado: string;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(false);
   const [openEtapa, setOpenEtapa] = useState<string | null>(null);
 
   useEffect(() => {
