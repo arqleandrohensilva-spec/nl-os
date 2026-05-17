@@ -45,8 +45,14 @@ const ScriptsAtendimento = () => {
 
   useEffect(() => {
     const fetchLeads = async () => {
-      const { data } = await supabase.from('leads').select('id, nome, tipo, cidade, stage, area, origem');
-      if (data) setLeads(data);
+      const { data } = await supabase.from('leads').select('id, nome, tipo, city, stage, area, origem');
+      if (data) {
+        const mappedLeads = data.map((l: any) => ({
+          ...l,
+          cidade: l.city // Mapeia city para cidade se necessário
+        }));
+        setLeads(mappedLeads);
+      }
     };
     fetchLeads();
   }, []);
@@ -54,6 +60,22 @@ const ScriptsAtendimento = () => {
   const handleLeadChange = (id: string) => {
     setSelectedLeadId(id);
     setLeadAtivo(leads.find(l => l.id === id) || null);
+  };
+
+  const cleanJSON = (text: string) => {
+    return text
+      .replace(/```json\n?/gi, '')
+      .replace(/```\n?/gi, '')
+      .trim();
+  };
+
+  const parseAIResponse = (data: any) => {
+    if (data.choices?.[0]?.message?.content) {
+      return JSON.parse(cleanJSON(data.choices[0].message.content));
+    } else if (typeof data === 'string') {
+      return JSON.parse(cleanJSON(data));
+    }
+    return data;
   };
 
   const gerarSugestao = async () => {
@@ -90,16 +112,7 @@ const ScriptsAtendimento = () => {
       }
       
       console.log("Resposta bruta da Edge Function (Assistente):", data);
-      
-      let result;
-      if (data.choices?.[0]?.message?.content) {
-        result = JSON.parse(data.choices[0].message.content);
-      } else if (typeof data === 'string') {
-        result = JSON.parse(data);
-      } else {
-        result = data;
-      }
-      
+      const result = parseAIResponse(data);
       setSugestaoIA(result);
     } catch (e: any) {
       console.error("Erro completo (Assistente):", e);
