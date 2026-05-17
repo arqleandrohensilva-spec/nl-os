@@ -10,6 +10,8 @@ interface LeadCardProps {
   lead: Lead;
   index: number;
   onClick: () => void;
+  onUpdateStatus?: (leadId: string, newStage: string) => void;
+  onQuickNote?: (leadId: string, note: string) => void;
 }
 
 const LeadCard = ({ lead, onClick }: LeadCardProps) => {
@@ -105,7 +107,7 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
 
           {/* Project Type · Value */}
           <p className="text-white/50 text-xs mt-1 truncate">
-            {lead.projeto_tipo} · {formatCurrency(lead.orcamento)}
+            {lead.tipo} · {formatCurrency(lead.orcamento)}
           </p>
         </div>
       </div>
