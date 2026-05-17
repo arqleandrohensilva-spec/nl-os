@@ -134,7 +134,7 @@ const PesquisaSatisfacao = () => {
     try {
       const fileName = `video_depoimento_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.mp4`;
       const clientName = survey.cliente_nome || 'Cliente';
-      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/${clientName}/06 - Depoimento/${fileName}`;
+      const destinationPath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${clientName}/06 - Depoimento/${fileName}`;
 
       const arrayBuffer = await videoBlob.arrayBuffer();
       const dropboxArg = JSON.stringify({

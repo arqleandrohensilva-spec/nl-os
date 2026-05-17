@@ -179,7 +179,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
     try {
       setUploadingItem(itemId);
       
-      const folderPath = `/NL Arquitetos/07 - Projetos NL OS/${projeto.nome_cliente}/00 - Documentos do Cliente`;
+      const folderPath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${projeto.nome_cliente}/00 - Documentos do Cliente`;
       const fileName = `${itemNome.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.${file.name.split('.').pop()}`;
       const fullPath = `${folderPath}/${fileName}`;
 

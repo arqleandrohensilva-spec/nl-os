@@ -117,7 +117,7 @@ serve(async (req) => {
     }
 
     const action = req.headers.get('x-action') || bodyJson.action;
-    let path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS';
+    let path = bodyJson.path || '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes';
     const folder = bodyJson.folder || "";
     
     console.log(`Dropbox Proxy Request - Action: ${action}, Path: ${path}`);
