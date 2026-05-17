@@ -20,7 +20,11 @@ import {
   Maximize2,
   Clock,
   LayoutGrid,
-  Calendar
+  Calendar,
+  List,
+  Zap,
+  ArrowUpRight,
+  ChevronUp
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -83,6 +87,8 @@ const Index = () => {
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
+  const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'foco'>('kanban');
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'score', direction: 'desc' });
   const [isNewLeadDialogOpen, setIsNewLeadDialogOpen] = useState(false);
   const [config, setConfig] = useState<ConfigEscritorio | null>(null);
   const [newLead, setNewLead] = useState({
@@ -820,6 +826,27 @@ const Index = () => {
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
               </div>
+              <div className="h-6 w-[1px] bg-white/10 mx-2" />
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
+                <button 
+                  onClick={() => setViewMode('kanban')} 
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'kanban' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
+                >
+                  <LayoutGrid size={12} /> KANBAN
+                </button>
+                <button 
+                  onClick={() => setViewMode('lista')} 
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'lista' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
+                >
+                  <List size={12} /> LISTA
+                </button>
+                <button 
+                  onClick={() => setViewMode('foco')} 
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'foco' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
+                >
+                  <Zap size={12} /> FOCO
+                </button>
+              </div>
             </div>
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
@@ -853,47 +880,252 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Kanban Board */}
+        {/* Content Area */}
         <div className="flex-1 bg-[#0A0A0A] overflow-y-auto p-6 pt-2 scrollbar-custom">
-          <DndContext 
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragOver={handleDragOver}
-            onDragEnd={handleDragEnd}
-            modifiers={[restrictToWindowEdges]}
-          >
-            <div className="grid grid-cols-6 h-full gap-4">
-              {STAGES.map(stage => (
-                <KanbanColumn 
-                  key={stage}
-                  stage={stage}
-                  leads={filteredLeads.filter(l => l.stage === stage)}
-                  onLeadClick={(lead) => setSelectedLeadId(lead.id)}
-                  onUpdateStatus={handleUpdateStage}
-                  onQuickNote={handleQuickNote}
-                />
-              ))}
-            </div>
+          {viewMode === 'kanban' && (
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCorners}
+              onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
+              onDragEnd={handleDragEnd}
+              modifiers={[restrictToWindowEdges]}
+            >
+              <div className="grid grid-cols-6 h-full gap-4">
+                {STAGES.map(stage => (
+                  <KanbanColumn 
+                    key={stage}
+                    stage={stage}
+                    leads={filteredLeads.filter(l => l.stage === stage)}
+                    onLeadClick={(lead) => setSelectedLeadId(lead.id)}
+                    onUpdateStatus={handleUpdateStage}
+                    onQuickNote={handleQuickNote}
+                  />
+                ))}
+              </div>
 
-            <DragOverlay dropAnimation={{
-              sideEffects: defaultDropAnimationSideEffects({
-                styles: {
-                  active: {
-                    opacity: '0.4',
+              <DragOverlay dropAnimation={{
+                sideEffects: defaultDropAnimationSideEffects({
+                  styles: {
+                    active: {
+                      opacity: '0.4',
+                    },
                   },
-                },
-              }),
-            }}>
-              {activeLead ? (
-                <LeadCard 
-                  lead={activeLead} 
-                  index={0} 
-                  onClick={() => {}} 
-                />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
+                }),
+              }}>
+                {activeLead ? (
+                  <LeadCard 
+                    lead={activeLead} 
+                    index={0} 
+                    onClick={() => {}} 
+                  />
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+          )}
+
+          {viewMode === 'lista' && (
+            <div className="w-full">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-white/[0.03] border-b border-white/10">
+                    {['NOME', 'ETAPA', 'TIPO', 'VALOR', 'SCORE', 'DIAS NA ETAPA', 'TEMPERATURA', 'AÇÕES'].map((header) => {
+                      const key = header === 'NOME' ? 'nome' : 
+                                  header === 'ETAPA' ? 'stage' : 
+                                  header === 'VALOR' ? 'orcamento' : 
+                                  header === 'SCORE' ? 'score' : 
+                                  header === 'DIAS NA ETAPA' ? 'etapa_desde' : '';
+                      return (
+                        <th 
+                          key={header}
+                          onClick={() => {
+                            if (!key) return;
+                            setSortConfig(prev => ({
+                              key,
+                              direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
+                            }));
+                          }}
+                          className="px-4 py-3 text-left text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white"
+                        >
+                          <div className="flex items-center gap-2">
+                            {header}
+                            {sortConfig.key === key && (
+                              sortConfig.direction === 'desc' ? <ChevronDown size={10} /> : <ChevronUp size={10} />
+                            )}
+                          </div>
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLeads
+                    .sort((a, b) => {
+                      if (!sortConfig.key) return 0;
+                      const aVal = (a as any)[sortConfig.key];
+                      const bVal = (b as any)[sortConfig.key];
+                      if (sortConfig.key === 'etapa_desde') {
+                        return sortConfig.direction === 'desc' 
+                          ? new Date(bVal).getTime() - new Date(aVal).getTime()
+                          : new Date(aVal).getTime() - new Date(bVal).getTime();
+                      }
+                      return sortConfig.direction === 'desc' 
+                        ? (aVal < bVal ? 1 : -1)
+                        : (aVal > bVal ? 1 : -1);
+                    })
+                    .map(lead => {
+                      const daysInStage = Math.floor((new Date().getTime() - new Date(lead.etapa_desde).getTime()) / (1000 * 60 * 60 * 24));
+                      const isAtiva = !['Fechado', 'Perdido'].includes(lead.stage);
+                      return (
+                        <tr key={lead.id} className="border-b border-white/5 hover:bg-white/[0.02] h-14 transition-colors">
+                          <td onClick={() => setSelectedLeadId(lead.id)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
+                          <td className="px-4">
+                            <span className={cn(
+                              "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-[2px]",
+                              lead.stage === 'Fechado' ? "bg-green-500/10 text-green-500" : 
+                              lead.stage === 'Perdido' ? "bg-red/10 text-red" : "bg-bronze/10 text-bronze"
+                            )}>
+                              {lead.stage}
+                            </span>
+                          </td>
+                          <td className="px-4 text-white/60 text-xs">{lead.tipo}</td>
+                          <td className="px-4 text-bronze text-sm font-bold">
+                            {lead.orcamento > 0 ? `R$ ${(lead.orcamento / 1000).toLocaleString()}k` : "—"}
+                          </td>
+                          <td className="px-4">
+                            <span className={cn(
+                              "px-2 py-0.5 text-[10px] font-bold rounded-full",
+                              lead.score >= 8 ? "bg-bronze text-white" : 
+                              lead.score >= 5 ? "bg-white/10 text-white" : "text-white/40"
+                            )}>
+                              {lead.score}
+                            </span>
+                          </td>
+                          <td className={cn(
+                            "px-4 text-xs",
+                            daysInStage > 10 ? "text-red font-bold" : "text-white/60"
+                          )}>
+                            {daysInStage} dias
+                          </td>
+                          <td className="px-4">
+                            <div className="flex items-center gap-2">
+                              <div className={cn(
+                                "w-1.5 h-1.5 rounded-full",
+                                lead.temp === 'Quente' ? "bg-red animate-pulse" : 
+                                lead.temp === 'Morno' ? "bg-amber" : "bg-white/40"
+                              )} />
+                              <span className="text-[10px] text-white/60 uppercase font-medium">{lead.temp}</span>
+                            </div>
+                          </td>
+                          <td className="px-4">
+                            <div className="flex items-center gap-3 text-white/40">
+                              <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="hover:text-bronze transition-colors"><FileText size={14} /></button>
+                              <button onClick={() => setSelectedLeadId(lead.id)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
+                              <button onClick={() => handleQuickNote(lead.id, "Ação rápida registrada via lista")} className="hover:text-bronze transition-colors"><Zap size={14} /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {viewMode === 'foco' && (
+            <div className="max-w-4xl mx-auto space-y-8">
+              {(() => {
+                const now = new Date();
+                const focusLeads = filteredLeads
+                  .filter(l => !['Fechado', 'Perdido'].includes(l.stage))
+                  .map(l => {
+                    let urgency = 0;
+                    let badge = "";
+                    let color = "border-white/10";
+                    
+                    const isAtrasado = l.proxima_acao_data && isBefore(parseISO(l.proxima_acao_data), startOfDay(now));
+                    const isQuenteSemContato = l.temp === 'Quente' && differenceInDays(now, parseISO(l.logs[0]?.data || l.created_at)) > 7;
+                    const isReuniaoProxima = l.stage === 'Reunião Agendada' && l.proxima_acao_data && 
+                                            differenceInDays(parseISO(l.proxima_acao_data), now) <= 2 &&
+                                            differenceInDays(parseISO(l.proxima_acao_data), now) >= 0;
+
+                    if (isAtrasado) {
+                      urgency = 10;
+                      badge = "ATRASADO";
+                      color = "border-red";
+                    } else if (isQuenteSemContato) {
+                      urgency = 8;
+                      badge = "ATENÇÃO";
+                      color = "border-amber";
+                    } else if (isReuniaoProxima) {
+                      urgency = 9;
+                      badge = "PREPARAR";
+                      color = "border-bronze";
+                    }
+
+                    return { ...l, focusScore: urgency, focusBadge: badge, focusColor: color };
+                  });
+
+                const prioritized = focusLeads.filter(l => l.focusScore > 0).sort((a, b) => b.focusScore - a.focusScore);
+                const regular = focusLeads.filter(l => l.focusScore === 0).sort((a, b) => b.score - a.score);
+
+                return (
+                  <>
+                    <div className="space-y-4">
+                      {prioritized.map(lead => (
+                        <div key={lead.id} className={cn("bg-white/[0.03] border-l-4 p-6 flex items-center justify-between group", lead.focusColor)}>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-3">
+                              <span className={cn(
+                                "px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.2em] rounded-[1px]",
+                                lead.focusBadge === 'ATRASADO' ? "bg-red text-white" :
+                                lead.focusBadge === 'ATENÇÃO' ? "bg-amber text-white" : "bg-bronze text-white"
+                              )}>
+                                {lead.focusBadge}
+                              </span>
+                              <h3 className="text-white font-medium text-lg">{lead.nome}</h3>
+                              <span className="text-white/40 text-xs">· {lead.tipo} · R$ {(lead.orcamento / 1000).toLocaleString()}k · Score {lead.score}</span>
+                            </div>
+                            <p className="text-white/40 text-xs italic">
+                              {lead.proxima_acao_nota || `Em ${lead.stage} há ${differenceInDays(now, parseISO(lead.etapa_desde))} dias`}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">ABRIR SCRIPT</button>
+                            <button onClick={() => handleQuickNote(lead.id, "Contato registrado via modo foco")} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">REGISTRAR CONTATO</button>
+                            <button onClick={() => setSelectedLeadId(lead.id)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {regular.length > 0 && (
+                      <div className="pt-8">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="h-[1px] flex-1 bg-white/10" />
+                          <h2 className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Demais Leads Ativos</h2>
+                          <div className="h-[1px] flex-1 bg-white/10" />
+                        </div>
+                        <div className="space-y-3">
+                          {regular.map(lead => (
+                            <div key={lead.id} className="bg-white/[0.01] border-l-4 border-white/5 p-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
+                              <div className="flex items-center gap-4">
+                                <span className="text-white font-medium">{lead.nome}</span>
+                                <span className="text-white/30 text-[10px] uppercase tracking-widest">{lead.stage}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => setSelectedLeadId(lead.id)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
         </div>
       </main>
 
