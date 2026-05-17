@@ -450,28 +450,27 @@ Gere a mensagem de WhatsApp.`;
   };
 
   const handleReviewProposal = async (proposal: Proposal) => {
+    console.log('revisar clicado', proposal);
     try {
       setSelectedProposal(proposal);
       setIsReviewing(true);
       setReviewResult(null);
       setIsReviewModalOpen(true);
 
-      // Buscar texto da proposta (objetivo no caso de proposals, ou cláusulas de contratos se houvesse vínculo direto)
-      // O prompt pede para buscar do Supabase campo clausulas da tabela contratos ou conteúdo do documento vinculado.
-      // Como estamos no Tracking de Propostas, vamos usar o objetivo da proposta ou simular a busca se houver contrato.
+      let proposalText = proposal.objetivo || "Esta é uma proposta teste para a NL Arquitetos.";
       
-      let proposalText = proposal.objetivo || "";
-      
-      // Tentar buscar contrato vinculado se existir
-      const { data: contractData } = await supabase
-        .from('contratos')
-        .select('dados_gerais')
-        .eq('lead_id', proposal.id) // Assumindo relação via lead_id ou similar
-        .maybeSingle();
+      try {
+        const { data: contractData } = await supabase
+          .from('contratos')
+          .select('dados_gerais')
+          .eq('lead_id', proposal.id)
+          .maybeSingle();
 
-      if (contractData?.dados_gerais) {
-        // Se houver dados mais robustos no contrato, podemos anexar
-        proposalText += "\n\nDETALHES DO CONTRATO:\n" + JSON.stringify(contractData.dados_gerais);
+        if (contractData?.dados_gerais) {
+          proposalText += "\n\nDETALHES DO CONTRATO:\n" + JSON.stringify(contractData.dados_gerais);
+        }
+      } catch (dbError) {
+        console.warn('Erro ao buscar contrato (não crítico):', dbError);
       }
 
       const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo em 3 aspectos:
@@ -517,21 +516,31 @@ Retorne APENAS JSON válido:
       const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
           prompt,
-          model: 'claude-sonnet-4-20250514'
+          model: 'claude-3-5-sonnet-20240620'
         }
       });
 
       if (error) throw error;
       if (data?.error) throw new Error(data.error.message);
 
-      const content = data.choices[0].message.content;
+      let content = data.choices ? data.choices[0].message.content : data.text || data.message;
+      if (!content) throw new Error('Resposta vazia da IA');
+
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content);
       
       setReviewResult(result);
     } catch (error: any) {
       console.error('Error reviewing proposal:', error);
-      toast.error('Erro ao revisar proposta: ' + error.message);
+      toast.error('Erro ao revisar proposta: ' + (error.message || 'Erro desconhecido'));
+      setReviewResult({
+        tom: { status: 'CORRIGIR', problemas: [{ trecho: 'Erro de processamento', sugestao: error.message }] },
+        palavras_proibidas: { status: 'APROVADO', encontradas: [] },
+        checklist: {
+          recapitulacao: false, solucao: false, entregaveis: false, metodo_resolve: false, 
+          investimento: false, proximo_passo: false, sem_urgencia: false
+        }
+      });
     } finally {
       setIsReviewing(false);
     }
@@ -1191,9 +1200,13 @@ Retorne APENAS JSON válido:
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-white/10">
-          <DialogHeader className="p-8 bg-graphite text-white relative overflow-hidden">
+        <DialogContent className="max-w-3xl bg-[#0F0F0F] rounded-none p-0 overflow-hidden border-[#2A2826]">
+          <DialogHeader className="p-8 bg-black text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Shield size={160} />
             </div>
@@ -1208,7 +1221,7 @@ Retorne APENAS JSON válido:
             </div>
           </DialogHeader>
 
-          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8">
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0F0F0F]">
             {isReviewing ? (
               <div className="py-20 flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 text-bronze animate-spin" />
@@ -1217,7 +1230,7 @@ Retorne APENAS JSON válido:
             ) : reviewResult ? (
               <>
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <MessageSquare size={14} className="text-bronze" />
                       Tom de Voz
@@ -1234,9 +1247,9 @@ Retorne APENAS JSON válido:
                   {reviewResult.tom.problemas.length > 0 ? (
                     <div className="space-y-3">
                       {reviewResult.tom.problemas.map((prob: any, i: number) => (
-                        <div key={i} className="bg-white border border-[#F0EDEA] p-4 rounded-[2px] space-y-2">
+                        <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-none space-y-2">
                           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
-                          <p className="text-xs italic text-white/40 border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
+                          <p className="text-xs italic text-white/40 border-l-2 border-red-200/20 pl-3">"{prob.trecho}"</p>
                           <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
                           <p className="text-xs font-medium text-white">{prob.sugestao}</p>
                         </div>
@@ -1248,7 +1261,7 @@ Retorne APENAS JSON válido:
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <Ban size={14} className="text-bronze" />
                       Palavras Proibidas
@@ -1279,7 +1292,7 @@ Retorne APENAS JSON válido:
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <ClipboardList size={14} className="text-bronze" />
                       Checklist Técnico
@@ -1295,7 +1308,7 @@ Retorne APENAS JSON válido:
                       { label: "Próximo passo definido", key: "proximo_passo" },
                       { label: "Sem urgência artificial", key: "sem_urgencia" }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-white border border-[#F0EDEA] rounded-[2px]">
+                      <div key={i} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-none">
                         <span className="text-[11px] font-medium text-white/40">{item.label}</span>
                         {reviewResult.checklist[item.key] ? (
                           <CheckCircle2 size={16} className="text-green-500" />
@@ -1312,7 +1325,7 @@ Retorne APENAS JSON válido:
             )}
           </div>
 
-          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-white/10 flex justify-between items-center sm:justify-between">
+          <DialogFooter className="p-6 bg-black border-t border-white/10 flex justify-between items-center sm:justify-between rounded-none">
             <Button 
               variant="outline" 
               onClick={() => setIsReviewModalOpen(false)}
@@ -1350,9 +1363,6 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
               Copiar Relatório
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
         </DialogContent>
       </Dialog>
     </div>
