@@ -87,14 +87,14 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
                 </span>
               )}
             </div>
-            <h3 className="text-[17px] font-cormorant text-graphite leading-tight group-hover:text-bronze transition-colors truncate">
+            <h3 className="text-[17px] font-cormorant text-white leading-tight group-hover:text-bronze transition-colors truncate">
               {lead.nome}
             </h3>
           </div>
           <div className="ml-3">
             <div className="w-9 h-9 border border-white/10 rounded-[2px] flex flex-col items-center justify-center group-hover:border-bronze/30 transition-colors">
               <span className="text-[7px] text-white/40 font-bold leading-none uppercase mb-0.5">Sc.</span>
-              <span className="text-graphite font-bold">{score}</span>
+              <span className="text-white font-bold">{score}</span>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
             <DollarSign size={14} className="text-bronze/60" />
             <span className={cn(
               "text-[15px] font-bold tracking-tight",
-              lead.orcamento > 0 ? "text-bronze" : "text-white/40 opacity-40"
+              lead.orcamento > 0 ? "text-bronze" : "text-white/20"
             )}>
               {formatCurrency(lead.orcamento)}
             </span>
