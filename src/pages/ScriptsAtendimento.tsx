@@ -56,6 +56,8 @@ const ScriptsAtendimento = () => {
   const [isAdaptando, setIsAdaptando] = useState(false);
   const [resultadoAdaptacao, setResultadoAdaptacao] = useState<{ script_adaptado: string; o_que_mudou: string } | null>(null);
 
+  const [activeIABlock, setActiveIABlock] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchLeads = async () => {
       const { data } = await supabase.from('leads').select('id, nome, tipo, city, stage, area, origem');
