@@ -51,8 +51,8 @@ export default function PaginaCliente() {
   async function fetchProjeto() {
     try {
       setLoading(true);
-      const { data: proj, error: projError } = await supabase
-        .from('projetos')
+      const { data: proj, error: projError } = await (supabase
+        .from('projetos') as any)
         .select('*')
         .eq('token_cliente', token || '')
         .maybeSingle();
@@ -64,16 +64,16 @@ export default function PaginaCliente() {
 
       setProjeto(proj);
 
-      const { data: etps } = await supabase
-        .from('etapas_projeto')
+      const { data: etps } = await (supabase
+        .from('projeto_etapas') as any)
         .select('*')
         .eq('projeto_id', proj.id)
-        .order('created_at', { ascending: true });
+        .order('criado_em', { ascending: true });
       
       setEtapas(etps || []);
 
-      const { data: arqs } = await supabase
-        .from('arquivos_projeto')
+      const { data: arqs } = await (supabase
+        .from('arquivos_projeto') as any)
         .select('*')
         .eq('projeto_id', proj.id)
         .order('created_at', { ascending: true });
@@ -115,12 +115,11 @@ export default function PaginaCliente() {
       const { ip } = await ipResponse.json();
 
       const { error: updateError } = await (supabase
-        .from('etapas_projeto') as any)
+        .from('projeto_etapas') as any)
         .update({
           status: 'Aprovado',
           aprovado_por: nomeAprovador,
-          data_aprovacao: new Date().toISOString(),
-          ip_aprovacao: ip
+          data_aprovacao: new Date().toISOString()
         })
         .eq('id', selectedEtapa.id);
 
@@ -308,7 +307,7 @@ export default function PaginaCliente() {
                   <div className="space-y-2">
                     <h3 className="font-cormorant text-3xl italic">{etapa.etapa}</h3>
                     <p className="text-white/40 text-xs">
-                      Enviado em {format(new Date(etapa.updated_at), "dd 'de' MMMM", { locale: ptBR })}
+                      Enviado em {format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR })}
                     </p>
                   </div>
                   <div className="flex gap-4">
