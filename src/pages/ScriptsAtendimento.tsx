@@ -264,7 +264,7 @@ const ScriptsAtendimento = () => {
               <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="bg-[#0F0F0F] p-4 border border-bronze/30 space-y-3 relative group">
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-widest font-bold text-bronze">RESPOSTA SUGERIDA</span>
+                    <span className="text-[8px] uppercase tracking-widest font-bold text-bronze font-mono">RESPOSTA SUGERIDA</span>
                     <Button 
                       variant="ghost" 
                       size="icon" 
@@ -274,7 +274,7 @@ const ScriptsAtendimento = () => {
                       <Copy size={12} />
                     </Button>
                   </div>
-                  <p className="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">{sugestaoIA.resposta}</p>
+                  <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
                   <div className="pt-2 border-t border-white/5 mt-2">
                     <p className="text-[9px] text-white/40 uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
                     <p className="text-[9px] text-white/40 uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
@@ -322,13 +322,13 @@ const ScriptsAtendimento = () => {
                         )}>
                           <div className="flex items-center justify-between mb-3">
                             <span className={cn(
-                              "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest",
+                              "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
                               script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
                             )}>
                               {script.situacao}
                             </span>
                           </div>
-                          <p className="text-[13px] text-white/70 leading-relaxed mb-8">
+                          <p className="text-[14px] text-[#CCCCCC] leading-[1.6] mb-8 font-sans">
                             {replaceVariables(script.texto)}
                           </p>
                           <Button 
