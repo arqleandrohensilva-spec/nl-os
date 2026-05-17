@@ -126,7 +126,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
               <p className="text-[8px] font-bold text-bronze uppercase tracking-widest leading-none">
                 Próxima: {lead.proxima_acao_tipo} · {lead.proxima_acao_data}
               </p>
-              <p className="text-[9px] text-graphite/70 line-clamp-1 leading-tight italic">
+              <p className="text-[9px] text-white/70 line-clamp-1 leading-tight italic">
                 "{lead.proxima_acao_nota}"
               </p>
             </div>

@@ -657,7 +657,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                             </div>
                             <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
                           </div>
-                          <p className="text-[10px] font-dm-mono text-graphite/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+                          <p className="text-[10px] font-dm-mono text-white/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
                             {item.conteudo}
                           </p>
                         </div>
@@ -701,7 +701,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             <div className="bg-white/[0.03] p-8 border border-white/10 border-b-2 border-b-graphite rounded-[4px] flex flex-col justify-between relative group">
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-[9px] font-dm-mono text-graphite uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
+                  <p className="text-[9px] font-dm-mono text-white uppercase tracking-[0.2em] font-bold">PREÇO SUGERIDO/HORA</p>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -724,7 +724,7 @@ Máximo 3 linhas. Sem markdown. Em português.
               <div className="mt-6 space-y-2">
                 <div className="flex justify-between items-center text-[10px] font-dm-mono uppercase tracking-widest text-white/40">
                   <span>Margem de Lucro</span>
-                  <span className="text-graphite font-bold">{config?.margem_lucro}%</span>
+                  <span className="text-white font-bold">{config?.margem_lucro}%</span>
                 </div>
                 <Slider 
                   value={[config?.margem_lucro || 0]} 
@@ -802,11 +802,11 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className="bg-bronze/5 p-6 rounded-[4px] border border-bronze/20 space-y-4 animate-in fade-in slide-in-from-left-4">
                   <div className="flex items-center gap-2">
                     <Target size={14} className="text-bronze" />
-                    <span className="text-[10px] font-dm-mono font-bold text-graphite uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
+                    <span className="text-[10px] font-dm-mono font-bold text-white uppercase tracking-widest">Plano de Ação para Meta: R$ {config.meta_custo_hora.toFixed(2)}/hora</span>
                   </div>
                   <div className="grid grid-cols-3 gap-6">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-graphite uppercase">A) Reduzir Custos</p>
+                      <p className="text-[10px] font-bold text-white uppercase">A) Reduzir Custos</p>
                       <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/mês 
                         ({Math.round(((calculations.monthlyCosts - (config.meta_custo_hora * calculations.faturableHours)) / calculations.monthlyCosts) * 100)}% dos custos)
@@ -820,7 +820,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-bold text-graphite uppercase">C) Combinar Estratégias</p>
+                      <p className="text-[10px] font-bold text-white uppercase">C) Combinar Estratégias</p>
                       <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
                       </p>
@@ -868,7 +868,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                               >
                                 <cat.icon size={16} />
                               </div>
-                              <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">{cat.label}</span>
+                              <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">{cat.label}</span>
                             </div>
                             <div className="flex items-center gap-6">
                               <span className="text-xs font-dm-mono text-bronze font-bold">
@@ -897,7 +897,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                           return (
                             <div key={item.id} className="group flex items-center justify-between py-3 border-b border-white/10/50 last:border-0 hover:bg-white/5/5 px-2 -mx-2 transition-colors">
                               <div className="flex items-center gap-3">
-                                <span className="text-xs font-dm-mono text-graphite">{item.nome}</span>
+                                <span className="text-xs font-dm-mono text-white">{item.nome}</span>
                                 {isNew && (
                                   <span className="text-[8px] font-bold text-bronze bg-bronze/10 px-1.5 py-0.5 rounded-[2px] uppercase">Novo hoje</span>
                                 )}
@@ -954,7 +954,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px] bg-white border-none rounded-[4px]">
                           <DialogHeader>
-                            <DialogTitle className="font-cormorant text-xl font-bold text-graphite uppercase tracking-tight">Novo Item — {cat.label}</DialogTitle>
+                            <DialogTitle className="font-cormorant text-xl font-bold text-white uppercase tracking-tight">Novo Item — {cat.label}</DialogTitle>
                           </DialogHeader>
                           <div className="space-y-6 py-4">
                             <div className="space-y-2">
@@ -1051,7 +1051,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-white/5/30 text-white/40")}>
                   <History size={16} />
                 </div>
-                <span className="text-xs font-dm-mono font-bold text-graphite uppercase tracking-widest">Evolução do Custo/Hora</span>
+                <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">Evolução do Custo/Hora</span>
               </div>
               {isEvolucaoOpen ? <ChevronDown size={14} className="text-white/40" /> : <ChevronRight size={14} className="text-white/40" />}
             </button>
@@ -1130,7 +1130,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Lightbulb size={12} className="text-bronze" />
-                          <span className="text-[10px] font-bold text-graphite uppercase font-dm-mono">{s.nome}</span>
+                          <span className="text-[10px] font-bold text-white uppercase font-dm-mono">{s.nome}</span>
                         </div>
                         <p className="text-[9px] text-white/40 leading-relaxed">{s.motivo}</p>
                       </div>
@@ -1180,7 +1180,7 @@ Máximo 3 linhas. Sem markdown. Em português.
 
             {isSimulatorOpen && (
               <div className="bg-white p-8 border border-white/10 rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 text-xs font-dm-mono text-graphite">
+                <div className="flex items-center gap-4 text-xs font-dm-mono text-white">
                   <span>Se fechar</span>
                   <Input 
                     type="number" 
@@ -1202,7 +1202,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-xs font-dm-mono">
                       <span className="text-white/40">Receita bruta estimada:</span>
-                      <span className="font-bold text-graphite">
+                      <span className="font-bold text-white">
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
@@ -1238,7 +1238,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         <Sparkles size={14} />
                         <span className="text-[9px] font-bold uppercase tracking-widest font-dm-mono">Análise de Viabilidade</span>
                       </div>
-                      <p className="text-[11px] font-dm-mono text-graphite leading-relaxed italic">
+                      <p className="text-[11px] font-dm-mono text-white leading-relaxed italic">
                         {simAnalysis || "Configure seu cenário e clique em analisar para uma avaliação da IA."}
                       </p>
                     </div>
@@ -1264,7 +1264,7 @@ Máximo 3 linhas. Sem markdown. Em português.
         <Dialog open={isComparingCenários} onOpenChange={setIsComparingCenários}>
           <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-white/10 bg-white animate-in slide-in-from-right duration-500">
             <DialogHeader className="border-b border-white/10 pb-6">
-              <DialogTitle className="font-cormorant text-2xl font-bold text-graphite uppercase tracking-tight">Comparador de Margem</DialogTitle>
+              <DialogTitle className="font-cormorant text-2xl font-bold text-white uppercase tracking-tight">Comparador de Margem</DialogTitle>
             </DialogHeader>
             
             <div className="py-8 space-y-12 overflow-y-auto max-h-[calc(100vh-120px)] scrollbar-hide">
@@ -1288,15 +1288,15 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="space-y-4 pt-4 border-t border-white/10/50">
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Proj. 200h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Proj. 300h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="pt-4 space-y-1">
                       <p className="text-[9px] text-white/40 uppercase font-bold text-bronze">Lucro/mês*:</p>
@@ -1319,7 +1319,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 {/* Cenário B */}
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <p className="text-[10px] font-dm-mono text-graphite uppercase font-bold tracking-widest">Cenário B</p>
+                    <p className="text-[10px] font-dm-mono text-white uppercase font-bold tracking-widest">Cenário B</p>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
                       <span className="text-white/40">Margem:</span>
                       <span className="font-bold">{cenarioBMargem}%</span>
@@ -1335,19 +1335,19 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="space-y-4 pt-4 border-t border-white/10/50">
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Proj. 200h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 200).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Proj. 300h:</p>
-                      <p className="text-sm font-dm-mono font-bold text-graphite">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100) * 300).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                     <div className="pt-4 space-y-1">
-                      <p className="text-[9px] text-white/40 uppercase font-bold text-graphite">Lucro/mês*:</p>
-                      <p className="text-base font-dm-mono font-bold text-graphite">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
+                      <p className="text-[9px] text-white/40 uppercase font-bold text-white">Lucro/mês*:</p>
+                      <p className="text-base font-dm-mono font-bold text-white">R$ {( (calculations.costPerHour * (1 + cenarioBMargem/100) * 250) - (calculations.costPerHour * 250) ).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
                     </div>
                   </div>
 

@@ -767,7 +767,7 @@ Retorne APENAS JSON válido:
                           onClick={() => toggleEngagement(p.id)}
                           className="flex items-center justify-between w-full group/eng py-1"
                         >
-                          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite flex items-center gap-2">
+                          <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white flex items-center gap-2">
                             <History size={12} className="text-bronze" />
                             Engajamento
                             <ChevronDown 
@@ -927,7 +927,7 @@ Retorne APENAS JSON válido:
                               setShowLeads(false);
                             }}
                           >
-                            <div className="font-medium text-graphite">{lead.nome}</div>
+                            <div className="font-medium text-white">{lead.nome}</div>
                             <div className="text-[10px] text-white/40 uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
                           </div>
                         ))
@@ -1135,7 +1135,7 @@ Retorne APENAS JSON válido:
               <Button 
                 onClick={copyFollowupMessage}
                 variant="outline"
-                className="border-white/10 text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
+                className="border-white/10 text-white hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
               >
                 <Copy size={16} className="mr-2 text-bronze" />
                 Copiar
@@ -1206,7 +1206,7 @@ Retorne APENAS JSON válido:
               <>
                 <section className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <MessageSquare size={14} className="text-bronze" />
                       Tom de Voz
                     </h3>
@@ -1226,7 +1226,7 @@ Retorne APENAS JSON válido:
                           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
                           <p className="text-xs italic text-white/40 border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
                           <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
-                          <p className="text-xs font-medium text-graphite">{prob.sugestao}</p>
+                          <p className="text-xs font-medium text-white">{prob.sugestao}</p>
                         </div>
                       ))}
                     </div>
@@ -1237,7 +1237,7 @@ Retorne APENAS JSON válido:
 
                 <section className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <Ban size={14} className="text-bronze" />
                       Palavras Proibidas
                     </h3>
@@ -1268,7 +1268,7 @@ Retorne APENAS JSON válido:
 
                 <section className="space-y-4">
                   <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-graphite flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <ClipboardList size={14} className="text-bronze" />
                       Checklist Técnico
                     </h3>

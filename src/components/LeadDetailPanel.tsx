@@ -134,19 +134,19 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="flex justify-between items-center mb-6">
               <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Dados do Lead</h4>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-graphite uppercase tracking-widest">Score Total:</span>
+                <span className="text-[10px] font-bold text-white uppercase tracking-widest">Score Total:</span>
                 <span className="text-sm font-bold text-bronze">{calculateLeadScore(lead).score}/10</span>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-6 text-[11px] mb-8">
               <div><p className="text-white/40">WhatsApp</p><a href={`https://wa.me/55${lead.whats.replace(/\D/g, '')}`} className="text-bronze underline">{lead.whats}</a></div>
-              <div><p className="text-white/40">Cidade</p><p className="text-graphite">{lead.cidade}</p></div>
-              <div><p className="text-white/40">Tipo</p><p className="text-graphite">{lead.tipo}</p></div>
-              <div><p className="text-white/40">Área</p><p className="text-graphite">{lead.area} m²</p></div>
-              <div><p className="text-white/40">Orçamento</p><p className="text-graphite">{formatCurrency(lead.orcamento)}</p></div>
-              <div><p className="text-white/40">Entrada</p><p className="text-graphite">{lead.criado}</p></div>
-              <div><p className="text-white/40">Origem</p><p className="text-graphite">{lead.origem}</p></div>
+              <div><p className="text-white/40">Cidade</p><p className="text-white">{lead.cidade}</p></div>
+              <div><p className="text-white/40">Tipo</p><p className="text-white">{lead.tipo}</p></div>
+              <div><p className="text-white/40">Área</p><p className="text-white">{lead.area} m²</p></div>
+              <div><p className="text-white/40">Orçamento</p><p className="text-white">{formatCurrency(lead.orcamento)}</p></div>
+              <div><p className="text-white/40">Entrada</p><p className="text-white">{lead.criado}</p></div>
+              <div><p className="text-white/40">Origem</p><p className="text-white">{lead.origem}</p></div>
             </div>
 
             <div className="bg-[#FAFAFA] border border-white/10 p-4 rounded-[2px] space-y-2">
@@ -155,7 +155,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                 <div key={idx} className="flex items-center justify-between text-[10px]">
                   <div className="flex items-center gap-2">
                     {item.achieved ? <Check size={10} className="text-green-600" /> : <X size={10} className="text-red" />}
-                    <span className={cn(item.achieved ? "text-graphite" : "text-white/40")}>{item.label}</span>
+                    <span className={cn(item.achieved ? "text-white" : "text-white/40")}>{item.label}</span>
                   </div>
                   <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-white/40")}>
                     {item.achieved ? `+${item.value}` : '+0'}
@@ -206,19 +206,19 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                     type="number" 
                     value={horasEstimadas} 
                     onChange={(e) => setHorasEstimadas(parseInt(e.target.value) || 0)}
-                    className="w-16 bg-transparent border-none p-0 text-xs font-bold text-graphite focus:ring-0"
+                    className="w-16 bg-transparent border-none p-0 text-xs font-bold text-white focus:ring-0"
                   />
                 </div>
                 <div>
                   <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Custo Real</p>
-                  <p className="text-xs font-bold text-graphite">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
+                  <p className="text-xs font-bold text-white">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Margem Real</p>
                 <p className={cn(
                   "text-sm font-bold",
-                  viability.status === 'prejuizo' ? "text-red-600" : "text-graphite"
+                  viability.status === 'prejuizo' ? "text-red-600" : "text-white"
                 )}>
                   {((viability as any).margemReal || 0).toFixed(0)}%
                 </p>
@@ -261,7 +261,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                     {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
                   </div>
                   <p className={cn(
-                    "text-graphite",
+                    "text-white",
                     log.tipo === 'N' && "italic text-white/40/80 flex items-center gap-2"
                   )}>
                     {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
