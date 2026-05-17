@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/types';
 import Sidebar from '@/components/Sidebar';
-// import MetricsBar from '@/components/MetricsBar';
+
 import KanbanColumn from '@/components/KanbanColumn';
 import LeadDetailPanel from '@/components/LeadDetailPanel';
 import { Button } from '@/components/ui/button';
