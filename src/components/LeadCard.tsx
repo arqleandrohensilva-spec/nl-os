@@ -60,7 +60,7 @@ const LeadCard = ({ lead, index, onClick }: LeadCardProps) => {
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group relative bg-white border border-white/10 p-5 cursor-pointer transition-all duration-500 hover:border-bronze hover:shadow-[0_25px_50px_-12px_rgba(139,115,85,0.15)]",
+        "group relative bg-white/[0.03] border border-white/10 p-5 cursor-pointer transition-all duration-500 hover:border-bronze hover:shadow-[0_25px_50px_-12px_rgba(139,115,85,0.15)]",
         "min-h-[230px] flex flex-col justify-between",
         lead.score >= 8 && "border-t-[4px] border-t-bronze",
         isDragging && "shadow-2xl ring-2 ring-bronze/30 scale-[1.05] rotate-2",

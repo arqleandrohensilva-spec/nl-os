@@ -1121,7 +1121,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             <div className="grid grid-cols-3 gap-6">
               {isAiSuggestionsLoading ? (
                 Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="h-24 bg-white border border-white/10 border-dashed rounded-[4px] animate-pulse" />
+                  <div key={i} className="h-24 bg-white/5 border border-white/10 border-dashed rounded-[4px] animate-pulse" />
                 ))
               ) : aiSuggestions.length > 0 ? (
                 aiSuggestions.map((s, i) => (

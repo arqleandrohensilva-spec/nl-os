@@ -694,7 +694,7 @@ const Index = () => {
                             <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue placeholder="Selecione a cidade" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-white/10">
+                            <SelectContent className="bg-[#1A1A1A] border border-white/10 text-white">
                               {config?.mercados?.map(m => (
                                 <SelectItem key={m} value={m}>{m}</SelectItem>
                               ))}

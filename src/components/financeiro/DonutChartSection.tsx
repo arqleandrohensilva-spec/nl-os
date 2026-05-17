@@ -32,7 +32,7 @@ const DonutChartSection: React.FC<DonutChartSectionProps> = ({ data, totalMonthl
   };
 
   return (
-    <div className="sticky top-24 h-fit flex flex-col items-center p-6 bg-white border border-white/10 rounded-[4px]">
+    <div className="sticky top-24 h-fit flex flex-col items-center p-6 bg-white/[0.03] border border-white/10 rounded-[4px]">
       <div className="relative w-[200px] h-[200px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
