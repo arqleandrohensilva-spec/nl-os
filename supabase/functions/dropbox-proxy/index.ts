@@ -155,6 +155,10 @@ serve(async (req) => {
       endpoint = 'https://api.dropboxapi.com/2/files/create_folder_v2';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path: folder || path, autorename: false });
+    } else if (action === 'create_folder_batch') {
+      endpoint = 'https://api.dropboxapi.com/2/files/create_folder_batch';
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ paths: bodyJson.paths, autorename: false, force_async: false });
     } else if (action === 'create_shared_link') {
       endpoint = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
       headers['Content-Type'] = 'application/json';
