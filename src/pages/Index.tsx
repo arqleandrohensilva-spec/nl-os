@@ -512,19 +512,39 @@ const Index = () => {
     }
   };
 
+  const calculateLeadScore = (lead: Lead) => {
+    let score = 0;
+    const daysSinceLastContact = lead.logs.length > 0 ? differenceInDays(new Date(), parseISO(lead.logs[0].data)) : 0;
+    
+    if (lead.temp === 'Quente') score += 2;
+    if (lead.temp === 'Morno') score += 1;
+    if (lead.stage === 'Fechado') score += 10;
+    if (lead.stage === 'Perdido') score += 0;
+    
+    return { score, daysSinceLastContact };
+  };
+
   const filteredLeads = leads.filter(l => {
-    const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase()) || 
+                          l.cidade.toLowerCase().includes(search.toLowerCase());
     const matchesType = filterType === 'Todos' || l.tipo === filterType;
     const matchesTemp = filterTemp.length === 0 || filterTemp.includes(l.temp);
+    const matchesResponsavel = filterResponsavel === 'Todos' || l.criado_por === filterResponsavel;
     
-    let matchesResponsavel = true;
-    if (filterResponsavel !== 'Todos') {
-      const isCreator = l.criado_por === filterResponsavel;
-      const isLogAuthor = l.logs.some(log => log.autor === filterResponsavel);
-      matchesResponsavel = isCreator || isLogAuthor;
+    // Smart Filters Logic
+    let matchesSmartFilter = true;
+    if (smartFilter === 'ghosting') {
+      const lastContact = l.logs.length > 0 ? new Date(l.logs[0].data) : new Date(l.criado);
+      const daysSinceLastContact = differenceInDays(new Date(), lastContact);
+      matchesSmartFilter = daysSinceLastContact > 3 && l.stage !== 'Fechado' && l.stage !== 'Perdido';
+    } else if (smartFilter === 'score8') {
+      const { score } = calculateLeadScore(l);
+      matchesSmartFilter = score >= 8;
+    } else if (smartFilter === 'high-ticket') {
+      matchesSmartFilter = l.orcamento >= 500000;
     }
-    
-    return matchesSearch && matchesType && matchesTemp && matchesResponsavel;
+
+    return matchesSearch && matchesType && matchesTemp && matchesResponsavel && matchesSmartFilter;
   });
 
   const exportToPDF = () => {
@@ -828,6 +848,45 @@ const Index = () => {
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
+              </div>
+              <div className="h-6 w-[1px] bg-white/10 mx-2" />
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
+                <button
+                  onClick={() => setSmartFilter('all')}
+                  className={cn(
+                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all",
+                    smartFilter === 'all' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  Todos
+                </button>
+                <button
+                  onClick={() => setSmartFilter('ghosting')}
+                  className={cn(
+                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
+                    smartFilter === 'ghosting' ? "bg-amber-600 text-white" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  Ghosting (+3d)
+                </button>
+                <button
+                  onClick={() => setSmartFilter('score8')}
+                  className={cn(
+                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
+                    smartFilter === 'score8' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  Score 8+
+                </button>
+                <button
+                  onClick={() => setSmartFilter('high-ticket')}
+                  className={cn(
+                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
+                    smartFilter === 'high-ticket' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
+                  )}
+                >
+                  Ticket Alto
+                </button>
               </div>
               <div className="h-6 w-[1px] bg-white/10 mx-2" />
               <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
