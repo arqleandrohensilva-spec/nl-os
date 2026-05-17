@@ -1048,7 +1048,7 @@ const Index = () => {
                     let color = "border-white/10";
                     
                     const isAtrasado = l.proxima_acao_data && isBefore(parseISO(l.proxima_acao_data), startOfDay(now));
-                    const isQuenteSemContato = l.temp === 'Quente' && differenceInDays(now, parseISO(l.logs[0]?.data || l.created_at)) > 7;
+                    const isQuenteSemContato = l.temp === 'Quente' && differenceInDays(now, parseISO(l.logs[0]?.data || l.criado)) > 7;
                     const isReuniaoProxima = l.stage === 'Reunião Agendada' && l.proxima_acao_data && 
                                             differenceInDays(parseISO(l.proxima_acao_data), now) <= 2 &&
                                             differenceInDays(parseISO(l.proxima_acao_data), now) >= 0;
