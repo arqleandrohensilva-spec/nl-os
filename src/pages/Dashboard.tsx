@@ -399,7 +399,7 @@ const Dashboard = () => {
           </AnimatePresence>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr,380px] gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.65fr,0.35fr] gap-16">
           {/* Column Left */}
           <div className="space-y-12">
             
