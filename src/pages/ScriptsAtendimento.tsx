@@ -153,13 +153,13 @@ CONTEXTO DA NL:
 
 PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
 
-LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
-ETAPA ATUAL: ${etapaAtualObjecao}
-
-OBJEÇÃO / SITUAÇÃO:
-${descricaoObjecao}
-
-Gere uma resposta no tom NL para essa situação específica.
+          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
+          ETAPA ATUAL: ${etapaAtualObjecao || 'Não especificada'}
+          
+          OBJEÇÃO / SITUAÇÃO:
+          ${descricaoObjecao}
+          
+          Gere uma resposta no tom NL para essa situação específica. ${!leadAtivo ? 'Como não há lead selecionado, gere um script genérico que possa ser adaptado.' : `Personalize a resposta para o lead ${leadAtivo.nome} e o tipo de projeto ${leadAtivo.tipo}.`}
 
 Retorne APENAS JSON válido:
 {
