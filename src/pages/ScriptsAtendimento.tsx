@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ interface Lead {
 }
 
 const ScriptsAtendimento = () => {
+  const location = useLocation();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedLeadId, setSelectedLeadId] = useState<string>('');
   const [leadAtivo, setLeadAtivo] = useState<Lead | null>(null);
@@ -71,6 +73,12 @@ const ScriptsAtendimento = () => {
     };
     fetchLeads();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.leadId && leads.length > 0) {
+      handleLeadChange(location.state.leadId);
+    }
+  }, [location.state, leads]);
 
   const handleLeadChange = (id: string) => {
     setSelectedLeadId(id);
