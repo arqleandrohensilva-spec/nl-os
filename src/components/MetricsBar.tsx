@@ -100,7 +100,7 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
   };
 
   return (
-    <div className="flex flex-col bg-[#1A1816] border-b border-white/10">
+    <div className="flex flex-col bg-[#0A0A0A] border-b border-white/10">
       <div className="flex border-b border-white/10">
         <div className="flex-1 px-10 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">

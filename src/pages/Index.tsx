@@ -584,31 +584,31 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-10 pt-10 pb-0">
-          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
+          <div className="bg-white/[0.03] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS ATIVOS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {leads.filter(l => l.stage !== 'Fechado' && l.stage !== 'Perdido').length}
             </span>
           </div>
-          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
+          <div className="bg-white/[0.03] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO MÉDIA</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {leads.length > 0 ? `${Math.round((leads.filter(l => l.stage === 'Fechado').length / leads.length) * 100)}%` : '0%'}
             </span>
           </div>
-          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1">
+          <div className="bg-white/[0.03] p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">FOLLOW-UPS HOJE</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {leads.filter(l => l.stage === 'Proposta Enviada').length}
             </span>
           </div>
-          <div className="bg-[#242220] p-6 border border-white/10 flex flex-col gap-1 relative overflow-hidden group">
+          <div className="bg-white/[0.03] p-6 border border-white/10 flex flex-col gap-1 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
               <TrendingUp size={12} className="text-bronze" />
             </div>
@@ -623,7 +623,7 @@ const Index = () => {
         </div>
 
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#1A1816] z-10">
+        <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
           <div className="px-10 py-6 border-b border-white/10 flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-white tracking-tight leading-none uppercase">Pipeline de Leads</h1>
@@ -637,14 +637,14 @@ const Index = () => {
                   placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#1A1816] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
+                  className="w-72 h-10 pl-10 bg-[#0A0A0A] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
                 />
               </div>
               <div className="h-8 w-[1px] bg-white/10" />
               <div className="flex items-center gap-3">
                 <button 
                   onClick={exportToPDF}
-                  className="p-2 text-muted hover:text-bronze transition-colors"
+                  className="p-2 text-white/40 hover:text-bronze transition-colors"
                   title="Exportar Pipeline"
                 >
                   <Download size={18} />
@@ -665,36 +665,36 @@ const Index = () => {
                     <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto scrollbar-custom">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Nome do Cliente</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Nome do Cliente</label>
                           <Input 
                             value={newLead.nome} 
                             onChange={(e) => setNewLead({ ...newLead, nome: e.target.value })}
                             placeholder="Ex: João Silva"
-                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">WhatsApp</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">WhatsApp</label>
                           <Input 
                             value={newLead.whats} 
                             onChange={(e) => setNewLead({ ...newLead, whats: e.target.value })}
                             placeholder="(00) 00000-0000"
-                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Cidade</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Cidade</label>
                           <Select 
                             value={newLead.cidade} 
                             onValueChange={(val) => setNewLead({ ...newLead, cidade: val })}
                           >
-                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                            <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue placeholder="Selecione a cidade" />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-beige">
+                            <SelectContent className="bg-white border border-white/10">
                               {config?.mercados?.map(m => (
                                 <SelectItem key={m} value={m}>{m}</SelectItem>
                               ))}
@@ -703,15 +703,15 @@ const Index = () => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Tipo de Projeto</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Tipo de Projeto</label>
                           <Select 
                             value={newLead.tipo} 
                             onValueChange={(val: TipoProjeto) => setNewLead({ ...newLead, tipo: val })}
                           >
-                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                            <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-beige">
+                            <SelectContent className="bg-white border border-white/10">
                               <SelectItem value="Arq+Int">Arquitetura + Interiores</SelectItem>
                               <SelectItem value="Interiores">Somente Interiores</SelectItem>
                               <SelectItem value="Comercial">Comercial</SelectItem>
@@ -722,38 +722,38 @@ const Index = () => {
 
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Área Estimada (m²)</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Área Estimada (m²)</label>
                           <Input 
                             type="number"
                             value={newLead.area || ''} 
                             onChange={(e) => setNewLead({ ...newLead, area: Number(e.target.value) })}
                             placeholder="0"
-                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Orçamento (R$)</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Orçamento (R$)</label>
                           <Input 
                             type="number"
                             value={newLead.orcamento || ''} 
                             onChange={(e) => setNewLead({ ...newLead, orcamento: Number(e.target.value) })}
                             placeholder="0"
-                            className="h-10 border-beige text-xs font-dm-mono focus:border-bronze"
+                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Origem</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Origem</label>
                           <Select 
                             value={newLead.origem} 
                             onValueChange={(val: Origem) => setNewLead({ ...newLead, origem: val })}
                           >
-                            <SelectTrigger className="h-10 border-beige text-xs font-dm-mono focus:border-bronze">
+                            <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-beige">
+                            <SelectContent className="bg-white border border-white/10">
                               <SelectItem value="Instagram">Instagram</SelectItem>
                               <SelectItem value="Indicação">Indicação</SelectItem>
                               <SelectItem value="Site">Site</SelectItem>
@@ -763,7 +763,7 @@ const Index = () => {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Temperatura</label>
+                          <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Temperatura</label>
                           <div className="flex gap-2">
                             {(['Quente', 'Morno', 'Frio'] as Temp[]).map(t => (
                               <button
@@ -773,7 +773,7 @@ const Index = () => {
                                   "flex-1 h-10 border text-[9px] font-bold uppercase tracking-widest rounded-[2px] transition-all",
                                   newLead.temp === t 
                                     ? (t === 'Quente' ? "bg-red text-white border-red" : t === 'Morno' ? "bg-amber text-white border-amber" : "bg-graphite text-white border-graphite")
-                                    : "border-beige text-muted hover:border-bronze"
+                                    : "border-white/10 text-white/40 hover:border-bronze"
                                 )}
                               >
                                 {t}
@@ -784,11 +784,11 @@ const Index = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[10px] font-dm-mono text-muted uppercase tracking-widest">Observações Iniciais</label>
+                        <label className="text-[10px] font-dm-mono text-white/40 uppercase tracking-widest">Observações Iniciais</label>
                         <textarea 
                           value={newLead.obs}
                           onChange={(e) => setNewLead({ ...newLead, obs: e.target.value })}
-                          className="w-full min-h-[100px] p-4 border border-beige text-xs font-dm-mono focus:border-bronze outline-none rounded-[2px] resize-none"
+                          className="w-full min-h-[100px] p-4 border border-white/10 text-xs font-dm-mono focus:border-bronze outline-none rounded-[2px] resize-none"
                           placeholder="Notas sobre o primeiro contato..."
                         />
                       </div>
@@ -809,32 +809,32 @@ const Index = () => {
           <MetricsBar leads={leads} />
           <OriginBreakdown leads={leads} />
 
-          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#1A1816] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
+          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
               <button 
                 onClick={showMockToast}
-                className="p-2 border border-beige rounded-[2px] text-muted hover:text-bronze transition-colors"
+                className="p-2 border border-white/10 rounded-[2px] text-white/40 hover:text-bronze transition-colors"
                 title="Simular proposta aberta"
               >
                 <Settings2 size={14} />
               </button>
-              <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
+              <div className="flex items-center gap-1 bg-white/5/20 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
-                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-white")}>{type}</button>
+                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
               </div>
             </div>
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Responsável:</span>
-                <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
+                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Responsável:</span>
+                <div className="flex items-center gap-1 bg-white/5/20 p-1 rounded-[2px]">
                   {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
                     <button 
                       key={resp} 
                       onClick={() => setFilterResponsavel(resp)} 
                       className={cn(
                         "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
-                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-white"
+                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-white/40 hover:text-white"
                       )}
                     >
                       {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
@@ -844,20 +844,20 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Prioridade:</span>
+                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
-                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-graphite bg-bronze/5" : "border-beige text-muted hover:border-muted-foreground")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-muted")} />{temp}</button>
+                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-graphite bg-bronze/5" : "border-white/10 text-white/40 hover:border-muted-foreground")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-muted")} />{temp}</button>
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-muted hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
+              <div className="flex items-center gap-2 text-white/40 hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
             </div>
           </div>
         </div>
 
         {/* Kanban Board */}
-        <div className="flex-1 bg-[#1A1816] overflow-y-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#0A0A0A] overflow-y-auto p-6 pt-2 scrollbar-custom">
           <DndContext 
             sensors={sensors}
             collisionDetection={closestCorners}

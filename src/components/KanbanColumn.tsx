@@ -37,7 +37,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
   return (
     <div className={cn(
       "w-full flex-shrink-1 flex flex-col h-full bg-[#F5F5F5]/50 border transition-all duration-200 rounded-[2px]",
-      isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-beige",
+      isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-white/10",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>
       {/* Header */}
@@ -55,14 +55,14 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
               {stage}
             </h2>
           </div>
-          <button className="text-muted hover:text-white transition-colors">
+          <button className="text-white/40 hover:text-white transition-colors">
             <MoreHorizontal size={14} />
           </button>
         </div>
         
         <div className="flex items-baseline gap-2">
           <span className="text-[18px] font-cormorant text-graphite">{leads.length}</span>
-          <span className="text-[8px] font-bold text-muted uppercase tracking-widest">Leads</span>
+          <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Leads</span>
           <div className="ml-auto flex items-center gap-1.5">
             <span className={cn(
               "text-[11px] font-bold text-graphite",
@@ -75,7 +75,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
 
         {/* Linha de valor mais espessa para colunas importantes */}
         <div className={cn(
-          "absolute bottom-0 left-6 right-6 h-[1px] bg-beige",
+          "absolute bottom-0 left-6 right-6 h-[1px] bg-white/5",
           isHighValue && "h-[2px] bg-bronze/40"
         )} />
       </div>
@@ -99,7 +99,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
               />
             ))
           ) : (
-            <div className="h-32 border border-dashed border-beige flex flex-col items-center justify-center opacity-40">
+            <div className="h-32 border border-dashed border-white/10 flex flex-col items-center justify-center opacity-40">
               <div className="w-8 h-[1px] bg-bronze/50 mb-3" />
               <span className="text-[8px] font-bold uppercase tracking-[0.3em]">Nenhum lead aqui</span>
             </div>

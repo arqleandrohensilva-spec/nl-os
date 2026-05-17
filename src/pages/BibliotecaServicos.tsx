@@ -157,14 +157,14 @@ const BibliotecaServicos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1816] text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white">Biblioteca de Serviços</h1>
-              <p className="text-muted-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Catálogo de Serviços e Precificação</p>
+              <p className="text-white/40-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Catálogo de Serviços e Precificação</p>
             </div>
             <Button 
               onClick={() => {
@@ -186,12 +186,12 @@ const BibliotecaServicos = () => {
             ].map((m, i) => (
               <div 
                 key={i}
-                className="bg-[#242220] p-6 rounded-[2px] border border-white/10 shadow-sm relative overflow-hidden group"
+                className="bg-white/[0.03] p-6 rounded-[2px] border border-white/10 shadow-sm relative overflow-hidden group"
               >
                 <div className="relative z-10">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mb-1 font-bold">{m.label}</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-white/40-foreground mb-1 font-bold">{m.label}</p>
                   <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1 uppercase tracking-wider">{m.sub}</p>
+                  <p className="text-[10px] text-white/40-foreground/60 mt-1 uppercase tracking-wider">{m.sub}</p>
                 </div>
                 <m.icon size={40} className="absolute right-[-10px] bottom-[-10px] text-bronze/5 group-hover:text-bronze/10 transition-colors" />
               </div>
@@ -202,13 +202,13 @@ const BibliotecaServicos = () => {
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Loader2 className="w-10 h-10 text-bronze animate-spin mb-4" />
-            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">Carregando biblioteca...</p>
+            <p className="text-[11px] uppercase tracking-widest text-white/40-foreground font-medium">Carregando biblioteca...</p>
           </div>
         ) : (
           <div className="grid grid-cols-12 gap-10">
             {/* Main Content */}
             <div className="col-span-8 space-y-8">
-              <div className="flex items-center justify-between bg-[#242220] p-4 border border-white/10 rounded-[2px] shadow-sm">
+              <div className="flex items-center justify-between bg-white/[0.03] p-4 border border-white/10 rounded-[2px] shadow-sm">
                 <div className="flex gap-4">
                   {['all', 'por_projeto', 'por_m2', 'por_hora'].map(type => (
                     <button 
@@ -218,7 +218,7 @@ const BibliotecaServicos = () => {
                         "text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-[2px] transition-all",
                         filterType === type 
                           ? "bg-[#1A1A1A] text-white" 
-                          : "text-muted-foreground hover:bg-[#F5F2EF] hover:text-[#1A1A1A]"
+                          : "text-white/40-foreground hover:bg-[#F5F2EF] hover:text-[#1A1A1A]"
                       )}
                     >
                       {type === 'all' ? 'Tudo' : type.replace('por_', 'Por ')}
@@ -226,12 +226,12 @@ const BibliotecaServicos = () => {
                   ))}
                 </div>
                 <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40-foreground" />
                   <Input 
                     placeholder="BUSCAR SERVIÇO..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#1A1816]"
+                    className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0A0A0A]"
                   />
                 </div>
               </div>
@@ -245,7 +245,7 @@ const BibliotecaServicos = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="bg-[#242220] p-8 border border-white/10 rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group"
+                      className="bg-white/[0.03] p-8 border border-white/10 rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group"
                     >
                       <div className="flex items-start justify-between gap-8">
                         <div className="flex-1">
@@ -253,7 +253,7 @@ const BibliotecaServicos = () => {
                             <span className="text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 bg-bronze/10 text-bronze rounded-[1px]">
                               {s.tipo.replace('_', ' ')}
                             </span>
-                            <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-muted-foreground uppercase">
+                            <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-widest text-white/40-foreground uppercase">
                               <Clock size={12} className="text-bronze/40" />
                               {(s.nome === 'Acompanhamento de Obra' || s.nome === 'EVF — Viabilidade Financeira' || s.horas_estimadas === 0) ? 'Variável' : `${s.horas_estimadas}h estimadas`}
                             </div>
@@ -263,18 +263,18 @@ const BibliotecaServicos = () => {
                             {s.nome}
                           </h3>
                           
-                          <p className="text-[12px] text-muted-foreground leading-relaxed max-w-xl">
+                          <p className="text-[12px] text-white/40-foreground leading-relaxed max-w-xl">
                             {s.descricao}
                           </p>
                         </div>
 
                         <div className="text-right flex flex-col items-end justify-between min-h-[100px]">
                           <div>
-                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Valor sugerido</p>
+                            <p className="text-[9px] uppercase tracking-widest text-white/40-foreground font-bold mb-1">Valor sugerido</p>
                             <h4 className="text-2xl font-bold text-white">
                               R$ {Math.round(calcularValor(s)).toLocaleString()}
-                              {s.tipo === 'por_m2' && <span className="text-xs font-normal text-muted-foreground ml-1">/m²</span>}
-                              {s.tipo === 'por_hora' && <span className="text-xs font-normal text-muted-foreground ml-1">/h</span>}
+                              {s.tipo === 'por_m2' && <span className="text-xs font-normal text-white/40-foreground ml-1">/m²</span>}
+                              {s.tipo === 'por_hora' && <span className="text-xs font-normal text-white/40-foreground ml-1">/h</span>}
                             </h4>
                           </div>
 
@@ -286,7 +286,7 @@ const BibliotecaServicos = () => {
                                 setEditingServico(s);
                                 setIsModalOpen(true);
                               }}
-                              className="h-8 text-[9px] uppercase font-bold tracking-widest text-muted-foreground hover:text-bronze hover:bg-bronze/5"
+                              className="h-8 text-[9px] uppercase font-bold tracking-widest text-white/40-foreground hover:text-bronze hover:bg-bronze/5"
                             >
                               <Pencil size={12} className="mr-2" />
                               Editar
@@ -368,12 +368,12 @@ const BibliotecaServicos = () => {
                   </div>
                 </div>
 
-                <div className="p-6 border border-white/10 rounded-[2px] bg-[#242220]">
+                <div className="p-6 border border-white/10 rounded-[2px] bg-white/[0.03]">
                   <div className="flex items-center gap-2 mb-3 text-bronze">
                     <Info size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest">Aviso</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed uppercase tracking-wider font-medium">
+                  <p className="text-[10px] text-white/40-foreground leading-relaxed uppercase tracking-wider font-medium">
                     Os valores sugeridos são calculados com base no custo/hora e margem de lucro definidos na <span className="text-bronze font-bold">Base Financeira</span>.
                   </p>
                 </div>
@@ -391,14 +391,14 @@ const BibliotecaServicos = () => {
               <h2 className="text-2xl font-bold mb-1">
                 {editingServico?.id ? 'Editar Serviço' : 'Novo Serviço'}
               </h2>
-              <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-bold">
+              <p className="text-[11px] uppercase tracking-widest text-white/40-foreground font-bold">
                 Cadastre ou atualize um item do seu catálogo
               </p>
             </header>
             
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Nome do Serviço</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40-foreground font-bold block">Nome do Serviço</label>
                 <Input 
                   value={editingServico?.nome || ''} 
                   onChange={(e) => setEditingServico({...editingServico, nome: e.target.value})}
@@ -408,7 +408,7 @@ const BibliotecaServicos = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Descrição / Escopo</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40-foreground font-bold block">Descrição / Escopo</label>
                 <textarea 
                   value={editingServico?.descricao || ''}
                   onChange={(e) => setEditingServico({...editingServico, descricao: e.target.value})}
@@ -419,7 +419,7 @@ const BibliotecaServicos = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">Tipo de Cobrança</label>
+                  <label className="text-[10px] uppercase tracking-widest text-white/40-foreground font-bold block">Tipo de Cobrança</label>
                   <Select 
                     value={editingServico?.tipo} 
                     onValueChange={(v: any) => setEditingServico({...editingServico, tipo: v})}
@@ -436,7 +436,7 @@ const BibliotecaServicos = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold block">
+                  <label className="text-[10px] uppercase tracking-widest text-white/40-foreground font-bold block">
                     {editingServico?.tipo === 'por_hora' ? 'Horas Base' : 'Horas Estimadas'}
                   </label>
                   <Input 

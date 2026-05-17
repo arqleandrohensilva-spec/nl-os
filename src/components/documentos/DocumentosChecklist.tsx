@@ -342,7 +342,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
         </div>
       </div>
 
-      <div className="bg-[#242220] border border-white/10 p-8 shadow-2xl">
+      <div className="bg-white/[0.03] border border-white/10 p-8 shadow-2xl">
         <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-4">
           <FileText className="text-bronze" size={20} />
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-white">DOCUMENTOS NECESSÁRIOS — {projeto.nome}</h2>

@@ -52,13 +52,13 @@ const ResetPassword = () => {
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <div className="w-full max-w-[320px] flex flex-col items-center">
         <h1 className="text-[56px] font-cormorant leading-tight text-graphite mb-1">NL OS</h1>
-        <p className="text-[10px] font-medium text-muted uppercase tracking-[0.2em] mb-6">
+        <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em] mb-6">
           Redefinir Senha
         </p>
         <div className="w-8 h-[1px] bg-bronze/40 mb-10" />
 
         {!ready ? (
-          <p className="text-[10px] uppercase tracking-widest text-muted">Validando link...</p>
+          <p className="text-[10px] uppercase tracking-widest text-white/40">Validando link...</p>
         ) : (
           <form onSubmit={handleSubmit} className="w-full space-y-4">
             <div className="relative">
@@ -67,12 +67,12 @@ const ResetPassword = () => {
                 placeholder="NOVA SENHA"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 border-beige focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider pr-10"
+                className="h-11 border-white/10 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShow((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
               >
                 {show ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
@@ -82,7 +82,7 @@ const ResetPassword = () => {
               placeholder="CONFIRMAR SENHA"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="h-11 border-beige focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider"
+              className="h-11 border-white/10 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider"
             />
             <Button
               type="submit"

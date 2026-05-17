@@ -153,7 +153,7 @@ const BriefingPublic = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="animate-pulse text-bronze uppercase tracking-[0.4em] text-xs font-bold">Carregando...</div>
       </div>
     );
@@ -161,8 +161,8 @@ const BriefingPublic = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#1A1816] flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-[#242220] border border-white/10 p-12 text-center space-y-6">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white/[0.03] border border-white/10 p-12 text-center space-y-6">
           <div className="w-16 h-16 bg-bronze/10 border border-bronze/30 rounded-full flex items-center justify-center mx-auto text-bronze mb-4">
             <CheckCircle2 size={32} />
           </div>
@@ -181,7 +181,7 @@ const BriefingPublic = () => {
   const progress = (step / 5) * 100;
 
   return (
-    <div className="min-h-screen bg-[#1A1816] text-white p-6 md:p-12">
+    <div className="min-h-screen bg-[#0A0A0A] text-white p-6 md:p-12">
       <div className="max-w-3xl mx-auto">
         <header className="text-center mb-12">
           <div className="mb-6 flex justify-center">
@@ -200,7 +200,7 @@ const BriefingPublic = () => {
           </div>
         </header>
 
-        <form onSubmit={handleSubmit} className="bg-[#242220] border border-white/10 p-8 md:p-12 shadow-2xl space-y-12">
+        <form onSubmit={handleSubmit} className="bg-white/[0.03] border border-white/10 p-8 md:p-12 shadow-2xl space-y-12">
           
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
@@ -301,9 +301,9 @@ const BriefingPublic = () => {
                       onChange={handleChange}
                       className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
                     >
-                      <option value="Residencial" className="bg-[#1A1816]">Residencial</option>
-                      <option value="Comercial" className="bg-[#1A1816]">Comercial</option>
-                      <option value="Interiores" className="bg-[#1A1816]">Interiores (Reforma)</option>
+                      <option value="Residencial" className="bg-[#0A0A0A]">Residencial</option>
+                      <option value="Comercial" className="bg-[#0A0A0A]">Comercial</option>
+                      <option value="Interiores" className="bg-[#0A0A0A]">Interiores (Reforma)</option>
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -332,9 +332,9 @@ const BriefingPublic = () => {
                       onChange={handleChange}
                       className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
                     >
-                      <option value="Plano" className="bg-[#1A1816]">Plano</option>
-                      <option value="Aclive" className="bg-[#1A1816]">Aclive (Sobe)</option>
-                      <option value="Declive" className="bg-[#1A1816]">Declive (Desce)</option>
+                      <option value="Plano" className="bg-[#0A0A0A]">Plano</option>
+                      <option value="Aclive" className="bg-[#0A0A0A]">Aclive (Sobe)</option>
+                      <option value="Declive" className="bg-[#0A0A0A]">Declive (Desce)</option>
                     </select>
                   </div>
                 </div>
@@ -381,10 +381,10 @@ const BriefingPublic = () => {
                     onChange={handleChange}
                     className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
                   >
-                    <option value="Raramente" className="bg-[#1A1816]">Raramente</option>
-                    <option value="Mensalmente" className="bg-[#1A1816]">Mensalmente</option>
-                    <option value="Semanalmente" className="bg-[#1A1816]">Semanalmente</option>
-                    <option value="Frequentemente" className="bg-[#1A1816]">Frequentemente</option>
+                    <option value="Raramente" className="bg-[#0A0A0A]">Raramente</option>
+                    <option value="Mensalmente" className="bg-[#0A0A0A]">Mensalmente</option>
+                    <option value="Semanalmente" className="bg-[#0A0A0A]">Semanalmente</option>
+                    <option value="Frequentemente" className="bg-[#0A0A0A]">Frequentemente</option>
                   </select>
                 </div>
                 <div className="space-y-2">
