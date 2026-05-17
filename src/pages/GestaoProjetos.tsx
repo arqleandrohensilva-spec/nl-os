@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; import { Monitor } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { 
