@@ -373,10 +373,11 @@ const Index = () => {
     ));
 
     try {
-      await Promise.all([
-        supabase.from('leads').update(updateData).eq('id', leadId),
-        supabase.from('lead_logs').insert({ ...newLog, lead_id: leadId })
-      ]);
+      const { error: updateError } = await supabase.from('leads').update(updateData).eq('id', leadId);
+      if (updateError) throw updateError;
+      
+      const { error: logError } = await supabase.from('lead_logs').insert({ ...newLog, lead_id: leadId });
+      if (logError) throw logError;
       
       toast.success(`Lead movido para ${newStage}`);
 
@@ -403,6 +404,33 @@ const Index = () => {
     } catch (err) {
       console.error('Error deleting lead:', err);
       toast.error('Erro ao excluir lead');
+    }
+  };
+
+  const handleQuickNote = async (leadId: string, note: string) => {
+    const log = {
+      tipo: 'N' as const,
+      nota: note,
+      data: new Date().toISOString(),
+      autor: user || 'Sistema'
+    };
+    
+    try {
+      const { data, error } = await supabase
+        .from('lead_logs')
+        .insert({ ...log, lead_id: leadId })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setLeads(prev => prev.map(l => 
+        l.id === leadId ? { ...l, logs: [data as any, ...l.logs] } : l
+      ));
+      toast.success("Interação registrada");
+    } catch (err) {
+      console.error('Error adding quick note:', err);
+      toast.error('Erro ao registrar interação');
     }
   };
 
