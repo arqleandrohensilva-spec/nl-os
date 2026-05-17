@@ -1247,9 +1247,9 @@ Retorne APENAS JSON válido:
                   {reviewResult.tom.problemas.length > 0 ? (
                     <div className="space-y-3">
                       {reviewResult.tom.problemas.map((prob: any, i: number) => (
-                        <div key={i} className="bg-white border border-[#F0EDEA] p-4 rounded-[2px] space-y-2">
+                        <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-none space-y-2">
                           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
-                          <p className="text-xs italic text-white/40 border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
+                          <p className="text-xs italic text-white/40 border-l-2 border-red-200/20 pl-3">"{prob.trecho}"</p>
                           <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
                           <p className="text-xs font-medium text-white">{prob.sugestao}</p>
                         </div>
@@ -1261,7 +1261,7 @@ Retorne APENAS JSON válido:
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <Ban size={14} className="text-bronze" />
                       Palavras Proibidas
