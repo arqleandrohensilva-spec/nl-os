@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
@@ -34,7 +35,9 @@ const App = () => (
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/pipeline" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/financeiro/base" element={<ProtectedRoute><BaseFinanceira /></ProtectedRoute>} />
         <Route path="/projetos/horas" element={<ProtectedRoute><ControleHoras /></ProtectedRoute>} />
         <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
