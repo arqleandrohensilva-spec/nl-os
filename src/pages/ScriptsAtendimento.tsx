@@ -24,6 +24,8 @@ const ScriptsAtendimento = () => {
   const [leadAtivo, setLeadAtivo] = useState<Lead | null>(null);
   const [mensagemCliente, setMensagemCliente] = useState('');
   const [mensagemDetector, setMensagemDetector] = useState('');
+  const [descricaoObjecao, setDescricaoObjecao] = useState('');
+  const [etapaAtualObjecao, setEtapaAtualObjecao] = useState('');
   const [sugestaoIA, setSugestaoIA] = useState<{ resposta: string; tom: string; proximo_passo: string } | null>(null);
   const [resultadoDetector, setResultadoDetector] = useState<{
     etapa_numero: number;
@@ -32,8 +34,13 @@ const ScriptsAtendimento = () => {
     motivo: string;
     script_recomendado: string;
   } | null>(null);
+  const [resultadoObjecao, setResultadoObjecao] = useState<{
+    script: string;
+    estrategia: string;
+  } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
+  const [isGeneratingObjecao, setIsGeneratingObjecao] = useState(false);
   const [openEtapa, setOpenEtapa] = useState<string | null>(null);
 
   useEffect(() => {
