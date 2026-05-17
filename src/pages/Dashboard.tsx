@@ -369,6 +369,57 @@ const Dashboard = () => {
     generateAIContent();
   }, [leads.length, projetos.length]);
 
+  const forecast = React.useMemo(() => {
+    const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido');
+    const today = new Date();
+    
+    const leadForecasts = activeLeads.map(lead => {
+      let prob = 0;
+      const stageLower = (lead.stage || '').toLowerCase();
+      
+      if (stageLower === 'novo lead') prob = 10;
+      else if (stageLower === 'reunião agendada') prob = 25;
+      else if (stageLower === 'briefing preenchido') prob = 40;
+      else if (stageLower === 'proposta enviada') prob = 60;
+      else if (stageLower === 'negociação') prob = 80;
+
+      // Score adjustment
+      const score = Number(lead.score || 0);
+      if (score >= 8) prob += 15;
+      else if (score < 5) prob -= 15;
+
+      // Time adjustment
+      const etapaDesde = lead.etapa_desde ? new Date(lead.etapa_desde) : new Date(lead.created_at);
+      const diffDays = Math.floor((today.getTime() - etapaDesde.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays > 20) prob -= 20;
+      else if (diffDays > 10) prob -= 10;
+
+      // Clamp probability
+      prob = Math.max(0, Math.min(100, prob));
+
+      return {
+        ...lead,
+        probabilidade: prob,
+        valor: Number(lead.orcamento || 0),
+        diffDays
+      };
+    });
+
+    const totalInGame = leadForecasts.reduce((acc, curr) => acc + curr.valor, 0);
+    const probableTotal = leadForecasts.filter(l => l.probabilidade >= 60).reduce((acc, curr) => acc + curr.valor, 0);
+    const weightedAverage = leadForecasts.length > 0 
+      ? leadForecasts.reduce((acc, curr) => acc + (curr.probabilidade * curr.valor), 0) / (totalInGame || 1)
+      : 0;
+
+    return {
+      items: leadForecasts,
+      totalInGame,
+      probableTotal,
+      weightedAverage,
+      meta: 2000000 // Meta: R$ 2M
+    };
+  }, [leads]);
+
   return (
     <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
       <Sidebar user={getDisplayName()} />
