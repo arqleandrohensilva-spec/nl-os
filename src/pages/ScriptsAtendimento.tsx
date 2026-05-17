@@ -730,7 +730,7 @@ Retorne APENAS JSON válido:
                 {scriptsContent.map((etapa) => (
                   <button
                     key={etapa.id}
-                    onClick={() => setSelectedEtapaId(etapa.id)}
+                    onClick={() => setSelectedEtapaId(selectedEtapaId === etapa.id ? null : etapa.id)}
                     className={cn(
                       "w-full p-3 flex items-center gap-4 border transition-all duration-200 text-left",
                       selectedEtapaId === etapa.id 
