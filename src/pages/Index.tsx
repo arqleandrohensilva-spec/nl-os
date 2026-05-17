@@ -1317,10 +1317,10 @@ const Index = () => {
                       }
 
                       setShowProjectConversion(false);
-                      fetchLeads(); // Refresh list
-                    } catch (err) {
-                      console.error("Error creating project:", err);
-                      toast.error("Erro ao criar projeto", { id: "create-project" });
+                      fetchLeads();
+                    } catch (err: any) {
+                      console.error("Erro detalhado na conversão:", err);
+                      toast.error(`Erro ao converter lead em projeto: ${err.message || "Erro desconhecido"}`, { id: "create-project" });
                     }
                   }}
                   className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest"
