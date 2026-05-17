@@ -98,7 +98,51 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
       if (error) throw error;
 
-      toast.success("Lead convertido em projeto com sucesso!");
+      // Criar pastas no Dropbox
+      const nomeCliente = lead.nome;
+      const tipo = lead.tipo || 'Projeto';
+      const pastaBase = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipo}`;
+
+      const subpastas = [
+        '01 - Briefing',
+        '02 - Conceito',
+        '03 - Estudo Preliminar', 
+        '04 - Projeto Executivo',
+        '05 - Detalhamento',
+        '06 - Obra',
+        '07 - Marketing',
+        '08 - Contrato'
+      ];
+
+      try {
+        // Criar pasta principal
+        await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', path: pastaBase }
+        });
+
+        // Criar subpastas
+        for (const subpasta of subpastas) {
+          await supabase.functions.invoke('dropbox-proxy', {
+            body: { action: 'create_folder', path: `${pastaBase}/${subpasta}` }
+          });
+        }
+
+        // Gerar token_cliente e salvar dropbox_folder
+        const tokenCliente = crypto.randomUUID();
+        await supabase
+          .from('projetos')
+          .update({ 
+            dropbox_folder: `${nomeCliente} - ${tipo}`,
+            token_cliente: tokenCliente
+          })
+          .eq('id', newProject.id);
+
+        toast.success('Projeto criado e pastas no Dropbox configuradas.');
+      } catch (dropboxError) {
+        console.error('Erro ao criar pastas no Dropbox:', dropboxError);
+        toast.warning('Projeto criado. Pastas no Dropbox não foram criadas — sincronize manualmente.');
+      }
+
       navigate(`/projetos/detalhe/${newProject.id}`);
     } catch (error) {
       console.error('Error converting lead to project:', error);
