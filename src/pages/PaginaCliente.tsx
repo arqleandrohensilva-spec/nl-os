@@ -268,14 +268,14 @@ export default function PaginaCliente() {
         <section className="space-y-8">
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">JORNADA DO PROJETO</p>
           <div className="relative overflow-x-auto pb-4 scrollbar-hide">
-            <div className="flex min-w-[800px] justify-between items-start">
+            <div className="flex min-w-[600px] justify-between items-start pr-10">
               {ETAPAS_JORNADA.map((step, idx) => {
                 const etapaData = etapas.find(e => e.etapa?.toUpperCase() === step);
                 const isCurrent = projeto.etapa_atual?.toUpperCase() === step;
                 const isApproved = etapaData?.status === 'Aprovado';
                 
                 return (
-                  <div key={step} className="flex flex-col items-center text-center space-y-4 w-1/6 relative">
+                  <div key={step} className="flex flex-col items-center text-center space-y-4 flex-1 relative">
                     {idx < ETAPAS_JORNADA.length - 1 && (
                       <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/10" />
                     )}
@@ -410,7 +410,7 @@ export default function PaginaCliente() {
               <Input 
                 value={nomeMensagem}
                 onChange={e => setNomeMensagem(e.target.value)}
-                className="bg-transparent border-white/10 focus:border-bronze/50 rounded-none h-12 text-sm"
+                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -419,7 +419,7 @@ export default function PaginaCliente() {
                 value={textoMensagem}
                 onChange={e => setTextoMensagem(e.target.value)}
                 placeholder="Dúvida, observação ou pedido de ajuste..."
-                className="bg-transparent border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-sm resize-none"
+                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
               />
             </div>
             <Button 
@@ -455,7 +455,7 @@ export default function PaginaCliente() {
                 autoFocus
                 value={nomeAprovador}
                 onChange={e => setNomeAprovador(e.target.value)}
-                className="bg-transparent border-white/10 focus:border-bronze/50 rounded-none h-12 text-sm"
+                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
             <p className="text-[10px] text-white/20 leading-relaxed italic">
@@ -492,7 +492,7 @@ export default function PaginaCliente() {
               value={textoAjuste}
               onChange={e => setTextoAjuste(e.target.value)}
               placeholder="Descreva detalhadamente..."
-              className="bg-transparent border-white/10 focus:border-bronze/50 rounded-none min-h-[150px] text-sm resize-none"
+              className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none min-h-[150px] text-white text-sm resize-none"
             />
           </div>
           <DialogFooter className="gap-4 sm:justify-start">
