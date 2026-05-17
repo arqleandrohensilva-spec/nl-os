@@ -27,8 +27,8 @@ const ETAPAS_JORNADA = [
 ];
 
 export default function PaginaCliente() {
-  const { token, slug } = useParams();
-  const param = token || slug;
+  const { id } = useParams();
+  const param = id;
   const [projeto, setProjeto] = useState<any>(null);
   const [etapas, setEtapas] = useState<any[]>([]);
   const [arquivos, setArquivos] = useState<any[]>([]);

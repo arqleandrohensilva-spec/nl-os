@@ -41,8 +41,7 @@ const App = () => (
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
         <Route path="/briefing/:token" element={<BriefingPublic />} />
         <Route path="/satisfacao/:token" element={<PesquisaSatisfacao />} />
-        <Route path="/cliente/:token" element={<PaginaCliente />} />
-        <Route path="/cliente/slug/:slug" element={<PaginaCliente />} />
+        <Route path="/cliente/:id" element={<PaginaCliente />} />
         <Route path="/dropbox-callback" element={<DropboxCallback />} />
 
         {/* Rotas Protegidas */}
