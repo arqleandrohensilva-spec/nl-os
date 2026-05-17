@@ -2,8 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 import Sidebar from '@/components/Sidebar';
+import NotificationsPanel from '@/components/NotificationsPanel';
+import ForecastModalContent from '@/components/ForecastModalContent';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Sparkles, 
   ChevronRight, 
@@ -17,12 +26,15 @@ import {
   DollarSign,
   Star,
   TrendingUp,
-  ArrowRight
+  ArrowRight,
+  BarChart3,
+  Bell
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, isToday, isPast, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
+
 
 // Types
 interface ActionItem {
@@ -63,6 +75,9 @@ const Dashboard = () => {
   const [aiGreeting, setAiGreeting] = useState<string>("");
   const [aiInsight, setAiInsight] = useState<AIInsight | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [isForecastOpen, setIsForecastOpen] = useState(false);
+
 
   // Fetch Auth User
   useEffect(() => {
@@ -134,7 +149,24 @@ const Dashboard = () => {
     }
   });
 
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notificacoes'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      return data || [];
+    }
+  });
+
+  const unreadCount = notifications.filter(n => !n.lida).length;
+
   // Process Ações do Dia
+
   const actions: ActionItem[] = React.useMemo(() => {
     const items: ActionItem[] = [];
     const today = new Date();
@@ -426,91 +458,75 @@ const Dashboard = () => {
       
       <main className="flex-1 ml-[230px] p-20 max-w-[1600px] mx-auto w-full">
         {/* Header */}
-        <header className="mb-16">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-bold tracking-tight">
-              {getGreeting()}, <span className="text-bronze uppercase">{getDisplayName()}</span>.
-            </h1>
-            <p className="text-white/40 text-sm uppercase tracking-widest font-medium">
-              {format(new Date(), "EEEE, d 'DE' MMMM", { locale: ptBR })}
-            </p>
+        <header className="mb-16 flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div>
+            <div className="flex flex-col gap-1">
+              <h1 className="text-3xl font-bold tracking-tight">
+                {getGreeting()}, <span className="text-bronze uppercase">{getDisplayName()}</span>.
+              </h1>
+              <div className="flex items-center gap-4">
+                <p className="text-white/40 text-sm uppercase tracking-widest font-medium">
+                  {format(new Date(), "EEEE, d 'DE' MMMM", { locale: ptBR })}
+                </p>
+                
+                {/* Dashboard Action Buttons */}
+                <div className="flex items-center gap-3 ml-4">
+                  <Dialog open={isForecastOpen} onOpenChange={setIsForecastOpen}>
+                    <DialogTrigger asChild>
+                      <button className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">
+                        <BarChart3 size={14} />
+                        PREVISÃO DE FECHAMENTO
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-6xl bg-black border-white/10 p-0 overflow-hidden">
+                      <DialogHeader className="p-8 border-b border-white/5">
+                        <DialogTitle className="text-bronze text-sm font-bold uppercase tracking-[0.3em]">
+                          PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <ForecastModalContent forecast={forecast} navigate={navigate} />
+                    </DialogContent>
+                  </Dialog>
+
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white/80 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
+                    >
+                      <Bell size={14} />
+                      {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'}
+                    </button>
+
+                    <NotificationsPanel 
+                      isOpen={showNotifications} 
+                      onClose={() => setShowNotifications(false)} 
+                      className="right-0 top-full mt-2"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <AnimatePresence>
+              {aiGreeting && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 flex items-center gap-2 text-bronze/80 italic text-sm"
+                >
+                  <Sparkles size={14} />
+                  <span>{aiGreeting}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          
-          <AnimatePresence>
-            {aiGreeting && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 flex items-center gap-2 text-bronze/80 italic text-sm"
-              >
-                <Sparkles size={14} />
-                <span>{aiGreeting}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </header>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-[0.65fr,0.35fr] gap-16">
           {/* Column Left */}
           <div className="space-y-12">
             
-            {/* Bloco Notificações Recentes */}
-            <section>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">NOTIFICAÇÕES RECENTES</span>
-                  <div className="h-[1px] w-24 bg-white/5" />
-                </div>
-                <button 
-                  onClick={() => navigate('/pipeline')}
-                  className="text-[9px] text-white/40 hover:text-white uppercase font-bold tracking-widest"
-                >
-                  VER TODAS
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {(() => {
-                  const { data: recentNotifications = [] } = useQuery({
-                    queryKey: ['recent-notificacoes'],
-                    queryFn: async () => {
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (!user) return [];
-                      const { data } = await supabase
-                        .from('notificacoes')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .eq('lida', false)
-                        .order('created_at', { ascending: false })
-                        .limit(3);
-                      return data || [];
-                    }
-                  });
-
-                  if (recentNotifications.length === 0) return (
-                    <div className="col-span-3 p-8 bg-white/[0.01] border border-dashed border-white/5 text-center">
-                      <p className="text-white/20 text-xs italic">Nenhuma notificação nova.</p>
-                    </div>
-                  );
-
-                  return recentNotifications.map(notification => (
-                    <div 
-                      key={notification.id}
-                      onClick={() => navigate(notification.modulo)}
-                      className="p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all cursor-pointer group"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[9px] font-bold text-bronze uppercase">{notification.tipo}</span>
-                        <span className="text-[8px] text-white/20 uppercase">
-                          {formatDistanceToNow(new Date(notification.created_at), { locale: ptBR })}
-                        </span>
-                      </div>
-                      <p className="text-xs text-white group-hover:text-bronze transition-colors line-clamp-2">{notification.titulo}</p>
-                    </div>
-                  ));
-                })()}
-              </div>
-            </section>
             
             {/* Bloco 1: Ações do Dia */}
             <section>
@@ -565,125 +581,6 @@ const Dashboard = () => {
               </div>
             </section>
 
-            {/* Bloco 2: Previsão de Fechamento */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">
-                  PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
-                </span>
-                <div className="h-[1px] flex-1 bg-white/5" />
-              </div>
-
-              <div className="bg-white/[0.02] border border-white/5 p-8">
-                {/* Totalizador */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-10 border-b border-white/5">
-                  <div>
-                    <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-2 block">FORECAST DO MÊS</span>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-2xl font-bold">R$ {(forecast.probableTotal / 1000000).toFixed(1)}M</span>
-                      <span className="text-white/40 text-xs">provável</span>
-                      <span className="text-white/20 mx-2">/</span>
-                      <span className="text-white/40 text-xs">R$ {(forecast.totalInGame / 1000000).toFixed(1)}M total em jogo</span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-white/40 mb-1">Meta: R$ {(forecast.meta / 1000000).toFixed(1)}M</div>
-                    <div className="flex items-center justify-end gap-2">
-                      <span className="text-[10px] font-bold text-bronze uppercase tracking-widest">Probabilidade de bater</span>
-                      <span className="text-xl font-bold text-bronze">{forecast.weightedAverage.toFixed(0)}%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                  {/* Provável */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32]" />
-                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">PROVÁVEL FECHAR</span>
-                    </div>
-                    <div className="space-y-3">
-                      {forecast.items.filter(l => l.probabilidade >= 60).length === 0 ? (
-                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
-                      ) : (
-                        forecast.items.filter(l => l.probabilidade >= 60).map(lead => (
-                          <div 
-                            key={lead.id} 
-                            onClick={() => navigate('/pipeline')}
-                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#2E7D32] hover:bg-white/[0.04] cursor-pointer transition-all"
-                          >
-                            <div className="text-sm font-medium mb-1">{lead.nome} · {lead.tipo}</div>
-                            <div className="text-[10px] text-white/40 leading-relaxed">
-                              R$ {(Number(lead.orcamento || 0) / 1000000).toFixed(1)}M · Score {lead.score} · {lead.stage}<br/>
-                              <span className={cn(
-                                "font-bold",
-                                lead.probabilidade >= 80 ? "text-[#2E7D32]" : "text-[#2E7D32]/70"
-                              )}>
-                                {lead.probabilidade}% probabilidade
-                              </span>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Em Risco */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
-                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">EM RISCO</span>
-                    </div>
-                    <div className="space-y-3">
-                      {forecast.items.filter(l => l.probabilidade >= 30 && l.probabilidade < 60).length === 0 ? (
-                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
-                      ) : (
-                        forecast.items.filter(l => l.probabilidade >= 30 && l.probabilidade < 60).map(lead => (
-                          <div 
-                            key={lead.id} 
-                            onClick={() => navigate('/pipeline')}
-                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#F59E0B] hover:bg-white/[0.04] cursor-pointer transition-all"
-                          >
-                            <div className="text-sm font-medium mb-1">⚠ {lead.nome} · {lead.tipo}</div>
-                            <div className="text-[10px] text-white/40 leading-relaxed">
-                              R$ {lead.orcamento ? `${(Number(lead.orcamento) / 1000).toFixed(0)}k` : '—'} · Score {lead.score} · {lead.stage} {lead.diffDays > 10 ? `há ${lead.diffDays} dias` : ''}<br/>
-                              <span className="text-[#F59E0B] font-bold">{lead.probabilidade}% probabilidade</span>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Improvável */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#7A4A3A]" />
-                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">IMPROVÁVEL</span>
-                    </div>
-                    <div className="space-y-3">
-                      {forecast.items.filter(l => l.probabilidade < 30).length === 0 ? (
-                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
-                      ) : (
-                        forecast.items.filter(l => l.probabilidade < 30).map(lead => (
-                          <div 
-                            key={lead.id} 
-                            onClick={() => navigate('/pipeline')}
-                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#7A4A3A] hover:bg-white/[0.04] cursor-pointer transition-all"
-                          >
-                            <div className="text-sm font-medium mb-1">✕ {lead.nome} · {lead.tipo}</div>
-                            <div className="text-[10px] text-white/40 leading-relaxed">
-                              Score {lead.score} · {lead.stage}<br/>
-                              <span className="text-[#7A4A3A] font-bold">{lead.probabilidade}% probabilidade</span>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
 
             {/* Bloco 3: Pulso da Empresa */}
             <section>
