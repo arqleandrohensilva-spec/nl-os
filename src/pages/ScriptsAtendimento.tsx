@@ -449,7 +449,7 @@ Retorne APENAS JSON válido:
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-sans">
       <Sidebar user="Sócio" />
       <div className="ml-[230px] flex-1 p-8 grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-8">
         {/* COLUNA ESQUERDA */}
@@ -491,11 +491,11 @@ Retorne APENAS JSON válido:
           {/* BLOCO — DETECTOR DE MOMENTO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeIABlock === 'detector' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+            activeAccordion === 'detector' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
-              className="w-full px-5 py-4 flex items-center justify-between group"
-              onClick={() => setActiveIABlock(activeIABlock === 'detector' ? null : 'detector')}
+              className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
+              onClick={() => setActiveAccordion(activeAccordion === 'detector' ? null : 'detector')}
             >
               <div className="flex items-center gap-3">
                 <FileText size={18} className="text-bronze" />
@@ -504,10 +504,10 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">Identifique em qual das 11 etapas o lead está agora</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'detector' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'detector' && "rotate-180 text-bronze")} size={16} />
             </button>
 
-            {activeIABlock === 'detector' && (
+            {activeAccordion === 'detector' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <Textarea 
                   className="bg-[#0F0F0F] border-white/5 text-white min-h-[100px] focus-visible:ring-bronze text-xs" 
@@ -540,7 +540,7 @@ Retorne APENAS JSON válido:
 
                     <Button 
                       variant="outline"
-                      onClick={() => setOpenEtapa(String(resultadoDetector.etapa_numero).padStart(2, '0'))}
+                      onClick={() => setSelectedEtapaId(String(resultadoDetector.etapa_numero).padStart(2, '0'))}
                       className="w-full border-bronze/50 text-bronze hover:bg-bronze hover:text-black h-9 text-[10px] font-bold tracking-wider"
                     >
                       IR PARA ESTA ETAPA
@@ -554,11 +554,11 @@ Retorne APENAS JSON válido:
           {/* BLOCO — GERADOR DE OBJEÇÃO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeIABlock === 'objecao' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+            activeAccordion === 'objecao' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
-              className="w-full px-5 py-4 flex items-center justify-between group"
-              onClick={() => setActiveIABlock(activeIABlock === 'objecao' ? null : 'objecao')}
+              className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
+              onClick={() => setActiveAccordion(activeAccordion === 'objecao' ? null : 'objecao')}
             >
               <div className="flex items-center gap-3">
                 <Bot size={18} className="text-bronze" />
@@ -567,10 +567,10 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">A IA gera a resposta certa no tom NL para situações fora do padrão</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'objecao' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'objecao' && "rotate-180 text-bronze")} size={16} />
             </button>
 
-            {activeIABlock === 'objecao' && (
+            {activeAccordion === 'objecao' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <div className="space-y-3">
                   <div className="space-y-1.5">
@@ -648,11 +648,11 @@ Retorne APENAS JSON válido:
           {/* BLOCO — ASSISTENTE DE ATENDIMENTO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeIABlock === 'assistente' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+            activeAccordion === 'assistente' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
-              className="w-full px-5 py-4 flex items-center justify-between group"
-              onClick={() => setActiveIABlock(activeIABlock === 'assistente' ? null : 'assistente')}
+              className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
+              onClick={() => setActiveAccordion(activeAccordion === 'assistente' ? null : 'assistente')}
             >
               <div className="flex items-center gap-3">
                 <Bot size={18} className="text-bronze" />
@@ -661,10 +661,10 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">Cole a mensagem do cliente e receba uma sugestão no tom NL</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'assistente' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'assistente' && "rotate-180 text-bronze")} size={16} />
             </button>
 
-            {activeIABlock === 'assistente' && (
+            {activeAccordion === 'assistente' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <Textarea 
                   className="bg-[#0F0F0F] border-white/5 text-white min-h-[120px] focus-visible:ring-bronze text-xs" 
@@ -705,78 +705,116 @@ Retorne APENAS JSON válido:
               </div>
             )}
           </div>
+
+          {/* NOVO BLOCO — SCRIPTS DE ATENDIMENTO · NL */}
+          <div className={cn(
+            "border transition-all duration-300",
+            activeAccordion === 'scripts' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+          )}>
+            <button 
+              className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
+              onClick={() => setActiveAccordion(activeAccordion === 'scripts' ? null : 'scripts')}
+            >
+              <div className="flex items-center gap-3">
+                <FileText size={18} className="text-bronze" />
+                <div className="text-left">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">SCRIPTS DE ATENDIMENTO · NL</p>
+                  <p className="text-[9px] text-white/30 italic">Selecione uma etapa para ver os scripts</p>
+                </div>
+              </div>
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'scripts' && "rotate-180 text-bronze")} size={16} />
+            </button>
+
+            {activeAccordion === 'scripts' && (
+              <div className="px-3 pb-5 space-y-1.5 animate-in slide-in-from-top-2 duration-200">
+                {scriptsContent.map((etapa) => (
+                  <button
+                    key={etapa.id}
+                    onClick={() => setSelectedEtapaId(etapa.id)}
+                    className={cn(
+                      "w-full p-3 flex items-center gap-4 border transition-all duration-200 text-left",
+                      selectedEtapaId === etapa.id 
+                        ? "bg-[#141414] border-bronze" 
+                        : "bg-[#0F0F0F] border-[#1A1A1A] hover:border-bronze/30"
+                    )}
+                  >
+                    <span className="text-bronze font-bold font-mono text-xs">{etapa.id}</span>
+                    <span className={cn(
+                      "text-[10px] font-bold tracking-wider",
+                      selectedEtapaId === etapa.id ? "text-white" : "text-white/60"
+                    )}>{etapa.titulo}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* COLUNA DIREITA */}
-        <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-64px)] pr-4 scrollbar-thin scrollbar-thumb-white/10">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-cormorant text-white">SCRIPTS DE ATENDIMENTO · NL</h1>
-            <p className="text-[10px] uppercase text-white/40 tracking-[0.3em] font-medium">Etapas I a XI — Primeiro Contato ao Pós-Projeto</p>
-          </div>
-
-          <div className="space-y-3">
-            {scriptsContent.map((etapa) => (
-              <div key={etapa.id} className={cn(
-                "border transition-all duration-300",
-                openEtapa === etapa.id ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]/50 hover:bg-[#0F0F0F]"
-              )}>
-                <button 
-                  className="w-full px-6 py-5 flex items-center justify-between"
-                  onClick={() => setOpenEtapa(openEtapa === etapa.id ? null : etapa.id)}
-                >
-                  <div className="flex items-center gap-6">
-                    <span className="text-bronze font-cormorant text-2xl font-bold opacity-60 leading-none">{etapa.id}</span>
-                    <div className="text-left space-y-0.5">
-                      <p className="text-sm font-bold tracking-widest text-white uppercase">{etapa.titulo}</p>
-                      <p className="text-[10px] text-white/40 uppercase tracking-wider">{etapa.objetivo}</p>
-                    </div>
+        <div className="overflow-y-auto max-h-[calc(100vh-64px)] pr-4 scrollbar-thin scrollbar-thumb-white/10">
+          {!selectedEtapaId ? (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40 py-20">
+              <FileText size={48} className="text-white/20" />
+              <p className="text-lg font-cormorant uppercase tracking-widest">Selecione uma etapa para ver os scripts.</p>
+            </div>
+          ) : (
+            <div key={selectedEtapaId} className="space-y-8 animate-in fade-in duration-300">
+              <div className="space-y-1 border-b border-white/5 pb-6">
+                <div className="flex items-center gap-4 mb-2">
+                  <span className="text-bronze font-cormorant text-5xl font-bold opacity-40 leading-none">
+                    {selectedEtapaId}
+                  </span>
+                  <div>
+                    <h1 className="text-3xl font-cormorant text-white uppercase tracking-wider">
+                      {scriptsContent.find(e => e.id === selectedEtapaId)?.titulo}
+                    </h1>
+                    <p className="text-[10px] uppercase text-white/40 tracking-[0.3em] font-medium">
+                      {scriptsContent.find(e => e.id === selectedEtapaId)?.objetivo}
+                    </p>
                   </div>
-                  <ChevronDown className={cn("text-white/20 transition-transform duration-300", openEtapa === etapa.id && "rotate-180")} size={18} />
-                </button>
-
-                {openEtapa === etapa.id && (
-                  <div className="px-6 pb-6 pt-2 space-y-4 animate-in slide-in-from-top-4 duration-300">
-                    <div className="grid grid-cols-1 gap-4">
-                      {etapa.scripts.map((script, idx) => (
-                        <div key={idx} className={cn(
-                          "bg-[#141414] p-5 relative group border-l-[3px]",
-                          script.especial ? "border-[#4A4846]" : "border-bronze"
-                        )}>
-                          <div className="flex items-center justify-between mb-3">
-                            <span className={cn(
-                              "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
-                              script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
-                            )}>
-                              {script.situacao}
-                            </span>
-                          </div>
-                          <p className="text-[14px] text-[#CCCCCC] leading-[1.6] mb-8 font-sans">
-                            {replaceVariables(script.texto)}
-                          </p>
-                          <Button 
-                            variant="ghost" 
-                            className="absolute bottom-4 left-4 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-7 border border-bronze/20"
-                            onClick={() => abrirModalAdaptar(script.situacao, script.texto)}
-                          >
-                            <Sparkles size={12} className="mr-2" />
-                            ADAPTAR TOM · IA
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            className="absolute bottom-4 right-4 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-7"
-                            onClick={() => copyToClipboard(replaceVariables(script.texto))}
-                          >
-                            <Copy size={12} className="mr-2" />
-                            COPIAR
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
-            ))}
-          </div>
+
+              <div className="grid grid-cols-1 gap-6">
+                {scriptsContent.find(e => e.id === selectedEtapaId)?.scripts.map((script, idx) => (
+                  <div key={idx} className={cn(
+                    "bg-[#0F0F0F] p-6 relative group border-l-[3px] transition-all hover:bg-[#141414]",
+                    script.especial ? "border-[#4A4846]" : "border-bronze"
+                  )}>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className={cn(
+                        "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
+                        script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
+                      )}>
+                        {script.situacao}
+                      </span>
+                    </div>
+                    <p className="text-[15px] text-[#CCCCCC] leading-[1.7] mb-12 font-sans whitespace-pre-wrap">
+                      {replaceVariables(script.texto)}
+                    </p>
+                    <div className="flex gap-3 absolute bottom-6 left-6 right-6">
+                      <Button 
+                        variant="ghost" 
+                        className="flex-1 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-9 border border-bronze/10"
+                        onClick={() => abrirModalAdaptar(script.situacao, script.texto)}
+                      >
+                        <Sparkles size={12} className="mr-2" />
+                        ADAPTAR TOM · IA
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="flex-1 text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white hover:bg-bronze/20 h-9 border border-bronze/10"
+                        onClick={() => copyToClipboard(replaceVariables(script.texto))}
+                      >
+                        <Copy size={12} className="mr-2" />
+                        COPIAR
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* MODAL ADAPTADOR DE TOM */}
