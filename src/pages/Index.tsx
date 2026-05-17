@@ -904,7 +904,7 @@ const Index = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-[#0A0A0A] overflow-y-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#0A0A0A] overflow-auto p-6 pt-2 scrollbar-custom">
           {viewMode === 'kanban' && (
             <DndContext 
               sensors={sensors}
@@ -914,7 +914,7 @@ const Index = () => {
               onDragEnd={handleDragEnd}
               modifiers={[restrictToWindowEdges]}
             >
-              <div className="grid grid-cols-7 h-full gap-4">
+              <div className="grid grid-cols-7 h-full gap-4 min-w-[1400px]">
                 {STAGES.map(stage => (
                   <KanbanColumn 
                     key={stage}
