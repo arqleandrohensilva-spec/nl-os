@@ -369,6 +369,57 @@ const Dashboard = () => {
     generateAIContent();
   }, [leads.length, projetos.length]);
 
+  const forecast = React.useMemo(() => {
+    const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido');
+    const today = new Date();
+    
+    const leadForecasts = activeLeads.map(lead => {
+      let prob = 0;
+      const stageLower = (lead.stage || '').toLowerCase();
+      
+      if (stageLower === 'novo lead') prob = 10;
+      else if (stageLower === 'reunião agendada') prob = 25;
+      else if (stageLower === 'briefing preenchido') prob = 40;
+      else if (stageLower === 'proposta enviada') prob = 60;
+      else if (stageLower === 'negociação') prob = 80;
+
+      // Score adjustment
+      const score = Number(lead.score || 0);
+      if (score >= 8) prob += 15;
+      else if (score < 5) prob -= 15;
+
+      // Time adjustment
+      const etapaDesde = lead.etapa_desde ? new Date(lead.etapa_desde) : new Date(lead.created_at);
+      const diffDays = Math.floor((today.getTime() - etapaDesde.getTime()) / (1000 * 60 * 60 * 24));
+      if (diffDays > 20) prob -= 20;
+      else if (diffDays > 10) prob -= 10;
+
+      // Clamp probability
+      prob = Math.max(0, Math.min(100, prob));
+
+      return {
+        ...lead,
+        probabilidade: prob,
+        valor: Number(lead.orcamento || 0),
+        diffDays
+      };
+    });
+
+    const totalInGame = leadForecasts.reduce((acc, curr) => acc + curr.valor, 0);
+    const probableTotal = leadForecasts.filter(l => l.probabilidade >= 60).reduce((acc, curr) => acc + curr.valor, 0);
+    const weightedAverage = leadForecasts.length > 0 
+      ? leadForecasts.reduce((acc, curr) => acc + (curr.probabilidade * curr.valor), 0) / (totalInGame || 1)
+      : 0;
+
+    return {
+      items: leadForecasts,
+      totalInGame,
+      probableTotal,
+      weightedAverage,
+      meta: 2000000 // Meta: R$ 2M
+    };
+  }, [leads]);
+
   return (
     <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
       <Sidebar user={getDisplayName()} />
@@ -514,7 +565,127 @@ const Dashboard = () => {
               </div>
             </section>
 
-            {/* Bloco 2: Pulso da Empresa */}
+            {/* Bloco 2: Previsão de Fechamento */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">
+                  PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
+                </span>
+                <div className="h-[1px] flex-1 bg-white/5" />
+              </div>
+
+              <div className="bg-white/[0.02] border border-white/5 p-8">
+                {/* Totalizador */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-10 border-b border-white/5">
+                  <div>
+                    <span className="text-[10px] font-bold tracking-widest text-white/40 uppercase mb-2 block">FORECAST DO MÊS</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-bold">R$ {(forecast.probableTotal / 1000000).toFixed(1)}M</span>
+                      <span className="text-white/40 text-xs">provável</span>
+                      <span className="text-white/20 mx-2">/</span>
+                      <span className="text-white/40 text-xs">R$ {(forecast.totalInGame / 1000000).toFixed(1)}M total em jogo</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-white/40 mb-1">Meta: R$ {(forecast.meta / 1000000).toFixed(1)}M</div>
+                    <div className="flex items-center justify-end gap-2">
+                      <span className="text-[10px] font-bold text-bronze uppercase tracking-widest">Probabilidade de bater</span>
+                      <span className="text-xl font-bold text-bronze">{forecast.weightedAverage.toFixed(0)}%</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                  {/* Provável */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#2E7D32]" />
+                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">PROVÁVEL FECHAR</span>
+                    </div>
+                    <div className="space-y-3">
+                      {forecast.items.filter(l => l.probabilidade >= 60).length === 0 ? (
+                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
+                      ) : (
+                        forecast.items.filter(l => l.probabilidade >= 60).map(lead => (
+                          <div 
+                            key={lead.id} 
+                            onClick={() => navigate('/pipeline')}
+                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#2E7D32] hover:bg-white/[0.04] cursor-pointer transition-all"
+                          >
+                            <div className="text-sm font-medium mb-1">{lead.nome} · {lead.tipo}</div>
+                            <div className="text-[10px] text-white/40 leading-relaxed">
+                              R$ {(Number(lead.orcamento || 0) / 1000000).toFixed(1)}M · Score {lead.score} · {lead.stage}<br/>
+                              <span className={cn(
+                                "font-bold",
+                                lead.probabilidade >= 80 ? "text-[#2E7D32]" : "text-[#2E7D32]/70"
+                              )}>
+                                {lead.probabilidade}% probabilidade
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Em Risco */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">EM RISCO</span>
+                    </div>
+                    <div className="space-y-3">
+                      {forecast.items.filter(l => l.probabilidade >= 30 && l.probabilidade < 60).length === 0 ? (
+                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
+                      ) : (
+                        forecast.items.filter(l => l.probabilidade >= 30 && l.probabilidade < 60).map(lead => (
+                          <div 
+                            key={lead.id} 
+                            onClick={() => navigate('/pipeline')}
+                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#F59E0B] hover:bg-white/[0.04] cursor-pointer transition-all"
+                          >
+                            <div className="text-sm font-medium mb-1">⚠ {lead.nome} · {lead.tipo}</div>
+                            <div className="text-[10px] text-white/40 leading-relaxed">
+                              R$ {lead.orcamento ? `${(Number(lead.orcamento) / 1000).toFixed(0)}k` : '—'} · Score {lead.score} · {lead.stage} {lead.diffDays > 10 ? `há ${lead.diffDays} dias` : ''}<br/>
+                              <span className="text-[#F59E0B] font-bold">{lead.probabilidade}% probabilidade</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Improvável */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#7A4A3A]" />
+                      <span className="text-[9px] font-bold tracking-widest text-white/60 uppercase">IMPROVÁVEL</span>
+                    </div>
+                    <div className="space-y-3">
+                      {forecast.items.filter(l => l.probabilidade < 30).length === 0 ? (
+                        <p className="text-white/10 text-[10px] italic">Nenhum lead nesta faixa.</p>
+                      ) : (
+                        forecast.items.filter(l => l.probabilidade < 30).map(lead => (
+                          <div 
+                            key={lead.id} 
+                            onClick={() => navigate('/pipeline')}
+                            className="p-3 bg-white/[0.02] border border-white/5 border-l-2 border-l-[#7A4A3A] hover:bg-white/[0.04] cursor-pointer transition-all"
+                          >
+                            <div className="text-sm font-medium mb-1">✕ {lead.nome} · {lead.tipo}</div>
+                            <div className="text-[10px] text-white/40 leading-relaxed">
+                              Score {lead.score} · {lead.stage}<br/>
+                              <span className="text-[#7A4A3A] font-bold">{lead.probabilidade}% probabilidade</span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Bloco 3: Pulso da Empresa */}
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PULSO DA EMPRESA</span>
