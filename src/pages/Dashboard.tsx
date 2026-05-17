@@ -72,7 +72,6 @@ interface AIInsight {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [aiGreeting, setAiGreeting] = useState<string>("");
   const [aiInsight, setAiInsight] = useState<AIInsight | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -335,7 +334,20 @@ const Dashboard = () => {
     });
   }, [leads, projetos, parcelas]);
 
-  // AI Logic
+  const aiGreeting = React.useMemo(() => {
+    const urgentItems = actions.filter(a => a.type === 'urgent').length;
+    const todayItems = actions.filter(a => a.type === 'today').length;
+    const totalItems = actions.length;
+
+    if (urgentItems > 0) {
+      return `Você tem ${urgentItems} ação${urgentItems > 1 ? 'ões' : 'ão'} urgente${urgentItems > 1 ? 's' : ''} pendente${urgentItems > 1 ? 's' : ''} hoje.`;
+    }
+    if (totalItems > 0) {
+      return `Você tem ${totalItems} compromisso${totalItems > 1 ? 's' : ''} para hoje.`;
+    }
+    return "Agenda limpa hoje. Bom momento para prospectar.";
+  }, [actions]);
+
   useEffect(() => {
     const generateAIContent = async () => {
       if (leads.length === 0 && projetos.length === 0) return;
@@ -355,16 +367,6 @@ const Dashboard = () => {
       const satisfacaoResumo = pulse[3].subtext;
 
       try {
-        // Greeting context
-        const greetingPrompt = `Gere uma frase curta de contexto (máximo 10 palavras) para o dashboard de um sócio de escritório de arquitetura.
-        Dados atuais: ${actions.filter(a => a.type === 'urgent').length} ações urgentes, ${actions.filter(a => a.type === 'today').length} para hoje.
-        Exemplo: "Você tem 2 ações urgentes e 4 compromissos para hoje."`;
-
-        const { data: gData } = await supabase.functions.invoke('ai-advisor', {
-          body: { prompt: greetingPrompt, systemPrompt: "Você é um assistente executivo conciso." }
-        });
-        setAiGreeting((gData?.choices?.[0]?.message?.content || "").replace(/^["']|["']$/g, ''));
-
         // Insight
         const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
         Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
@@ -478,7 +480,7 @@ const Dashboard = () => {
                         PREVISÃO DE FECHAMENTO
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-6xl bg-black border-white/10 p-0 overflow-hidden">
+                    <DialogContent className="max-w-6xl bg-[#0F0F0F] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
                       <DialogHeader className="p-8 border-b border-white/5">
                         <DialogTitle className="text-bronze text-sm font-bold uppercase tracking-[0.3em]">
                           PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
@@ -491,7 +493,7 @@ const Dashboard = () => {
                   <div className="relative">
                     <button 
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white/80 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
+                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
                     >
                       <Bell size={14} />
                       {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'}
