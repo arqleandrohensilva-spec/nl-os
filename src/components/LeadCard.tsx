@@ -18,6 +18,11 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   const { score } = calculateLeadScore(lead);
   
+  // Ghosting detection
+  const lastLogDate = lead.logs.length > 0 ? parseISO(lead.logs[0].data) : parseISO(lead.criado);
+  const daysSinceLastContact = differenceInDays(new Date(), lastLogDate);
+  const isGhosting = daysSinceLastContact > 3 && lead.stage !== 'Fechado' && lead.stage !== 'Perdido';
+  
   const tempConfig = {
     'Quente': { border: 'border-red-500', badge: 'bg-red-500/10 text-red-500', pulse: true },
     'Morno': { border: 'border-amber-500', badge: 'bg-amber-500/10 text-amber-500', pulse: false },
@@ -60,10 +65,17 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         "min-h-[100px] flex flex-col justify-between overflow-hidden",
         "border-l-4",
         currentTemp.border,
+        isGhosting && "ring-1 ring-amber-500/50 animate-pulse-subtle shadow-[0_0_15px_rgba(245,158,11,0.1)]",
         isDragging && "shadow-2xl ring-2 ring-bronze/30 scale-[1.05] rotate-2",
         lead.stage === 'Perdido' && "opacity-45 grayscale-[0.5]"
       )}
     >
+      {/* Ghosting Indicator - Ice flame / Alert icon */}
+      {isGhosting && (
+        <div className=\"absolute top-1 right-1/2 translate-x-1/2 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20\">
+          <span className=\"text-[7px] font-bold text-amber-500 uppercase tracking-tighter\">Sem Contato há {daysSinceLastContact} dias</span>
+        </div>
+      )}
       {/* Pulse effect for Hot Lead - Left border only */}
       {currentTemp.pulse && (
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 animate-pulse" />

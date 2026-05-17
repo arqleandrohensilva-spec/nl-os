@@ -91,6 +91,7 @@ const Index = () => {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'foco'>('kanban');
+  const [smartFilter, setSmartFilter] = useState<'all' | 'ghosting' | 'score8' | 'premium' | 'high-ticket'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'score', direction: 'desc' });
   const [isNewLeadDialogOpen, setIsNewLeadDialogOpen] = useState(false);
   const [config, setConfig] = useState<ConfigEscritorio | null>(null);

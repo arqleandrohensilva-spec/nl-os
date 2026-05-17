@@ -257,6 +257,48 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           </section>
 
           <section>
+            <div className=\"flex justify-between items-center mb-6\">
+              <h4 className=\"text-[10px] font-bold uppercase tracking-[0.3em] text-white/40\">Scripts de Atendimento</h4>
+              <span className=\"text-[8px] px-2 py-0.5 bg-bronze/10 text-bronze border border-bronze/20 font-bold uppercase tracking-widest\">{lead.stage}</span>
+            </div>
+            <div className=\"space-y-3\">
+              {getScriptsForStage(lead.stage).length > 0 ? (
+                getScriptsForStage(lead.stage).map((script, idx) => (
+                  <div key={idx} className=\"bg-white/[0.02] border border-white/5 p-4 group hover:border-bronze/30 transition-all\">
+                    <div className=\"flex justify-between items-start mb-2\">
+                      <span className=\"text-[9px] font-bold text-white/30 uppercase tracking-widest\">{script.situacao}</span>
+                      <button 
+                        onClick={() => copyToClipboard(script.texto)}
+                        className=\"text-white/20 hover:text-bronze transition-colors\"
+                      >
+                        <MessageSquare size={14} />
+                      </button>
+                    </div>
+                    <p className=\"text-[11px] text-white/60 leading-relaxed\">{script.texto}</p>
+                    <button 
+                      onClick={() => copyToClipboard(script.texto)}
+                      className=\"mt-3 w-full py-2 bg-white/5 hover:bg-bronze hover:text-white text-[9px] font-bold uppercase tracking-widest text-white/40 transition-all opacity-0 group-hover:opacity-100\"
+                    >
+                      Copiar Script
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className=\"p-8 border border-dashed border-white/5 text-center\">
+                  <p className=\"text-[10px] text-white/20 uppercase font-bold tracking-widest\">Sem scripts específicos para esta etapa</p>
+                  <Button 
+                    variant=\"ghost\" 
+                    className=\"mt-4 text-[9px] font-bold uppercase tracking-widest text-bronze\"
+                    onClick={() => navigate('/scripts')}
+                  >
+                    Ver Todos os Scripts
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Histórico de Contatos</h4>
             <div className="space-y-4">
               {lead.logs.map((log, i) => (
