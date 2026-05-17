@@ -57,7 +57,7 @@ const ScriptsAtendimento = () => {
   };
 
   const gerarSugestao = async () => {
-    if (!leadAtivo || !mensagemCliente) return;
+    if (mensagemCliente.trim().length === 0) return;
     setIsGenerating(true);
     toast.info("Consultando IA...");
     try {
@@ -65,8 +65,8 @@ const ScriptsAtendimento = () => {
         body: {
           prompt: `Você é o assistente de atendimento da NL Arquitetos. Sugira uma resposta para a mensagem do cliente abaixo.
           TOM OBRIGATÓRIO: profissional, condutor, centrado no cliente. Nunca informal, nunca ansioso, nunca com urgência artificial.
-          LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
-          ETAPA ATUAL: ${leadAtivo.stage}
+          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
+          ETAPA ATUAL: ${leadAtivo ? leadAtivo.stage : 'Nenhuma etapa definida'}
           MENSAGEM: ${mensagemCliente}
           Retorne APENAS JSON: {"resposta": "...", "tom": "...", "proximo_passo": "..."}`
         }
@@ -81,7 +81,7 @@ const ScriptsAtendimento = () => {
   };
   
   const identificarEtapa = async () => {
-    if (!leadAtivo || !mensagemDetector) return;
+    if (mensagemDetector.trim().length === 0) return;
     setIsDetecting(true);
     toast.info("Identificando momento...");
     try {
@@ -103,7 +103,7 @@ AS 11 ETAPAS DA JORNADA NL:
 10 - ENTREGA FINAL: projeto concluído, entrega do material
 11 - PÓS-PROJETO: projeto entregue, fase de depoimento e indicação
 
-LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
+LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
 
 MENSAGEM DO CLIENTE:
 ${mensagemDetector}
@@ -128,7 +128,7 @@ Analise a mensagem e retorne APENAS JSON válido:
   };
 
   const gerarScriptObjecao = async () => {
-    if (!leadAtivo || !descricaoObjecao || !etapaAtualObjecao) return;
+    if (descricaoObjecao.trim().length === 0) return;
     setIsGeneratingObjecao(true);
     toast.info("Gerando script...");
     try {
@@ -147,7 +147,7 @@ CONTEXTO DA NL:
 
 PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
 
-LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
+LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
 ETAPA ATUAL: ${etapaAtualObjecao}
 
 OBJEÇÃO / SITUAÇÃO:
@@ -363,7 +363,7 @@ Retorne APENAS JSON válido:
             <Button 
               className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
               onClick={identificarEtapa}
-              disabled={isDetecting || !leadAtivo || !mensagemDetector}
+              disabled={isDetecting || mensagemDetector.trim().length === 0}
             >
               {isDetecting ? "IDENTIFICANDO..." : "IDENTIFICAR ETAPA · IA"}
             </Button>
@@ -435,7 +435,7 @@ Retorne APENAS JSON válido:
             <Button 
               className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
               onClick={gerarScriptObjecao}
-              disabled={isGeneratingObjecao || !leadAtivo || !descricaoObjecao || !etapaAtualObjecao}
+              disabled={isGeneratingObjecao || descricaoObjecao.trim().length === 0}
             >
               {isGeneratingObjecao ? "GERANDO..." : "GERAR SCRIPT · IA"}
             </Button>
@@ -493,7 +493,7 @@ Retorne APENAS JSON válido:
             <Button 
               className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
               onClick={gerarSugestao}
-              disabled={isGenerating || !leadAtivo || !mensagemCliente}
+              disabled={isGenerating || mensagemCliente.trim().length === 0}
             >
               {isGenerating ? "GERANDO..." : "SUGERIR RESPOSTA · IA"}
             </Button>
