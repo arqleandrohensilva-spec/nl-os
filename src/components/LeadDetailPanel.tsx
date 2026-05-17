@@ -110,22 +110,29 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             )}>
               {lead.temp}
             </span>
-            <span className="text-[10px] text-white/40 font-mono">#{lead.id}</span>
           </div>
           <h2 className="text-4xl font-cormorant text-white mb-6 leading-none">{lead.nome}</h2>
           <div className="flex flex-wrap gap-2">
-            {STAGES.map(s => (
-              <button 
-                key={s} 
-                onClick={() => onUpdateStage(lead.id, s)}
-                className={cn(
-                  "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-[2px] transition-all",
-                  lead.stage === s ? "bg-bronze text-white border-bronze" : "border-white/10 text-white/40 hover:border-bronze hover:text-bronze"
-                )}
-              >
-                {s}
-              </button>
-            ))}
+            {STAGES.map(s => {
+              const isPerdido = s === 'Perdido';
+              const isActive = lead.stage === s;
+              return (
+                <button 
+                  key={s} 
+                  onClick={() => onUpdateStage(lead.id, s)}
+                  className={cn(
+                    "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-none transition-all",
+                    isActive 
+                      ? "bg-bronze text-white border-bronze" 
+                      : isPerdido
+                        ? "bg-transparent border-red-500/30 text-red-400/60 hover:border-red-500 hover:text-red-400"
+                        : "bg-[#2A2826] border-[#4A4846] text-white/40 hover:border-bronze hover:text-white"
+                  )}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
         </div>
 
