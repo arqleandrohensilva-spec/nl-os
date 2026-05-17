@@ -106,7 +106,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           <div className="flex items-center gap-3 mb-2">
             <span className={cn(
               "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border",
-              lead.temp === 'Quente' ? "bg-red/5 border-red/20 text-red" : "bg-white/5/20 border-white/10 text-white/40"
+              lead.temp === 'Quente' ? "bg-red/5 border-red/20 text-red" : "bg-white/5 border-white/10 text-white/40"
             )}>
               {lead.temp}
             </span>
