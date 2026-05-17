@@ -870,6 +870,8 @@ const Index = () => {
                   stage={stage}
                   leads={filteredLeads.filter(l => l.stage === stage)}
                   onLeadClick={(lead) => setSelectedLeadId(lead.id)}
+                  onUpdateStatus={handleUpdateStage}
+                  onQuickNote={handleQuickNote}
                 />
               ))}
             </div>
