@@ -252,6 +252,8 @@ Retorne APENAS JSON válido:
     } finally {
       setIsGeneratingObjecao(false);
     }
+  };
+
   const adaptarTom = async () => {
     if (!scriptParaAdaptar || !perfilCliente) return;
     setIsAdaptando(true);
