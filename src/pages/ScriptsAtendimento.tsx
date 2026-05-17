@@ -274,7 +274,7 @@ const ScriptsAtendimento = () => {
                       <Copy size={12} />
                     </Button>
                   </div>
-                  <p className="text-xs text-white/80 leading-relaxed whitespace-pre-wrap">{sugestaoIA.resposta}</p>
+                  <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
                   <div className="pt-2 border-t border-white/5 mt-2">
                     <p className="text-[9px] text-white/40 uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
                     <p className="text-[9px] text-white/40 uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
