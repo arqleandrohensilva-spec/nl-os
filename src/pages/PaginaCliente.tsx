@@ -52,13 +52,22 @@ export default function PaginaCliente() {
   async function fetchProjeto() {
     try {
       setLoading(true);
-      const { data: proj, error: projError } = await (supabase
-        .from('projetos') as any)
-        .select('*')
-        .or(`token_cliente.eq.${param},slug_cliente.eq.${param}`)
-        .maybeSingle();
+      
+      // Check if param is a valid UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(param || "");
+      
+      let query = supabase.from('projetos').select('*');
+      
+      if (isUUID) {
+        query = query.or(`token_cliente.eq.${param},slug_cliente.eq.${param}`);
+      } else {
+        query = query.eq('slug_cliente', param);
+      }
+
+      const { data: proj, error: projError } = await (query as any).maybeSingle();
 
       if (projError || !proj) {
+        console.error("Erro ao buscar projeto:", projError);
         setError(true);
         return;
       }
