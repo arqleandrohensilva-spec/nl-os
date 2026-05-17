@@ -19,7 +19,7 @@ interface LeadDetailPanelProps {
   onAddLog: (leadId: string, log: any) => void;
 }
 
-const STAGES: Stage[] = ['Novo Lead', 'Reunião Agendada', 'Proposta Enviada', 'Negociação', 'Fechado', 'Perdido'];
+const STAGES: Stage[] = ['Novo Lead', 'Reunião Agendada', 'Briefing Preenchido', 'Proposta Enviada', 'Negociação', 'Fechado', 'Perdido'];
 
 const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: LeadDetailPanelProps) => {
   const navigate = useNavigate();
@@ -108,10 +108,36 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
     }
   };
 
+  const getScriptsForStage = (stage: Stage) => {
+    const scriptsMap: Record<string, { situacao: string; texto: string }[]> = {
+      'Novo Lead': [
+        { situacao: "RESPOSTA PADRÃO", texto: `Olá, ${lead.nome}. Tudo bem? Sou arquiteto da NL Arquitetos. Obrigado pelo contato. Para entender se podemos ajudar e como, preciso de duas informações rápidas: — Qual tipo de projeto você está pensando? (residencial, interiores ou comercial) — Em qual cidade o imóvel ou terreno está localizado?` },
+        { situacao: "ENVIO DO PRÉ-BRIEFING", texto: `Perfeito, obrigado pelas informações. O primeiro passo aqui na NL Arquitetos é um pré-briefing — um formulário rápido que leva cerca de 8 minutos. Ele nos permite entender melhor o seu projeto antes da reunião. Segue o link: [LINK] Assim que receber suas respostas, analiso pessoalmente.` }
+      ],
+      'Reunião Agendada': [
+        { situacao: "CONFIRMAÇÃO", texto: `Olá, ${lead.nome}. Confirmando nossa reunião de apresentação amanhã às [HORA]. Podemos manter?` },
+        { situacao: "PÓS-REUNIÃO", texto: `Olá, ${lead.nome}. Foi um prazer conhecer seu projeto hoje. Já estou trabalhando na estruturação da sua proposta e te envio em breve.` }
+      ],
+      'Proposta Enviada': [
+        { situacao: "FOLLOW-UP 48H", texto: `Olá, ${lead.nome}. Tudo bem? Passando para confirmar se você recebeu a proposta que enviei e se ficou com alguma dúvida sobre o escopo ou as fases do projeto.` },
+        { situacao: "REUNIÃO DE DÚVIDAS", texto: `Olá, ${lead.nome}. Geralmente após ler a proposta surgem algumas dúvidas técnicas. Se preferir, podemos fazer uma chamada rápida de 10 minutos para eu te explicar os detalhes do investimento. O que acha?` }
+      ],
+      'Negociação': [
+        { situacao: "FECHAMENTO", texto: `Olá, ${lead.nome}. Estou com o contrato pronto aqui conforme conversamos. Podemos avançar com a assinatura digital hoje?` }
+      ]
+    };
+    return scriptsMap[stage] || [];
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Script copiado!");
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
       <div className="absolute inset-0 bg-graphite/40 backdrop-blur-[8px]" onClick={onClose} />
-      <div className="relative w-[500px] h-full bg-[#111111] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
+      <div className="relative w-[520px] h-full bg-[#111111] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
         <div className="p-10 border-b border-white/10 relative">
           <button onClick={onClose} className="absolute right-8 top-8 text-white/40 hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
           <div className="flex items-center gap-3 mb-2">
@@ -257,6 +283,48 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           </section>
 
           <section>
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Scripts de Atendimento</h4>
+              <span className="text-[8px] px-2 py-0.5 bg-bronze/10 text-bronze border border-bronze/20 font-bold uppercase tracking-widest">{lead.stage}</span>
+            </div>
+            <div className="space-y-3">
+              {getScriptsForStage(lead.stage).length > 0 ? (
+                getScriptsForStage(lead.stage).map((script, idx) => (
+                  <div key={idx} className="bg-white/[0.02] border border-white/5 p-4 group hover:border-bronze/30 transition-all">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-[9px] font-bold text-white/30 uppercase tracking-widest">{script.situacao}</span>
+                      <button 
+                        onClick={() => copyToClipboard(script.texto)}
+                        className="text-white/20 hover:text-bronze transition-colors"
+                      >
+                        <MessageSquare size={14} />
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-white/60 leading-relaxed">{script.texto}</p>
+                    <button 
+                      onClick={() => copyToClipboard(script.texto)}
+                      className="mt-3 w-full py-2 bg-white/5 hover:bg-bronze hover:text-white text-[9px] font-bold uppercase tracking-widest text-white/40 transition-all opacity-0 group-hover:opacity-100"
+                    >
+                      Copiar Script
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 border border-dashed border-white/5 text-center">
+                  <p className="text-[10px] text-white/20 uppercase font-bold tracking-widest">Sem scripts específicos para esta etapa</p>
+                  <Button 
+                    variant="ghost" 
+                    className="mt-4 text-[9px] font-bold uppercase tracking-widest text-bronze"
+                    onClick={() => navigate('/scripts')}
+                  >
+                    Ver Todos os Scripts
+                  </Button>
+                </div>
+              )}
+            </div>
+          </section>
+
+          <section>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Histórico de Contatos</h4>
             <div className="space-y-4">
               {lead.logs.map((log, i) => (
@@ -270,7 +338,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   </div>
                   <p className={cn(
                     "text-white",
-                    log.tipo === 'N' && "italic text-white/40/80 flex items-center gap-2"
+                    log.tipo === 'N' && "italic text-white/40 flex items-center gap-2"
                   )}>
                     {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
                     {log.nota}
