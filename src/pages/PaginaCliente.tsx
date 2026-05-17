@@ -28,7 +28,8 @@ const ETAPAS_JORNADA = [
 
 export default function PaginaCliente() {
   const { slug } = useParams();
-  const param = slug;
+  const location = useLocation();
+  const param = slug || (location.pathname.startsWith('/cliente/') ? location.pathname.split('/').pop() : null);
   const [projeto, setProjeto] = useState<any>(null);
   const [etapas, setEtapas] = useState<any[]>([]);
   const [arquivos, setArquivos] = useState<any[]>([]);
