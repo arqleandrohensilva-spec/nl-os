@@ -74,16 +74,16 @@ const ScriptsAtendimento = () => {
     fetchLeads();
   }, []);
 
+  const handleLeadChange = (id: string) => {
+    setSelectedLeadId(id);
+    setLeadAtivo(leads.find(l => l.id === id) || null);
+  };
+
   useEffect(() => {
     if (location.state?.leadId && leads.length > 0) {
       handleLeadChange(location.state.leadId);
     }
   }, [location.state, leads]);
-
-  const handleLeadChange = (id: string) => {
-    setSelectedLeadId(id);
-    setLeadAtivo(leads.find(l => l.id === id) || null);
-  };
 
   const cleanJSON = (text: string) => {
     return text
