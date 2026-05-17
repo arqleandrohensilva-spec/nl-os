@@ -1230,7 +1230,7 @@ Retorne APENAS JSON válido:
             ) : reviewResult ? (
               <>
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <MessageSquare size={14} className="text-bronze" />
                       Tom de Voz
