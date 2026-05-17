@@ -242,7 +242,31 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   {isConverting ? "Convertendo..." : "Converter em Projeto"}
                 </Button>
               )}
-...
+            </div>
+          </section>
+
+          <section>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Histórico de Contatos</h4>
+            <div className="space-y-4">
+              {lead.logs.map((log, i) => (
+                <div key={i} className={cn(
+                  "text-[11px] p-3 border rounded-none",
+                  log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-white/10"
+                )}>
+                  <div className="flex justify-between text-white/40 text-[9px] mb-1">
+                    <span>{log.data} · {log.autor}</span>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
+                  </div>
+                  <p className={cn(
+                    "text-white",
+                    log.tipo === 'N' && "italic text-white/40/80 flex items-center gap-2"
+                  )}>
+                    {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
+                    {log.nota}
+                  </p>
+                </div>
+              ))}
+            </div>
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
               <select 
                 className="w-full p-2 bg-[#1A1A1A] border border-white/10 text-white text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors" 
@@ -268,7 +292,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <Button className="flex-1 bg-red-600 text-white" onClick={() => onDelete(lead.id)}>Confirmar Exclusão</Button>
             </div>
           ) : (
-            <Button variant="ghost" className="w-full text-white/40 hover:text-red-600 border border-transparent hover:border-red-600 rounded-[2px]" onClick={() => setIsDeleting(true)}>
+            <Button variant="ghost" className="w-full text-white/40 hover:text-red-600 border border-transparent hover:border-red-600 rounded-none" onClick={() => setIsDeleting(true)}>
               <Trash2 size={14} className="mr-2"/> Excluir Lead
             </Button>
           )}
