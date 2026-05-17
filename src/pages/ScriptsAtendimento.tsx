@@ -65,9 +65,15 @@ const ScriptsAtendimento = () => {
         body: {
           prompt: `Você é o assistente de atendimento da NL Arquitetos. Sugira uma resposta para a mensagem do cliente abaixo.
           TOM OBRIGATÓRIO: profissional, condutor, centrado no cliente. Nunca informal, nunca ansioso, nunca com urgência artificial.
-          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
-          ETAPA ATUAL: ${leadAtivo ? leadAtivo.stage : 'Nenhuma etapa definida'}
-          MENSAGEM: ${mensagemCliente}
+          
+          ${leadAtivo ? `CONTEXTO DO LEAD:
+          - Nome: ${leadAtivo.nome}
+          - Tipo de Projeto: ${leadAtivo.tipo}
+          - Cidade: ${leadAtivo.cidade}
+          - Etapa Atual: ${leadAtivo.stage}` : 'CONTEXTO: Gerar uma resposta genérica no tom NL, pois não há um lead específico selecionado.'}
+          
+          MENSAGEM DO CLIENTE: ${mensagemCliente}
+          
           Retorne APENAS JSON: {"resposta": "...", "tom": "...", "proximo_passo": "..."}`
         }
       });
@@ -103,7 +109,7 @@ AS 11 ETAPAS DA JORNADA NL:
 10 - ENTREGA FINAL: projeto concluído, entrega do material
 11 - PÓS-PROJETO: projeto entregue, fase de depoimento e indicação
 
-LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
+          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
 
 MENSAGEM DO CLIENTE:
 ${mensagemDetector}
@@ -147,13 +153,13 @@ CONTEXTO DA NL:
 
 PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
 
-LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
-ETAPA ATUAL: ${etapaAtualObjecao}
-
-OBJEÇÃO / SITUAÇÃO:
-${descricaoObjecao}
-
-Gere uma resposta no tom NL para essa situação específica.
+          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
+          ETAPA ATUAL: ${etapaAtualObjecao || 'Não especificada'}
+          
+          OBJEÇÃO / SITUAÇÃO:
+          ${descricaoObjecao}
+          
+          Gere uma resposta no tom NL para essa situação específica. ${!leadAtivo ? 'Como não há lead selecionado, gere um script genérico que possa ser adaptado.' : `Personalize a resposta para o lead ${leadAtivo.nome} e o tipo de projeto ${leadAtivo.tipo}.`}
 
 Retorne APENAS JSON válido:
 {
