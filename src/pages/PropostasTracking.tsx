@@ -647,7 +647,7 @@ Retorne APENAS JSON válido:
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-[#E8E4DF] pb-1">
+            <div className="flex items-center gap-2 border-b border-white/10 pb-1">
               {[
                 { id: 'all', label: 'Todas' },
                 { id: 'Enviada', label: 'Aguardando' },
@@ -662,7 +662,7 @@ Retorne APENAS JSON válido:
                     "px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 -mb-[2px]",
                     statusFilter === tab.id 
                       ? "border-bronze text-bronze" 
-                      : "border-transparent text-white/40 hover:text-white hover:border-[#E8E4DF]"
+                      : "border-transparent text-white/40 hover:text-white hover:border-white/10"
                   )}
                 >
                   {tab.label}
@@ -673,7 +673,7 @@ Retorne APENAS JSON válido:
             <div className="flex items-center justify-between bg-white/[0.03] p-4 border border-white/10 rounded-[2px] shadow-sm">
               <div className="flex gap-4">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-9 w-40 border-[#E8E4DF] rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
+                  <SelectTrigger className="h-9 w-40 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
                     <SelectValue placeholder="TIPO" />
                   </SelectTrigger>
                   <SelectContent>
@@ -736,13 +736,13 @@ Retorne APENAS JSON válido:
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-[#E8E4DF] mb-4 relative overflow-hidden group/view">
+                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-white/10 mb-4 relative overflow-hidden group/view">
                       <div className="flex items-center gap-2">
                         <Eye size={12} className="text-bronze" />
                         <span className="text-[10px] font-medium tracking-tight">Aberta {p.views_count} vezes</span>
                       </div>
                       {p.last_view_at && (
-                        <div className="flex items-center gap-2 border-l border-[#E8E4DF] pl-4">
+                        <div className="flex items-center gap-2 border-l border-white/10 pl-4">
                           <div className={cn(
                             "w-1.5 h-1.5 rounded-full",
                             new Date().getTime() - new Date(p.last_view_at).getTime() < 1000 * 60 * 60 * 24 
@@ -762,7 +762,7 @@ Retorne APENAS JSON válido:
                     </div>
 
                     {p.proposta_engajamento && p.proposta_engajamento.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-[#E8E4DF]">
+                      <div className="mt-4 pt-4 border-t border-white/10">
                         <button 
                           onClick={() => toggleEngagement(p.id)}
                           className="flex items-center justify-between w-full group/eng py-1"
@@ -909,10 +909,10 @@ Retorne APENAS JSON válido:
                     }}
                     onFocus={() => setShowLeads(true)}
                     onBlur={() => setTimeout(() => setShowLeads(false), 200)}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                   {showLeads && leads.length > 0 && (
-                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-[#E8E4DF] rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
+                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
                       {leads
                         .filter(lead => 
                           !newProposal.cliente || 
@@ -950,7 +950,7 @@ Retorne APENAS JSON válido:
                     value={newProposal.tipo} 
                     onValueChange={(val: any) => setNewProposal({...newProposal, tipo: val})}
                   >
-                    <SelectTrigger className="rounded-[2px] border-[#E8E4DF] h-10">
+                    <SelectTrigger className="rounded-[2px] border-white/10 h-10">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -966,7 +966,7 @@ Retorne APENAS JSON válido:
                     type="date"
                     value={newProposal.data}
                     onChange={(e) => setNewProposal({...newProposal, data: e.target.value})}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                 </div>
               </div>
@@ -977,7 +977,7 @@ Retorne APENAS JSON válido:
                   <Input 
                     value={newProposal.cidade || ''}
                     onChange={(e) => setNewProposal({...newProposal, cidade: e.target.value})}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -985,7 +985,7 @@ Retorne APENAS JSON válido:
                   <Input 
                     value={newProposal.estado || ''}
                     onChange={(e) => setNewProposal({...newProposal, estado: e.target.value})}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                 </div>
               </div>
@@ -997,7 +997,7 @@ Retorne APENAS JSON válido:
                     type="number"
                     value={newProposal.area || ''}
                     onChange={(e) => setNewProposal({...newProposal, area: Number(e.target.value)})}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1006,7 +1006,7 @@ Retorne APENAS JSON válido:
                     type="number"
                     value={newProposal.validade}
                     onChange={(e) => setNewProposal({...newProposal, validade: Number(e.target.value)})}
-                    className="rounded-[2px] border-[#E8E4DF] h-10"
+                    className="rounded-[2px] border-white/10 h-10"
                   />
                 </div>
               </div>
@@ -1018,7 +1018,7 @@ Retorne APENAS JSON válido:
                 <textarea 
                   value={newProposal.objetivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, objetivo: e.target.value})}
-                  className="w-full h-[106px] rounded-[2px] border border-[#E8E4DF] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20"
+                  className="w-full h-[106px] rounded-[2px] border border-white/10 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20"
                 />
               </div>
 
@@ -1028,7 +1028,7 @@ Retorne APENAS JSON válido:
                   type="number"
                   value={newProposal.valor_executivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_executivo: Number(e.target.value)})}
-                  className="rounded-[2px] border-[#E8E4DF] h-10"
+                  className="rounded-[2px] border-white/10 h-10"
                 />
               </div>
 
@@ -1038,13 +1038,13 @@ Retorne APENAS JSON válido:
                   type="number"
                   value={newProposal.valor_completo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_completo: Number(e.target.value)})}
-                  className="rounded-[2px] border-[#E8E4DF] h-10"
+                  className="rounded-[2px] border-white/10 h-10"
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="border-t border-[#E8E4DF] pt-6">
+          <DialogFooter className="border-t border-white/10 pt-6">
             <Button 
               variant="outline" 
               onClick={() => setIsModalOpen(false)}
@@ -1063,7 +1063,7 @@ Retorne APENAS JSON válido:
         </DialogContent>
       </Dialog>
       <Dialog open={isFollowupModalOpen} onOpenChange={setIsFollowupModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-white rounded-[2px] border-[#E8E4DF] p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
+        <DialogContent className="sm:max-w-[500px] bg-[#1A1A1A] border-white/10 text-white p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
           <DialogHeader className="p-6 bg-graphite text-white">
             <DialogTitle className="text-xl font-bold font-cormorant flex items-center gap-2 uppercase tracking-tight">
               <MessageSquare size={20} className="text-bronze" />
@@ -1082,10 +1082,10 @@ Retorne APENAS JSON válido:
                     if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, v, followupLang);
                   }}
                 >
-                  <SelectTrigger className="h-9 rounded-[2px] border-[#E8E4DF] text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-[#E8E4DF] rounded-[2px]">
+                  <SelectContent className="bg-white border-white/10 rounded-[2px]">
                     <SelectItem value="direto" className="text-xs font-bold uppercase tracking-wider">Direto / Amigável</SelectItem>
                     <SelectItem value="formal" className="text-xs font-bold uppercase tracking-wider">Formal / Polido</SelectItem>
                   </SelectContent>
@@ -1100,10 +1100,10 @@ Retorne APENAS JSON válido:
                     if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, followupTone, v);
                   }}
                 >
-                  <SelectTrigger className="h-9 rounded-[2px] border-[#E8E4DF] text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-[#E8E4DF] rounded-[2px]">
+                  <SelectContent className="bg-white border-white/10 rounded-[2px]">
                     <SelectItem value="pt" className="text-xs font-bold uppercase tracking-wider">Português</SelectItem>
                     <SelectItem value="en" className="text-xs font-bold uppercase tracking-wider">English</SelectItem>
                     <SelectItem value="es" className="text-xs font-bold uppercase tracking-wider">Español</SelectItem>
@@ -1117,13 +1117,13 @@ Retorne APENAS JSON válido:
                 Script Recomendado
               </div>
               {isGeneratingFollowup ? (
-                <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px]">
+                <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-white/10 rounded-[2px]">
                   <Loader2 size={24} className="animate-spin text-bronze mb-2" />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 animate-pulse">Gerando análise...</span>
                 </div>
               ) : (
                 <textarea
-                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
+                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-[#FDFDFD] border border-white/10 rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
                   value={followupMessage}
                   onChange={(e) => setFollowupMessage(e.target.value)}
                   placeholder="Aguardando geração do script..."
@@ -1135,7 +1135,7 @@ Retorne APENAS JSON válido:
               <Button 
                 onClick={copyFollowupMessage}
                 variant="outline"
-                className="border-[#E8E4DF] text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
+                className="border-white/10 text-graphite hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
               >
                 <Copy size={16} className="mr-2 text-bronze" />
                 Copiar
@@ -1180,7 +1180,7 @@ Retorne APENAS JSON válido:
               />
             )}
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-[#E8E4DF]">
+        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-white/10">
           <DialogHeader className="p-8 bg-graphite text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Shield size={160} />
@@ -1300,7 +1300,7 @@ Retorne APENAS JSON válido:
             )}
           </div>
 
-          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-[#E8E4DF] flex justify-between items-center sm:justify-between">
+          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-white/10 flex justify-between items-center sm:justify-between">
             <Button 
               variant="outline" 
               onClick={() => setIsReviewModalOpen(false)}
