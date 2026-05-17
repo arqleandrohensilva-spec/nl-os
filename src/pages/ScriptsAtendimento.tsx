@@ -173,16 +173,7 @@ Analise a mensagem e retorne APENAS JSON válido:
       }
 
       console.log("Resposta bruta da Edge Function (Detector):", data);
-
-      let result;
-      if (data.choices?.[0]?.message?.content) {
-        result = JSON.parse(data.choices[0].message.content);
-      } else if (typeof data === 'string') {
-        result = JSON.parse(data);
-      } else {
-        result = data;
-      }
-
+      const result = parseAIResponse(data);
       setResultadoDetector(result);
     } catch (e: any) {
       console.error("Erro completo (Detector):", e);
