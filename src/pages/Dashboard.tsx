@@ -480,7 +480,7 @@ const Dashboard = () => {
                         PREVISÃO DE FECHAMENTO
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-6xl bg-black border-white/10 p-0 overflow-hidden">
+                    <DialogContent className="max-w-6xl bg-[#0F0F0F] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
                       <DialogHeader className="p-8 border-b border-white/5">
                         <DialogTitle className="text-bronze text-sm font-bold uppercase tracking-[0.3em]">
                           PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
