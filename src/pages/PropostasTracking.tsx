@@ -1200,6 +1200,8 @@ Retorne APENAS JSON válido:
                 onGenerateFollowup={(analysis) => handleGenerateFollowup(selectedProposal, analysis)}
               />
             )}
+          </div>
+        </DialogContent>
       </Dialog>
       
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
