@@ -20,7 +20,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, isToday, isPast, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
+import { format, isToday, isPast, addDays, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, parseISO, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -402,6 +402,64 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[0.65fr,0.35fr] gap-16">
           {/* Column Left */}
           <div className="space-y-12">
+            
+            {/* Bloco Notificações Recentes */}
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">NOTIFICAÇÕES RECENTES</span>
+                  <div className="h-[1px] w-24 bg-white/5" />
+                </div>
+                <button 
+                  onClick={() => navigate('/pipeline')}
+                  className="text-[9px] text-white/40 hover:text-white uppercase font-bold tracking-widest"
+                >
+                  VER TODAS
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {(() => {
+                  const { data: recentNotifications = [] } = useQuery({
+                    queryKey: ['recent-notificacoes'],
+                    queryFn: async () => {
+                      const { data: { user } } = await supabase.auth.getUser();
+                      if (!user) return [];
+                      const { data } = await supabase
+                        .from('notificacoes')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .eq('lida', false)
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+                      return data || [];
+                    }
+                  });
+
+                  if (recentNotifications.length === 0) return (
+                    <div className="col-span-3 p-8 bg-white/[0.01] border border-dashed border-white/5 text-center">
+                      <p className="text-white/20 text-xs italic">Nenhuma notificação nova.</p>
+                    </div>
+                  );
+
+                  return recentNotifications.map(notification => (
+                    <div 
+                      key={notification.id}
+                      onClick={() => navigate(notification.modulo)}
+                      className="p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all cursor-pointer group"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[9px] font-bold text-bronze uppercase">{notification.tipo}</span>
+                        <span className="text-[8px] text-white/20 uppercase">
+                          {formatDistanceToNow(new Date(notification.created_at), { locale: ptBR })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white group-hover:text-bronze transition-colors line-clamp-2">{notification.titulo}</p>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </section>
             
             {/* Bloco 1: Ações do Dia */}
             <section>

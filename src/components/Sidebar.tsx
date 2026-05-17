@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, FileSearch } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { supabase } from '@/integrations/supabase/client';
 
@@ -142,20 +146,261 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
                    displayName.toLowerCase() === 'neandro' ? 'NE' : 
                    displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
+  const queryClient = useQueryClient();
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['notificacoes'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+      const { data } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      return data || [];
+    }
+  });
+
+  const unreadCount = notifications.filter(n => !n.lida).length;
+
+  const markAsRead = useMutation({
+    mutationFn: async (id: string) => {
+      await supabase.from('notificacoes').update({ lida: true }).eq('id', id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
+    }
+  });
+
+  const markAllAsRead = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('notificacoes').update({ lida: true }).eq('user_id', user.id).eq('lida', false);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
+    }
+  });
+
+  const getNotificationIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'urgente': return <span className="text-red-500 text-lg">⚡</span>;
+      case 'financeiro': return <span className="text-bronze text-lg">💰</span>;
+      case 'projeto': return <span className="text-bronze text-lg">📋</span>;
+      case 'satisfacao': return <span className="text-green-500 text-lg">⭐</span>;
+      default: return <span className="text-bronze text-lg">📋</span>;
+    }
+  };
+
+  const checkAndCreateNotifications = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const today = new Date();
+    const fiveDaysAgo = new Date(today.getTime() - (5 * 24 * 60 * 60 * 1000)).toISOString();
+    const sevenDaysAgo = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000)).toISOString();
+    const threeDaysAgo = new Date(today.getTime() - (3 * 24 * 60 * 60 * 1000)).toISOString();
+    const twoDaysFromNow = new Date(today.getTime() + (2 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0];
+
+    const { data: existingToday } = await supabase
+      .from('notificacoes')
+      .select('tipo, modulo, created_at')
+      .eq('user_id', user.id)
+      .gt('created_at', new Date(today.getTime() - (24 * 60 * 60 * 1000)).toISOString());
+
+    const hasRecent = (tipo: string, modulo: string) => 
+      existingToday?.some(n => n.tipo === tipo && n.modulo === modulo);
+
+    // 1. Leads Proposta Enviada > 5 dias
+    const { data: leadsProposta } = await supabase
+      .from('leads')
+      .select('id, nome, updated_at')
+      .or('stage.eq.PROPOSTA ENVIADA,stage.eq.Proposta Enviada')
+      .lt('updated_at', fiveDaysAgo);
+
+    for (const lead of (leadsProposta || [])) {
+      if (!hasRecent('urgente', `/`)) {
+        const diff = Math.floor((today.getTime() - new Date(lead.updated_at).getTime()) / (1000 * 60 * 60 * 24));
+        await supabase.from('notificacoes').insert({
+          user_id: user.id,
+          tipo: 'urgente',
+          titulo: `${lead.nome} · Proposta sem retorno há ${diff} dias`,
+          modulo: '/'
+        });
+      }
+    }
+
+    // 2. Parcela vencendo em 2 dias
+    const { data: parcelasVencendo } = await supabase
+      .from('financeiro_parcelas')
+      .select('id, cliente_nome, valor, data_vencimento')
+      .eq('status', 'pendente')
+      .eq('data_vencimento', twoDaysFromNow);
+
+    for (const p of (parcelasVencendo || [])) {
+      if (!hasRecent('financeiro', '/financeiro/projetos')) {
+        await supabase.from('notificacoes').insert({
+          user_id: user.id,
+          tipo: 'financeiro',
+          titulo: `Parcela de R$ ${Number(p.valor).toLocaleString('pt-BR')} vence em 2 dias · ${p.cliente_nome}`,
+          modulo: '/financeiro/projetos'
+        });
+      }
+    }
+
+    // 3. Lead sem contato > 7 dias
+    const { data: leadsSemContato } = await supabase
+      .from('leads')
+      .select('id, nome, proxima_acao_data')
+      .neq('stage', 'FECHADO')
+      .neq('stage', 'Fechado')
+      .lt('proxima_acao_data', sevenDaysAgo);
+
+    for (const lead of (leadsSemContato || [])) {
+      if (!hasRecent('lead', '/')) {
+        const actionDate = lead.proxima_acao_data ? new Date(lead.proxima_acao_data) : new Date();
+        const diff = Math.floor((today.getTime() - actionDate.getTime()) / (1000 * 60 * 60 * 24));
+        await supabase.from('notificacoes').insert({
+          user_id: user.id,
+          tipo: 'lead',
+          titulo: `${lead.nome} · Sem contato há ${diff} dias`,
+          modulo: '/'
+        });
+      }
+    }
+
+    // 4. Checklist pendente > 3 dias
+    const { data: checklistPendente } = await supabase
+      .from('documentos_checklist')
+      .select('id, item, updated_at, projetos(nome)')
+      .eq('status', 'pendente')
+      .lt('updated_at', threeDaysAgo);
+
+    for (const item of (checklistPendente || [])) {
+      const projName = (item as any).projetos?.nome || 'Projeto';
+      if (!hasRecent('projeto', '/projetos/gestao')) {
+        await supabase.from('notificacoes').insert({
+          user_id: user.id,
+          tipo: 'projeto',
+          titulo: `${projName} · Itens pendentes no checklist`,
+          modulo: '/projetos/gestao'
+        });
+      }
+    }
+
+    // 5. Nota baixa <= 6
+    const { data: satisfacaoBaixa } = await supabase
+      .from('pesquisas_satisfacao')
+      .select('id, nota_geral, respondida_em')
+      .lte('nota_geral', 6)
+      .gt('respondida_em', sevenDaysAgo);
+
+    for (const sat of (satisfacaoBaixa || [])) {
+      if (!hasRecent('satisfacao', '/marketing/satisfacao')) {
+        await supabase.from('notificacoes').insert({
+          user_id: user.id,
+          tipo: 'satisfacao',
+          titulo: `Avaliação baixa recebida · nota ${sat.nota_geral}/10`,
+          modulo: '/marketing/satisfacao'
+        });
+      }
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['notificacoes'] });
+  };
+
+  useEffect(() => {
+    checkAndCreateNotifications();
+  }, [location.pathname]);
+
   return (
     <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
       <div className="p-8 mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)]">
-            NL
-          </div>
-          <div className="space-y-0.5">
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)]">
+              NL
             </div>
-            <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">
-              {location.pathname === '/financeiro/base' ? 'Módulo Financeiro' : 'Módulo Pipeline'}
-            </p>
+            <div className="space-y-0.5">
+              <div className="flex items-baseline gap-1">
+                <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
+              </div>
+              <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">
+                {location.pathname === '/financeiro/base' ? 'Módulo Financeiro' : 'Módulo Pipeline'}
+              </p>
+            </div>
+          </div>
+          
+          <div className="relative">
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className={cn(
+                "p-2 rounded-full transition-colors relative",
+                showNotifications ? "text-bronze" : "text-white/40 hover:text-bronze"
+              )}
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <div className="w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center">
+                  {unreadCount}
+                </div>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {showNotifications && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute left-0 mt-4 w-[320px] bg-[#0F0F0F] border border-[#1A1A1A] shadow-2xl z-[60] flex flex-col max-h-[480px]"
+                >
+                  <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-bronze uppercase tracking-widest">NOTIFICAÇÕES</span>
+                    <button 
+                      onClick={() => markAllAsRead.mutate()}
+                      className="text-[9px] text-white/40 hover:text-white uppercase font-bold"
+                    >
+                      Marcar todas como lidas
+                    </button>
+                  </div>
+                  
+                  <div className="flex-1 overflow-y-auto scrollbar-hide">
+                    {notifications.length === 0 ? (
+                      <div className="p-10 text-center">
+                        <p className="text-white/20 text-xs italic">Nenhuma notificação.</p>
+                      </div>
+                    ) : (
+                      notifications.map(notification => (
+                        <div 
+                          key={notification.id}
+                          onClick={() => {
+                            markAsRead.mutate(notification.id);
+                            navigate(notification.modulo);
+                            setShowNotifications(false);
+                          }}
+                          className={cn(
+                            "p-4 border-b border-[#1A1A1A] cursor-pointer transition-colors flex gap-4 items-start",
+                            !notification.lida ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
+                          )}
+                        >
+                          <div className="mt-1">{getNotificationIcon(notification.tipo)}</div>
+                          <div className="flex-1 space-y-1">
+                            <p className="text-sm text-white leading-relaxed">{notification.titulo}</p>
+                            <p className="text-[10px] text-white/30 uppercase tracking-tighter">
+                              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: ptBR })}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
