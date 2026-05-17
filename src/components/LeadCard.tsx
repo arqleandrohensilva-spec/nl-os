@@ -70,14 +70,9 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         lead.stage === 'Perdido' && "opacity-45 grayscale-[0.5]"
       )}
     >
-      {/* Stagnation Alert - Small clock icon with tooltip */}
+      {/* Stagnation Alert - Pulse animation ring only */}
       {isGhosting && (
-        <div 
-          className="absolute top-3 right-3 text-red-500 z-10" 
-          title={`Sem contato há ${daysSinceLastContact} dias`}
-        >
-          <Clock size={12} className="animate-pulse" />
-        </div>
+        <div className="absolute inset-0 ring-1 ring-red-400/30 animate-pulse-subtle pointer-events-none" />
       )}
       {/* Pulse effect for Hot Lead - Left border only */}
       {currentTemp.pulse && (
@@ -99,10 +94,20 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
             {lead.temp}
           </div>
 
-          {/* Score */}
-          <div className="flex items-center gap-1 text-bronze">
-            <span className="text-[9px] font-bold uppercase">Sc.</span>
-            <span className="text-sm font-bold">{score}</span>
+          {/* Score & Stagnation Icon */}
+          <div className="flex items-center gap-2 text-bronze">
+            {isGhosting && (
+              <div 
+                className="text-red-400" 
+                title={`Sem contato há ${daysSinceLastContact} dias`}
+              >
+                <Clock size={12} className="animate-pulse" />
+              </div>
+            )}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] font-bold uppercase">Sc.</span>
+              <span className="text-sm font-bold">{score}</span>
+            </div>
           </div>
         </div>
         
