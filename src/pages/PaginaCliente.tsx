@@ -9,9 +9,6 @@ import {
   Lock, 
   Download, 
   Clock, 
-  CheckCircle2, 
-  MessageSquare, 
-  Send,
   Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,14 +34,12 @@ export default function PaginaCliente() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   
-  // Modais
   const [showAprovarModal, setShowAprovarModal] = useState(false);
   const [showAjusteModal, setShowAjusteModal] = useState(false);
   const [selectedEtapa, setSelectedEtapa] = useState<any>(null);
   const [nomeAprovador, setNomeAprovador] = useState('');
   const [textoAjuste, setTextoAjuste] = useState('');
   
-  // Mensagem direta
   const [nomeMensagem, setNomeMensagem] = useState('');
   const [textoMensagem, setTextoMensagem] = useState('');
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
@@ -59,8 +54,8 @@ export default function PaginaCliente() {
       const { data: proj, error: projError } = await supabase
         .from('projetos')
         .select('*')
-        .eq('token_cliente', token)
-        .single();
+        .eq('token_cliente', token || '')
+        .maybeSingle();
 
       if (projError || !proj) {
         setError(true);
@@ -69,7 +64,6 @@ export default function PaginaCliente() {
 
       setProjeto(proj);
 
-      // Buscar etapas
       const { data: etps } = await supabase
         .from('etapas_projeto')
         .select('*')
@@ -78,7 +72,6 @@ export default function PaginaCliente() {
       
       setEtapas(etps || []);
 
-      // Buscar arquivos
       const { data: arqs } = await supabase
         .from('arquivos_projeto')
         .select('*')
@@ -94,7 +87,7 @@ export default function PaginaCliente() {
     }
   }
 
-  const handleDownload = async (path: string, filename: string) => {
+  const handleDownload = async (path: string) => {
     try {
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
         body: {
@@ -121,8 +114,8 @@ export default function PaginaCliente() {
       const ipResponse = await fetch('https://api.ipify.org?format=json');
       const { ip } = await ipResponse.json();
 
-      const { error: updateError } = await supabase
-        .from('etapas_projeto')
+      const { error: updateError } = await (supabase
+        .from('etapas_projeto') as any)
         .update({
           status: 'Aprovado',
           aprovado_por: nomeAprovador,
@@ -133,8 +126,9 @@ export default function PaginaCliente() {
 
       if (updateError) throw updateError;
 
-      await supabase.from('notificacoes').insert({
+      await (supabase.from('notificacoes') as any).insert({
         tipo: 'projeto',
+        modulo: 'Projetos',
         titulo: '✅ Aprovação recebida',
         descricao: `${nomeAprovador} aprovou ${selectedEtapa.etapa} · ${projeto.nome_cliente}`
       });
@@ -155,15 +149,16 @@ export default function PaginaCliente() {
     }
 
     try {
-      await supabase.from('mensagens_cliente').insert({
+      await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
         token_cliente: token,
         mensagem: textoAjuste,
         tipo: 'ajuste'
       });
 
-      await supabase.from('notificacoes').insert({
+      await (supabase.from('notificacoes') as any).insert({
         tipo: 'projeto',
+        modulo: 'Projetos',
         titulo: '⚠️ Solicitação de ajuste',
         descricao: `${projeto.nome_cliente} solicitou ajuste em ${selectedEtapa.etapa}`
       });
@@ -182,7 +177,7 @@ export default function PaginaCliente() {
 
     setEnviandoMensagem(true);
     try {
-      await supabase.from('mensagens_cliente').insert({
+      await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
         token_cliente: token,
         nome_remetente: nomeMensagem,
@@ -190,8 +185,9 @@ export default function PaginaCliente() {
         tipo: 'mensagem'
       });
 
-      await supabase.from('notificacoes').insert({
+      await (supabase.from('notificacoes') as any).insert({
         tipo: 'projeto',
+        modulo: 'Projetos',
         titulo: '💬 Nova mensagem do cliente',
         descricao: `${nomeMensagem || 'Cliente'} · ${projeto.nome_cliente}`
       });
@@ -237,7 +233,6 @@ export default function PaginaCliente() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-20 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
         <h1 className="font-cormorant text-2xl italic">NL ARQUITETOS</h1>
         <span className="text-[10px] text-bronze uppercase tracking-[0.3em] font-medium hidden sm:block">
@@ -247,7 +242,6 @@ export default function PaginaCliente() {
 
       <main className="pt-32 pb-20 px-8 md:px-20 max-w-7xl mx-auto space-y-20">
         
-        {/* Identificação */}
         <section className="space-y-6">
           <h2 className="font-cormorant text-4xl italic">Olá, {projeto.nome_cliente}.</h2>
           <div className="space-y-1">
@@ -261,7 +255,6 @@ export default function PaginaCliente() {
           </div>
         </section>
 
-        {/* Jornada */}
         <section className="space-y-8">
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">JORNADA DO PROJETO</p>
           <div className="relative overflow-x-auto pb-4 scrollbar-hide">
@@ -273,12 +266,10 @@ export default function PaginaCliente() {
                 
                 return (
                   <div key={step} className="flex flex-col items-center text-center space-y-4 w-1/6 relative">
-                    {/* Line Connector */}
                     {idx < ETAPAS_JORNADA.length - 1 && (
                       <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/10" />
                     )}
                     
-                    {/* Circle */}
                     <div className="z-10 bg-[#0A0A0A]">
                       {isApproved ? (
                         <div className="w-3 h-3 rounded-full bg-bronze" />
@@ -304,7 +295,6 @@ export default function PaginaCliente() {
           </div>
         </section>
 
-        {/* Aprovações Pendentes */}
         {etapasPendentes.length > 0 && (
           <section className="space-y-6">
             <div className="border border-bronze/30 bg-bronze/5 p-8 md:p-12 space-y-8">
@@ -349,7 +339,6 @@ export default function PaginaCliente() {
           </section>
         )}
 
-        {/* Arquivos */}
         <section className="space-y-8">
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">ARQUIVOS DISPONÍVEIS</p>
           
@@ -386,7 +375,7 @@ export default function PaginaCliente() {
                           
                           {arquivo.liberado && (
                             <button 
-                              onClick={() => handleDownload(arquivo.dropbox_path, arquivo.nome_arquivo)}
+                              onClick={() => handleDownload(arquivo.dropbox_path)}
                               className="text-bronze hover:text-white transition-colors text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5"
                             >
                               <Download className="w-3.5 h-3.5" />
@@ -403,7 +392,6 @@ export default function PaginaCliente() {
           )}
         </section>
 
-        {/* Contato */}
         <section className="space-y-8 max-w-2xl">
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">FALAR COM A NL</p>
           <div className="space-y-6">
@@ -436,7 +424,6 @@ export default function PaginaCliente() {
 
       </main>
 
-      {/* Footer */}
       <footer className="py-20 border-t border-white/5 px-8 flex flex-col items-center gap-4">
         <p className="text-white/20 text-[10px] uppercase tracking-[0.4em] text-center">
           NL ARQUITETOS · São José dos Campos, SP
@@ -446,7 +433,6 @@ export default function PaginaCliente() {
         </p>
       </footer>
 
-      {/* Modal Aprovação */}
       <Dialog open={showAprovarModal} onOpenChange={setShowAprovarModal}>
         <DialogContent className="bg-[#121212] border-white/10 rounded-none text-white max-w-md">
           <DialogHeader className="space-y-4">
@@ -485,7 +471,6 @@ export default function PaginaCliente() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal Ajuste */}
       <Dialog open={showAjusteModal} onOpenChange={setShowAjusteModal}>
         <DialogContent className="bg-[#121212] border-white/10 rounded-none text-white max-w-md">
           <DialogHeader>
