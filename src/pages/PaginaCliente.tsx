@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -28,7 +28,8 @@ const ETAPAS_JORNADA = [
 
 export default function PaginaCliente() {
   const { slug } = useParams();
-  const param = slug;
+  const location = useLocation();
+  const param = slug || location.pathname.split('/').pop();
   const [projeto, setProjeto] = useState<any>(null);
   const [etapas, setEtapas] = useState<any[]>([]);
   const [arquivos, setArquivos] = useState<any[]>([]);
