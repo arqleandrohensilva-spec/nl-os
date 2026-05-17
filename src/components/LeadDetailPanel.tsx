@@ -172,12 +172,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             </div>
           </section>
 
-          <section className={cn(
-            "p-6 rounded-[2px] border space-y-4",
-            viability.status === 'prejuizo' ? "bg-red-50 border-red-200" :
-            viability.status === 'alerta' ? "bg-amber-50 border-amber-200" :
-            "bg-green-50 border-green-200"
-          )}>
+          <section className="p-4 rounded-none border border-amber-500/30 bg-white/[0.03] space-y-4">
             <div className="flex items-start gap-3">
               {viability.status === 'prejuizo' ? <AlertCircle size={18} className="text-red-600 shrink-0" /> :
                viability.status === 'alerta' ? <AlertCircle size={18} className="text-amber-600 shrink-0" /> :
@@ -186,20 +181,15 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <div className="space-y-1">
                 <p className={cn(
                   "text-[10px] font-bold uppercase tracking-widest",
-                  viability.status === 'prejuizo' ? "text-red-800" :
-                  viability.status === 'alerta' ? "text-amber-800" :
-                  "text-green-800"
+                  viability.status === 'prejuizo' ? "text-red-600" :
+                  viability.status === 'alerta' ? "text-amber-600" :
+                  "text-green-600"
                 )}>
                   {viability.status === 'prejuizo' ? "ATENÇÃO: Este projeto está abaixo do custo interno" :
                    viability.status === 'alerta' ? "Margem baixa recomendada" :
                    "Projeto Viável"}
                 </p>
-                <p className={cn(
-                  "text-[11px] leading-relaxed",
-                  viability.status === 'prejuizo' ? "text-red-700" :
-                  viability.status === 'alerta' ? "text-amber-700" :
-                  "text-green-700"
-                )}>
+                <p className="text-[11px] leading-relaxed text-white/70">
                   {viability.mensagem}
                 </p>
               </div>
