@@ -228,51 +228,35 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Ações Rápidas</h4>
             <div className="flex flex-col gap-3">
               <div className="flex gap-3">
-                <Button className="flex-1 bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
-                <Button variant="outline" className="flex-1 border-white/10 text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]">Agendar Próxima Ação</Button>
+                <Button className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
+                <Button variant="outline" className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all">Agendar Próxima Ação</Button>
               </div>
               
               {lead.stage === 'Fechado' && (
                 <Button 
                   onClick={handleConvertToProject}
                   disabled={isConverting}
-                  className="w-full bg-bronze hover:bg-bronze/90 text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-[2px] shadow-lg shadow-bronze/20"
+                  className="w-full bg-bronze hover:bg-bronze/90 text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-none transition-all shadow-lg shadow-bronze/20"
                 >
                   <LayoutGrid size={14} className="mr-2" />
                   {isConverting ? "Convertendo..." : "Converter em Projeto"}
                 </Button>
               )}
-            </div>
-          </section>
-
-          <section>
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Histórico de Contatos</h4>
-            <div className="space-y-4">
-              {lead.logs.map((log, i) => (
-                <div key={i} className={cn(
-                  "text-[11px] p-3 border rounded-[2px]",
-                  log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-white/10"
-                )}>
-                  <div className="flex justify-between text-white/40 text-[9px] mb-1">
-                    <span>{log.data} · {log.autor}</span>
-                    {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
-                  </div>
-                  <p className={cn(
-                    "text-white",
-                    log.tipo === 'N' && "italic text-white/40/80 flex items-center gap-2"
-                  )}>
-                    {log.tipo === 'N' && <span className="text-bronze font-bold">→</span>}
-                    {log.nota}
-                  </p>
-                </div>
-              ))}
-            </div>
+...
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
-              <select className="w-full p-2 border border-white/10 text-[11px] rounded-[2px]" onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}>
+              <select 
+                className="w-full p-2 bg-[#1A1A1A] border border-white/10 text-white text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors" 
+                onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}
+              >
                 <option value="N">Nota</option><option value="W">WhatsApp</option><option value="L">Ligação</option>
               </select>
-              <Input placeholder="Descrever o contato..." value={newLog.nota} onChange={(e) => setNewLog({...newLog, nota: e.target.value})} className="rounded-[2px]" />
-              <Button className="w-full bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={handleAddLog}>Registrar</Button>
+              <Input 
+                placeholder="Descrever o contato..." 
+                value={newLog.nota} 
+                onChange={(e) => setNewLog({...newLog, nota: e.target.value})} 
+                className="bg-[#1A1A1A] border-white/10 text-white rounded-none focus:border-bronze transition-colors" 
+              />
+              <Button className="w-full bg-bronze text-white hover:bg-bronze/80 text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={handleAddLog}>Registrar</Button>
             </div>
           </section>
         </div>
