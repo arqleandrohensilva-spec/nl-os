@@ -58,6 +58,44 @@ export type Database = {
           },
         ]
       }
+      arquivos_projeto: {
+        Row: {
+          created_at: string | null
+          dropbox_path: string
+          etapa: string | null
+          id: string
+          liberado: boolean | null
+          nome_arquivo: string
+          projeto_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dropbox_path: string
+          etapa?: string | null
+          id?: string
+          liberado?: boolean | null
+          nome_arquivo: string
+          projeto_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dropbox_path?: string
+          etapa?: string | null
+          id?: string
+          liberado?: boolean | null
+          nome_arquivo?: string
+          projeto_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "arquivos_projeto_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       base_conhecimento: {
         Row: {
           created_at: string | null
