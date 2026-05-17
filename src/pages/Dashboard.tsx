@@ -72,7 +72,6 @@ interface AIInsight {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [aiGreeting, setAiGreeting] = useState<string>("");
   const [aiInsight, setAiInsight] = useState<AIInsight | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
