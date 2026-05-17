@@ -673,7 +673,7 @@ Retorne APENAS JSON válido:
             <div className="flex items-center justify-between bg-white/[0.03] p-4 border border-white/10 rounded-[2px] shadow-sm">
               <div className="flex gap-4">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-9 w-40 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest font-bold">
+                  <SelectTrigger className="h-9 w-40 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest font-bold bg-white/5 text-white">
                     <SelectValue placeholder="TIPO" />
                   </SelectTrigger>
                   <SelectContent>
@@ -909,7 +909,7 @@ Retorne APENAS JSON válido:
                     }}
                     onFocus={() => setShowLeads(true)}
                     onBlur={() => setTimeout(() => setShowLeads(false), 200)}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                   {showLeads && leads.length > 0 && (
                     <div className="absolute top-full left-0 w-full mt-1 bg-[#1A1A1A] border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
@@ -950,7 +950,7 @@ Retorne APENAS JSON válido:
                     value={newProposal.tipo} 
                     onValueChange={(val: any) => setNewProposal({...newProposal, tipo: val})}
                   >
-                    <SelectTrigger className="rounded-[2px] border-white/10 h-10">
+                    <SelectTrigger className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -966,7 +966,7 @@ Retorne APENAS JSON válido:
                     type="date"
                     value={newProposal.data}
                     onChange={(e) => setNewProposal({...newProposal, data: e.target.value})}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
@@ -977,7 +977,7 @@ Retorne APENAS JSON válido:
                   <Input 
                     value={newProposal.cidade || ''}
                     onChange={(e) => setNewProposal({...newProposal, cidade: e.target.value})}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -985,7 +985,7 @@ Retorne APENAS JSON válido:
                   <Input 
                     value={newProposal.estado || ''}
                     onChange={(e) => setNewProposal({...newProposal, estado: e.target.value})}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
@@ -997,7 +997,7 @@ Retorne APENAS JSON válido:
                     type="number"
                     value={newProposal.area || ''}
                     onChange={(e) => setNewProposal({...newProposal, area: Number(e.target.value)})}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1006,7 +1006,7 @@ Retorne APENAS JSON válido:
                     type="number"
                     value={newProposal.validade}
                     onChange={(e) => setNewProposal({...newProposal, validade: Number(e.target.value)})}
-                    className="rounded-[2px] border-white/10 h-10"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
@@ -1028,7 +1028,7 @@ Retorne APENAS JSON válido:
                   type="number"
                   value={newProposal.valor_executivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_executivo: Number(e.target.value)})}
-                  className="rounded-[2px] border-white/10 h-10"
+                  className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                 />
               </div>
 
@@ -1038,7 +1038,7 @@ Retorne APENAS JSON válido:
                   type="number"
                   value={newProposal.valor_completo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_completo: Number(e.target.value)})}
-                  className="rounded-[2px] border-white/10 h-10"
+                  className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                 />
               </div>
             </div>
