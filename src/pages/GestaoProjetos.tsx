@@ -127,7 +127,7 @@ const GestaoProjetos = () => {
       setIsDeleting(id);
       
       const folderName = `${nomeCliente} - ${tipo}`;
-      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/${folderName}`;
+      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${folderName}`;
       
       console.log("Excluindo pasta do Dropbox:", projectPath);
       

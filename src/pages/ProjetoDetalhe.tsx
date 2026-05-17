@@ -459,7 +459,7 @@ const ProjetoDetalhe = () => {
       
       // 1. Delete folder from Dropbox
       const folderName = `${projeto.nome_cliente} - ${projeto.tipo}`;
-      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/${folderName}`;
+      const projectPath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${folderName}`;
       
       console.log("Excluindo pasta do Dropbox:", projectPath);
       

@@ -490,7 +490,7 @@ const DocumentosContratos = () => {
       if (!docxBlob) return;
       
       const folderName = `${contractFormData.cliente.nome} - ${contractFormData.projeto.tipo}`;
-      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${folderName}/05 - Contrato`;
       const path = `${contractFolder}/${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
 
       // Create folder if not exists
@@ -570,7 +570,7 @@ const DocumentosContratos = () => {
       if (!docxBlob) return;
       
       const folderName = `${contract.cliente_nome} - ${contract.tipo}`;
-      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/${folderName}/05 - Contrato`;
+      const contractFolder = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${folderName}/05 - Contrato`;
       const path = `${contractFolder}/${contract.numero} - ${contract.cliente_nome}.docx`;
 
       // Create folder if not exists
@@ -650,7 +650,7 @@ const DocumentosContratos = () => {
     }
   };
 
-  const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS') => {
+  const fetchDropboxFiles = async (path = '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes') => {
     try {
       setDropboxLoading(true);
       const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
@@ -669,7 +669,7 @@ const DocumentosContratos = () => {
       setCurrentPath(path);
       
       // Sempre que listamos a pasta raiz de projetos, atualizamos a lista lateral
-      if (path === '/NL Arquitetos/07 - Projetos NL OS') {
+      if (path === '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes') {
         setDropboxProjectsFolders(data.entries.filter((e: any) => e['.tag'] === 'folder') || []);
       }
     } catch (error: any) {
@@ -836,7 +836,7 @@ const DocumentosContratos = () => {
     try {
       setIsCreatingProject(true);
       const projectFolderName = `${newProjectClient || 'Cliente'} - ${newProjectType || 'Projeto'}`;
-      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/${projectFolderName}`;
+      const projectBasePath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${projectFolderName}`;
       
       const subfolders = [
         '01 - Briefing',
@@ -1198,15 +1198,15 @@ const DocumentosContratos = () => {
                   <div 
                     onClick={() => {
                       setSelectedProjetoArquivos(null);
-                      fetchDropboxFiles('/NL Arquitetos/07 - Projetos NL OS');
+                      fetchDropboxFiles('/NL Arquitetos/07 - Projetos NL OS/01 - Clientes');
                     }}
                     className={cn(
                       "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
-                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos/07 - Projetos NL OS' || currentPath === '')) && "bg-white/5 border-l-2 border-bronze"
+                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes' || currentPath === '')) && "bg-white/5 border-l-2 border-bronze"
                     )}
                   >
                     <Cloud size={14} className="text-blue-400" />
-                    <span>07 - Projetos NL OS</span>
+                    <span>01 - Clientes</span>
                   </div>
                   <div className="h-px bg-white/5 my-4" />
                   <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
