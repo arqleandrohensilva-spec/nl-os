@@ -450,28 +450,27 @@ Gere a mensagem de WhatsApp.`;
   };
 
   const handleReviewProposal = async (proposal: Proposal) => {
+    console.log('revisar clicado', proposal);
     try {
       setSelectedProposal(proposal);
       setIsReviewing(true);
       setReviewResult(null);
       setIsReviewModalOpen(true);
 
-      // Buscar texto da proposta (objetivo no caso de proposals, ou cláusulas de contratos se houvesse vínculo direto)
-      // O prompt pede para buscar do Supabase campo clausulas da tabela contratos ou conteúdo do documento vinculado.
-      // Como estamos no Tracking de Propostas, vamos usar o objetivo da proposta ou simular a busca se houver contrato.
+      let proposalText = proposal.objetivo || "Esta é uma proposta teste para a NL Arquitetos.";
       
-      let proposalText = proposal.objetivo || "";
-      
-      // Tentar buscar contrato vinculado se existir
-      const { data: contractData } = await supabase
-        .from('contratos')
-        .select('dados_gerais')
-        .eq('lead_id', proposal.id) // Assumindo relação via lead_id ou similar
-        .maybeSingle();
+      try {
+        const { data: contractData } = await supabase
+          .from('contratos')
+          .select('dados_gerais')
+          .eq('lead_id', proposal.id)
+          .maybeSingle();
 
-      if (contractData?.dados_gerais) {
-        // Se houver dados mais robustos no contrato, podemos anexar
-        proposalText += "\n\nDETALHES DO CONTRATO:\n" + JSON.stringify(contractData.dados_gerais);
+        if (contractData?.dados_gerais) {
+          proposalText += "\n\nDETALHES DO CONTRATO:\n" + JSON.stringify(contractData.dados_gerais);
+        }
+      } catch (dbError) {
+        console.warn('Erro ao buscar contrato (não crítico):', dbError);
       }
 
       const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo em 3 aspectos:
@@ -517,21 +516,31 @@ Retorne APENAS JSON válido:
       const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
           prompt,
-          model: 'claude-sonnet-4-20250514'
+          model: 'claude-3-5-sonnet-20240620'
         }
       });
 
       if (error) throw error;
       if (data?.error) throw new Error(data.error.message);
 
-      const content = data.choices[0].message.content;
+      let content = data.choices ? data.choices[0].message.content : data.text || data.message;
+      if (!content) throw new Error('Resposta vazia da IA');
+
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content);
       
       setReviewResult(result);
     } catch (error: any) {
       console.error('Error reviewing proposal:', error);
-      toast.error('Erro ao revisar proposta: ' + error.message);
+      toast.error('Erro ao revisar proposta: ' + (error.message || 'Erro desconhecido'));
+      setReviewResult({
+        tom: { status: 'CORRIGIR', problemas: [{ trecho: 'Erro de processamento', sugestao: error.message }] },
+        palavras_proibidas: { status: 'APROVADO', encontradas: [] },
+        checklist: {
+          recapitulacao: false, solucao: false, entregaveis: false, metodo_resolve: false, 
+          investimento: false, proximo_passo: false, sem_urgencia: false
+        }
+      });
     } finally {
       setIsReviewing(false);
     }
