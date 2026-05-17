@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lead, calculateLeadScore } from '@/lib/types';
-import { Star } from 'lucide-react';
+import { Star, Clock } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -70,10 +70,13 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         lead.stage === 'Perdido' && "opacity-45 grayscale-[0.5]"
       )}
     >
-      {/* Ghosting Indicator - Ice flame / Alert icon */}
+      {/* Stagnation Alert - Small clock icon with tooltip */}
       {isGhosting && (
-        <div className="absolute top-1 right-1/2 translate-x-1/2 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-          <span className="text-[7px] font-bold text-amber-500 uppercase tracking-tighter">Sem Contato há {daysSinceLastContact} dias</span>
+        <div 
+          className="absolute top-3 right-3 text-red-500 z-10" 
+          title={`Sem contato há ${daysSinceLastContact} dias`}
+        >
+          <Clock size={12} className="animate-pulse" />
         </div>
       )}
       {/* Pulse effect for Hot Lead - Left border only */}
