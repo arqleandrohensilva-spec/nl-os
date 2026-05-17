@@ -494,13 +494,9 @@ const Dashboard = () => {
                       className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-white/80 text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
                     >
                       <Bell size={14} />
-                      {unreadCount > 0 ? `${unreadCount} notificação${unreadCount > 1 ? 's' : ''}` : 'Notificações'}
-                      {unreadCount > 0 && (
-                        <div className="w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full absolute -top-1.5 -right-1.5 flex items-center justify-center">
-                          {unreadCount}
-                        </div>
-                      )}
+                      {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'}
                     </button>
+
                     <NotificationsPanel 
                       isOpen={showNotifications} 
                       onClose={() => setShowNotifications(false)} 
