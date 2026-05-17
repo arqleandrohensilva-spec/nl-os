@@ -109,7 +109,7 @@ AS 11 ETAPAS DA JORNADA NL:
 10 - ENTREGA FINAL: projeto concluído, entrega do material
 11 - PÓS-PROJETO: projeto entregue, fase de depoimento e indicação
 
-LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
+          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
 
 MENSAGEM DO CLIENTE:
 ${mensagemDetector}
