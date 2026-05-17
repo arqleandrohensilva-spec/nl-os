@@ -1286,6 +1286,7 @@ const Index = () => {
                         tipo: conversionLead.tipo,
                         area_m2: conversionLead.area,
                         valor_proposta: conversionLead.orcamento,
+                        valor_total: conversionLead.orcamento,
                         horas_estimadas: (conversionHours.briefing || 0) + (conversionHours.conceito || 0) + (conversionHours.estudo || 0) + (conversionHours.executivo || 0) + (conversionHours.detalhamento || 0) + (conversionHours.acompanhamento || 0),
                         horas_briefing: conversionHours.briefing,
                         horas_conceito: conversionHours.conceito,
@@ -1294,6 +1295,7 @@ const Index = () => {
                         horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
                         status_geral: 'Em andamento',
+                        etapa_atual: 'Briefing',
                         token_cliente: tokenCliente,
                         dropbox_folder: dropboxFolder || null
                       };
