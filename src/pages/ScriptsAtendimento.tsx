@@ -322,13 +322,13 @@ const ScriptsAtendimento = () => {
                         )}>
                           <div className="flex items-center justify-between mb-3">
                             <span className={cn(
-                              "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest",
+                              "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
                               script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
                             )}>
                               {script.situacao}
                             </span>
                           </div>
-                          <p className="text-[13px] text-white/70 leading-relaxed mb-8">
+                          <p className="text-[14px] text-[#CCCCCC] leading-[1.6] mb-8 font-sans">
                             {replaceVariables(script.texto)}
                           </p>
                           <Button 
