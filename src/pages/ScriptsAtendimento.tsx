@@ -65,9 +65,15 @@ const ScriptsAtendimento = () => {
         body: {
           prompt: `Você é o assistente de atendimento da NL Arquitetos. Sugira uma resposta para a mensagem do cliente abaixo.
           TOM OBRIGATÓRIO: profissional, condutor, centrado no cliente. Nunca informal, nunca ansioso, nunca com urgência artificial.
-          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Nenhum lead selecionado'}
-          ETAPA ATUAL: ${leadAtivo ? leadAtivo.stage : 'Nenhuma etapa definida'}
-          MENSAGEM: ${mensagemCliente}
+          
+          ${leadAtivo ? `CONTEXTO DO LEAD:
+          - Nome: ${leadAtivo.nome}
+          - Tipo de Projeto: ${leadAtivo.tipo}
+          - Cidade: ${leadAtivo.cidade}
+          - Etapa Atual: ${leadAtivo.stage}` : 'CONTEXTO: Gerar uma resposta genérica no tom NL, pois não há um lead específico selecionado.'}
+          
+          MENSAGEM DO CLIENTE: ${mensagemCliente}
+          
           Retorne APENAS JSON: {"resposta": "...", "tom": "...", "proximo_passo": "..."}`
         }
       });
