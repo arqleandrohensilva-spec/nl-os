@@ -190,7 +190,7 @@ const BibliotecaServicos = () => {
               >
                 <div className="relative z-10">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-1 font-bold">{m.label}</p>
-                  <h2 className="text-2xl font-bold text-[#1A1A1A]">{m.value}</h2>
+                  <h2 className="text-2xl font-bold text-white">{m.value}</h2>
                   <p className="text-[10px] text-white/40/60 mt-1 uppercase tracking-wider">{m.sub}</p>
                 </div>
                 <m.icon size={40} className="absolute right-[-10px] bottom-[-10px] text-bronze/5 group-hover:text-bronze/10 transition-colors" />
@@ -218,7 +218,7 @@ const BibliotecaServicos = () => {
                         "text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-[2px] transition-all",
                         filterType === type 
                           ? "bg-[#1A1A1A] text-white" 
-                          : "text-white/40 hover:bg-[#F5F2EF] hover:text-[#1A1A1A]"
+                          : "text-white/40 hover:bg-white/10 hover:text-white"
                       )}
                     >
                       {type === 'all' ? 'Tudo' : type.replace('por_', 'Por ')}
@@ -278,7 +278,7 @@ const BibliotecaServicos = () => {
                             </h4>
                           </div>
 
-                          <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex gap-2 mt-4 opacity-100 transition-opacity">
                             <Button 
                               variant="ghost" 
                               size="sm" 
@@ -385,7 +385,7 @@ const BibliotecaServicos = () => {
 
       {/* New/Edit Service Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-white border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] p-0 max-w-lg overflow-hidden shadow-2xl">
+        <DialogContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px] p-0 max-w-lg overflow-hidden shadow-2xl">
           <div className="p-10">
             <header className="mb-8">
               <h2 className="text-2xl font-bold mb-1">
@@ -403,7 +403,7 @@ const BibliotecaServicos = () => {
                   value={editingServico?.nome || ''} 
                   onChange={(e) => setEditingServico({...editingServico, nome: e.target.value})}
                   placeholder="Ex: Projeto Executivo"
-                  className="bg-[#F8F9FA] border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] h-11"
+                  className="bg-white/5 border-white/10 text-white rounded-[2px] h-11 focus:border-bronze"
                 />
               </div>
 
@@ -413,7 +413,7 @@ const BibliotecaServicos = () => {
                   value={editingServico?.descricao || ''}
                   onChange={(e) => setEditingServico({...editingServico, descricao: e.target.value})}
                   placeholder="Descreva o que está incluso..."
-                  className="w-full h-28 bg-[#F8F9FA] border border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] p-3 text-xs focus:ring-1 focus:ring-bronze outline-none resize-none"
+                  className="w-full h-28 bg-white/5 border border-white/10 text-white rounded-[2px] p-3 text-xs focus:ring-1 focus:ring-bronze outline-none resize-none"
                 />
               </div>
 
@@ -424,10 +424,10 @@ const BibliotecaServicos = () => {
                     value={editingServico?.tipo} 
                     onValueChange={(v: any) => setEditingServico({...editingServico, tipo: v})}
                   >
-                    <SelectTrigger className="bg-[#F8F9FA] border-[#E8E4DF] rounded-[2px] h-11 text-xs">
+                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-[2px] h-11 text-xs">
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
                       <SelectItem value="por_projeto">Por Projeto</SelectItem>
                       <SelectItem value="por_m2">Por m²</SelectItem>
                       <SelectItem value="por_hora">Por Hora</SelectItem>
@@ -444,7 +444,7 @@ const BibliotecaServicos = () => {
                     value={editingServico?.horas_estimadas || ''} 
                     onChange={(e) => setEditingServico({...editingServico, horas_estimadas: Number(e.target.value)})}
                     placeholder="0"
-                    className="bg-[#F8F9FA] border-[#E8E4DF] text-[#1A1A1A] rounded-[2px] h-11"
+                    className="bg-white/5 border-white/10 text-white rounded-[2px] h-11 focus:border-bronze"
                   />
                 </div>
               </div>
@@ -453,7 +453,7 @@ const BibliotecaServicos = () => {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsModalOpen(false)}
-                  className="flex-1 rounded-[2px] h-11 text-[11px] uppercase tracking-widest font-bold border-[#E8E4DF]"
+                  className="flex-1 rounded-[2px] h-11 text-[11px] uppercase tracking-widest font-bold border-white/10 text-white/40 hover:text-white"
                 >
                   Cancelar
                 </Button>
