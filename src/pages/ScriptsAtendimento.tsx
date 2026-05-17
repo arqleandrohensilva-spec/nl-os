@@ -60,27 +60,40 @@ const ScriptsAtendimento = () => {
     if (mensagemCliente.trim().length === 0) return;
     setIsGenerating(true);
     toast.info("Consultando IA...");
+    
+    const systemPrompt = "Você é o assistente de atendimento da NL Arquitetos. Sugira uma resposta para a mensagem do cliente abaixo. TOM OBRIGATÓRIO: profissional, condutor, centrado no cliente. Nunca informal, nunca ansioso, nunca com urgência artificial.";
+    const prompt = `${leadAtivo ? `CONTEXTO DO LEAD:
+    - Nome: ${leadAtivo.nome}
+    - Tipo de Projeto: ${leadAtivo.tipo}
+    - Cidade: ${leadAtivo.cidade}
+    - Etapa Atual: ${leadAtivo.stage}` : 'CONTEXTO: Gerar uma resposta genérica no tom NL, pois não há um lead específico selecionado.'}
+    
+    MENSAGEM DO CLIENTE: ${mensagemCliente}
+    
+    Retorne APENAS JSON: {"resposta": "...", "tom": "...", "proximo_passo": "..."}`;
+
+    console.log("Assistente - System Prompt:", systemPrompt);
+    console.log("Assistente - Prompt:", prompt);
+
     try {
-      const { data, error } = await supabase.functions.invoke('chat-completions', {
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: {
-          prompt: `Você é o assistente de atendimento da NL Arquitetos. Sugira uma resposta para a mensagem do cliente abaixo.
-          TOM OBRIGATÓRIO: profissional, condutor, centrado no cliente. Nunca informal, nunca ansioso, nunca com urgência artificial.
-          
-          ${leadAtivo ? `CONTEXTO DO LEAD:
-          - Nome: ${leadAtivo.nome}
-          - Tipo de Projeto: ${leadAtivo.tipo}
-          - Cidade: ${leadAtivo.cidade}
-          - Etapa Atual: ${leadAtivo.stage}` : 'CONTEXTO: Gerar uma resposta genérica no tom NL, pois não há um lead específico selecionado.'}
-          
-          MENSAGEM DO CLIENTE: ${mensagemCliente}
-          
-          Retorne APENAS JSON: {"resposta": "...", "tom": "...", "proximo_passo": "..."}`
+          systemPrompt,
+          prompt,
+          model: 'claude-sonnet-4-20250514'
         }
       });
-      if (error) throw error;
-      setSugestaoIA(data);
-    } catch (e) {
-      toast.error("Erro ao gerar sugestão");
+      
+      if (error) {
+        console.error("Erro invoke ai-advisor (Assistente):", error);
+        throw error;
+      }
+      
+      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      setSugestaoIA(result);
+    } catch (e: any) {
+      console.error("Erro completo (Assistente):", e);
+      toast.error(`Erro ao gerar sugestão: ${e.message || "Verifique o console"}`);
     } finally {
       setIsGenerating(false);
     }
@@ -90,13 +103,9 @@ const ScriptsAtendimento = () => {
     if (mensagemDetector.trim().length === 0) return;
     setIsDetecting(true);
     toast.info("Identificando momento...");
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-completions', {
-        body: {
-          model: 'claude-sonnet-4-20250514',
-          prompt: `Você é o assistente comercial da NL Arquitetos. Analise a mensagem do cliente abaixo e identifique em qual etapa da jornada ele está.
-
-AS 11 ETAPAS DA JORNADA NL:
+    
+    const systemPrompt = "Você é o assistente comercial da NL Arquitetos. Analise a mensagem do cliente abaixo e identifique em qual etapa da jornada ele está.";
+    const prompt = `AS 11 ETAPAS DA JORNADA NL:
 01 - PRIMEIRO CONTATO: lead acabou de entrar em contato, ainda não foi qualificado
 02 - PRÉ-BRIEFING RECEBIDO: cliente preencheu o formulário, aguarda agendamento
 03 - REUNIÃO AGENDADA: reunião marcada, aguarda confirmação ou lembrete
@@ -109,7 +118,7 @@ AS 11 ETAPAS DA JORNADA NL:
 10 - ENTREGA FINAL: projeto concluído, entrega do material
 11 - PÓS-PROJETO: projeto entregue, fase de depoimento e indicação
 
-          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
+LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
 
 MENSAGEM DO CLIENTE:
 ${mensagemDetector}
@@ -119,15 +128,32 @@ Analise a mensagem e retorne APENAS JSON válido:
   "etapa_numero": 1,
   "etapa_nome": "PRIMEIRO CONTATO",
   "confianca": "ALTA | MÉDIA | BAIXA",
-  "motivo": "explicação em 1-2 linhas do porquê desta etapa",
+  "motivo": "explicação em 1-2 lines do porquê desta etapa",
   "script_recomendado": "nome exato do script mais adequado para usar agora"
-}`
+}`;
+
+    console.log("Detector - System Prompt:", systemPrompt);
+    console.log("Detector - Prompt:", prompt);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: {
+          systemPrompt,
+          prompt,
+          model: 'claude-sonnet-4-20250514'
         }
       });
-      if (error) throw error;
-      setResultadoDetector(data);
-    } catch (e) {
-      toast.error("Erro ao identificar etapa");
+
+      if (error) {
+        console.error("Erro invoke ai-advisor (Detector):", error);
+        throw error;
+      }
+
+      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      setResultadoDetector(result);
+    } catch (e: any) {
+      console.error("Erro completo (Detector):", e);
+      toast.error(`Erro ao identificar etapa: ${e.message || "Verifique o console"}`);
     } finally {
       setIsDetecting(false);
     }
@@ -137,13 +163,9 @@ Analise a mensagem e retorne APENAS JSON válido:
     if (descricaoObjecao.trim().length === 0) return;
     setIsGeneratingObjecao(true);
     toast.info("Gerando script...");
-    try {
-      const { data, error } = await supabase.functions.invoke('chat-completions', {
-        body: {
-          model: 'claude-sonnet-4-20250514',
-          prompt: `Você é o assistente comercial da NL Arquitetos. Gere um script de resposta para a objeção ou situação abaixo.
 
-CONTEXTO DA NL:
+    const systemPrompt = "Você é o assistente comercial da NL Arquitetos. Gere um script de resposta para a objeção ou situação abaixo. Tom: profissional, condutor, sem pressão de venda. Nunca confrontar o cliente — redirecionar com método.";
+    const prompt = `CONTEXTO DA NL:
 - Tom: profissional, condutor, sem pressão de venda
 - Nunca confrontar o cliente — redirecionar com método
 - Sempre centrado no problema do cliente, não na defesa da NL
@@ -153,25 +175,42 @@ CONTEXTO DA NL:
 
 PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
 
-          LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
-          ETAPA ATUAL: ${etapaAtualObjecao || 'Não especificada'}
-          
-          OBJEÇÃO / SITUAÇÃO:
-          ${descricaoObjecao}
-          
-          Gere uma resposta no tom NL para essa situação específica. ${!leadAtivo ? 'Como não há lead selecionado, gere um script genérico que possa ser adaptado.' : `Personalize a resposta para o lead ${leadAtivo.nome} e o tipo de projeto ${leadAtivo.tipo}.`}
+LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}` : 'Contexto genérico (sem lead selecionado)'}
+ETAPA ATUAL: ${etapaAtualObjecao || 'Não especificada'}
+
+OBJEÇÃO / SITUAÇÃO:
+${descricaoObjecao}
+
+Gere uma resposta no tom NL para essa situação específica. ${!leadAtivo ? 'Como não há lead selecionado, gere um script genérico que possa ser adaptado.' : `Personalize a resposta para o lead ${leadAtivo.nome} e o tipo de projeto ${leadAtivo.tipo}.`}
 
 Retorne APENAS JSON válido:
 {
   "script": "texto completo da resposta pronta para enviar",
   "estrategia": "explicação em 1 linha do que foi feito — ex: Reconheceu o ponto e redirecionou para o valor do projeto executivo"
-}`
+}`;
+
+    console.log("Objeção - System Prompt:", systemPrompt);
+    console.log("Objeção - Prompt:", prompt);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: {
+          systemPrompt,
+          prompt,
+          model: 'claude-sonnet-4-20250514'
         }
       });
-      if (error) throw error;
-      setResultadoObjecao(data);
-    } catch (e) {
-      toast.error("Erro ao gerar script");
+
+      if (error) {
+        console.error("Erro invoke ai-advisor (Objeção):", error);
+        throw error;
+      }
+
+      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      setResultadoObjecao(result);
+    } catch (e: any) {
+      console.error("Erro completo (Objeção):", e);
+      toast.error(`Erro ao gerar script: ${e.message || "Verifique o console"}`);
     } finally {
       setIsGeneratingObjecao(false);
     }
