@@ -7,27 +7,30 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface NavItemProps {
   label: string;
+  icon?: React.ReactNode;
   active?: boolean;
   disabled?: boolean;
   onClick?: () => void;
 }
 
-const NavItem = ({ label, active, disabled, onClick }: NavItemProps) => (
+const NavItem = ({ label, icon, active, disabled, onClick }: NavItemProps) => (
   <div 
     onClick={!disabled ? onClick : undefined}
     className={cn(
-
-    "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
-    active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
-    disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
-  )}>
+      "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
+      active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
+      disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
+    )}>
     <div className="flex items-center justify-between gap-2">
-      <span className={cn(
-        "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase",
-        active ? "text-white" : "group-hover:text-white/70"
-      )}>
-        {label}
-      </span>
+      <div className="flex items-center gap-2">
+        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/20 group-hover:text-white/40")}>{icon}</div>}
+        <span className={cn(
+          "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase",
+          active ? "text-white" : "group-hover:text-white/70"
+        )}>
+          {label}
+        </span>
+      </div>
       {disabled && (
         <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
           em breve
