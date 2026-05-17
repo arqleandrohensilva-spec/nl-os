@@ -29,10 +29,10 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
   const maxCount = sortedOrigins[0]?.count || 0;
 
   return (
-    <div className="border-b border-white/10 bg-white">
+    <div className="border-b border-white/10 bg-[#0A0A0A]">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-10 py-2.5 flex items-center justify-between hover:bg-white/5/10 transition-colors"
+        className="w-full px-10 py-2.5 flex items-center justify-between hover:bg-white/[0.03] transition-colors"
       >
         <div className="flex items-center gap-2">
           <BarChart3 size={12} className="text-bronze" />
@@ -63,14 +63,14 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
           {sortedOrigins.map((origin) => (
             <div key={origin.name} className="space-y-1">
               <div className="flex justify-between items-end">
-                <span className="text-[9px] font-bold text-graphite uppercase tracking-widest">
+                <span className="text-[9px] font-bold text-white uppercase tracking-widest">
                   {origin.name}
                 </span>
                 <span className="text-[9px] font-mono text-white/40">
                   {origin.count} {origin.count === 1 ? 'lead' : 'leads'} · {origin.percentage.toFixed(1)}%
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-white/5/30 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                 <div 
                   className={cn(
                     "h-full transition-all duration-1000 ease-out",

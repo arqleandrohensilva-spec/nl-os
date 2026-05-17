@@ -36,7 +36,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
 
   return (
     <div className={cn(
-      "w-full flex-shrink-1 flex flex-col h-full bg-[#F5F5F5]/50 border transition-all duration-200 rounded-[2px]",
+      "w-full flex-shrink-1 flex flex-col h-full bg-[#111111] border transition-all duration-200 rounded-[2px]",
       isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-white/10",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>
@@ -51,7 +51,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
                 boxShadow: `0 0 0 4px ${theme.indicator}20`
               }} 
             />
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black font-mono">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-white font-mono">
               {stage}
             </h2>
           </div>
@@ -61,11 +61,11 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
         </div>
         
         <div className="flex items-baseline gap-2">
-          <span className="text-[18px] font-cormorant text-graphite">{leads.length}</span>
+          <span className="text-[18px] font-cormorant text-white">{leads.length}</span>
           <span className="text-[8px] font-bold text-white/40 uppercase tracking-widest">Leads</span>
           <div className="ml-auto flex items-center gap-1.5">
             <span className={cn(
-              "text-[11px] font-bold text-graphite",
+              "text-[11px] font-bold text-white",
               isHighValue && "scale-110 origin-right transition-transform"
             )}>
               R$ {(totalValue / 1000).toLocaleString('pt-BR')}k
