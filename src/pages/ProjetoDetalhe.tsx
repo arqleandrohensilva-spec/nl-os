@@ -19,7 +19,8 @@ import {
   Image as ImageIcon,
   Check,
   DollarSign,
-  Trash2
+  Trash2,
+  Monitor
 } from 'lucide-react';
 import { format, parseISO, isBefore, startOfDay, addMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
