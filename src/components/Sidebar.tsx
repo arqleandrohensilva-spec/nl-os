@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, FileSearch } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { supabase } from '@/integrations/supabase/client';
