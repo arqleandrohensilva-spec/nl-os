@@ -202,7 +202,7 @@ const LeadCard = ({ lead, index, onClick, onUpdateStatus, onQuickNote }: LeadCar
           <button 
             onClick={(e) => {
               e.stopPropagation();
-              navigate('/marketing/scripts', { state: { leadId: lead.id } });
+              navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } });
             }}
             className="flex flex-col items-center gap-1 text-white/60 hover:text-bronze transition-colors"
           >
