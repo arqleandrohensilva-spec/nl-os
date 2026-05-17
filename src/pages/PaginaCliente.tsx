@@ -268,7 +268,7 @@ export default function PaginaCliente() {
         <section className="space-y-8">
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">JORNADA DO PROJETO</p>
           <div className="relative overflow-x-auto pb-4 scrollbar-hide">
-            <div className="flex min-w-[800px] justify-between items-start pr-10">
+            <div className="flex min-w-[600px] justify-between items-start pr-10">
               {ETAPAS_JORNADA.map((step, idx) => {
                 const etapaData = etapas.find(e => e.etapa?.toUpperCase() === step);
                 const isCurrent = projeto.etapa_atual?.toUpperCase() === step;
