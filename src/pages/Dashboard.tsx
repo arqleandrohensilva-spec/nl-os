@@ -331,7 +331,7 @@ const Dashboard = () => {
         const { data: gData } = await supabase.functions.invoke('ai-advisor', {
           body: { prompt: greetingPrompt, systemPrompt: "Você é um assistente executivo conciso." }
         });
-        setAiGreeting(gData?.choices?.[0]?.message?.content || "");
+        setAiGreeting((gData?.choices?.[0]?.message?.content || "").replace(/^["']|["']$/g, ''));
 
         // Insight
         const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
@@ -464,25 +464,48 @@ const Dashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                {pulse.map(item => (
-                  <div key={item.label} className="space-y-3">
-                    <div className="flex justify-between items-end">
-                      <span className="text-[11px] font-bold tracking-widest text-white/60">{item.label}</span>
-                      <span className="text-[10px] font-mono text-bronze">
-                        {Math.round((item.value / item.max) * 100)}%
-                      </span>
+                {pulse.map(item => {
+                  const percentage = Math.round((item.value / item.max) * 100);
+                  const isCaptação = item.label === 'CAPTAÇÃO';
+                  const isMetaSuperada = isCaptação && item.value > item.max;
+                  const isEmpty = (item.label === 'FINANCEIRO' || item.label === 'EXECUÇÃO') && item.value === 0;
+
+                  return (
+                    <div key={item.label} className="space-y-3">
+                      <div className="flex justify-between items-end">
+                        <span className="text-[11px] font-bold tracking-widest text-white/60">{item.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-mono text-bronze">
+                            {Math.min(percentage, 100)}%
+                          </span>
+                          {isMetaSuperada && (
+                            <span className="px-1.5 py-0.5 bg-green-500/10 text-green-500 text-[8px] font-bold uppercase tracking-wider">
+                              META SUPERADA
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {isEmpty ? (
+                        <div className="h-2 flex items-center">
+                          <p className="text-[10px] text-white/20 italic">— Sem dados este mês</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="h-2 w-full bg-white/5 overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
+                              transition={{ duration: 1, ease: "easeOut" }}
+                              className="h-full bg-bronze"
+                            />
+                          </div>
+                          <p className="text-[10px] text-white/30 uppercase tracking-wider font-medium">{item.subtext}</p>
+                        </>
+                      )}
                     </div>
-                    <div className="h-2 w-full bg-white/5 overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                        className="h-full bg-bronze"
-                      />
-                    </div>
-                    <p className="text-[10px] text-white/30 uppercase tracking-wider font-medium">{item.subtext}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
 
@@ -506,25 +529,29 @@ const Dashboard = () => {
                         <p className="text-xs font-mono">{format(day, 'dd')}</p>
                       </div>
                       
-                      <div className="space-y-2">
-                        {events.map(event => (
-                          <button 
-                            key={event.id}
-                            onClick={() => navigate(event.link)}
-                            className="w-full text-left group"
-                          >
-                            <div className="flex items-start gap-1.5">
-                              <div className={cn(
-                                "w-1.5 h-1.5 rounded-full mt-1 shrink-0",
-                                event.type === 'lead' ? "bg-blue-400" : 
-                                event.type === 'projeto' ? "bg-bronze" : "bg-green-400"
-                              )} />
-                              <p className="text-[9px] text-white/40 leading-tight group-hover:text-white transition-colors truncate">
-                                {event.title}
-                              </p>
-                            </div>
-                          </button>
-                        ))}
+                      <div className="space-y-2 min-h-[40px] flex flex-col items-center justify-center">
+                        {events.length === 0 ? (
+                          <span className="text-white/10 text-lg">—</span>
+                        ) : (
+                          events.map(event => (
+                            <button 
+                              key={event.id}
+                              onClick={() => navigate(event.link)}
+                              className="w-full text-left group"
+                            >
+                              <div className="flex items-start gap-1.5">
+                                <div className={cn(
+                                  "w-1.5 h-1.5 rounded-full mt-1 shrink-0",
+                                  event.type === 'lead' ? "bg-blue-400" : 
+                                  event.type === 'projeto' ? "bg-bronze" : "bg-green-400"
+                                )} />
+                                <p className="text-[9px] text-white/40 leading-tight group-hover:text-white transition-colors truncate">
+                                  {event.title}
+                                </p>
+                              </div>
+                            </button>
+                          ))
+                        )}
                       </div>
                     </div>
                   );
@@ -552,14 +579,13 @@ const Dashboard = () => {
                     <div className="h-10 mt-4 bg-white/5 animate-pulse w-full" />
                   </div>
                 ) : aiInsight ? (
-                  <div className="space-y-6">
-                    <p className="text-sm leading-relaxed text-white/90 font-medium">
+                  <div className="space-y-0">
+                    <p className="text-sm leading-relaxed text-white/90 font-medium mb-6">
                       {aiInsight.insight}
                     </p>
-                    <div className="h-[1px] w-full bg-white/5" />
-                    <div>
-                      <p className="text-[10px] text-bronze uppercase font-bold tracking-widest mb-4">
-                        → AÇÃO: <span className="text-white/80">{aiInsight.acao}</span>
+                    <div className="border-t border-bronze/20 pt-4 mt-4">
+                      <p className="text-xs text-bronze font-bold uppercase tracking-widest mb-4">
+                        → AÇÃO: <span className="text-white/80 normal-case font-normal">{aiInsight.acao}</span>
                       </p>
                       <Button 
                         onClick={() => navigate(aiInsight.modulo === 'pipeline' ? '/pipeline' : aiInsight.modulo === 'financeiro' ? '/financeiro/base' : `/${aiInsight.modulo}`)}
