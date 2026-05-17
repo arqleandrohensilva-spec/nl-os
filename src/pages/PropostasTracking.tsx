@@ -1366,9 +1366,6 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
         </DialogContent>
       </Dialog>
     </div>
-        </DialogContent>
-      </Dialog>
-    </div>
   );
 };
 
