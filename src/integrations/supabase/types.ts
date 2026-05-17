@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      aprovacoes: {
+        Row: {
+          created_at: string
+          data: string
+          documento: string | null
+          etapa: string
+          id: string
+          ip_address: string | null
+          nome_aprovador: string
+          projeto_id: string
+          token_cliente: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          etapa: string
+          id?: string
+          ip_address?: string | null
+          nome_aprovador: string
+          projeto_id: string
+          token_cliente?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          documento?: string | null
+          etapa?: string
+          id?: string
+          ip_address?: string | null
+          nome_aprovador?: string
+          projeto_id?: string
+          token_cliente?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "aprovacoes_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       base_conhecimento: {
         Row: {
           created_at: string | null
@@ -783,6 +827,38 @@ export type Database = {
         }
         Relationships: []
       }
+      mensagens_cliente: {
+        Row: {
+          created_at: string
+          id: string
+          mensagem: string
+          projeto_id: string
+          token_cliente: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mensagem: string
+          projeto_id: string
+          token_cliente?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mensagem?: string
+          projeto_id?: string
+          token_cliente?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensagens_cliente_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notificacoes: {
         Row: {
           created_at: string
@@ -998,6 +1074,7 @@ export type Database = {
           prazo_final: string | null
           status_geral: string | null
           tipo: string | null
+          token_cliente: string | null
           updated_at: string | null
           valor_proposta: number | null
           valor_total: number | null
@@ -1024,6 +1101,7 @@ export type Database = {
           prazo_final?: string | null
           status_geral?: string | null
           tipo?: string | null
+          token_cliente?: string | null
           updated_at?: string | null
           valor_proposta?: number | null
           valor_total?: number | null
@@ -1050,6 +1128,7 @@ export type Database = {
           prazo_final?: string | null
           status_geral?: string | null
           tipo?: string | null
+          token_cliente?: string | null
           updated_at?: string | null
           valor_proposta?: number | null
           valor_total?: number | null
