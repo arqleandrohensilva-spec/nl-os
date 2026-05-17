@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index.tsx";
@@ -25,6 +25,7 @@ import PesquisaSatisfacao from "./pages/PesquisaSatisfacao.tsx";
 import MarketingIA from "./pages/MarketingIA.tsx";
 import ScriptsAtendimento from "./pages/ScriptsAtendimento.tsx";
 import ModoApresentacao from "./pages/ModoApresentacao.tsx";
+import PaginaCliente from "./pages/PaginaCliente.tsx";
 
 const queryClient = new QueryClient();
 
@@ -34,29 +35,35 @@ const App = () => (
     <Sonner />
     <BrowserRouter>
       <Routes>
+        {/* Rotas Públicas */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/pipeline" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-        <Route path="/financeiro/base" element={<ProtectedRoute><BaseFinanceira /></ProtectedRoute>} />
-        <Route path="/projetos/horas" element={<ProtectedRoute><ControleHoras /></ProtectedRoute>} />
-        <Route path="/propostas/biblioteca" element={<ProtectedRoute><BibliotecaServicos /></ProtectedRoute>} />
-        <Route path="/projetos/gestao" element={<ProtectedRoute><GestaoProjetos /></ProtectedRoute>} />
-        <Route path="/projetos/detalhe/:id" element={<ProtectedRoute><ProjetoDetalhe /></ProtectedRoute>} />
-        <Route path="/financeiro/projetos" element={<ProtectedRoute><FinanceiroProjetos /></ProtectedRoute>} />
-        <Route path="/propostas/documentos" element={<ProtectedRoute><DocumentosContratos /></ProtectedRoute>} />
-        <Route path="/propostas/tracking" element={<ProtectedRoute><PropostasTracking /></ProtectedRoute>} />
-        <Route path="/sistema/configuracoes" element={<ProtectedRoute><ConfiguracoesSistema /></ProtectedRoute>} />
-        <Route path="/dropbox-callback" element={<DropboxCallback />} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
         <Route path="/briefing/:token" element={<BriefingPublic />} />
-        <Route path="/marketing/satisfacao" element={<ProtectedRoute><SatisfacaoDashboard /></ProtectedRoute>} />
         <Route path="/satisfacao/:token" element={<PesquisaSatisfacao />} />
-        <Route path="/marketing/ia" element={<ProtectedRoute><MarketingIA /></ProtectedRoute>} />
-        <Route path="/scripts-atendimento" element={<ProtectedRoute><ScriptsAtendimento /></ProtectedRoute>} />
-        <Route path="/apresentacao/:id" element={<ProtectedRoute><ModoApresentacao /></ProtectedRoute>} />
-        <Route path="/cliente/:token" element={<ModoApresentacao />} />
+        <Route path="/cliente/:token" element={<PaginaCliente />} />
+        <Route path="/dropbox-callback" element={<DropboxCallback />} />
+
+        {/* Rotas Protegidas */}
+        <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/pipeline" element={<Index />} />
+          <Route path="/financeiro/base" element={<BaseFinanceira />} />
+          <Route path="/projetos/horas" element={<ControleHoras />} />
+          <Route path="/propostas/biblioteca" element={<BibliotecaServicos />} />
+          <Route path="/projetos/gestao" element={<GestaoProjetos />} />
+          <Route path="/projetos/detalhe/:id" element={<ProjetoDetalhe />} />
+          <Route path="/financeiro/projetos" element={<FinanceiroProjetos />} />
+          <Route path="/propostas/documentos" element={<DocumentosContratos />} />
+          <Route path="/propostas/tracking" element={<PropostasTracking />} />
+          <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
+          <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
+          <Route path="/marketing/ia" element={<MarketingIA />} />
+          <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
+          <Route path="/apresentacao/:id" element={<ModoApresentacao />} />
+        </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
