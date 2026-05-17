@@ -847,7 +847,7 @@ const Index = () => {
                 <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
-                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/10 text-white/40 hover:border-white/40")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/40")} />{temp}</button>
+                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/10 text-white/40 hover:text-white hover:border-white/20")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/40")} />{temp}</button>
                   ))}
                 </div>
               </div>
