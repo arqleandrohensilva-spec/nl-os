@@ -266,7 +266,7 @@ const Dashboard = () => {
       {
         label: 'SATISFAÇÃO',
         value: avgSatisfacao,
-        max: 5,
+        max: 10,
         subtext: `${avgSatisfacao.toFixed(1)} média · ${satisfacao.length} avaliações`
       }
     ];
@@ -529,9 +529,9 @@ const Dashboard = () => {
                         <p className="text-xs font-mono">{format(day, 'dd')}</p>
                       </div>
                       
-                      <div className="space-y-2 min-h-[40px] flex flex-col items-center justify-center">
+                      <div className="space-y-2 min-h-[80px] flex flex-col items-center justify-center">
                         {events.length === 0 ? (
-                          <span className="text-white/10 text-lg">—</span>
+                          <span className="text-white/10 text-lg flex items-center justify-center h-full">—</span>
                         ) : (
                           events.map(event => (
                             <button 
