@@ -187,7 +187,7 @@ const ModoApresentacao = () => {
                         ? format(parseISO(etapaData.data_aprovacao), 'dd/MM/yyyy')
                         : etapaData?.data_entrega 
                           ? format(parseISO(etapaData.data_entrega), 'dd/MM/yyyy')
-                          : '--/--/----'
+                          : <span className="text-white/30 italic">A definir</span>
                       }
                     </p>
                   </div>
@@ -207,7 +207,7 @@ const ModoApresentacao = () => {
             </div>
             <div className="space-y-2">
               <p className="text-bronze text-[10px] uppercase tracking-[0.4em] font-bold">ETAPA ATUAL</p>
-              <h2 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">PROJETO {projeto.etapa_atual}</h2>
+              <h2 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">{projeto.etapa_atual}</h2>
             </div>
             
             <div className="h-[1px] w-full bg-bronze/20" />
@@ -216,14 +216,14 @@ const ModoApresentacao = () => {
               <div className="space-y-2">
                 <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Início</p>
                 <p className="text-xl font-light">
-                  {etapaAtualData?.data_inicio ? format(parseISO(etapaAtualData.data_inicio), 'dd/MM/yyyy') : '--/--/----'}
+                  {etapaAtualData?.data_inicio ? format(parseISO(etapaAtualData.data_inicio), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}
                 </p>
               </div>
               <div className="space-y-2">
                 <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Próxima Entrega</p>
                 <div className="flex items-baseline gap-3">
                   <p className="text-xl font-light">
-                    {etapaAtualData?.data_entrega ? format(parseISO(etapaAtualData.data_entrega), 'dd/MM/yyyy') : '--/--/----'}
+                    {etapaAtualData?.data_entrega ? format(parseISO(etapaAtualData.data_entrega), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}
                   </p>
                   {daysRemaining !== null && (
                     <span className={cn("text-xs font-bold uppercase tracking-widest", getStatusColor(daysRemaining))}>
@@ -259,7 +259,7 @@ const ModoApresentacao = () => {
                     <div className="w-5 h-5 rounded-full border border-white/10" />
                     <div className="flex flex-col">
                       <span>{e.etapa}</span>
-                      <span className="text-xs">{e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM') : 'A definir'}</span>
+                      <span className="text-xs">{e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM') : <span className="text-white/30 italic">A definir</span>}</span>
                     </div>
                   </li>
                 ))}
@@ -281,8 +281,8 @@ const ModoApresentacao = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    <h3 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">ETAPA {e.etapa}</h3>
-                    <p className="text-white/40 text-sm">Enviado em {e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM/yyyy') : '--/--/----'}</p>
+                    <h3 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">{e.etapa}</h3>
+                    <p className="text-white/40 text-sm">Enviado em {e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}</p>
                   </div>
 
                   <div className="flex flex-col md:flex-row gap-6">
