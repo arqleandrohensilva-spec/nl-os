@@ -1042,13 +1042,13 @@ Máximo 3 linhas. Sem markdown. Em português.
           </div>
 
           {/* Evolução do Custo/Hora Section */}
-          <div className="border border-white/10 rounded-[4px] overflow-hidden bg-white">
+          <div className="border border-white/10 rounded-[4px] overflow-hidden bg-white/[0.03]">
             <button 
               onClick={() => setIsEvolucaoOpen(!isEvolucaoOpen)}
-              className="w-full flex items-center justify-between p-5 hover:bg-white/5/10 transition-colors"
+              className="w-full flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors"
             >
               <div className="flex items-center gap-4">
-                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-white/5/30 text-white/40")}>
+                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-white/[0.08] text-white/40")}>
                   <History size={16} />
                 </div>
                 <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">Evolução do Custo/Hora</span>

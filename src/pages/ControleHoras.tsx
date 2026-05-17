@@ -638,7 +638,7 @@ const ControleHoras = () => {
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
                   </span>
-                  <span className="text-[#1A1A1A]/20">|</span>
+                  <span className="text-white/20">|</span>
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.neandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.neandro >= 30 ? '✓' : '✗'} Neandro
                   </span>
@@ -738,7 +738,7 @@ const ControleHoras = () => {
                   <div className="mb-8">
                     <div className="flex justify-between text-[9px] uppercase tracking-wider text-white/40 mb-1.5 font-bold">
                       <StageBadge stage={p.etapa_atual} />
-                      <span className={cn(progress > 90 ? "text-rose-500" : "text-[#1A1A1A]")}>
+                      <span className={cn(progress > 90 ? "text-rose-500" : "text-white")}>
                         {Math.round(totalHoras)}h / {p.horas_estimadas}h
                       </span>
                     </div>
@@ -823,10 +823,10 @@ const ControleHoras = () => {
           </button>
           
           {isReportExpanded && (
-            <div className="px-6 pb-6 border-t border-[#E8E4DF] pt-6">
+            <div className="px-6 pb-6 border-t border-white/10 pt-6">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-widest text-white/40 border-b border-[#E8E4DF]">
+                  <tr className="text-[9px] uppercase tracking-widest text-white/40 border-b border-white/10">
                     <th className="pb-4 font-bold text-white/40">Projeto</th>
                     <th className="pb-4 font-bold text-white/40">Receita</th>
                     <th className="pb-4 font-bold text-white/40">Custo Int.</th>

@@ -952,7 +952,7 @@ const DocumentosContratos = () => {
                 >
                   <RefreshCw size={14} className={cn("mr-2", dropboxLoading && "animate-spin")} /> ATUALIZAR
                 </Button>
-                <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-white hover:bg-white/90 text-black border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
+                <Button onClick={() => setIsNewProjectModalOpen(true)} className="bg-bronze hover:bg-bronze/80 text-white border-none rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold">
                   <Plus size={14} className="mr-2" /> NOVO PROJETO
                 </Button>
               </div>
