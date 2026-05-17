@@ -294,6 +294,56 @@ Analise a mensagem e retorne APENAS JSON válido:
             </div>
           )}
 
+          {/* BLOCO — DETECTOR DE MOMENTO */}
+          <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-bronze">
+                <Bot size={16} />
+                <p className="text-[10px] uppercase font-bold tracking-widest">DETECTOR DE MOMENTO · IA</p>
+              </div>
+              <p className="text-[10px] text-white/30 italic">Cole a última mensagem do cliente e a IA identifica em qual etapa ele está</p>
+            </div>
+            <Textarea 
+              className="bg-[#0F0F0F] border-white/5 text-white min-h-[100px] focus-visible:ring-bronze" 
+              placeholder="Cole aqui a última mensagem recebida do cliente..."
+              value={mensagemDetector}
+              onChange={(e) => setMensagemDetector(e.target.value)}
+            />
+            <Button 
+              className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
+              onClick={identificarEtapa}
+              disabled={isDetecting || !leadAtivo || !mensagemDetector}
+            >
+              {isDetecting ? "IDENTIFICANDO..." : "IDENTIFICAR ETAPA · IA"}
+            </Button>
+
+            {resultadoDetector && (
+              <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 rounded-md space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-bronze text-black">
+                  ETAPA {String(resultadoDetector.etapa_numero).padStart(2, '0')} — {resultadoDetector.etapa_nome}
+                </div>
+                
+                <p className="text-xs text-[#CCCCCC] leading-relaxed">
+                  {resultadoDetector.motivo}
+                </p>
+
+                <div className="pt-2 border-t border-white/5">
+                  <p className="text-[9px] text-white/40 uppercase tracking-widest mb-1">Script Recomendado</p>
+                  <p className="text-xs font-semibold text-bronze">{resultadoDetector.script_recomendado}</p>
+                </div>
+
+                <Button 
+                  variant="outline"
+                  onClick={() => setOpenEtapa(String(resultadoDetector.etapa_numero).padStart(2, '0'))}
+                  className="w-full border-bronze/50 text-bronze hover:bg-bronze hover:text-black h-9 text-[10px] font-bold tracking-wider"
+                >
+                  IR PARA ESTA ETAPA
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* BLOCO — ASSISTENTE DE ATENDIMENTO */}
           <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2 text-bronze">
