@@ -489,178 +489,219 @@ Retorne APENAS JSON válido:
           )}
 
           {/* BLOCO — DETECTOR DE MOMENTO */}
-          <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-bronze">
-                <Bot size={16} />
-                <p className="text-[10px] uppercase font-bold tracking-widest">DETECTOR DE MOMENTO · IA</p>
-              </div>
-              <p className="text-[10px] text-white/30 italic">Cole a última mensagem do cliente e a IA identifica em qual etapa ele está</p>
-            </div>
-            <Textarea 
-              className="bg-[#0F0F0F] border-white/5 text-white min-h-[100px] focus-visible:ring-bronze" 
-              placeholder="Cole aqui a última mensagem recebida do cliente..."
-              value={mensagemDetector}
-              onChange={(e) => setMensagemDetector(e.target.value)}
-            />
-            <Button 
-              className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
-              onClick={identificarEtapa}
-              disabled={isDetecting || mensagemDetector.trim().length === 0}
+          <div className={cn(
+            "border transition-all duration-300",
+            activeIABlock === 'detector' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+          )}>
+            <button 
+              className="w-full px-5 py-4 flex items-center justify-between group"
+              onClick={() => setActiveIABlock(activeIABlock === 'detector' ? null : 'detector')}
             >
-              {isDetecting ? "IDENTIFICANDO..." : "IDENTIFICAR ETAPA · IA"}
-            </Button>
-
-            {resultadoDetector && (
-              <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 rounded-md space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-bronze text-black">
-                  ETAPA {String(resultadoDetector.etapa_numero).padStart(2, '0')} — {resultadoDetector.etapa_nome}
+              <div className="flex items-center gap-3">
+                <FileText size={18} className="text-bronze" />
+                <div className="text-left">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">DETECTOR DE MOMENTO · IA</p>
+                  <p className="text-[9px] text-white/30 italic">Identifique em qual das 11 etapas o lead está agora</p>
                 </div>
-                
-                <p className="text-xs text-[#CCCCCC] leading-relaxed">
-                  {resultadoDetector.motivo}
-                </p>
+              </div>
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'detector' && "rotate-180 text-bronze")} size={16} />
+            </button>
 
-                <div className="pt-2 border-t border-white/5">
-                  <p className="text-[9px] text-white/40 uppercase tracking-widest mb-1">Script Recomendado</p>
-                  <p className="text-xs font-semibold text-bronze">{resultadoDetector.script_recomendado}</p>
-                </div>
-
+            {activeIABlock === 'detector' && (
+              <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <Textarea 
+                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[100px] focus-visible:ring-bronze text-xs" 
+                  placeholder="Cole aqui a última mensagem recebida do cliente..."
+                  value={mensagemDetector}
+                  onChange={(e) => setMensagemDetector(e.target.value)}
+                />
                 <Button 
-                  variant="outline"
-                  onClick={() => setOpenEtapa(String(resultadoDetector.etapa_numero).padStart(2, '0'))}
-                  className="w-full border-bronze/50 text-bronze hover:bg-bronze hover:text-black h-9 text-[10px] font-bold tracking-wider"
+                  className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
+                  onClick={identificarEtapa}
+                  disabled={isDetecting || mensagemDetector.trim().length === 0}
                 >
-                  IR PARA ESTA ETAPA
+                  {isDetecting ? "IDENTIFICANDO..." : "IDENTIFICAR ETAPA · IA"}
                 </Button>
+
+                {resultadoDetector && (
+                  <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 rounded-md space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-bronze text-black">
+                      ETAPA {String(resultadoDetector.etapa_numero).padStart(2, '0')} — {resultadoDetector.etapa_nome}
+                    </div>
+                    
+                    <p className="text-xs text-[#CCCCCC] leading-relaxed">
+                      {resultadoDetector.motivo}
+                    </p>
+
+                    <div className="pt-2 border-t border-white/5">
+                      <p className="text-[9px] text-white/40 uppercase tracking-widest mb-1">Script Recomendado</p>
+                      <p className="text-xs font-semibold text-bronze">{resultadoDetector.script_recomendado}</p>
+                    </div>
+
+                    <Button 
+                      variant="outline"
+                      onClick={() => setOpenEtapa(String(resultadoDetector.etapa_numero).padStart(2, '0'))}
+                      className="w-full border-bronze/50 text-bronze hover:bg-bronze hover:text-black h-9 text-[10px] font-bold tracking-wider"
+                    >
+                      IR PARA ESTA ETAPA
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* BLOCO — GERADOR DE OBJEÇÃO */}
-          <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-bronze">
-                <Bot size={16} />
-                <p className="text-[10px] uppercase font-bold tracking-widest">OBJEÇÃO NÃO MAPEADA · IA</p>
-              </div>
-              <p className="text-[10px] text-white/30 italic">Situação fora dos scripts padrão? A IA gera a resposta certa no tom NL</p>
-            </div>
-
-            <div className="space-y-3">
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 block">O QUE O CLIENTE DISSE</label>
-                <Textarea 
-                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[80px] focus-visible:ring-bronze text-xs" 
-                  placeholder="Ex: Cliente disse que vai construir com o cunhado que é engenheiro e não precisa de arquiteto..."
-                  value={descricaoObjecao}
-                  onChange={(e) => setDescricaoObjecao(e.target.value)}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[9px] uppercase tracking-widest text-white/40 block">ETAPA ATUAL</label>
-                <Select onValueChange={setEtapaAtualObjecao} value={etapaAtualObjecao}>
-                  <SelectTrigger className="bg-[#0F0F0F] border-white/5 text-white h-9 text-xs">
-                    <SelectValue placeholder="Selecione a etapa..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#141414] border-white/10 text-white">
-                    {scriptsContent.map((etapa) => (
-                      <SelectItem key={etapa.id} value={etapa.titulo} className="focus:bg-bronze/20 focus:text-white text-xs">
-                        {etapa.id} - {etapa.titulo}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <Button 
-              className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
-              onClick={gerarScriptObjecao}
-              disabled={isGeneratingObjecao || descricaoObjecao.trim().length === 0}
+          <div className={cn(
+            "border transition-all duration-300",
+            activeIABlock === 'objecao' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+          )}>
+            <button 
+              className="w-full px-5 py-4 flex items-center justify-between group"
+              onClick={() => setActiveIABlock(activeIABlock === 'objecao' ? null : 'objecao')}
             >
-              {isGeneratingObjecao ? "GERANDO..." : "GERAR SCRIPT · IA"}
-            </Button>
-
-            {resultadoObjecao && (
-              <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                <div className="flex items-center justify-between">
-                  <span className="text-[8px] px-2 py-0.5 font-bold bg-bronze text-black uppercase tracking-widest font-mono">SCRIPT GERADO · NL</span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 text-white/40 hover:text-white"
-                    onClick={() => copyToClipboard(resultadoObjecao.script)}
-                  >
-                    <Copy size={12} />
-                  </Button>
+              <div className="flex items-center gap-3">
+                <Bot size={18} className="text-bronze" />
+                <div className="text-left">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">OBJEÇÃO NÃO MAPEADA · IA</p>
+                  <p className="text-[9px] text-white/30 italic">A IA gera a resposta certa no tom NL para situações fora do padrão</p>
                 </div>
-                
-                <p className="text-[13px] text-[#CCCCCC] leading-relaxed whitespace-pre-wrap font-sans">
-                  {resultadoObjecao.script}
-                </p>
+              </div>
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'objecao' && "rotate-180 text-bronze")} size={16} />
+            </button>
 
-                <div className="pt-2 border-t border-white/5 space-y-3">
-                  <div>
-                    <p className="text-[8px] text-white/40 uppercase tracking-widest mb-0.5">ESTRATÉGIA USADA</p>
-                    <p className="text-[10px] text-white/60 italic leading-tight">{resultadoObjecao.estrategia}</p>
+            {activeIABlock === 'objecao' && (
+              <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] uppercase tracking-widest text-white/40 block">O QUE O CLIENTE DISSE</label>
+                    <Textarea 
+                      className="bg-[#0F0F0F] border-white/5 text-white min-h-[80px] focus-visible:ring-bronze text-xs" 
+                      placeholder="Ex: Cliente disse que vai construir com o cunhado que é engenheiro..."
+                      value={descricaoObjecao}
+                      onChange={(e) => setDescricaoObjecao(e.target.value)}
+                    />
                   </div>
-                  
-                  <Button 
-                    onClick={() => copyToClipboard(resultadoObjecao.script)}
-                    className="w-full bg-bronze/10 text-bronze hover:bg-bronze hover:text-black border border-bronze/20 h-9 text-[10px] font-bold tracking-wider"
-                  >
-                    COPIAR SCRIPT
-                  </Button>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[9px] uppercase tracking-widest text-white/40 block">ETAPA ATUAL</label>
+                    <Select onValueChange={setEtapaAtualObjecao} value={etapaAtualObjecao}>
+                      <SelectTrigger className="bg-[#0F0F0F] border-white/5 text-white h-9 text-xs">
+                        <SelectValue placeholder="Selecione a etapa..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#141414] border-white/10 text-white">
+                        {scriptsContent.map((etapa) => (
+                          <SelectItem key={etapa.id} value={etapa.titulo} className="focus:bg-bronze/20 focus:text-white text-xs">
+                            {etapa.id} - {etapa.titulo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+
+                <Button 
+                  className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
+                  onClick={gerarScriptObjecao}
+                  disabled={isGeneratingObjecao || descricaoObjecao.trim().length === 0}
+                >
+                  {isGeneratingObjecao ? "GERANDO..." : "GERAR SCRIPT · IA"}
+                </Button>
+
+                {resultadoObjecao && (
+                  <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[8px] px-2 py-0.5 font-bold bg-bronze text-black uppercase tracking-widest font-mono">SCRIPT GERADO · NL</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-6 w-6 text-white/40 hover:text-white"
+                        onClick={() => copyToClipboard(resultadoObjecao.script)}
+                      >
+                        <Copy size={12} />
+                      </Button>
+                    </div>
+                    
+                    <p className="text-[13px] text-[#CCCCCC] leading-relaxed whitespace-pre-wrap font-sans">
+                      {resultadoObjecao.script}
+                    </p>
+
+                    <div className="pt-2 border-t border-white/5 space-y-3">
+                      <div>
+                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-0.5">ESTRATÉGIA USADA</p>
+                        <p className="text-[10px] text-white/60 italic leading-tight">{resultadoObjecao.estrategia}</p>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => copyToClipboard(resultadoObjecao.script)}
+                        className="w-full bg-bronze/10 text-bronze hover:bg-bronze hover:text-black border border-bronze/20 h-9 text-[10px] font-bold tracking-wider"
+                      >
+                        COPIAR SCRIPT
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* BLOCO — ASSISTENTE DE ATENDIMENTO */}
-          <div className="bg-[#141414] p-5 border border-white/5 space-y-4">
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-bronze">
-                <Bot size={16} />
-                <p className="text-[10px] uppercase font-bold tracking-widest">ASSISTENTE DE ATENDIMENTO · IA</p>
-              </div>
-              <p className="text-[10px] text-white/30 italic">Cole a mensagem do cliente e receba uma sugestão no tom NL</p>
-            </div>
-            <Textarea 
-              className="bg-[#0F0F0F] border-white/5 text-white min-h-[120px] focus-visible:ring-bronze" 
-              placeholder="Cole aqui a mensagem ou pergunta do cliente..."
-              value={mensagemCliente}
-              onChange={(e) => setMensagemCliente(e.target.value)}
-            />
-            <Button 
-              className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
-              onClick={gerarSugestao}
-              disabled={isGenerating || mensagemCliente.trim().length === 0}
+          <div className={cn(
+            "border transition-all duration-300",
+            activeIABlock === 'assistente' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
+          )}>
+            <button 
+              className="w-full px-5 py-4 flex items-center justify-between group"
+              onClick={() => setActiveIABlock(activeIABlock === 'assistente' ? null : 'assistente')}
             >
-              {isGenerating ? "GERANDO..." : "SUGERIR RESPOSTA · IA"}
-            </Button>
-
-            {sugestaoIA && (
-              <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
-                <div className="bg-[#0F0F0F] p-4 border border-bronze/30 space-y-3 relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-widest font-bold text-bronze font-mono">RESPOSTA SUGERIDA</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-6 w-6 text-white/40 hover:text-white"
-                      onClick={() => copyToClipboard(sugestaoIA.resposta)}
-                    >
-                      <Copy size={12} />
-                    </Button>
-                  </div>
-                  <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
-                  <div className="pt-2 border-t border-white/5 mt-2">
-                    <p className="text-[9px] text-white/40 uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
-                    <p className="text-[9px] text-white/40 uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <Bot size={18} className="text-bronze" />
+                <div className="text-left">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">ASSISTENTE DE ATENDIMENTO · IA</p>
+                  <p className="text-[9px] text-white/30 italic">Cole a mensagem do cliente e receba uma sugestão no tom NL</p>
                 </div>
+              </div>
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeIABlock === 'assistente' && "rotate-180 text-bronze")} size={16} />
+            </button>
+
+            {activeIABlock === 'assistente' && (
+              <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                <Textarea 
+                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[120px] focus-visible:ring-bronze text-xs" 
+                  placeholder="Cole aqui a mensagem ou pergunta do cliente..."
+                  value={mensagemCliente}
+                  onChange={(e) => setMensagemCliente(e.target.value)}
+                />
+                <Button 
+                  className="w-full bg-bronze text-white hover:bg-bronze/90 h-11 font-bold text-xs tracking-widest" 
+                  onClick={gerarSugestao}
+                  disabled={isGenerating || mensagemCliente.trim().length === 0}
+                >
+                  {isGenerating ? "GERANDO..." : "SUGERIR RESPOSTA · IA"}
+                </Button>
+
+                {sugestaoIA && (
+                  <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
+                    <div className="bg-[#0F0F0F] p-4 border border-bronze/30 space-y-3 relative group">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[8px] uppercase tracking-widest font-bold text-bronze font-mono">RESPOSTA SUGERIDA</span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-6 w-6 text-white/40 hover:text-white"
+                          onClick={() => copyToClipboard(sugestaoIA.resposta)}
+                        >
+                          <Copy size={12} />
+                        </Button>
+                      </div>
+                      <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
+                      <div className="pt-2 border-t border-white/5 mt-2">
+                        <p className="text-[9px] text-white/40 uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
+                        <p className="text-[9px] text-white/40 uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
