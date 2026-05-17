@@ -1205,8 +1205,8 @@ Retorne APENAS JSON válido:
       </Dialog>
       
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="max-w-3xl bg-[#FDFDFD] rounded-[2px] p-0 overflow-hidden border-white/10">
-          <DialogHeader className="p-8 bg-graphite text-white relative overflow-hidden">
+        <DialogContent className="max-w-3xl bg-[#0F0F0F] rounded-none p-0 overflow-hidden border-[#2A2826]">
+          <DialogHeader className="p-8 bg-black text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Shield size={160} />
             </div>
@@ -1221,7 +1221,7 @@ Retorne APENAS JSON válido:
             </div>
           </DialogHeader>
 
-          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8">
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0F0F0F]">
             {isReviewing ? (
               <div className="py-20 flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 text-bronze animate-spin" />
