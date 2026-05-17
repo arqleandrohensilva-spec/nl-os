@@ -264,7 +264,7 @@ const ScriptsAtendimento = () => {
               <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
                 <div className="bg-[#0F0F0F] p-4 border border-bronze/30 space-y-3 relative group">
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-widest font-bold text-bronze">RESPOSTA SUGERIDA</span>
+                    <span className="text-[8px] uppercase tracking-widest font-bold text-bronze font-mono">RESPOSTA SUGERIDA</span>
                     <Button 
                       variant="ghost" 
                       size="icon" 
