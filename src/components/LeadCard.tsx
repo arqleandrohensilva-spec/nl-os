@@ -65,15 +65,10 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         "min-h-[100px] flex flex-col justify-between overflow-hidden",
         "border-l-4",
         currentTemp.border,
-        isGhosting && "ring-1 ring-amber-500/50 animate-pulse-subtle shadow-[0_0_15px_rgba(245,158,11,0.1)]",
         isDragging && "shadow-2xl ring-2 ring-bronze/30 scale-[1.05] rotate-2",
         lead.stage === 'Perdido' && "opacity-45 grayscale-[0.5]"
       )}
     >
-      {/* Stagnation Alert - Pulse animation ring only */}
-      {isGhosting && (
-        <div className="absolute inset-0 ring-1 ring-red-400/30 animate-pulse-subtle pointer-events-none" />
-      )}
       {/* Pulse effect for Hot Lead - Left border only */}
       {currentTemp.pulse && (
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500 animate-pulse" />
