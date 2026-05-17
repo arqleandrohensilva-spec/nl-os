@@ -783,6 +783,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notificacoes: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          lida: boolean
+          modulo: string
+          tipo: Database["public"]["Enums"]["notification_type"]
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          lida?: boolean
+          modulo: string
+          tipo: Database["public"]["Enums"]["notification_type"]
+          titulo: string
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          lida?: boolean
+          modulo?: string
+          tipo?: Database["public"]["Enums"]["notification_type"]
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pesquisas_satisfacao: {
         Row: {
           avaliacao_processo: string | null
@@ -1273,7 +1309,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      notification_type:
+        | "urgente"
+        | "financeiro"
+        | "projeto"
+        | "satisfacao"
+        | "lead"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1400,6 +1441,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      notification_type: [
+        "urgente",
+        "financeiro",
+        "projeto",
+        "satisfacao",
+        "lead",
+      ],
+    },
   },
 } as const
