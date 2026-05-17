@@ -42,11 +42,22 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
   const formatCurrency = (val: number) => val > 0 ? `R$ ${(val / 1000).toFixed(0)}k` : "—";
 
+  const formatarDataHora = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + 
+             ' · ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+    } catch (e) {
+      return iso;
+    }
+  };
+
   const handleAddLog = () => {
     if (!newLog.nota) return;
     onAddLog(lead.id, {
       ...newLog,
-      data: format(new Date(), 'yyyy-MM-dd'),
+      data: new Date().toISOString(),
       autor: sessionStorage.getItem('nl_user') || 'Sócio'
     });
     setNewLog({ tipo: 'N', nota: '' });
@@ -121,7 +132,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   key={s} 
                   onClick={() => onUpdateStage(lead.id, s)}
                   className={cn(
-                    "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-none transition-all",
+                    "px-4 py-2 text-[9px] font-bold uppercase tracking-widest border rounded-none transition-all",
                     isActive 
                       ? "bg-bronze text-white border-bronze" 
                       : isPerdido
@@ -254,7 +265,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-white/10"
                 )}>
                   <div className="flex justify-between text-white/40 text-[9px] mb-1">
-                    <span>{log.data} · {log.autor}</span>
+                    <span>{formatarDataHora(log.data)} · {log.autor}</span>
                     {log.tipo === 'N' && <span className="text-bronze font-bold uppercase tracking-tighter">Movimentação</span>}
                   </div>
                   <p className={cn(
@@ -268,12 +279,15 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               ))}
             </div>
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
-              <select 
-                className="w-full p-2 bg-[#1A1A1A] border border-white/10 text-white text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors" 
-                onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}
-              >
-                <option value="N">Nota</option><option value="W">WhatsApp</option><option value="L">Ligação</option>
-              </select>
+              <div className="relative">
+                <select 
+                  className="w-full p-2 bg-[#1A1A1A] border border-white/10 text-white/60 text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors appearance-none pr-8" 
+                  onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}
+                >
+                  <option value="N">Nota</option><option value="W">WhatsApp</option><option value="L">Ligação</option>
+                </select>
+                <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+              </div>
               <Input 
                 placeholder="Descrever o contato..." 
                 value={newLog.nota} 
