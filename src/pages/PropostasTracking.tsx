@@ -1085,7 +1085,7 @@ Retorne APENAS JSON válido:
                   <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-white/10 rounded-[2px]">
+                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="direto" className="text-xs font-bold uppercase tracking-wider">Direto / Amigável</SelectItem>
                     <SelectItem value="formal" className="text-xs font-bold uppercase tracking-wider">Formal / Polido</SelectItem>
                   </SelectContent>
@@ -1103,7 +1103,7 @@ Retorne APENAS JSON válido:
                   <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-white/10 rounded-[2px]">
+                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="pt" className="text-xs font-bold uppercase tracking-wider">Português</SelectItem>
                     <SelectItem value="en" className="text-xs font-bold uppercase tracking-wider">English</SelectItem>
                     <SelectItem value="es" className="text-xs font-bold uppercase tracking-wider">Español</SelectItem>
@@ -1117,13 +1117,13 @@ Retorne APENAS JSON válido:
                 Script Recomendado
               </div>
               {isGeneratingFollowup ? (
-                <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-white/10 rounded-[2px]">
+                <div className="h-32 flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[2px]">
                   <Loader2 size={24} className="animate-spin text-bronze mb-2" />
                   <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 animate-pulse">Gerando análise...</span>
                 </div>
               ) : (
                 <textarea
-                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-[#FDFDFD] border border-white/10 rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
+                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-white/5 border border-white/10 text-white rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
                   value={followupMessage}
                   onChange={(e) => setFollowupMessage(e.target.value)}
                   placeholder="Aguardando geração do script..."
