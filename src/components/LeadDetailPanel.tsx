@@ -110,22 +110,29 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             )}>
               {lead.temp}
             </span>
-            <span className="text-[10px] text-white/40 font-mono">#{lead.id}</span>
           </div>
           <h2 className="text-4xl font-cormorant text-white mb-6 leading-none">{lead.nome}</h2>
           <div className="flex flex-wrap gap-2">
-            {STAGES.map(s => (
-              <button 
-                key={s} 
-                onClick={() => onUpdateStage(lead.id, s)}
-                className={cn(
-                  "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-[2px] transition-all",
-                  lead.stage === s ? "bg-bronze text-white border-bronze" : "border-white/10 text-white/40 hover:border-bronze hover:text-bronze"
-                )}
-              >
-                {s}
-              </button>
-            ))}
+            {STAGES.map(s => {
+              const isPerdido = s === 'Perdido';
+              const isActive = lead.stage === s;
+              return (
+                <button 
+                  key={s} 
+                  onClick={() => onUpdateStage(lead.id, s)}
+                  className={cn(
+                    "px-3 py-1 text-[9px] font-bold uppercase tracking-widest border rounded-none transition-all",
+                    isActive 
+                      ? "bg-bronze text-white border-bronze" 
+                      : isPerdido
+                        ? "bg-transparent border-red-500/30 text-red-400/60 hover:border-red-500 hover:text-red-400"
+                        : "bg-[#2A2826] border-[#4A4846] text-white/40 hover:border-bronze hover:text-white"
+                  )}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -145,11 +152,11 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <div><p className="text-white/40">Tipo</p><p className="text-white">{lead.tipo}</p></div>
               <div><p className="text-white/40">Área</p><p className="text-white">{lead.area} m²</p></div>
               <div><p className="text-white/40">Orçamento</p><p className="text-white">{formatCurrency(lead.orcamento)}</p></div>
-              <div><p className="text-white/40">Entrada</p><p className="text-white">{lead.criado}</p></div>
+              <div><p className="text-white/40">Entrada</p><p className="text-white">{new Date(lead.criado).toLocaleDateString('pt-BR')}</p></div>
               <div><p className="text-white/40">Origem</p><p className="text-white">{lead.origem}</p></div>
             </div>
 
-            <div className="bg-[#FAFAFA] border border-white/10 p-4 rounded-[2px] space-y-2">
+            <div className="bg-white/[0.03] border border-white/10 p-4 rounded-none space-y-2">
               <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2">Breakdown do Score</p>
               {calculateLeadScore(lead).breakdown.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-[10px]">
@@ -165,12 +172,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             </div>
           </section>
 
-          <section className={cn(
-            "p-6 rounded-[2px] border space-y-4",
-            viability.status === 'prejuizo' ? "bg-red-50 border-red-200" :
-            viability.status === 'alerta' ? "bg-amber-50 border-amber-200" :
-            "bg-green-50 border-green-200"
-          )}>
+          <section className="p-4 rounded-none border border-amber-500/30 bg-white/[0.03] space-y-4">
             <div className="flex items-start gap-3">
               {viability.status === 'prejuizo' ? <AlertCircle size={18} className="text-red-600 shrink-0" /> :
                viability.status === 'alerta' ? <AlertCircle size={18} className="text-amber-600 shrink-0" /> :
@@ -179,20 +181,15 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <div className="space-y-1">
                 <p className={cn(
                   "text-[10px] font-bold uppercase tracking-widest",
-                  viability.status === 'prejuizo' ? "text-red-800" :
-                  viability.status === 'alerta' ? "text-amber-800" :
-                  "text-green-800"
+                  viability.status === 'prejuizo' ? "text-red-600" :
+                  viability.status === 'alerta' ? "text-amber-600" :
+                  "text-green-600"
                 )}>
                   {viability.status === 'prejuizo' ? "ATENÇÃO: Este projeto está abaixo do custo interno" :
                    viability.status === 'alerta' ? "Margem baixa recomendada" :
                    "Projeto Viável"}
                 </p>
-                <p className={cn(
-                  "text-[11px] leading-relaxed",
-                  viability.status === 'prejuizo' ? "text-red-700" :
-                  viability.status === 'alerta' ? "text-amber-700" :
-                  "text-green-700"
-                )}>
+                <p className="text-[11px] leading-relaxed text-white/70">
                   {viability.mensagem}
                 </p>
               </div>
@@ -231,15 +228,15 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Ações Rápidas</h4>
             <div className="flex flex-col gap-3">
               <div className="flex gap-3">
-                <Button className="flex-1 bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
-                <Button variant="outline" className="flex-1 border-white/10 text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]">Agendar Próxima Ação</Button>
+                <Button className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
+                <Button variant="outline" className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all">Agendar Próxima Ação</Button>
               </div>
               
               {lead.stage === 'Fechado' && (
                 <Button 
                   onClick={handleConvertToProject}
                   disabled={isConverting}
-                  className="w-full bg-bronze hover:bg-bronze/90 text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-[2px] shadow-lg shadow-bronze/20"
+                  className="w-full bg-bronze hover:bg-bronze/90 text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-none transition-all shadow-lg shadow-bronze/20"
                 >
                   <LayoutGrid size={14} className="mr-2" />
                   {isConverting ? "Convertendo..." : "Converter em Projeto"}
@@ -253,7 +250,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="space-y-4">
               {lead.logs.map((log, i) => (
                 <div key={i} className={cn(
-                  "text-[11px] p-3 border rounded-[2px]",
+                  "text-[11px] p-3 border rounded-none",
                   log.tipo === 'N' ? "border-bronze/20 bg-bronze/5" : "border-white/10"
                 )}>
                   <div className="flex justify-between text-white/40 text-[9px] mb-1">
@@ -271,11 +268,19 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               ))}
             </div>
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
-              <select className="w-full p-2 border border-white/10 text-[11px] rounded-[2px]" onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}>
+              <select 
+                className="w-full p-2 bg-[#1A1A1A] border border-white/10 text-white text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors" 
+                onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}
+              >
                 <option value="N">Nota</option><option value="W">WhatsApp</option><option value="L">Ligação</option>
               </select>
-              <Input placeholder="Descrever o contato..." value={newLog.nota} onChange={(e) => setNewLog({...newLog, nota: e.target.value})} className="rounded-[2px]" />
-              <Button className="w-full bg-graphite hover:bg-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-[2px]" onClick={handleAddLog}>Registrar</Button>
+              <Input 
+                placeholder="Descrever o contato..." 
+                value={newLog.nota} 
+                onChange={(e) => setNewLog({...newLog, nota: e.target.value})} 
+                className="bg-[#1A1A1A] border-white/10 text-white rounded-none focus:border-bronze transition-colors" 
+              />
+              <Button className="w-full bg-bronze text-white hover:bg-bronze/80 text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={handleAddLog}>Registrar</Button>
             </div>
           </section>
         </div>
@@ -287,7 +292,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <Button className="flex-1 bg-red-600 text-white" onClick={() => onDelete(lead.id)}>Confirmar Exclusão</Button>
             </div>
           ) : (
-            <Button variant="ghost" className="w-full text-white/40 hover:text-red-600 border border-transparent hover:border-red-600 rounded-[2px]" onClick={() => setIsDeleting(true)}>
+            <Button variant="ghost" className="w-full text-white/40 hover:text-red-600 border border-transparent hover:border-red-600 rounded-none" onClick={() => setIsDeleting(true)}>
               <Trash2 size={14} className="mr-2"/> Excluir Lead
             </Button>
           )}
