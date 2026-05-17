@@ -201,7 +201,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="pt-3 border-t border-black/5 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-[8px] text-white/40-foreground uppercase font-bold tracking-tighter">Horas Est.</p>
+                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Horas Est.</p>
                   <input 
                     type="number" 
                     value={horasEstimadas} 
@@ -210,12 +210,12 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   />
                 </div>
                 <div>
-                  <p className="text-[8px] text-white/40-foreground uppercase font-bold tracking-tighter">Custo Real</p>
+                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Custo Real</p>
                   <p className="text-xs font-bold text-graphite">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[8px] text-white/40-foreground uppercase font-bold tracking-tighter">Margem Real</p>
+                <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Margem Real</p>
                 <p className={cn(
                   "text-sm font-bold",
                   viability.status === 'prejuizo' ? "text-red-600" : "text-graphite"

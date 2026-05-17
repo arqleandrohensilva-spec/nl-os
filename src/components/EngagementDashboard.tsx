@@ -44,10 +44,10 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
     return (
       <div className="flex flex-col items-center justify-center p-12 bg-white border border-dashed border-[#E8E4DF] rounded-[2px] text-center animate-fade-in">
         <div className="w-16 h-16 bg-muted-foreground/5 rounded-full flex items-center justify-center mb-6">
-          <AlertCircle size={32} className="text-white/40-foreground/30" />
+          <AlertCircle size={32} className="text-white/40/30" />
         </div>
         <h3 className="text-xl font-bold font-cormorant text-graphite mb-3 uppercase tracking-tight">Aguardando Engajamento</h3>
-        <p className="text-[10px] text-white/40-foreground uppercase tracking-[0.2em] max-w-[320px] leading-relaxed">
+        <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] max-w-[320px] leading-relaxed">
           Esta proposta ainda não foi visualizada. Assim que o cliente abrir o link, os dados aparecerão aqui em tempo real.
         </p>
       </div>
@@ -117,7 +117,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           { label: 'Último Dispositivo', value: lastEngagement.dispositivo || 'Desktop', icon: lastEngagement.dispositivo?.toLowerCase().includes('mobile') ? Smartphone : Monitor, color: 'text-bronze' },
         ].map((card, i) => (
           <div key={i} className="bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group">
-            <p className="text-[9px] uppercase tracking-[0.2em] text-white/40-foreground mb-1 font-bold group-hover:text-bronze transition-colors">{card.label}</p>
+            <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 mb-1 font-bold group-hover:text-bronze transition-colors">{card.label}</p>
             <div className="flex items-center gap-2">
               <card.icon size={16} className={card.color} />
               <h3 className="text-lg font-bold text-graphite font-cormorant">{card.value}</h3>
@@ -134,7 +134,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
               <Activity size={14} className="text-bronze" />
               Retenção por Seção (Tempo Acumulado)
             </span>
-            <Info size={14} className="text-white/40-foreground/30" />
+            <Info size={14} className="text-white/40/30" />
           </h4>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -213,7 +213,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
             {deviceData.map((d, i) => (
               <div key={i} className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: i === 0 ? '#C5A16F' : '#1A1A1A' }} />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/40-foreground">{d.name}: {d.value}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">{d.name}: {d.value}</span>
               </div>
             ))}
           </div>
@@ -288,14 +288,14 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                     <p className="text-[10px] font-bold text-graphite uppercase tracking-wide">
                       Sessão {engagements.length - idx}
                     </p>
-                    <p className="text-[9px] text-white/40-foreground uppercase tracking-wider">
+                    <p className="text-[9px] text-white/40 uppercase tracking-wider">
                       {eng.dispositivo || 'Desktop'}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] font-bold text-bronze">{formatTime(eng.tempo_total || 0)}</p>
-                  <p className="text-[8px] text-white/40-foreground uppercase">Duração</p>
+                  <p className="text-[8px] text-white/40 uppercase">Duração</p>
                 </div>
               </div>
             ))}

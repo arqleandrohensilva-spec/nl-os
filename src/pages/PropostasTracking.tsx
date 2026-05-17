@@ -590,7 +590,7 @@ Retorne APENAS JSON válido:
                 </div>
 
               </div>
-              <p className="text-white/40-foreground mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
+              <p className="text-white/40 mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
             </div>
             <Button 
               onClick={() => setIsModalOpen(true)}
@@ -662,7 +662,7 @@ Retorne APENAS JSON válido:
                     "px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 -mb-[2px]",
                     statusFilter === tab.id 
                       ? "border-bronze text-bronze" 
-                      : "border-transparent text-white/40-foreground hover:text-white hover:border-[#E8E4DF]"
+                      : "border-transparent text-white/40 hover:text-white hover:border-[#E8E4DF]"
                   )}
                 >
                   {tab.label}
@@ -686,7 +686,7 @@ Retorne APENAS JSON válido:
               </div>
 
               <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40-foreground" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                 <Input 
                   placeholder="BUSCAR CLIENTE..."
                   value={search}
@@ -700,7 +700,7 @@ Retorne APENAS JSON válido:
           {loading ? (
             <div className="flex flex-col items-center justify-center min-h-[400px]">
               <Loader2 className="w-10 h-10 text-bronze animate-spin mb-4" />
-              <p className="text-[11px] uppercase tracking-widest text-white/40-foreground font-medium">Carregando propostas...</p>
+              <p className="text-[11px] uppercase tracking-widest text-white/40 font-medium">Carregando propostas...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -717,7 +717,7 @@ Retorne APENAS JSON válido:
                       )}>
                         {p.status}
                       </span>
-                      <span className="text-[10px] text-white/40-foreground font-medium">
+                      <span className="text-[10px] text-white/40 font-medium">
                         {format(new Date(p.data), "dd 'de' MMM, yyyy", { locale: ptBR })}
                       </span>
                     </div>
@@ -727,11 +727,11 @@ Retorne APENAS JSON válido:
 
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="space-y-1">
-                        <p className="text-[9px] text-white/40-foreground uppercase tracking-wider font-bold">Executivo</p>
+                        <p className="text-[9px] text-white/40 uppercase tracking-wider font-bold">Executivo</p>
                         <p className="text-xs font-bold">R$ {p.valor_executivo?.toLocaleString()}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] text-white/40-foreground uppercase tracking-wider font-bold">Completo</p>
+                        <p className="text-[9px] text-white/40 uppercase tracking-wider font-bold">Completo</p>
                         <p className="text-xs font-bold">R$ {p.valor_completo?.toLocaleString()}</p>
                       </div>
                     </div>
@@ -749,7 +749,7 @@ Retorne APENAS JSON válido:
                               ? "bg-green-500 animate-pulse" 
                               : "bg-muted-foreground/30"
                           )} />
-                          <span className="text-[9px] text-white/40-foreground uppercase tracking-wider font-bold whitespace-nowrap">Visto em {format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
+                          <span className="text-[9px] text-white/40 uppercase tracking-wider font-bold whitespace-nowrap">Visto em {format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
                         </div>
                       )}
                       
@@ -773,7 +773,7 @@ Retorne APENAS JSON válido:
                             <ChevronDown 
                               size={12} 
                               className={cn(
-                                "text-white/40-foreground transition-transform duration-200",
+                                "text-white/40 transition-transform duration-200",
                                 expandedEngagements[p.id] && "rotate-180"
                               )} 
                             />
@@ -790,7 +790,7 @@ Retorne APENAS JSON válido:
                         {expandedEngagements[p.id] && (
                           <div className="mt-4 space-y-4 pb-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/40-foreground px-1 py-0.5 bg-muted rounded-[2px]">
+                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/40 px-1 py-0.5 bg-muted rounded-[2px]">
                                 {getEngagementStats(p.proposta_engajamento)?.dispositivo}
                               </span>
                               <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
@@ -804,11 +804,11 @@ Retorne APENAS JSON válido:
                                   <div className="flex justify-between items-center text-[8px]">
                                     <span className={cn(
                                       "uppercase tracking-widest font-bold",
-                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-white/40-foreground"
+                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-white/40"
                                     )}>
                                       {section.label}
                                     </span>
-                                    <span className="font-medium text-white/40-foreground">{section.time}s</span>
+                                    <span className="font-medium text-white/40">{section.time}s</span>
                                   </div>
                                   <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
                                     <div 
@@ -898,7 +898,7 @@ Retorne APENAS JSON válido:
           <div className="grid grid-cols-2 gap-6 py-6">
             <div className="space-y-4">
               <div className="space-y-1.5 relative">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Cliente</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Cliente</label>
                 <div className="relative">
                   <Input 
                     placeholder="Buscar lead ou digitar nome..."
@@ -928,7 +928,7 @@ Retorne APENAS JSON válido:
                             }}
                           >
                             <div className="font-medium text-graphite">{lead.nome}</div>
-                            <div className="text-[10px] text-white/40-foreground uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
                           </div>
                         ))
                       }
@@ -936,7 +936,7 @@ Retorne APENAS JSON válido:
                         !newProposal.cliente || 
                         lead.nome.toLowerCase().includes(newProposal.cliente.toLowerCase())
                       ).length === 0 && (
-                        <div className="p-3 text-xs text-white/40-foreground italic">Nenhum lead encontrado</div>
+                        <div className="p-3 text-xs text-white/40 italic">Nenhum lead encontrado</div>
                       )}
                     </div>
                   )}
@@ -945,7 +945,7 @@ Retorne APENAS JSON válido:
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Tipo</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Tipo</label>
                   <Select 
                     value={newProposal.tipo} 
                     onValueChange={(val: any) => setNewProposal({...newProposal, tipo: val})}
@@ -961,7 +961,7 @@ Retorne APENAS JSON válido:
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Data</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Data</label>
                   <Input 
                     type="date"
                     value={newProposal.data}
@@ -973,7 +973,7 @@ Retorne APENAS JSON válido:
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Cidade</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Cidade</label>
                   <Input 
                     value={newProposal.cidade || ''}
                     onChange={(e) => setNewProposal({...newProposal, cidade: e.target.value})}
@@ -981,7 +981,7 @@ Retorne APENAS JSON válido:
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Estado</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Estado</label>
                   <Input 
                     value={newProposal.estado || ''}
                     onChange={(e) => setNewProposal({...newProposal, estado: e.target.value})}
@@ -992,7 +992,7 @@ Retorne APENAS JSON válido:
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Área (m²)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Área (m²)</label>
                   <Input 
                     type="number"
                     value={newProposal.area || ''}
@@ -1001,7 +1001,7 @@ Retorne APENAS JSON válido:
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Validade (dias)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Validade (dias)</label>
                   <Input 
                     type="number"
                     value={newProposal.validade}
@@ -1014,7 +1014,7 @@ Retorne APENAS JSON válido:
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Objetivo</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Objetivo</label>
                 <textarea 
                   value={newProposal.objetivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, objetivo: e.target.value})}
@@ -1023,7 +1023,7 @@ Retorne APENAS JSON válido:
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Valor Executivo (R$)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Valor Executivo (R$)</label>
                 <Input 
                   type="number"
                   value={newProposal.valor_executivo || ''}
@@ -1033,7 +1033,7 @@ Retorne APENAS JSON válido:
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40-foreground">Valor Completo (R$)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Valor Completo (R$)</label>
                 <Input 
                   type="number"
                   value={newProposal.valor_completo || ''}
@@ -1074,7 +1074,7 @@ Retorne APENAS JSON válido:
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40-foreground">Tom de Voz</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Tom de Voz</label>
                 <Select 
                   value={followupTone} 
                   onValueChange={(v: 'formal' | 'direto') => {
@@ -1092,7 +1092,7 @@ Retorne APENAS JSON válido:
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40-foreground">Idioma</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Idioma</label>
                 <Select 
                   value={followupLang} 
                   onValueChange={(v: 'pt' | 'en' | 'es') => {
@@ -1119,7 +1119,7 @@ Retorne APENAS JSON válido:
               {isGeneratingFollowup ? (
                 <div className="h-32 flex flex-col items-center justify-center bg-[#FDFDFD] border border-[#E8E4DF] rounded-[2px]">
                   <Loader2 size={24} className="animate-spin text-bronze mb-2" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40-foreground animate-pulse">Gerando análise...</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 animate-pulse">Gerando análise...</span>
                 </div>
               ) : (
                 <textarea
@@ -1200,7 +1200,7 @@ Retorne APENAS JSON válido:
             {isReviewing ? (
               <div className="py-20 flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 text-bronze animate-spin" />
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/40-foreground animate-pulse">Auditando proposta...</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/40 animate-pulse">Auditando proposta...</p>
               </div>
             ) : reviewResult ? (
               <>
@@ -1224,14 +1224,14 @@ Retorne APENAS JSON válido:
                       {reviewResult.tom.problemas.map((prob: any, i: number) => (
                         <div key={i} className="bg-white border border-[#F0EDEA] p-4 rounded-[2px] space-y-2">
                           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
-                          <p className="text-xs italic text-white/40-foreground border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
+                          <p className="text-xs italic text-white/40 border-l-2 border-red-200 pl-3">"{prob.trecho}"</p>
                           <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
                           <p className="text-xs font-medium text-graphite">{prob.sugestao}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-white/40-foreground italic">Nenhum desvio de tom encontrado.</p>
+                    <p className="text-xs text-white/40 italic">Nenhum desvio de tom encontrado.</p>
                   )}
                 </section>
 
@@ -1262,7 +1262,7 @@ Retorne APENAS JSON válido:
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-white/40-foreground italic">Nenhuma palavra proibida encontrada.</p>
+                    <p className="text-xs text-white/40 italic">Nenhuma palavra proibida encontrada.</p>
                   )}
                 </section>
 
@@ -1284,7 +1284,7 @@ Retorne APENAS JSON válido:
                       { label: "Sem urgência artificial", key: "sem_urgencia" }
                     ].map((item, i) => (
                       <div key={i} className="flex items-center justify-between p-3 bg-white border border-[#F0EDEA] rounded-[2px]">
-                        <span className="text-[11px] font-medium text-white/40-foreground">{item.label}</span>
+                        <span className="text-[11px] font-medium text-white/40">{item.label}</span>
                         {reviewResult.checklist[item.key] ? (
                           <CheckCircle2 size={16} className="text-green-500" />
                         ) : (
@@ -1296,7 +1296,7 @@ Retorne APENAS JSON válido:
                 </section>
               </>
             ) : (
-              <p className="text-center py-10 text-white/40-foreground">Erro ao carregar análise.</p>
+              <p className="text-center py-10 text-white/40">Erro ao carregar análise.</p>
             )}
           </div>
 
