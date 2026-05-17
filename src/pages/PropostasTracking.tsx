@@ -1325,7 +1325,7 @@ Retorne APENAS JSON válido:
             )}
           </div>
 
-          <DialogFooter className="p-6 bg-[#F8F9FA] border-t border-white/10 flex justify-between items-center sm:justify-between">
+          <DialogFooter className="p-6 bg-black border-t border-white/10 flex justify-between items-center sm:justify-between rounded-none">
             <Button 
               variant="outline" 
               onClick={() => setIsReviewModalOpen(false)}
