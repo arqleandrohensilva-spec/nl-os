@@ -24,8 +24,11 @@ import {
   List,
   Zap,
   ArrowUpRight,
-  ChevronUp
+  ChevronUp,
+  FileText
 } from 'lucide-react';
+import { parseISO, differenceInDays, isBefore, startOfDay } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { cn } from '@/lib/utils';
@@ -77,6 +80,7 @@ const STAGES: Stage[] = [
 ];
 
 const Index = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<string | null>(null);
   const [session, setSession] = useState<any>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
