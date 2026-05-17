@@ -456,28 +456,42 @@ Gere a mensagem de WhatsApp.`;
       setReviewResult(null);
       setIsReviewModalOpen(true);
 
-      const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo e verifique três aspectos:
+      // Buscar texto da proposta (objetivo no caso de proposals, ou cláusulas de contratos se houvesse vínculo direto)
+      // O prompt pede para buscar do Supabase campo clausulas da tabela contratos ou conteúdo do documento vinculado.
+      // Como estamos no Tracking de Propostas, vamos usar o objetivo da proposta ou simular a busca se houver contrato.
+      
+      let proposalText = proposal.objetivo || "";
+      
+      // Tentar buscar contrato vinculado se existir
+      const { data: contractData } = await supabase
+        .from('contratos')
+        .select('dados_gerais')
+        .eq('lead_id', proposal.id) // Assumindo relação via lead_id ou similar
+        .maybeSingle();
+
+      if (contractData?.dados_gerais) {
+        // Se houver dados mais robustos no contrato, podemos anexar
+        proposalText += "\n\nDETALHES DO CONTRATO:\n" + JSON.stringify(contractData.dados_gerais);
+      }
+
+      const prompt = `Você é o revisor interno da NL Arquitetos. Analise a proposta abaixo em 3 aspectos:
 
 1. TOM DE VOZ: O texto segue o tom técnico, condutor e centrado no cliente da NL? Identifique trechos que soem como vendedor ansioso, informal ou romantizado.
 
-2. PALAVRAS PROIBIDAS: Verifique se contém alguma dessas palavras ou expressões:
+2. PALAVRAS PROIBIDAS: Verificar se contém:
 "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "design exclusivo", "rapidinho", "baratinho", "método revolucionário", "fórmula secreta", "corre que acaba", "oportunidade única hoje", "sem risco nenhum", "zero problema garantido", "qualquer arquiteto faz isso", "obra sempre tem imprevisto faz parte", "pode confiar a gente resolve"
 
-3. CHECKLIST TÉCNICO: Verifique se a proposta contém:
+3. CHECKLIST TÉCNICO:
 - Recapitulação do problema do cliente
-- Solução apresentada claramente  
+- Solução apresentada claramente
 - Entregáveis listados
 - Método R.E.S.O.L.V.E. mencionado
 - Investimento apresentado com contexto
 - Próximo passo definido
-- Ausência de urgência artificial ou pressão de venda
+- Sem urgência artificial ou pressão de venda
 
 PROPOSTA:
-Cliente: ${proposal.cliente}
-Tipo: ${proposal.tipo}
-Objetivo/Conteúdo: ${proposal.objetivo}
-Valor Executivo: R$ ${proposal.valor_executivo}
-Valor Completo: R$ ${proposal.valor_completo}
+${proposalText}
 
 Retorne APENAS JSON válido:
 {
@@ -487,22 +501,22 @@ Retorne APENAS JSON válido:
   },
   "palavras_proibidas": {
     "status": "APROVADO" | "ENCONTRADAS",
-    "encontradas": [{"palavra": "...", "contexto": "..."}]
+    "encontradas": [{"palavra": "...", "contexto": "...", "motivo": "..."}]
   },
   "checklist": {
-    "recapitulacao": true/false,
-    "solucao": true/false,
-    "entregaveis": true/false,
-    "metodo_resolve": true/false,
-    "investimento": true/false,
-    "proximo_passo": true/false,
-    "sem_urgencia": true/false
+    "recapitulacao": true,
+    "solucao": true,
+    "entregaveis": false,
+    "metodo_resolve": true,
+    "investimento": false,
+    "proximo_passo": true,
+    "sem_urgencia": true
   }
 }`;
 
       const { data, error } = await supabase.functions.invoke('ai-advisor', {
         body: { 
-          prompt, 
+          prompt,
           model: 'claude-sonnet-4-20250514'
         }
       });
@@ -511,7 +525,6 @@ Retorne APENAS JSON válido:
       if (data?.error) throw new Error(data.error.message);
 
       const content = data.choices[0].message.content;
-      // Extract JSON if AI wrapped it in markdown
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       const result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(content);
       
@@ -519,7 +532,6 @@ Retorne APENAS JSON válido:
     } catch (error: any) {
       console.error('Error reviewing proposal:', error);
       toast.error('Erro ao revisar proposta: ' + error.message);
-      setIsReviewModalOpen(false);
     } finally {
       setIsReviewing(false);
     }
