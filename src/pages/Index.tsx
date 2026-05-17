@@ -118,6 +118,47 @@ const Index = () => {
     detalhamento: 60,
     acompanhamento: 40
   });
+  const criarPastasDropbox = async (nomeCliente: string, tipo: string) => {
+    const pastaBase = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipo}`;
+    
+    const subpastas = [
+      '01 - Briefing',
+      '02 - Conceito', 
+      '03 - Estudo Preliminar',
+      '04 - Projeto Executivo',
+      '05 - Detalhamento',
+      '06 - Obra',
+      '07 - Marketing',
+      '08 - Contrato'
+    ];
+
+    try {
+      console.log("Iniciando criação de pastas no Dropbox:", pastaBase);
+      // Criar pasta principal
+      const { error: mainFolderError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'create_folder', path: pastaBase }
+      });
+
+      if (mainFolderError) {
+        console.warn("Aviso ao criar pasta principal (pode já existir):", mainFolderError);
+      }
+
+      // Criar subpastas
+      for (const subpasta of subpastas) {
+        const { error: subFolderError } = await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', path: `${pastaBase}/${subpasta}` }
+        });
+        if (subFolderError) {
+          console.warn(`Aviso ao criar subpasta ${subpasta}:`, subFolderError);
+        }
+      }
+      
+      return pastaBase;
+    } catch (error) {
+      console.error("Erro fatal ao criar pastas no Dropbox:", error);
+      throw error;
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
