@@ -851,45 +851,6 @@ const Index = () => {
               </div>
               <div className="h-6 w-[1px] bg-white/10 mx-2" />
               <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
-                <button
-                  onClick={() => setSmartFilter('all')}
-                  className={cn(
-                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all",
-                    smartFilter === 'all' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
-                  )}
-                >
-                  Todos
-                </button>
-                <button
-                  onClick={() => setSmartFilter('ghosting')}
-                  className={cn(
-                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
-                    smartFilter === 'ghosting' ? "bg-amber-600 text-white" : "text-white/40 hover:text-white"
-                  )}
-                >
-                  Ghosting (+3d)
-                </button>
-                <button
-                  onClick={() => setSmartFilter('score8')}
-                  className={cn(
-                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
-                    smartFilter === 'score8' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
-                  )}
-                >
-                  Score 8+
-                </button>
-                <button
-                  onClick={() => setSmartFilter('high-ticket')}
-                  className={cn(
-                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all border-l border-white/5",
-                    smartFilter === 'high-ticket' ? "bg-bronze text-white" : "text-white/40 hover:text-white"
-                  )}
-                >
-                  Ticket Alto
-                </button>
-              </div>
-              <div className="h-6 w-[1px] bg-white/10 mx-2" />
-              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                 <button 
                   onClick={() => setViewMode('kanban')} 
                   className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'kanban' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
@@ -953,7 +914,7 @@ const Index = () => {
               onDragEnd={handleDragEnd}
               modifiers={[restrictToWindowEdges]}
             >
-              <div className="grid grid-cols-6 h-full gap-4">
+              <div className="grid grid-cols-7 h-full gap-4">
                 {STAGES.map(stage => (
                   <KanbanColumn 
                     key={stage}
