@@ -542,7 +542,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 size="sm" 
                 onClick={exportReport}
                 disabled={isExporting}
-                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-white/5/10 flex items-center gap-2"
+                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-white/[0.05] flex items-center gap-2"
               >
                 {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
                 Exportar Relatório
@@ -852,18 +852,18 @@ Máximo 3 linhas. Sem markdown. Em português.
                 const mostExpensive = [...catCosts].sort((a, b) => b.valor - a.valor)[0];
 
                 return (
-                  <div key={cat.id} className="border border-white/10 rounded-[4px] overflow-hidden bg-white group/cat">
+                  <div key={cat.id} className="border border-white/10 rounded-[4px] overflow-hidden bg-white/[0.03] group/cat">
                     <TooltipProvider>
                       <Tooltip delayDuration={300}>
                         <TooltipTrigger asChild>
                           <button 
                             id={`accordion-trigger-${cat.id}`}
                             onClick={() => setOpenAccordion(isOpen ? null : cat.id)}
-                            className="w-full flex items-center justify-between p-5 hover:bg-white/5/10 transition-colors"
+                            className="w-full flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors"
                           >
                             <div className="flex items-center gap-4">
                               <div 
-                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-white/5/30 text-white/40")}
+                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-white/[0.08] text-white/40")}
                                 style={isOpen ? {} : { backgroundColor: `${cat.color}15`, color: cat.color }}
                               >
                                 <cat.icon size={16} />
@@ -895,7 +895,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         {catCosts.map((item) => {
                           const isNew = new Date(item.criado_em).toDateString() === new Date().toDateString();
                           return (
-                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-white/10/50 last:border-0 hover:bg-white/5/5 px-2 -mx-2 transition-colors">
+                            <div key={item.id} className="group flex items-center justify-between py-3 border-b border-white/[0.08] last:border-0 hover:bg-white/[0.03] px-2 -mx-2 transition-colors">
                               <div className="flex items-center gap-3">
                                 <span className="text-xs font-dm-mono text-white">{item.nome}</span>
                                 {isNew && (
@@ -904,7 +904,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                                 <div className="flex items-center gap-2">
                                   <span className={cn(
                                     "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
-                                    item.frequencia === 'mensal' ? "bg-white/5/30 text-white/40" : "bg-bronze/10 text-bronze"
+                                    item.frequencia === 'mensal' ? "bg-white/[0.08] text-white/40" : "bg-bronze/10 text-bronze"
                                   )}>
                                     {item.frequencia}
                                   </span>
@@ -1232,7 +1232,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     </p>
                   </div>
 
-                  <div className="bg-[#E8E4DF]/20 p-6 rounded-[4px] border border-white/10/50 flex flex-col justify-between">
+                  <div className="bg-[#E8E4DF]/20 p-6 rounded-[4px] border border-white/[0.08] flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-bronze">
                         <Sparkles size={14} />
@@ -1285,7 +1285,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </div>
                   
-                  <div className="space-y-4 pt-4 border-t border-white/10/50">
+                  <div className="space-y-4 pt-4 border-t border-white/[0.08]">
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
                       <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
@@ -1332,7 +1332,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     />
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-white/10/50">
+                  <div className="space-y-4 pt-4 border-t border-white/[0.08]">
                     <div className="space-y-1">
                       <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
                       <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioBMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
@@ -1364,7 +1364,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               </div>
 
-              <div className="mt-8 p-4 bg-white/5/10 border border-white/10/30 rounded-[4px]">
+              <div className="mt-8 p-4 bg-white/[0.05] border border-white/10/30 rounded-[4px]">
                 <p className="text-[9px] text-white/40 font-dm-mono italic">*Estimado para 2 projetos de 250h/mês totais. O lucro líquido real depende da eficiência produtiva e dos impostos variáveis.</p>
               </div>
             </div>
