@@ -86,10 +86,20 @@ const ScriptsAtendimento = () => {
       
       if (error) {
         console.error("Erro invoke ai-advisor (Assistente):", error);
-        throw error;
+        throw new Error(error.message || JSON.stringify(error));
       }
       
-      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      console.log("Resposta bruta da Edge Function (Assistente):", data);
+      
+      let result;
+      if (data.choices?.[0]?.message?.content) {
+        result = JSON.parse(data.choices[0].message.content);
+      } else if (typeof data === 'string') {
+        result = JSON.parse(data);
+      } else {
+        result = data;
+      }
+      
       setSugestaoIA(result);
     } catch (e: any) {
       console.error("Erro completo (Assistente):", e);
@@ -146,10 +156,20 @@ Analise a mensagem e retorne APENAS JSON válido:
 
       if (error) {
         console.error("Erro invoke ai-advisor (Detector):", error);
-        throw error;
+        throw new Error(error.message || JSON.stringify(error));
       }
 
-      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      console.log("Resposta bruta da Edge Function (Detector):", data);
+
+      let result;
+      if (data.choices?.[0]?.message?.content) {
+        result = JSON.parse(data.choices[0].message.content);
+      } else if (typeof data === 'string') {
+        result = JSON.parse(data);
+      } else {
+        result = data;
+      }
+
       setResultadoDetector(result);
     } catch (e: any) {
       console.error("Erro completo (Detector):", e);
@@ -203,10 +223,20 @@ Retorne APENAS JSON válido:
 
       if (error) {
         console.error("Erro invoke ai-advisor (Objeção):", error);
-        throw error;
+        throw new Error(error.message || JSON.stringify(error));
       }
 
-      const result = data.choices?.[0]?.message?.content ? JSON.parse(data.choices[0].message.content) : data;
+      console.log("Resposta bruta da Edge Function (Objeção):", data);
+
+      let result;
+      if (data.choices?.[0]?.message?.content) {
+        result = JSON.parse(data.choices[0].message.content);
+      } else if (typeof data === 'string') {
+        result = JSON.parse(data);
+      } else {
+        result = data;
+      }
+
       setResultadoObjecao(result);
     } catch (e: any) {
       console.error("Erro completo (Objeção):", e);
