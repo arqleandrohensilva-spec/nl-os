@@ -69,11 +69,28 @@ interface AIInsight {
   modulo: string;
 }
 
+interface BusinessHealth {
+  score: number;
+  diagnostico: string;
+  pipeline: 'ok' | 'atencao' | 'critico';
+  projetos: 'ok' | 'atencao' | 'critico';
+  financeiro: 'ok' | 'atencao' | 'critico';
+  satisfacao: 'ok' | 'atencao' | 'critico';
+}
+
+interface VelocityItem {
+  label: string;
+  days: number;
+  status: 'normal' | 'atencao' | 'critico';
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [aiInsight, setAiInsight] = useState<AIInsight | null>(null);
+  const [businessHealth, setBusinessHealth] = useState<BusinessHealth | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
+  const [loadingHealth, setLoadingHealth] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isForecastOpen, setIsForecastOpen] = useState(false);
 
@@ -352,6 +369,7 @@ const Dashboard = () => {
     const generateAIContent = async () => {
       if (leads.length === 0 && projetos.length === 0) return;
       setLoadingAI(true);
+      setLoadingHealth(true);
 
       const leadsResumo = leads
         .filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO')
@@ -384,24 +402,65 @@ const Dashboard = () => {
           "modulo": "pipeline | projetos | financeiro | marketing"
         }`;
 
-        const { data: iData } = await supabase.functions.invoke('ai-advisor', {
-          body: { prompt: insightPrompt, systemPrompt: "Você é um consultor estratégico de negócios. Responda apenas com JSON." }
-        });
+        // Health Score
+        const healthPrompt = `Você é o analista estratégico da NL Arquitetos. Analise os dados abaixo e gere um score de saúde do negócio de 0 a 100.
+
+CRITÉRIOS DE AVALIAÇÃO:
+- Pipeline (25pts): leads ativos, taxa de conversão, tempo nas etapas
+- Projetos (25pts): projetos em andamento, entregas no prazo, checklists pendentes
+- Financeiro (25pts): parcelas em dia, receita prevista vs meta, inadimplência
+- Satisfação (25pts): nota média, número de avaliações, tendência
+
+DADOS:
+Leads: ${leadsResumo}
+Projetos: ${projetosResumo}
+Financeiro: ${financeiroResumo}
+Satisfação: ${satisfacaoResumo}
+
+Retorne APENAS JSON:
+{
+  "score": 87,
+  "diagnostico": "frase de diagnóstico em 2 linhas máximo",
+  "pipeline": "ok | atencao | critico",
+  "projetos": "ok | atencao | critico",
+  "financeiro": "ok | atencao | critico",
+  "satisfacao": "ok | atencao | critico"
+}`;
+
+        const [insightRes, healthRes] = await Promise.all([
+          supabase.functions.invoke('ai-advisor', {
+            body: { prompt: insightPrompt, systemPrompt: "Você é um consultor estratégico de negócios. Responda apenas com JSON." }
+          }),
+          supabase.functions.invoke('ai-advisor', {
+            body: { 
+              prompt: healthPrompt, 
+              systemPrompt: "Você é um analista estratégico. Responda apenas com JSON.",
+              model: "claude-sonnet-4-20250514"
+            }
+          })
+        ]);
         
-        const content = iData?.choices?.[0]?.message?.content;
-        if (content) {
-          const jsonStr = content.match(/\{[\s\S]*\}/)?.[0];
+        const iContent = insightRes.data?.choices?.[0]?.message?.content;
+        if (iContent) {
+          const jsonStr = iContent.match(/\{[\s\S]*\}/)?.[0];
           if (jsonStr) setAiInsight(JSON.parse(jsonStr));
+        }
+
+        const hContent = healthRes.data?.choices?.[0]?.message?.content;
+        if (hContent) {
+          const jsonStr = hContent.match(/\{[\s\S]*\}/)?.[0];
+          if (jsonStr) setBusinessHealth(JSON.parse(jsonStr));
         }
       } catch (e) {
         console.error("AI Error:", e);
       } finally {
         setLoadingAI(false);
+        setLoadingHealth(false);
       }
     };
 
     generateAIContent();
-  }, [leads.length, projetos.length]);
+  }, [leads.length, projetos.length, pulse]);
 
   const forecast = React.useMemo(() => {
     const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido');
@@ -453,6 +512,79 @@ const Dashboard = () => {
       meta: 2000000 // Meta: R$ 2M
     };
   }, [leads]);
+
+  const velocity = React.useMemo(() => {
+    // Benchmarks
+    const benchmarks = {
+      'Novo Lead → Reunião': 3,
+      'Reunião → Proposta': 5,
+      'Proposta → Fechamento': 15,
+      'Negociação → Fechado': 7
+    };
+
+    if (leadLogs.length === 0) {
+      return Object.entries(benchmarks).map(([label, days]) => ({
+        label,
+        days,
+        status: 'normal' as const,
+        isBenchmark: true
+      }));
+    }
+
+    const transitions: Record<string, number[]> = {};
+
+    // Group logs by lead
+    const logsByLead: Record<string, any[]> = {};
+    leadLogs.forEach(log => {
+      if (!logsByLead[log.lead_id]) logsByLead[log.lead_id] = [];
+      logsByLead[log.lead_id].push(log);
+    });
+
+    Object.values(logsByLead).forEach(leadLogsList => {
+      const sortedLogs = leadLogsList.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      
+      for (let i = 0; i < sortedLogs.length - 1; i++) {
+        const current = sortedLogs[i];
+        const next = sortedLogs[i+1];
+        
+        const currentStage = current.nota?.includes('Movido para') ? current.nota.replace('Movido para ', '') : null;
+        const nextStage = next.nota?.includes('Movido para') ? next.nota.replace('Movido para ', '') : null;
+
+        if (currentStage && nextStage) {
+          const label = `${currentStage} → ${nextStage}`;
+          const diff = (new Date(next.created_at).getTime() - new Date(current.created_at).getTime()) / (1000 * 60 * 60 * 24);
+          
+          // Map to standard labels if possible
+          let standardLabel = null;
+          if (currentStage.toLowerCase().includes('novo') && nextStage.toLowerCase().includes('reunião')) standardLabel = 'Novo Lead → Reunião';
+          else if (currentStage.toLowerCase().includes('reunião') && nextStage.toLowerCase().includes('proposta')) standardLabel = 'Reunião → Proposta';
+          else if (currentStage.toLowerCase().includes('proposta') && nextStage.toLowerCase().includes('fechamento')) standardLabel = 'Proposta → Fechamento';
+          else if (currentStage.toLowerCase().includes('negociação') && nextStage.toLowerCase().includes('fechado')) standardLabel = 'Negociação → Fechado';
+
+          if (standardLabel) {
+            if (!transitions[standardLabel]) transitions[standardLabel] = [];
+            transitions[standardLabel].push(diff);
+          }
+        }
+      }
+    });
+
+    return Object.entries(benchmarks).map(([label, benchmark]) => {
+      const times = transitions[label];
+      const avg = times && times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : benchmark;
+      
+      let status: 'normal' | 'atencao' | 'critico' = 'normal';
+      if (avg > benchmark * 1.5) status = 'critico';
+      else if (avg > benchmark * 1.2) status = 'atencao';
+
+      return {
+        label,
+        days: Math.round(avg),
+        status,
+        hasData: !!times
+      };
+    });
+  }, [leadLogs]);
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
@@ -726,6 +858,115 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <p className="text-xs text-white/20 italic">Aguardando dados para gerar insight...</p>
+                )}
+              </div>
+            </section>
+
+            {/* Separator */}
+            <div className="border-t border-white/5" />
+
+            {/* Bloco: Saúde do Negócio */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">SAÚDE DO NEGÓCIO</span>
+              </div>
+
+              <div className="p-6 bg-white/[0.02] border border-white/5 space-y-6">
+                {loadingHealth ? (
+                  <div className="space-y-4">
+                    <div className="h-8 bg-white/5 animate-pulse w-24" />
+                    <div className="h-2 bg-white/5 animate-pulse w-full" />
+                    <div className="h-12 bg-white/5 animate-pulse w-full" />
+                  </div>
+                ) : businessHealth ? (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex items-baseline gap-2">
+                        <span className={cn(
+                          "text-3xl font-mono font-bold",
+                          businessHealth.score >= 80 ? "text-bronze" : 
+                          businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]"
+                        )}>
+                          {businessHealth.score}
+                        </span>
+                        <span className="text-white/20 text-sm font-mono">/ 100</span>
+                      </div>
+                      <div className="flex gap-1">
+                        {[...Array(10)].map((_, i) => (
+                          <span 
+                            key={i} 
+                            className={cn(
+                              "text-sm leading-none",
+                              i < Math.round(businessHealth.score / 10) 
+                                ? (businessHealth.score >= 80 ? "text-bronze" : businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]")
+                                : "text-white/5"
+                            )}
+                          >
+                            ●
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-white/80 leading-relaxed italic">
+                      "{businessHealth.diagnostico}"
+                    </p>
+
+                    <div className="grid grid-cols-4 gap-2 pt-4 border-t border-white/5">
+                      {[
+                        { label: 'PIPELINE', status: businessHealth.pipeline },
+                        { label: 'PROJETOS', status: businessHealth.projetos },
+                        { label: 'FINANCEIRO', status: businessHealth.financeiro },
+                        { label: 'SATISFAÇÃO', status: businessHealth.satisfacao }
+                      ].map(item => (
+                        <div key={item.label} className="text-center space-y-2">
+                          <p className="text-[7px] font-bold tracking-tighter text-white/40 uppercase">{item.label}</p>
+                          <div className="flex justify-center">
+                            {item.status === 'ok' ? (
+                              <CheckCircle2 size={14} className="text-bronze" />
+                            ) : item.status === 'atencao' ? (
+                              <AlertCircle size={14} className="text-amber-500" />
+                            ) : (
+                              <AlertCircle size={14} className="text-[#7A4A3A]" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs text-white/20 italic">Analisando indicadores...</p>
+                )}
+              </div>
+            </section>
+
+            {/* Bloco: Velocidade do Pipeline */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">VELOCIDADE DO PIPELINE</span>
+              </div>
+
+              <div className="p-6 bg-white/[0.02] border border-white/5">
+                {!velocity.some(v => v.hasData) && leadLogs.length > 0 ? (
+                  <p className="text-xs text-white/20 italic">Dados insuficientes — disponível após 30 dias de uso.</p>
+                ) : (
+                  <div className="space-y-5">
+                    {velocity.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-white/60 uppercase tracking-wider">{item.label}</p>
+                          <p className="text-sm font-bold text-white font-mono">{item.days} {item.days === 1 ? 'dia' : 'dias'}</p>
+                        </div>
+                        <div className={cn(
+                          "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest",
+                          item.status === 'normal' ? "bg-green-500/10 text-green-500" :
+                          item.status === 'atencao' ? "bg-amber-500/10 text-amber-500" : "bg-red-500/10 text-red-500"
+                        )}>
+                          {item.status === 'normal' ? '✅ normal' : item.status === 'atencao' ? '⚠️ atenção' : '🔴 crítico'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </section>
