@@ -144,9 +144,12 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
       }
 
       navigate(`/projetos/detalhe/${newProject.id}`);
-    } catch (error) {
-      console.error('Error converting lead to project:', error);
-      toast.error("Erro ao converter lead em projeto.");
+    } catch (error: any) {
+      console.error('Erro detalhado:', error);
+      console.error('Mensagem:', error?.message);
+      console.error('Código:', error?.code);
+      console.error('Detalhes:', error?.details);
+      toast.error(`Erro: ${error?.message || error?.code || JSON.stringify(error)}`);
     } finally {
       setIsConverting(false);
     }
