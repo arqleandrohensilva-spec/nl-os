@@ -72,6 +72,53 @@ const ScriptsAtendimento = () => {
       setIsGenerating(false);
     }
   };
+  
+  const identificarEtapa = async () => {
+    if (!leadAtivo || !mensagemDetector) return;
+    setIsDetecting(true);
+    toast.info("Identificando momento...");
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-completions', {
+        body: {
+          model: 'claude-sonnet-4-20250514',
+          prompt: `Você é o assistente comercial da NL Arquitetos. Analise a mensagem do cliente abaixo e identifique em qual etapa da jornada ele está.
+
+AS 11 ETAPAS DA JORNADA NL:
+01 - PRIMEIRO CONTATO: lead acabou de entrar em contato, ainda não foi qualificado
+02 - PRÉ-BRIEFING RECEBIDO: cliente preencheu o formulário, aguarda agendamento
+03 - REUNIÃO AGENDADA: reunião marcada, aguarda confirmação ou lembrete
+04 - APÓS A REUNIÃO: reunião aconteceu, proposta ainda não enviada
+05 - PROPOSTA ENVIADA: proposta enviada, aguarda resposta
+06 - NEGOCIAÇÃO: cliente está negociando escopo, valor ou condições
+07 - FECHAMENTO: cliente confirmou que quer fechar
+08 - INÍCIO DO PROJETO: contrato assinado, projeto iniciando
+09 - DESENVOLVIMENTO: projeto em andamento, apresentação de fases
+10 - ENTREGA FINAL: projeto concluído, entrega do material
+11 - PÓS-PROJETO: projeto entregue, fase de depoimento e indicação
+
+LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
+
+MENSAGEM DO CLIENTE:
+${mensagemDetector}
+
+Analise a mensagem e retorne APENAS JSON válido:
+{
+  "etapa_numero": 1,
+  "etapa_nome": "PRIMEIRO CONTATO",
+  "confianca": "ALTA | MÉDIA | BAIXA",
+  "motivo": "explicação em 1-2 linhas do porquê desta etapa",
+  "script_recomendado": "nome exato do script mais adequado para usar agora"
+}`
+        }
+      });
+      if (error) throw error;
+      setResultadoDetector(data);
+    } catch (e) {
+      toast.error("Erro ao identificar etapa");
+    } finally {
+      setIsDetecting(false);
+    }
+  };
 
   const replaceVariables = (text: string) => {
     if (!leadAtivo) return text;
