@@ -72,8 +72,8 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
     >
       {/* Ghosting Indicator - Ice flame / Alert icon */}
       {isGhosting && (
-        <div className=\"absolute top-1 right-1/2 translate-x-1/2 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20\">
-          <span className=\"text-[7px] font-bold text-amber-500 uppercase tracking-tighter\">Sem Contato há {daysSinceLastContact} dias</span>
+        <div className="absolute top-1 right-1/2 translate-x-1/2 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+          <span className="text-[7px] font-bold text-amber-500 uppercase tracking-tighter">Sem Contato há {daysSinceLastContact} dias</span>
         </div>
       )}
       {/* Pulse effect for Hot Lead - Left border only */}
