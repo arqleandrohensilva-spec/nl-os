@@ -152,11 +152,11 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
               <div><p className="text-white/40">Tipo</p><p className="text-white">{lead.tipo}</p></div>
               <div><p className="text-white/40">Área</p><p className="text-white">{lead.area} m²</p></div>
               <div><p className="text-white/40">Orçamento</p><p className="text-white">{formatCurrency(lead.orcamento)}</p></div>
-              <div><p className="text-white/40">Entrada</p><p className="text-white">{lead.criado}</p></div>
+              <div><p className="text-white/40">Entrada</p><p className="text-white">{new Date(lead.criado).toLocaleDateString('pt-BR')}</p></div>
               <div><p className="text-white/40">Origem</p><p className="text-white">{lead.origem}</p></div>
             </div>
 
-            <div className="bg-[#FAFAFA] border border-white/10 p-4 rounded-[2px] space-y-2">
+            <div className="bg-white/[0.03] border border-white/10 p-4 rounded-none space-y-2">
               <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2">Breakdown do Score</p>
               {calculateLeadScore(lead).breakdown.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-[10px]">
