@@ -171,7 +171,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/')} 
           />
           <NavItem 
-            label="12 · Scripts de Atendimento" 
+            label="Scripts de Atendimento" 
             active={location.pathname === '/scripts-atendimento'} 
             onClick={() => navigate('/scripts-atendimento')} 
           />
