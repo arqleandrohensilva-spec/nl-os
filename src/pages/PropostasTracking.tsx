@@ -1292,7 +1292,7 @@ Retorne APENAS JSON válido:
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-[#F0EDEA] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <ClipboardList size={14} className="text-bronze" />
                       Checklist Técnico
@@ -1308,7 +1308,7 @@ Retorne APENAS JSON válido:
                       { label: "Próximo passo definido", key: "proximo_passo" },
                       { label: "Sem urgência artificial", key: "sem_urgencia" }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-white border border-[#F0EDEA] rounded-[2px]">
+                      <div key={i} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-none">
                         <span className="text-[11px] font-medium text-white/40">{item.label}</span>
                         {reviewResult.checklist[item.key] ? (
                           <CheckCircle2 size={16} className="text-green-500" />
