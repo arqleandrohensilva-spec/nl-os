@@ -699,7 +699,7 @@ const Index = () => {
                                 <SelectItem key={m} value={m}>{m}</SelectItem>
                               ))}
                               <SelectItem value="Outra cidade">Outra cidade</SelectItem>
-                            </SelectContent>
+                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-2">
@@ -711,7 +711,7 @@ const Index = () => {
                             <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-white/10">
+                            <SelectContent className="bg-[#1A1A1A] border border-white/10 text-white">
                               <SelectItem value="Arq+Int">Arquitetura + Interiores</SelectItem>
                               <SelectItem value="Interiores">Somente Interiores</SelectItem>
                               <SelectItem value="Comercial">Comercial</SelectItem>
@@ -728,7 +728,7 @@ const Index = () => {
                             value={newLead.area || ''} 
                             onChange={(e) => setNewLead({ ...newLead, area: Number(e.target.value) })}
                             placeholder="0"
-                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                             className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze bg-[#1A1A1A] text-white"
                           />
                         </div>
                         <div className="space-y-2">
@@ -738,7 +738,7 @@ const Index = () => {
                             value={newLead.orcamento || ''} 
                             onChange={(e) => setNewLead({ ...newLead, orcamento: Number(e.target.value) })}
                             placeholder="0"
-                            className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                             className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze bg-[#1A1A1A] text-white"
                           />
                         </div>
                       </div>
@@ -753,7 +753,7 @@ const Index = () => {
                             <SelectTrigger className="h-10 border-white/10 text-xs font-dm-mono focus:border-bronze">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-white border border-white/10">
+                             <SelectContent className="bg-[#1A1A1A] border border-white/10 text-white">
                               <SelectItem value="Instagram">Instagram</SelectItem>
                               <SelectItem value="Indicação">Indicação</SelectItem>
                               <SelectItem value="Site">Site</SelectItem>
@@ -788,7 +788,7 @@ const Index = () => {
                         <textarea 
                           value={newLead.obs}
                           onChange={(e) => setNewLead({ ...newLead, obs: e.target.value })}
-                          className="w-full min-h-[100px] p-4 border border-white/10 text-xs font-dm-mono focus:border-bronze outline-none rounded-[2px] resize-none"
+                          className="w-full min-h-[100px] p-4 border border-white/10 text-xs font-dm-mono focus:border-bronze outline-none rounded-[2px] resize-none bg-[#1A1A1A] text-white"
                           placeholder="Notas sobre o primeiro contato..."
                         />
                       </div>
@@ -820,7 +820,7 @@ const Index = () => {
               </button>
               <div className="flex items-center gap-1 bg-white/5/20 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
-                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
+                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
               </div>
             </div>
@@ -834,7 +834,7 @@ const Index = () => {
                       onClick={() => setFilterResponsavel(resp)} 
                       className={cn(
                         "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
-                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-white/40 hover:text-white"
+                        filterResponsavel === resp ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white"
                       )}
                     >
                       {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
@@ -847,7 +847,7 @@ const Index = () => {
                 <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
-                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-graphite bg-bronze/5" : "border-white/10 text-white/40 hover:border-muted-foreground")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-muted")} />{temp}</button>
+                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/10 text-white/40 hover:border-white/40")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/40")} />{temp}</button>
                   ))}
                 </div>
               </div>
