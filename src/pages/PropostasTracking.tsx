@@ -890,9 +890,9 @@ Retorne APENAS JSON válido:
       </main>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl bg-white rounded-[2px]">
+        <DialogContent className="max-w-2xl bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold font-cormorant text-graphite uppercase tracking-wider">Nova Proposta</DialogTitle>
+            <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">Nova Proposta</DialogTitle>
           </DialogHeader>
           
           <div className="grid grid-cols-2 gap-6 py-6">
@@ -912,7 +912,7 @@ Retorne APENAS JSON válido:
                     className="rounded-[2px] border-white/10 h-10"
                   />
                   {showLeads && leads.length > 0 && (
-                    <div className="absolute top-full left-0 w-full mt-1 bg-white border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
+                    <div className="absolute top-full left-0 w-full mt-1 bg-[#1A1A1A] border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
                       {leads
                         .filter(lead => 
                           !newProposal.cliente || 
@@ -921,7 +921,7 @@ Retorne APENAS JSON válido:
                         .map(lead => (
                           <div 
                             key={lead.id}
-                            className="p-3 hover:bg-bronze/5 cursor-pointer text-sm border-b border-[#F8F9FA] last:border-0"
+                            className="p-3 hover:bg-bronze/5 cursor-pointer text-sm border-b border-white/5 last:border-0"
                             onClick={() => {
                               handleLeadSelect(lead.id);
                               setShowLeads(false);
@@ -1018,7 +1018,7 @@ Retorne APENAS JSON válido:
                 <textarea 
                   value={newProposal.objetivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, objetivo: e.target.value})}
-                  className="w-full h-[106px] rounded-[2px] border border-white/10 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20"
+                  className="w-full h-[106px] rounded-[2px] border border-white/10 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20 bg-white/5 text-white"
                 />
               </div>
 
