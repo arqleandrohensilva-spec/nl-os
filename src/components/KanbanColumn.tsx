@@ -55,7 +55,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick }: KanbanColumnProps) => {
               {stage}
             </h2>
           </div>
-          <button className="text-muted hover:text-graphite transition-colors">
+          <button className="text-muted hover:text-white transition-colors">
             <MoreHorizontal size={14} />
           </button>
         </div>

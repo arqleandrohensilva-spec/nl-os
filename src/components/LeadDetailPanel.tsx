@@ -102,7 +102,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
       <div className="absolute inset-0 bg-graphite/40 backdrop-blur-[8px]" onClick={onClose} />
       <div className="relative w-[500px] h-full bg-white shadow-[-30px_0_60px_rgba(0,0,0,0.15)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
         <div className="p-10 border-b border-beige relative">
-          <button onClick={onClose} className="absolute right-8 top-8 text-muted hover:text-graphite transition-transform hover:scale-110"><X size={20} /></button>
+          <button onClick={onClose} className="absolute right-8 top-8 text-muted hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
           <div className="flex items-center gap-3 mb-2">
             <span className={cn(
               "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border",

@@ -87,7 +87,7 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-graphite transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-white transition-colors"
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}

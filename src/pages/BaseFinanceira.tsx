@@ -610,7 +610,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         e.stopPropagation();
                         setIsAiExpanded(false);
                       }}
-                      className="p-1 text-muted hover:text-graphite transition-colors"
+                      className="p-1 text-muted hover:text-white transition-colors"
                     >
                       <ChevronUp size={16} />
                     </button>

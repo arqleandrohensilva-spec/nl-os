@@ -662,7 +662,7 @@ Retorne APENAS JSON válido:
                     "px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 -mb-[2px]",
                     statusFilter === tab.id 
                       ? "border-bronze text-bronze" 
-                      : "border-transparent text-muted-foreground hover:text-graphite hover:border-[#E8E4DF]"
+                      : "border-transparent text-muted-foreground hover:text-white hover:border-[#E8E4DF]"
                   )}
                 >
                   {tab.label}

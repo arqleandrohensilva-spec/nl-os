@@ -820,7 +820,7 @@ const Index = () => {
               </button>
               <div className="flex items-center gap-1 bg-beige/20 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
-                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite")}>{type}</button>
+                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-white")}>{type}</button>
                 ))}
               </div>
             </div>
@@ -834,7 +834,7 @@ const Index = () => {
                       onClick={() => setFilterResponsavel(resp)} 
                       className={cn(
                         "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
-                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-graphite"
+                        filterResponsavel === resp ? "bg-white text-graphite shadow-sm" : "text-muted hover:text-white"
                       )}
                     >
                       {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
@@ -851,7 +851,7 @@ const Index = () => {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-muted hover:text-graphite cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
+              <div className="flex items-center gap-2 text-muted hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
             </div>
           </div>
         </div>
