@@ -1266,6 +1266,7 @@ const Index = () => {
                   onClick={async () => {
                     if (!conversionLead) return;
                     try {
+                      console.log("Iniciando conversão de lead em projeto:", conversionLead);
                       toast.loading("Configurando projeto e pastas no Dropbox...", { id: "create-project" });
                       
                       const tokenCliente = crypto.randomUUID();
@@ -1273,12 +1274,12 @@ const Index = () => {
                       
                       try {
                         dropboxFolder = await criarPastasDropbox(conversionLead.nome, conversionLead.tipo);
-                      } catch (dbErr) {
-                        console.error("Dropbox error:", dbErr);
+                      } catch (dbErr: any) {
+                        console.error("Erro no Dropbox durante conversão:", dbErr);
                         // Se falhou o Dropbox, continuamos para criar o projeto mas avisaremos no final
                       }
 
-                      const { error } = await supabase.from('projetos').insert({
+                      const projetoData = {
                         nome: conversionLead.nome,
                         nome_cliente: conversionLead.nome,
                         cliente_id: conversionLead.id,
@@ -1292,27 +1293,34 @@ const Index = () => {
                         horas_executivo: conversionHours.executivo,
                         horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
-                        status_geral: 'ativo',
+                        status_geral: 'Em andamento',
                         token_cliente: tokenCliente,
                         dropbox_folder: dropboxFolder || null
-                      });
+                      };
 
-                      if (error) throw error;
+                      console.log("Dados do projeto a serem inseridos:", projetoData);
+
+                      const { error } = await supabase.from('projetos').insert(projetoData);
+
+                      if (error) {
+                        console.error("Erro ao inserir projeto no Supabase:", error);
+                        throw error;
+                      }
 
                       if (dropboxFolder) {
                         toast.success("Projeto criado e pastas no Dropbox configuradas!", { id: "create-project" });
                       } else {
-                        toast.error("Projeto criado. Pastas no Dropbox não foram criadas — tente sincronizar manualmente.", { 
+                        toast.error("Projeto criado. Pastas no Dropbox não foram criadas — verifique os logs ou sincronize manualmente.", { 
                           id: "create-project",
                           duration: 6000 
                         });
                       }
-                      
+
                       setShowProjectConversion(false);
-                      fetchLeads(); // Refresh list
-                    } catch (err) {
-                      console.error("Error creating project:", err);
-                      toast.error("Erro ao criar projeto", { id: "create-project" });
+                      fetchLeads();
+                    } catch (err: any) {
+                      console.error("Erro detalhado na conversão:", err);
+                      toast.error(`Erro ao converter lead em projeto: ${err.message || "Erro desconhecido"}`, { id: "create-project" });
                     }
                   }}
                   className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest"
