@@ -127,6 +127,50 @@ Analise a mensagem e retorne APENAS JSON válido:
     }
   };
 
+  const gerarScriptObjecao = async () => {
+    if (!leadAtivo || !descricaoObjecao || !etapaAtualObjecao) return;
+    setIsGeneratingObjecao(true);
+    toast.info("Gerando script...");
+    try {
+      const { data, error } = await supabase.functions.invoke('chat-completions', {
+        body: {
+          model: 'claude-sonnet-4-20250514',
+          prompt: `Você é o assistente comercial da NL Arquitetos. Gere um script de resposta para a objeção ou situação abaixo.
+
+CONTEXTO DA NL:
+- Tom: profissional, condutor, sem pressão de venda
+- Nunca confrontar o cliente — redirecionar com método
+- Sempre centrado no problema do cliente, não na defesa da NL
+- Sem "casa dos sonhos", "lindo", "incrível", urgência artificial
+- Resposta curta quando possível, completa quando necessário
+- Sempre com próximo passo claro
+
+PALAVRAS PROIBIDAS: "casa dos sonhos", "projeto dos sonhos", "obra sem dor de cabeça garantida", "luxo acessível", "rapidinho", "baratinho", "pode confiar a gente resolve", "obra sempre tem imprevisto faz parte"
+
+LEAD: ${leadAtivo.nome} · ${leadAtivo.tipo} · ${leadAtivo.cidade}
+ETAPA ATUAL: ${etapaAtualObjecao}
+
+OBJEÇÃO / SITUAÇÃO:
+${descricaoObjecao}
+
+Gere uma resposta no tom NL para essa situação específica.
+
+Retorne APENAS JSON válido:
+{
+  "script": "texto completo da resposta pronta para enviar",
+  "estrategia": "explicação em 1 linha do que foi feito — ex: Reconheceu o ponto e redirecionou para o valor do projeto executivo"
+}`
+        }
+      });
+      if (error) throw error;
+      setResultadoObjecao(data);
+    } catch (e) {
+      toast.error("Erro ao gerar script");
+    } finally {
+      setIsGeneratingObjecao(false);
+    }
+  };
+
   const replaceVariables = (text: string) => {
     if (!leadAtivo) return text;
     return text
