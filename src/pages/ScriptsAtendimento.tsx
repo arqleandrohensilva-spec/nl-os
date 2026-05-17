@@ -4,9 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ChevronDown, Copy, Bot, FileText, Check } from 'lucide-react';
+import { ChevronDown, Copy, Bot, FileText, Check, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 interface Lead {
   id: string;
@@ -42,6 +49,12 @@ const ScriptsAtendimento = () => {
   const [isDetecting, setIsDetecting] = useState(false);
   const [isGeneratingObjecao, setIsGeneratingObjecao] = useState(false);
   const [openEtapa, setOpenEtapa] = useState<string | null>(null);
+  const [modalAdaptarAberto, setModalAdaptarAberto] = useState(false);
+  const [scriptParaAdaptar, setScriptParaAdaptar] = useState<{ situacao: string; texto: string } | null>(null);
+  const [perfilCliente, setPerfilCliente] = useState<string>('');
+  const [obsCliente, setObsCliente] = useState('');
+  const [isAdaptando, setIsAdaptando] = useState(false);
+  const [resultadoAdaptacao, setResultadoAdaptacao] = useState<{ script_adaptado: string; o_que_mudou: string } | null>(null);
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -239,6 +252,62 @@ Retorne APENAS JSON válido:
     } finally {
       setIsGeneratingObjecao(false);
     }
+  const adaptarTom = async () => {
+    if (!scriptParaAdaptar || !perfilCliente) return;
+    setIsAdaptando(true);
+    setResultadoAdaptacao(null);
+    toast.info("Adaptando tom...");
+
+    const systemPrompt = "Você é o assistente comercial da NL Arquitetos. Adapte o script abaixo para o perfil específico deste cliente, mantendo o tom NL — técnico, condutor, sem pressão — mas ajustando a ênfase para o perfil.";
+    const prompt = `PERFIL DO CLIENTE: ${perfilCliente}
+
+Instruções por perfil:
+- TÉCNICO: ser mais direto, usar dados e lógica, menos contexto emocional
+- EMOCIONAL: adicionar uma frase de conexão no início, mostrar que entende a situação antes de conduzir
+- DESCONFIADO: reforçar transparência e método, mostrar o processo passo a passo, evitar qualquer promessa vaga
+- INDECISO: simplificar o próximo passo, deixar a ação muito clara, reduzir opções
+
+OBSERVAÇÃO SOBRE O CLIENTE: ${obsCliente || 'Nenhuma observação adicional.'}
+
+LEAD: ${leadAtivo ? `${leadAtivo.nome} · ${leadAtivo.tipo}` : 'Contexto genérico (sem lead selecionado)'}
+
+SCRIPT ORIGINAL:
+${scriptParaAdaptar.texto}
+
+Adapte o script mantendo o tom NL. Não mude o conteúdo — mude a ênfase e a abordagem.
+
+Retorne APENAS JSON válido:
+{
+  "script_adaptado": "texto completo do script adaptado",
+  "o_que_mudou": "explicação em 1 linha do que foi ajustado"
+}`;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-advisor', {
+        body: {
+          systemPrompt,
+          prompt,
+          model: 'claude-sonnet-4-20250514'
+        }
+      });
+
+      if (error) throw error;
+      const result = parseAIResponse(data);
+      setResultadoAdaptacao(result);
+    } catch (e: any) {
+      console.error("Erro adaptar tom:", e);
+      toast.error(`Erro ao adaptar tom: ${e.message || "Verifique o console"}`);
+    } finally {
+      setIsAdaptando(false);
+    }
+  };
+
+  const abrirModalAdaptar = (situacao: string, texto: string) => {
+    setScriptParaAdaptar({ situacao, texto: replaceVariables(texto) });
+    setPerfilCliente('');
+    setObsCliente('');
+    setResultadoAdaptacao(null);
+    setModalAdaptarAberto(true);
   };
 
   const replaceVariables = (text: string) => {
