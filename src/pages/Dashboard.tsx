@@ -896,10 +896,10 @@ Retorne APENAS JSON:
                           <span 
                             key={i} 
                             className={cn(
-                              "text-sm leading-none",
+                              "text-sm leading-none transition-colors duration-500",
                               i < Math.round(businessHealth.score / 10) 
                                 ? (businessHealth.score >= 80 ? "text-bronze" : businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]")
-                                : "text-white/5"
+                                : "text-white/10"
                             )}
                           >
                             ●
@@ -920,16 +920,16 @@ Retorne APENAS JSON:
                         { label: 'SATISFAÇÃO', status: businessHealth.satisfacao }
                       ].map(item => (
                         <div key={item.label} className="text-center space-y-2">
-                          <p className="text-[7px] font-bold tracking-tighter text-white/40 uppercase">{item.label}</p>
-                          <div className="flex justify-center">
+                          <div className="flex justify-center mb-1">
                             {item.status === 'ok' ? (
-                              <CheckCircle2 size={14} className="text-bronze" />
+                              <span className="text-green-500 text-sm font-bold">✓</span>
                             ) : item.status === 'atencao' ? (
-                              <AlertCircle size={14} className="text-amber-500" />
+                              <span className="text-amber-500 text-sm font-bold">⚠</span>
                             ) : (
-                              <AlertCircle size={14} className="text-[#7A4A3A]" />
+                              <span className="text-red-500/70 text-sm font-bold">●</span>
                             )}
                           </div>
+                          <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">{item.label}</p>
                         </div>
                       ))}
                     </div>
