@@ -1222,6 +1222,7 @@ export type Database = {
           data: string | null
           estado: string | null
           id: string
+          link_proposta: string | null
           objetivo: string | null
           status: string | null
           tipo: string
@@ -1238,6 +1239,7 @@ export type Database = {
           data?: string | null
           estado?: string | null
           id?: string
+          link_proposta?: string | null
           objetivo?: string | null
           status?: string | null
           tipo: string
@@ -1254,6 +1256,7 @@ export type Database = {
           data?: string | null
           estado?: string | null
           id?: string
+          link_proposta?: string | null
           objetivo?: string | null
           status?: string | null
           tipo?: string
