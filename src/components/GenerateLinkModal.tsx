@@ -83,8 +83,12 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
         })
       });
 
+      const responseText = await response.text();
+      console.log('Status:', response.status);
+      console.log('Response:', responseText);
+
       if (!response.ok) {
-        throw new Error('Erro ao salvar no servidor de propostas');
+        throw new Error(`HTTP ${response.status}: ${responseText}`);
       }
 
       // 2. Salvar o link na tabela local do NL OS
