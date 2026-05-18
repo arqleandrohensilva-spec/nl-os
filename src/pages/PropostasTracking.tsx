@@ -29,11 +29,13 @@ import {
   AlertTriangle,
   AlertCircle,
   Ban,
-  ClipboardList
+  ClipboardList,
+  Link2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
 import EngagementDashboard from '@/components/EngagementDashboard';
+import GenerateLinkModal from '@/components/GenerateLinkModal';
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -104,6 +106,8 @@ const PropostasTracking = () => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewResult, setReviewResult] = useState<any>(null);
+  const [isGenerateLinkModalOpen, setIsGenerateLinkModalOpen] = useState(false);
+  const [proposalToGenerateLink, setProposalToGenerateLink] = useState<Proposal | null>(null);
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
@@ -883,11 +887,14 @@ Retorne APENAS JSON válido:
                       <Button 
                         variant="outline"
                         size="sm"
-                        onClick={() => copyLink(p)}
-                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA] hover:text-white hover:border-bronze"
+                        onClick={() => {
+                          setProposalToGenerateLink(p);
+                          setIsGenerateLinkModalOpen(true);
+                        }}
+                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all"
                       >
-                        <Copy size={11} className="mr-2" />
-                        Link
+                        <Link2 size={11} className="mr-2" />
+                        Gerar Link
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
@@ -908,6 +915,18 @@ Retorne APENAS JSON válido:
             </div>
           )}
         </div>
+
+        {proposalToGenerateLink && (
+          <GenerateLinkModal
+            isOpen={isGenerateLinkModalOpen}
+            onClose={() => {
+              setIsGenerateLinkModalOpen(false);
+              setProposalToGenerateLink(null);
+            }}
+            proposal={proposalToGenerateLink}
+            onLinkGenerated={() => fetchProposals()}
+          />
+        )}
       </main>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
