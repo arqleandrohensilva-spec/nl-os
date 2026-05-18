@@ -328,17 +328,17 @@ const BibliotecaServicos = () => {
                       {
                         title: "Apresentações",
                         items: [
-                          { name: "Apresentação ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/arqint" },
-                          { name: "Apresentação Interiores", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/int" },
-                          { name: "Apresentação Comercial", url: "https://nlarquitetosapresentacao.lovable.app/apresentacao/comercial" },
+                          { name: "Apresentação ArqInt", url: "https://proposta.nl.arq.br/apresentacao/arqint" },
+                          { name: "Apresentação Interiores", url: "https://proposta.nl.arq.br/apresentacao/int" },
+                          { name: "Apresentação Comercial", url: "https://proposta.nl.arq.br/apresentacao/comercial" },
                         ]
                       },
                       {
                         title: "Propostas",
                         items: [
-                          { name: "Proposta ArqInt", url: "https://nlarquitetosapresentacao.lovable.app/proposta/arqint" },
-                          { name: "Proposta Interiores", url: "https://nlarquitetosapresentacao.lovable.app/proposta/int" },
-                          { name: "Proposta Comercial", url: "https://nlarquitetosapresentacao.lovable.app/proposta/comercial" },
+                          { name: "Proposta ArqInt", url: "https://proposta.nl.arq.br/proposta/arqint" },
+                          { name: "Proposta Interiores", url: "https://proposta.nl.arq.br/proposta/int" },
+                          { name: "Proposta Comercial", url: "https://proposta.nl.arq.br/proposta/comercial" },
                         ]
                       }
                     ].map((group, idx) => (
