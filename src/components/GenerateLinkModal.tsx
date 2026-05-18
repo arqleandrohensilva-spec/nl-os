@@ -76,9 +76,9 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
           slug: slug,
           nome_cliente: nomeCliente,
           cidade: cidade,
-          area: area ? parseFloat(area) : null,
-          valor_executivo: valorExecutivo ? parseFloat(valorExecutivo) : null,
-          valor_completo: valorCompleto ? parseFloat(valorCompleto) : null,
+          area: area || null,
+          valor_executivo: valorExecutivo || null,
+          valor_completo: valorCompleto || null,
           objetivo: objetivo,
         })
       });

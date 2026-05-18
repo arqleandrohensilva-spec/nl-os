@@ -1317,6 +1317,60 @@ export type Database = {
           },
         ]
       }
+      propostas_clientes: {
+        Row: {
+          acessos: number | null
+          area: string | null
+          cidade: string | null
+          criado_em: string | null
+          estado: string | null
+          id: string
+          nome_cliente: string | null
+          objetivo: string | null
+          slug: string
+          tipo: string
+          tipo_negocio: string | null
+          ultimo_acesso: string | null
+          validade: string | null
+          valor_completo: string | null
+          valor_executivo: string | null
+        }
+        Insert: {
+          acessos?: number | null
+          area?: string | null
+          cidade?: string | null
+          criado_em?: string | null
+          estado?: string | null
+          id?: string
+          nome_cliente?: string | null
+          objetivo?: string | null
+          slug: string
+          tipo: string
+          tipo_negocio?: string | null
+          ultimo_acesso?: string | null
+          validade?: string | null
+          valor_completo?: string | null
+          valor_executivo?: string | null
+        }
+        Update: {
+          acessos?: number | null
+          area?: string | null
+          cidade?: string | null
+          criado_em?: string | null
+          estado?: string | null
+          id?: string
+          nome_cliente?: string | null
+          objetivo?: string | null
+          slug?: string
+          tipo?: string
+          tipo_negocio?: string | null
+          ultimo_acesso?: string | null
+          validade?: string | null
+          valor_completo?: string | null
+          valor_executivo?: string | null
+        }
+        Relationships: []
+      }
       servicos: {
         Row: {
           ativo: boolean | null
