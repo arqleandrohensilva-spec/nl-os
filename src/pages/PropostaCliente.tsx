@@ -70,7 +70,7 @@ const PropostaCliente = () => {
     estado: proposta.estado || 'SP',
     area: proposta.area || '[XXX]',
     objetivo: proposta.objetivo || '',
-    data: proposta.criado_at ? new Date(proposta.criado_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
+    data: proposta.criado_em ? new Date(proposta.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
     plano: '',
     valor_executivo: proposta.valor_executivo || 'Sob consulta',
     valor_completo: proposta.valor_completo || 'Sob consulta',
