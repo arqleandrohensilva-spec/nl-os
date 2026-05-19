@@ -54,6 +54,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
   const [valorExecutivo, setValorExecutivo] = useState(proposal.valor_executivo?.toString() || '');
   const [valorCompleto, setValorCompleto] = useState(proposal.valor_completo?.toString() || '');
   const [objetivo, setObjetivo] = useState(proposal.objetivo || '');
+  const [tipoNegocio, setTipoNegocio] = useState('');
   
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
