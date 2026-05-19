@@ -38,7 +38,16 @@ interface GenerateLinkModalProps {
 }
 
 const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: GenerateLinkModalProps) => {
-  const [tipo, setTipo] = useState(proposal.tipo?.toLowerCase() === 'interiores' ? 'int' : (proposal.tipo || 'arqint'));
+  const getInitialTipo = () => {
+    if (!proposal.tipo) return 'arqint';
+    const t = proposal.tipo.toLowerCase();
+    if (t === 'interiores' || t === 'int') return 'int';
+    if (t === 'arq+int' || t === 'arqint') return 'arqint';
+    if (t === 'comercial') return 'comercial';
+    return 'arqint';
+  };
+
+  const [tipo, setTipo] = useState(getInitialTipo());
   const [nomeCliente, setNomeCliente] = useState(proposal.cliente);
   const [cidade, setCidade] = useState(proposal.cidade || '');
   const [area, setArea] = useState(proposal.area?.toString() || '');
