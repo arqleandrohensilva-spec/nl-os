@@ -67,6 +67,13 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
     setIsGenerating(true);
     try {
       const typeSlug = tipo;
+      
+      // Validação básica do tipo
+      const tiposValidos = ['arqint', 'int', 'comercial'];
+      if (!tiposValidos.includes(typeSlug)) {
+        throw new Error(`Tipo de proposta inválido: ${typeSlug}`);
+      }
+
       const slug = gerarSlug(nomeCliente);
       const baseUrl = `https://proposta.nl.arq.br`;
       const finalLink = `${baseUrl}/p/${typeSlug}/${slug}`;
@@ -92,13 +99,14 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
         })
       });
 
-      const responseText = await response.text();
-      console.log('Status:', response.status);
-      console.log('Response:', responseText);
-
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${responseText}`);
+        const responseText = await response.text();
+        console.error('Erro Supabase Externo:', response.status, responseText);
+        throw new Error(`Erro ao salvar no servidor de propostas (HTTP ${response.status})`);
       }
+
+      const data = await response.json();
+      console.log('Sucesso no Supabase Externo:', data);
 
       // 2. Salvar o link na tabela local do NL OS
       const { error: updateError } = await supabase
@@ -112,11 +120,11 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
       
       // Auto-copy to clipboard
       await navigator.clipboard.writeText(finalLink);
-      toast.success("Link gerado e copiado!");
+      toast.success("Link gerado e copiado com sucesso!");
       
       if (onLinkGenerated) onLinkGenerated(finalLink);
     } catch (error: any) {
-      console.error('Erro ao gerar link:', error);
+      console.error('Erro detalhado ao gerar link:', error);
       toast.error(error.message || 'Erro ao gerar link da proposta');
     } finally {
       setIsGenerating(false);
