@@ -169,6 +169,19 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                 </SelectContent>
               </Select>
             </div>
+            
+            {tipo === 'comercial' && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Negócio</Label>
+                <Input
+                  id="tipoNegocio"
+                  value={tipoNegocio}
+                  onChange={(e) => setTipoNegocio(e.target.value)}
+                  placeholder="Ex: Barbearia, Clínica, Restaurante..."
+                  className="bg-[#1A1A1A] border-white/10 rounded-none focus:border-bronze"
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="nome" className="text-[10px] uppercase tracking-widest text-white/40">Nome do Cliente</Label>
