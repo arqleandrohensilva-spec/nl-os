@@ -81,10 +81,13 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
       else if (typeSlug === 'comercial') tipo_negocio = tipoNegocio;
 
       const baseSlug = gerarSlug(nomeCliente);
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      
       const slugAttempts = [
         baseSlug,
-        `${baseSlug}-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}`,
-        `${baseSlug}-${Math.floor(Math.random() * 10000)}`
+        `${baseSlug}-${timestamp}`,
+        `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
       ];
 
       let finalLink = "";
@@ -92,39 +95,45 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
 
       // Loop de tentativas para tratar conflitos de slug (Erro 409)
       for (const attemptSlug of slugAttempts) {
-        const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify({
-            tipo: typeSlug,
-            slug: attemptSlug,
-            nome_cliente: nomeCliente,
-            cidade: cidade,
-            area: area || null,
-            valor_executivo: valorExecutivo || null,
-            valor_completo: valorCompleto || null,
-            objetivo: objetivo,
-            tipo_negocio: tipo_negocio,
-          })
-        });
+        try {
+          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              tipo: typeSlug,
+              slug: attemptSlug,
+              nome_cliente: nomeCliente,
+              cidade: cidade,
+              area: area || null,
+              valor_executivo: valorExecutivo || null,
+              valor_completo: valorCompleto || null,
+              objetivo: objetivo,
+              tipo_negocio: tipo_negocio,
+            })
+          });
 
-        if (response.ok) {
-          finalSlug = attemptSlug;
-          const baseUrl = `https://proposta.nl.arq.br`;
-          finalLink = `${baseUrl}/p/${typeSlug}/${finalSlug}`;
-          break;
-        } else if (response.status === 409) {
-          console.warn(`Conflito de slug (${attemptSlug}), tentando próxima variação...`);
-          continue;
-        } else {
-          const responseText = await response.text();
-          console.error('Erro Supabase Externo:', response.status, responseText);
-          throw new Error(`Erro ao salvar no servidor de propostas (HTTP ${response.status})`);
+          if (response.ok) {
+            finalSlug = attemptSlug;
+            const baseUrl = `https://proposta.nl.arq.br`;
+            finalLink = `${baseUrl}/p/${typeSlug}/${finalSlug}`;
+            break;
+          } else if (response.status === 409) {
+            console.warn(`Conflito de slug (${attemptSlug}), tentando próxima variação...`);
+            continue;
+          } else {
+            const responseText = await response.text();
+            console.error('Erro Supabase Externo:', response.status, responseText);
+            throw new Error(`Erro ao salvar no servidor de propostas (HTTP ${response.status})`);
+          }
+        } catch (err: any) {
+          // Se for 409, o loop continua. Se for outro erro, interrompe a menos que seja erro de rede
+          if (err.message?.includes('409')) continue;
+          throw err;
         }
       }
 
