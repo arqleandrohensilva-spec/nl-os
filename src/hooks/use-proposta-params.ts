@@ -1,8 +1,9 @@
-import { usePropostaContext } from './use-proposta-context';
+import { useContext } from 'react';
+import { PropostaContext } from './use-proposta-context';
 import { PropostaParams } from './use-proposta-params-types';
 
 export function usePropostaParams(): PropostaParams {
-  const context = usePropostaContext();
+  const context = useContext(PropostaContext);
 
   const searchParams = typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search)
