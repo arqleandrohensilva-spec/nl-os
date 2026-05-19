@@ -38,7 +38,7 @@ interface GenerateLinkModalProps {
 }
 
 const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: GenerateLinkModalProps) => {
-  const [tipo, setTipo] = useState(proposal.tipo || 'ARQ+INT');
+  const [tipo, setTipo] = useState(proposal.tipo?.toLowerCase() === 'interiores' ? 'int' : (proposal.tipo || 'arqint'));
   const [nomeCliente, setNomeCliente] = useState(proposal.cliente);
   const [cidade, setCidade] = useState(proposal.cidade || '');
   const [area, setArea] = useState(proposal.area?.toString() || '');
@@ -57,7 +57,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const typeSlug = tipo.toLowerCase().replace('+', '');
+      const typeSlug = tipo;
       const slug = gerarSlug(nomeCliente);
       const baseUrl = `https://proposta.nl.arq.br`;
       const finalLink = `${baseUrl}/p/${typeSlug}/${slug}`;
@@ -139,9 +139,9 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
-                  <SelectItem value="ARQ+INT">ARQ+INT</SelectItem>
-                  <SelectItem value="Interiores">Interiores</SelectItem>
-                  <SelectItem value="Comercial">Comercial</SelectItem>
+                  <SelectItem value="arqint">ARQ+INT</SelectItem>
+                  <SelectItem value="int">Interiores</SelectItem>
+                  <SelectItem value="comercial">Comercial</SelectItem>
                 </SelectContent>
               </Select>
             </div>
