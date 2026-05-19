@@ -80,6 +80,11 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
       const finalLink = `${baseUrl}/p/${typeSlug}/${slug}`;
 
       // 1. Salvar no Supabase externo
+      let tipo_negocio = "";
+      if (typeSlug === 'arqint') tipo_negocio = "Residencial";
+      else if (typeSlug === 'int') tipo_negocio = "Interiores";
+      else if (typeSlug === 'comercial') tipo_negocio = tipoNegocio;
+
       const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
         method: 'POST',
         headers: {
@@ -97,6 +102,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
           valor_executivo: valorExecutivo || null,
           valor_completo: valorCompleto || null,
           objetivo: objetivo,
+          tipo_negocio: tipo_negocio,
         })
       });
 
