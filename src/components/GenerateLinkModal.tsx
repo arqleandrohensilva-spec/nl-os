@@ -54,6 +54,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
   const [valorExecutivo, setValorExecutivo] = useState(proposal.valor_executivo?.toString() || '');
   const [valorCompleto, setValorCompleto] = useState(proposal.valor_completo?.toString() || '');
   const [objetivo, setObjetivo] = useState(proposal.objetivo || '');
+  const [tipoNegocio, setTipoNegocio] = useState('');
   
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -79,6 +80,11 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
       const finalLink = `${baseUrl}/p/${typeSlug}/${slug}`;
 
       // 1. Salvar no Supabase externo
+      let tipo_negocio = "";
+      if (typeSlug === 'arqint') tipo_negocio = "Residencial";
+      else if (typeSlug === 'int') tipo_negocio = "Interiores";
+      else if (typeSlug === 'comercial') tipo_negocio = tipoNegocio;
+
       const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
         method: 'POST',
         headers: {
@@ -96,6 +102,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
           valor_executivo: valorExecutivo || null,
           valor_completo: valorCompleto || null,
           objetivo: objetivo,
+          tipo_negocio: tipo_negocio,
         })
       });
 
@@ -162,6 +169,19 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                 </SelectContent>
               </Select>
             </div>
+            
+            {tipo === 'comercial' && (
+              <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Negócio</Label>
+                <Input
+                  id="tipoNegocio"
+                  value={tipoNegocio}
+                  onChange={(e) => setTipoNegocio(e.target.value)}
+                  placeholder="Ex: Barbearia, Clínica, Restaurante..."
+                  className="bg-[#1A1A1A] border-white/10 rounded-none focus:border-bronze"
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="nome" className="text-[10px] uppercase tracking-widest text-white/40">Nome do Cliente</Label>
