@@ -14,7 +14,7 @@ interface PropostaContextType {
   validade: string;
 }
 
-const PropostaContext = createContext<PropostaContextType | undefined>(undefined);
+export const PropostaContext = createContext<PropostaContextType | undefined>(undefined);
 
 export const PropostaProvider = ({ children, value }: { children: ReactNode; value: PropostaContextType }) => {
   return (
