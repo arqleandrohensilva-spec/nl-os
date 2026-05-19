@@ -26,6 +26,7 @@ import MarketingIA from "./pages/MarketingIA.tsx";
 import ScriptsAtendimento from "./pages/ScriptsAtendimento.tsx";
 import ModoApresentacao from "./pages/ModoApresentacao.tsx";
 import PaginaCliente from "./pages/PaginaCliente.tsx";
+import PropostaCliente from "./pages/PropostaCliente.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
         <Route path="/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
+        <Route path="/p/:tipo/:slug" element={<PropostaCliente />} />
         <Route path="/briefing/:token" element={<BriefingPublic />} />
         <Route path="/satisfacao/:token" element={<PesquisaSatisfacao />} />
         <Route path="/cliente/:slug" element={<PaginaCliente />} />
