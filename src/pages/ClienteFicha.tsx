@@ -236,13 +236,13 @@ const ClienteFicha = () => {
             label="PROPOSTA" 
             value={proposta?.valor_completo ? formatCurrency(Number(proposta.valor_completo)) : '—'} 
             actionLabel="ABRIR PROPOSTA" 
-            onClick={() => navigate('/calculadora')} 
+            onClick={() => proposta?.id ? navigate(`/calculadora/${proposta.id}`) : navigate('/calculadora')} 
           />
           <ShortcutCard 
             label="PROJETO" 
             value={projeto?.status_geral || '—'} 
             actionLabel="VER PROJETO" 
-            onClick={() => navigate('/projetos')} 
+            onClick={() => projeto?.id ? navigate(`/projetos/${projeto.id}`) : navigate('/projetos')} 
           />
           <ShortcutCard 
             label="FINANCEIRO" 
