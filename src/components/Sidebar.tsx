@@ -396,6 +396,14 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           />
         </SectionAccordion>
 
+        <NavItem 
+          label="04 · CALCULADORA" 
+          icon={<Calculator size={12} />}
+          active={location.pathname.startsWith('/calculadora')} 
+          onClick={() => navigate('/calculadora')} 
+        />
+
+
         <SectionAccordion 
           label="PROPOSTAS" 
           icon={<FileText size={14} />}
@@ -406,12 +414,6 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="04 · Tracking" 
             active={location.pathname === '/propostas/tracking'} 
             onClick={() => navigate('/propostas/tracking')} 
-          />
-          <NavItem 
-            label="04 · Calculadora" 
-            icon={<Calculator size={12} />}
-            active={location.pathname.startsWith('/calculadora')} 
-            onClick={() => navigate('/calculadora')} 
           />
           <NavItem 
             label="05 · Biblioteca" 
