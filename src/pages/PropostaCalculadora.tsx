@@ -170,13 +170,20 @@ const PropostaCalculadora = () => {
 
   const totals = useMemo(() => {
     const includedPhases = phases.filter(p => p.included);
+    
+    // Executive Plan Total: sum only marked phases that are of type 'executivo'
+    const execPhases = includedPhases.filter(p => p.planType === 'executivo');
+    const execHours = execPhases.reduce((acc, curr) => acc + curr.hours, 0);
+    const valorExecutivo = execHours * config.preco_hora * complexity;
+
+    // Complete Plan Total: sum all marked phases
     const totalHours = includedPhases.reduce((acc, curr) => acc + curr.hours, 0);
+    const valorCompleto = totalHours * config.preco_hora * complexity;
+
     const subtotal = totalHours * config.preco_hora;
     const impactComplexity = subtotal * (complexity - 1);
-    const valorExecutivo = subtotal * complexity;
-    const valorCompleto = valorExecutivo * 1.35; // Example: Complete is usually ~35% more
     const totalCusto = totalHours * config.custo_hora;
-    const lucro = valorExecutivo - totalCusto;
+    const lucro = valorCompleto - totalCusto; // Profit relative to the complete total (all marked phases)
     
     return {
       totalHours,
