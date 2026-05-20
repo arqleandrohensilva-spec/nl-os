@@ -208,6 +208,48 @@ export type Database = {
           },
         ]
       }
+      clientes: {
+        Row: {
+          cidade: string | null
+          cpf_cnpj: string | null
+          created_at: string | null
+          email: string | null
+          endereco_imovel: string | null
+          id: string
+          nome: string
+          origem: string | null
+          status_comercial: string | null
+          updated_at: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          cidade?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string | null
+          email?: string | null
+          endereco_imovel?: string | null
+          id?: string
+          nome: string
+          origem?: string | null
+          status_comercial?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          cidade?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string | null
+          email?: string | null
+          endereco_imovel?: string | null
+          id?: string
+          nome?: string
+          origem?: string | null
+          status_comercial?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       config_escritorio: {
         Row: {
           atualizado_em: string | null
