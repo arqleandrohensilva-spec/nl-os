@@ -286,36 +286,82 @@ const PropostaCalculadora = () => {
         valor_completo: totals.valorCompleto
       }).eq('id', currentProposalId);
 
-      // Generate Link...
-      const typeMapping: Record<string, string> = { 'ArqInt': 'arqint', 'Interiores': 'int', 'Comercial': 'comercial' };
-      const typeSlug = typeMapping[proposal?.tipo || ''] || 'arqint';
-      const baseSlug = gerarSlug(proposal?.cliente || '');
+      // Generate Link and Save to External Supabase
+      const typeMapping: Record<string, string> = {
+        'ArqInt': 'arqint',
+        'Interiores': 'int',
+        'Comercial': 'comercial'
+      };
       
-      const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          tipo: typeSlug,
-          slug: baseSlug,
-          nome_cliente: proposal?.cliente,
-          valor_executivo: Math.round(totals.valorExecutivo).toString(),
-          valor_completo: Math.round(totals.valorCompleto).toString(),
-        })
-      });
+      const typeSlug = typeMapping[proposal?.tipo || ''] || 'arqint';
+      let finalTipoNegocio = "";
+      if (typeSlug === 'arqint') finalTipoNegocio = "Residencial";
+      else if (typeSlug === 'int') finalTipoNegocio = "Interiores";
+      else if (typeSlug === 'comercial') finalTipoNegocio = tipoNegocio;
 
-      if (response.ok) {
-        const finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${baseSlug}`;
-        await supabase.from('proposals').update({ link_proposta: finalLink }).eq('id', currentProposalId);
-        setGeneratedLink(finalLink);
-        toast.success('Proposta gerada!');
-      } else {
-        throw new Error('Erro ao salvar no servidor externo');
+      const baseSlug = gerarSlug(proposal?.cliente || '');
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      
+      const slugAttempts = [
+        baseSlug,
+        `${baseSlug}-${timestamp}`,
+        `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
+      ];
+
+      let finalLink = "";
+      let finalSlug = "";
+
+      for (const attemptSlug of slugAttempts) {
+        try {
+          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              tipo: typeSlug,
+              slug: attemptSlug,
+              nome_cliente: proposal?.cliente,
+              cidade: proposal?.cidade,
+              estado: proposal?.estado,
+              area: proposal?.area || null,
+              valor_executivo: Math.round(totals.valorExecutivo).toString(),
+              valor_completo: Math.round(totals.valorCompleto).toString(),
+              objetivo: proposal?.objetivo || "",
+              tipo_negocio: finalTipoNegocio,
+            })
+          });
+
+          if (response.ok) {
+            finalSlug = attemptSlug;
+            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${finalSlug}`;
+            break;
+          } else if (response.status === 409) {
+            continue;
+          } else {
+            throw new Error(`Erro no servidor externo (${response.status})`);
+          }
+        } catch (err) {
+          console.warn("Attempt failed", err);
+        }
       }
+
+      if (!finalLink) throw new Error("Não foi possível gerar um link único.");
+
+      // 4. Update local proposal with the link
+      const { error: linkError } = await supabase
+        .from('proposals')
+        .update({ link_proposta: finalLink })
+        .eq('id', currentProposalId);
+
+      if (linkError) throw linkError;
+      
+      setGeneratedLink(finalLink);
+      toast.success('Proposta gerada com sucesso!');
 
     } catch (error: any) {
       toast.error(error.message);
@@ -335,8 +381,57 @@ const PropostaCalculadora = () => {
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
-            <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze">CALCULADORA DE PROPOSTA</h1>
-            <p className="text-[10px] uppercase tracking-widest text-white/40">{proposal.cliente}</p>
+            {proposalId === 'nova' ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <Input 
+                    placeholder="NOME DO CLIENTE"
+                    value={proposal.cliente}
+                    onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
+                    className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
+                    <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ArqInt">ArqInt</SelectItem>
+                      <SelectItem value="Interiores">Interiores</SelectItem>
+                      <SelectItem value="Comercial">Comercial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-white/20">·</span>
+                  <Input 
+                    placeholder="CIDADE"
+                    value={proposal.cidade}
+                    onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
+                    className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                  />
+                  <span className="text-white/20">·</span>
+                  <div className="flex items-center gap-1">
+                    <Input 
+                      type="number"
+                      placeholder="ÁREA"
+                      value={proposal.area || ''}
+                      onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
+                      className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                    />
+                    <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
+                  CALCULADORA DE PROPOSTA · {proposal.cliente}
+                </h1>
+                <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                  {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
+                </p>
+              </>
+            )}
           </div>
         </div>
       </header>
