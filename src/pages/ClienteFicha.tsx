@@ -103,8 +103,13 @@ const ClienteFicha = () => {
     queryKey: ['proposta_ultima', cliente?.nome],
     enabled: !!cliente?.nome,
     queryFn: async () => {
-      // Searching by name as fallback since there's no direct ID link in propostas table yet
-      const { data } = await supabase.from('proposals').select('valor_completo').eq('cliente', cliente.nome).order('created_at', { ascending: false }).limit(1).maybeSingle();
+      const { data } = await supabase
+        .from('proposals')
+        .select('id, valor_completo')
+        .eq('cliente', cliente.nome)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       return data;
     }
   });
