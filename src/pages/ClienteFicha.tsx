@@ -132,7 +132,7 @@ const ClienteFicha = () => {
         }).eq('id', leadExistente.id);
       } else {
         // Cria novo lead se não for 'Fechado' ou 'Perdido' (embora o trigger no DB possa lidar com isso, fazemos aqui por segurança)
-        await supabase.from('leads').insert({
+        const { error: leadError } = await supabase.from('leads').insert({
           cliente_id: clienteSalvo.id,
           nome: clienteSalvo.nome,
           whats: clienteSalvo.whatsapp,
@@ -144,6 +144,11 @@ const ClienteFicha = () => {
           temp: 'Morno',
           criado: new Date().toISOString()
         });
+
+        if (leadError) {
+          console.error('Erro ao criar lead:', leadError);
+          toast.error('Erro ao sincronizar com Pipeline: ' + leadError.message);
+        }
       }
 
       return clienteSalvo;
