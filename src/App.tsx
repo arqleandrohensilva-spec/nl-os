@@ -29,6 +29,8 @@ import PaginaCliente from "./pages/PaginaCliente.tsx";
 import PropostaCliente from "./pages/PropostaCliente.tsx";
 import PropostaCalculadora from "./pages/PropostaCalculadora.tsx";
 import CalculadoraList from "./pages/CalculadoraList.tsx";
+import ClientesLista from "./pages/ClientesLista.tsx";
+import ClienteFicha from "./pages/ClienteFicha.tsx";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +54,9 @@ const App = () => (
         <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/clientes" element={<ClientesLista />} />
+          <Route path="/clientes/novo" element={<ClienteFicha />} />
+          <Route path="/clientes/:id" element={<ClienteFicha />} />
           <Route path="/pipeline" element={<Index />} />
           <Route path="/financeiro/base" element={<BaseFinanceira />} />
           <Route path="/projetos/horas" element={<ControleHoras />} />
