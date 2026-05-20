@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -87,6 +88,7 @@ interface Lead {
 }
 
 const PropostasTracking = () => {
+  const navigate = useNavigate();
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -888,14 +890,11 @@ Retorne APENAS JSON válido:
                       <Button 
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          setProposalToGenerateLink(p);
-                          setIsGenerateLinkModalOpen(true);
-                        }}
-                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all"
+                        onClick={() => navigate(`/proposta/calculadora/${p.id}`)}
+                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
                       >
-                        <Link2 size={11} className="mr-2" />
-                        Gerar Link
+                        <Calculator size={11} />
+                        Calcular Proposta
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
