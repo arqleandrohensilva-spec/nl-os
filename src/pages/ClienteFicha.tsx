@@ -126,7 +126,7 @@ const ClienteFicha = () => {
           whats: clienteSalvo.whatsapp,
           cidade: clienteSalvo.cidade,
           tipo: clienteSalvo.tipo_projeto,
-          area: clienteSalvo.area_m2,
+          area: clienteSalvo.area_m2 ? parseFloat(clienteSalvo.area_m2.toString()) : 0,
           stage: clienteSalvo.status_comercial,
           updated_at: new Date().toISOString()
         }).eq('id', leadExistente.id);
@@ -138,7 +138,7 @@ const ClienteFicha = () => {
           whats: clienteSalvo.whatsapp,
           cidade: clienteSalvo.cidade,
           tipo: clienteSalvo.tipo_projeto,
-          area: clienteSalvo.area_m2,
+          area: clienteSalvo.area_m2 ? parseFloat(clienteSalvo.area_m2.toString()) : 0,
           stage: clienteSalvo.status_comercial,
           origem: clienteSalvo.origem,
           temp: 'Morno',
