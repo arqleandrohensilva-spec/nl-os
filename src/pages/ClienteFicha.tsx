@@ -141,7 +141,8 @@ const ClienteFicha = () => {
           area: clienteSalvo.area_m2,
           stage: clienteSalvo.status_comercial,
           origem: clienteSalvo.origem,
-          temp: 'Morno'
+          temp: 'Morno',
+          criado: new Date().toISOString()
         });
       }
 
