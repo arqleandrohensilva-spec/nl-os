@@ -459,13 +459,19 @@ const PropostaCalculadora = () => {
 
               <div className="mt-8 space-y-4">
                 <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/5 space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold">PLANO EXECUTIVO</p>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold flex items-center gap-2">
+                    PLANO EXECUTIVO 
+                    <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 py-0 h-3">BASE</Badge>
+                  </p>
                   <p className="text-3xl font-light text-bronze">R$ {totals.valorExecutivo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
                 
-                <div className="p-6 bg-white/[0.02] rounded-2xl border border-white/5 space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold">PLANO COMPLETO</p>
-                  <p className="text-2xl font-light text-white/80">R$ {totals.valorCompleto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <div className="p-6 bg-bronze/[0.03] rounded-2xl border border-bronze/10 space-y-1">
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold flex items-center gap-2">
+                    PLANO COMPLETO
+                    <Badge className="bg-bronze text-white text-[7px] py-0 h-3 border-none">PREMIUM</Badge>
+                  </p>
+                  <p className="text-2xl font-light text-white/90">R$ {totals.valorCompleto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
 
