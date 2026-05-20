@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator } from 'lucide-react';
 import NotificationsPanel from './NotificationsPanel';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -118,7 +118,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       setOpenSections(prev => ({ ...prev, 'FINANCEIRO': true }));
     } else if (path === '/projetos/gestao' || path.startsWith('/projetos/detalhe/')) {
       setOpenSections(prev => ({ ...prev, 'PROJETOS': true }));
-    } else if (path.startsWith('/propostas/')) {
+    } else if (path.startsWith('/propostas/') || path.startsWith('/calculadora')) {
       setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
     } else if (path === '/sistema/configuracoes') {
       setOpenSections(prev => ({ ...prev, 'SISTEMA': true }));
@@ -395,6 +395,14 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/projetos/gestao')} 
           />
         </SectionAccordion>
+
+        <NavItem 
+          label="04 · CALCULADORA" 
+          icon={<Calculator size={12} />}
+          active={location.pathname.startsWith('/calculadora')} 
+          onClick={() => navigate('/calculadora')} 
+        />
+
 
         <SectionAccordion 
           label="PROPOSTAS" 

@@ -28,6 +28,7 @@ import ModoApresentacao from "./pages/ModoApresentacao.tsx";
 import PaginaCliente from "./pages/PaginaCliente.tsx";
 import PropostaCliente from "./pages/PropostaCliente.tsx";
 import PropostaCalculadora from "./pages/PropostaCalculadora.tsx";
+import CalculadoraList from "./pages/CalculadoraList.tsx";
 
 const queryClient = new QueryClient();
 
@@ -60,7 +61,9 @@ const App = () => (
           <Route path="/financeiro/projetos" element={<FinanceiroProjetos />} />
           <Route path="/propostas/documentos" element={<DocumentosContratos />} />
           <Route path="/propostas/tracking" element={<PropostasTracking />} />
-          <Route path="/proposta/calculadora/:proposalId" element={<PropostaCalculadora />} />
+          <Route path="/calculadora" element={<CalculadoraList />} />
+          <Route path="/calculadora/:proposalId" element={<PropostaCalculadora />} />
+          <Route path="/proposta/calculadora/:proposalId" element={<Navigate to="/calculadora/:proposalId" replace />} />
           <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
           <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
           <Route path="/marketing/ia" element={<MarketingIA />} />

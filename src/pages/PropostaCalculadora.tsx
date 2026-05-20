@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { 
@@ -72,7 +73,35 @@ const PropostaCalculadora = () => {
     try {
       setLoading(true);
       
-      // 1. Fetch Proposal
+      // Handle Standalone case
+      if (proposalId === 'nova') {
+        setProposal({
+          id: 'nova',
+          cliente: '',
+          tipo: 'ArqInt',
+          cidade: '',
+          estado: 'SP',
+          area: 0,
+          objetivo: ''
+        });
+        setPhases([]);
+        
+        // Load default config
+        const { data: configData } = await supabase
+          .from('config_escritorio')
+          .select('custo_hora, margem_lucro')
+          .maybeSingle();
+        
+        const custo = configData?.custo_hora || 67.37;
+        const margem = configData?.margem_lucro || 40;
+        const preco = custo / (1 - margem / 100);
+        
+        setConfig({ custo_hora: custo, margem_lucro: margem, preco_hora: preco });
+        setLoading(false);
+        return;
+      }
+
+      // Fetch Proposal
       const { data: proposalData, error: proposalError } = await supabase
         .from('proposals')
         .select('*')
@@ -82,7 +111,7 @@ const PropostaCalculadora = () => {
       if (proposalError) throw proposalError;
       setProposal(proposalData);
 
-      // 2. Fetch Config
+      // Fetch Config
       const { data: configData, error: configError } = await supabase
         .from('config_escritorio')
         .select('custo_hora, margem_lucro')
@@ -100,8 +129,32 @@ const PropostaCalculadora = () => {
         preco_hora: preco
       });
 
-      // 3. Initialize Phases based on type
-      const type = proposalData.tipo;
+      // Try to fetch existing calculation
+      const { data: calcData } = await supabase
+        .from('calculos_proposta')
+        .select('*')
+        .eq('proposal_id', proposalId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+        
+      if (calcData) {
+        setPhases(calcData.fases as any);
+        setComplexity(calcData.complexidade as any);
+        setObservacoes(calcData.observacoes || '');
+      }
+
+    } catch (error: any) {
+      console.error('Error fetching data:', error);
+      toast.error('Erro ao carregar dados da calculadora');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (proposal?.tipo) {
+      const type = proposal.tipo;
       let initialPhases: Phase[] = [];
       
       if (type === 'ArqInt') {
@@ -139,39 +192,9 @@ const PropostaCalculadora = () => {
         ];
       }
       
-      // 4. Try to fetch existing calculation
-      const { data: calcData } = await supabase
-        .from('calculos_proposta')
-        .select('*')
-        .eq('proposal_id', proposalId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-        
-      if (calcData) {
-        const savedPhases = calcData.fases as unknown as Phase[];
-        // Merge saved phases with initial phases to ensure all current structure (like planType) is present
-        const mergedPhases = initialPhases.map(ip => {
-          const saved = savedPhases.find(s => s.id === ip.id);
-          if (saved) {
-            return { ...ip, hours: saved.hours, included: saved.included };
-          }
-          return ip;
-        });
-        setPhases(mergedPhases);
-        setComplexity(calcData.complexidade as any);
-        setObservacoes(calcData.observacoes || '');
-      } else {
-        setPhases(initialPhases);
-      }
-
-    } catch (error: any) {
-      console.error('Error fetching data:', error);
-      toast.error('Erro ao carregar dados da calculadora');
-    } finally {
-      setLoading(false);
+      if (phases.length === 0) setPhases(initialPhases);
     }
-  };
+  }, [proposal?.tipo]);
 
   const handlePhaseToggle = (id: string) => {
     setPhases(prev => prev.map(p => p.id === id ? { ...p, included: !p.included } : p));
@@ -184,36 +207,20 @@ const PropostaCalculadora = () => {
 
   const totals = useMemo(() => {
     const includedPhases = phases.filter(p => p.included);
-    
-    // Executive Plan Total: sum only marked phases that are of type 'executivo'
     const execPhases = includedPhases.filter(p => p.planType === 'executivo');
     const execHours = execPhases.reduce((acc, curr) => acc + curr.hours, 0);
     const valorExecutivo = execHours * config.preco_hora * complexity;
-
-    // Complete Plan Total: sum all marked phases
     const totalHours = includedPhases.reduce((acc, curr) => acc + curr.hours, 0);
     const valorCompleto = totalHours * config.preco_hora * complexity;
-
     const subtotal = totalHours * config.preco_hora;
     const impactComplexity = subtotal * (complexity - 1);
     const totalCusto = totalHours * config.custo_hora;
-    const lucro = valorCompleto - totalCusto; // Profit relative to the complete total (all marked phases)
+    const lucro = valorCompleto - totalCusto;
     
-    return {
-      totalHours,
-      subtotal,
-      impactComplexity,
-      valorExecutivo,
-      valorCompleto,
-      lucro,
-      includedPhases
-    };
+    return { totalHours, subtotal, impactComplexity, valorExecutivo, valorCompleto, lucro, includedPhases };
   }, [phases, complexity, config]);
 
-  const gerarSlug = (nome: string) => nome.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-').trim();
+  const gerarSlug = (nome: string) => nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
 
   const handleCopyLink = () => {
     if (generatedLink) {
@@ -229,11 +236,39 @@ const PropostaCalculadora = () => {
       setSaving(true);
       setIsGeneratingLink(true);
       
-      // 1. Save Calculation
+      let currentProposalId = proposalId;
+
+      // Handle standalone creation
+      if (proposalId === 'nova') {
+        if (!proposal?.cliente) {
+          toast.error("Por favor, informe o nome do cliente.");
+          setIsGeneratingLink(false);
+          setSaving(false);
+          return;
+        }
+        
+        const { data: newProp, error: propCreateError } = await supabase
+          .from('proposals')
+          .insert({
+            cliente: proposal.cliente,
+            tipo: proposal.tipo as any,
+            cidade: proposal.cidade,
+            area: proposal.area,
+            status: 'Enviada',
+            data: new Date().toISOString().split('T')[0]
+          })
+          .select()
+          .single();
+          
+        if (propCreateError) throw propCreateError;
+        currentProposalId = newProp.id;
+      }
+
+      // Save Calculation
       const { error: calcError } = await supabase
         .from('calculos_proposta')
         .upsert({
-          proposal_id: proposalId,
+          proposal_id: currentProposalId,
           fases: phases as any,
           horas_total: totals.totalHours,
           complexidade: complexity,
@@ -245,18 +280,13 @@ const PropostaCalculadora = () => {
         
       if (calcError) throw calcError;
       
-      // 2. Update Proposal with values
-      const { error: propError } = await supabase
-        .from('proposals')
-        .update({
-          valor_executivo: totals.valorExecutivo,
-          valor_completo: totals.valorCompleto
-        })
-        .eq('id', proposalId);
-        
-      if (propError) throw propError;
+      // Update Proposal
+      await supabase.from('proposals').update({
+        valor_executivo: totals.valorExecutivo,
+        valor_completo: totals.valorCompleto
+      }).eq('id', currentProposalId);
 
-      // 3. Generate Link and Save to External Supabase
+      // Generate Link and Save to External Supabase
       const typeMapping: Record<string, string> = {
         'ArqInt': 'arqint',
         'Interiores': 'int',
@@ -326,63 +356,87 @@ const PropostaCalculadora = () => {
       const { error: linkError } = await supabase
         .from('proposals')
         .update({ link_proposta: finalLink })
-        .eq('id', proposalId);
+        .eq('id', currentProposalId);
 
       if (linkError) throw linkError;
       
       setGeneratedLink(finalLink);
       toast.success('Proposta gerada com sucesso!');
-      
+
     } catch (error: any) {
-      console.error('Error generating link:', error);
-      toast.error(error.message || 'Erro ao gerar link da proposta');
+      toast.error(error.message);
     } finally {
       setSaving(false);
       setIsGeneratingLink(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white">
-        <Loader2 className="animate-spin text-bronze mr-2" /> Carregando calculadora...
-      </div>
-    );
-  }
-
-  if (!proposal) return <div>Proposta não encontrada</div>;
+  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      {/* Header */}
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
       <header className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white/40 hover:text-white hover:bg-white/5 transition-colors gap-2"
-              onClick={() => navigate('/propostas/tracking')}
-            >
-              <ChevronLeft size={16} /> Voltar ao Tracking
-            </Button>
-            <div className="h-8 w-px bg-white/10" />
-            <div>
-              <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze">
-                CALCULADORA DE PROPOSTA · {proposal.cliente}
-              </h1>
-              <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
-              </p>
-            </div>
+          <Button variant="ghost" className="text-white/40 gap-2" onClick={() => navigate('/calculadora')}>
+            <ChevronLeft size={16} /> Voltar
+          </Button>
+          <div className="flex-1 px-8">
+            {proposalId === 'nova' ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <Input 
+                    placeholder="NOME DO CLIENTE"
+                    value={proposal.cliente}
+                    onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
+                    className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
+                    <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ArqInt">ArqInt</SelectItem>
+                      <SelectItem value="Interiores">Interiores</SelectItem>
+                      <SelectItem value="Comercial">Comercial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-white/20">·</span>
+                  <Input 
+                    placeholder="CIDADE"
+                    value={proposal.cidade}
+                    onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
+                    className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                  />
+                  <span className="text-white/20">·</span>
+                  <div className="flex items-center gap-1">
+                    <Input 
+                      type="number"
+                      placeholder="ÁREA"
+                      value={proposal.area || ''}
+                      onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
+                      className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                    />
+                    <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
+                  CALCULADORA DE PROPOSTA · {proposal.cliente}
+                </h1>
+                <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                  {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
+                </p>
+              </>
+            )}
           </div>
         </div>
       </header>
-
       <main className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12 items-start">
-          
-          {/* Left Column - 60% */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12">
           <div className="lg:col-span-6 space-y-10">
             
             {/* Block 1 - Base Info */}

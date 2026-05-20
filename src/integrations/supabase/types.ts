@@ -202,7 +202,7 @@ export type Database = {
           {
             foreignKeyName: "calculos_proposta_proposal_id_fkey"
             columns: ["proposal_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "proposals"
             referencedColumns: ["id"]
           },
@@ -1366,6 +1366,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      propostas: {
+        Row: {
+          area_m2: string | null
+          cliente_cidade: string | null
+          cliente_nome: string | null
+          complexidade: string | null
+          complexidade_multiplicador: number | null
+          created_at: string | null
+          custo_hora: number | null
+          fases: Json | null
+          id: string
+          lucro_previsto: number | null
+          margem_real: number | null
+          observacoes: string | null
+          plano_completo: number | null
+          plano_executivo: number | null
+          slug: string
+          tipo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          area_m2?: string | null
+          cliente_cidade?: string | null
+          cliente_nome?: string | null
+          complexidade?: string | null
+          complexidade_multiplicador?: number | null
+          created_at?: string | null
+          custo_hora?: number | null
+          fases?: Json | null
+          id?: string
+          lucro_previsto?: number | null
+          margem_real?: number | null
+          observacoes?: string | null
+          plano_completo?: number | null
+          plano_executivo?: number | null
+          slug: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          area_m2?: string | null
+          cliente_cidade?: string | null
+          cliente_nome?: string | null
+          complexidade?: string | null
+          complexidade_multiplicador?: number | null
+          created_at?: string | null
+          custo_hora?: number | null
+          fases?: Json | null
+          id?: string
+          lucro_previsto?: number | null
+          margem_real?: number | null
+          observacoes?: string | null
+          plano_completo?: number | null
+          plano_executivo?: number | null
+          slug?: string
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       propostas_clientes: {
         Row: {

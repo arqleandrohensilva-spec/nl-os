@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2, LayoutGrid } from 'lucide-react';
+import { X, MessageSquare, Calendar, Trash2, ChevronDown, Check, AlertCircle, TrendingDown, CheckCircle2, LayoutGrid, Calculator } from 'lucide-react';
 import { Lead, Stage, LogTipo, calculateLeadScore } from '@/lib/types';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -324,6 +324,41 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           <section>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Ações Rápidas</h4>
             <div className="flex flex-col gap-3">
+              <Button 
+                onClick={async () => {
+                  // Find or create proposal for this lead
+                  const { data: existing } = await supabase
+                    .from('proposals')
+                    .select('id')
+                    .eq('cliente', lead.nome)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                  if (existing) {
+                    navigate(`/calculadora/${existing.id}`);
+                  } else {
+                    const { data: newProp } = await supabase
+                      .from('proposals')
+                      .insert({
+                        cliente: lead.nome,
+                        tipo: (['ArqInt', 'Interiores', 'Comercial'].includes(lead.tipo) ? lead.tipo : 'ArqInt') as any,
+                        cidade: lead.cidade,
+                        area: lead.area,
+                        status: 'Enviada',
+                        data: new Date().toISOString().split('T')[0]
+                      })
+                      .select()
+                      .single();
+                    if (newProp) navigate(`/calculadora/${newProp.id}`);
+                  }
+                }}
+                className="w-full bg-[#8B7355]/10 border border-[#8B7355]/30 text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[10px] uppercase font-bold tracking-widest h-12 rounded-none transition-all shadow-lg shadow-bronze/10 flex items-center justify-center gap-2"
+              >
+                <Calculator size={14} />
+                CALCULAR PROPOSTA
+              </Button>
+
               <div className="flex gap-3">
                 <Button className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={() => window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}`)}>Abrir WhatsApp</Button>
                 <Button variant="outline" className="flex-1 bg-[#2A2826] border border-[#4A4846] text-white hover:border-bronze text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all">Agendar Próxima Ação</Button>
