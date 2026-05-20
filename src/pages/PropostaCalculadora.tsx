@@ -338,6 +338,9 @@ const PropostaCalculadora = () => {
                         className="text-sm font-medium flex items-center gap-2 cursor-pointer"
                       >
                         {phase.label}
+                        {phase.planType === 'completo' && (
+                          <Badge className="bg-bronze/20 text-bronze border-bronze/20 text-[8px] uppercase tracking-widest py-0 h-4">COMPLETO</Badge>
+                        )}
                         {phase.optional && (
                           <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-white/10 text-white/40 py-0 h-4">OPCIONAL</Badge>
                         )}
