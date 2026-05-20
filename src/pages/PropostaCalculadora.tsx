@@ -143,7 +143,7 @@ const PropostaCalculadora = () => {
         .maybeSingle();
         
       if (calcData) {
-        setPhases(calcData.fases as Phase[]);
+        setPhases(calcData.fases as unknown as Phase[]);
         setComplexity(calcData.complexidade as any);
         setObservacoes(calcData.observacoes || '');
       } else {
@@ -197,7 +197,7 @@ const PropostaCalculadora = () => {
         .from('calculos_proposta')
         .upsert({
           proposal_id: proposalId,
-          fases: phases,
+          fases: phases as any,
           horas_total: totals.totalHours,
           complexidade: complexity,
           valor_executivo: totals.valorExecutivo,
