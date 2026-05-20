@@ -1,0 +1,131 @@
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import Sidebar from '@/components/Sidebar';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, Plus, MapPin, Phone, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+
+const STATUS_BADGES: Record<string, { label: string; color: string }> = {
+  'Novo Lead': { label: 'Novo Lead', color: 'bg-zinc-500/10 text-zinc-500' },
+  'Reunião Agendada': { label: 'Reunião Agendada', color: 'bg-blue-500/10 text-blue-500' },
+  'Briefing Preenchido': { label: 'Briefing Preenchido', color: 'bg-yellow-500/10 text-yellow-500' },
+  'Proposta Enviada': { label: 'Proposta Enviada', color: 'bg-orange-500/10 text-orange-500' },
+  'Negociação': { label: 'Negociação', color: 'bg-[#8B7355]/10 text-[#8B7355]' },
+  'Fechado': { label: 'Fechado', color: 'bg-green-500/10 text-green-500' },
+  'Perdido': { label: 'Perdido', color: 'bg-red-500/10 text-red-500' }
+};
+
+const ClientesLista = () => {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+
+  const { data: clientes, isLoading } = useQuery({
+    queryKey: ['clientes'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const filteredClientes = clientes?.filter(c => 
+    c.nome?.toLowerCase().includes(search.toLowerCase()) ||
+    c.cidade?.toLowerCase().includes(search.toLowerCase()) ||
+    c.tipo_projeto?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
+      <Sidebar user="User" />
+      
+      <main className="flex-1 ml-[230px] p-10">
+        <div className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-3xl font-['Courier_New'] font-bold text-[#8B7355] tracking-tighter uppercase">CLIENTES</h1>
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1 font-['Courier_New']">Gestão da carteira NL OS</p>
+          </div>
+          
+          <Button 
+            onClick={() => navigate('/clientes/novo')}
+            className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest"
+          >
+            <Plus size={16} className="mr-2" />
+            NOVO CLIENTE
+          </Button>
+        </div>
+
+        <div className="relative mb-8 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#8B7355] transition-colors" size={18} />
+          <Input 
+            placeholder="BUSCAR POR NOME, CIDADE OU TIPO..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-white/5 border-white/10 focus:border-[#8B7355] rounded-none pl-12 h-14 font-['Courier_New'] text-xs tracking-widest uppercase text-white"
+          />
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredClientes?.map((cliente) => (
+              <div 
+                key={cliente.id}
+                onClick={() => navigate(`/clientes/${cliente.id}`)}
+                className="bg-[#1A1816] border border-white/5 p-6 hover:border-[#8B7355]/50 transition-all cursor-pointer group relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-1 h-full bg-[#8B7355] opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <div className="flex justify-between items-start mb-4">
+                  <div className={cn(
+                    "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-[1px]",
+                    STATUS_BADGES[cliente.status_comercial]?.color || 'bg-white/10 text-white/40'
+                  )}>
+                    {cliente.status_comercial || 'Novo Lead'}
+                  </div>
+                </div>
+
+                <h3 className="text-lg font-bold text-white mb-4 group-hover:text-[#8B7355] transition-colors uppercase font-['Courier_New']">
+                  {cliente.nome}
+                </h3>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-white/40">
+                    <MapPin size={14} className="text-[#8B7355]" />
+                    <span className="text-[10px] uppercase tracking-wider">{cliente.cidade || '—'}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-white/40">
+                    <Phone size={14} className="text-[#8B7355]" />
+                    <span className="text-[10px] uppercase tracking-wider">{cliente.whatsapp || '—'}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-white/40 border-t border-white/5 pt-3 mt-3">
+                    <User size={14} className="text-[#8B7355]/40" />
+                    <span className="text-[9px] uppercase tracking-[0.2em] font-bold">
+                      {cliente.tipo_projeto || 'SEM PROJETO'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {filteredClientes?.length === 0 && !isLoading && (
+          <div className="text-center py-20 border border-dashed border-white/10">
+            <p className="text-white/20 text-xs uppercase tracking-widest font-['Courier_New']">Nenhum cliente encontrado</p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default ClientesLista;

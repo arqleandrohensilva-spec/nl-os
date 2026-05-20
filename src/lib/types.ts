@@ -13,6 +13,7 @@ export interface LeadLog {
 
 export interface Lead {
   id: string;
+  cliente_id?: string;
   nome: string;
   whats: string;
   cidade: string;

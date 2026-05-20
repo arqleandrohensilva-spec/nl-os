@@ -208,6 +208,57 @@ export type Database = {
           },
         ]
       }
+      clientes: {
+        Row: {
+          area_m2: number | null
+          cidade: string | null
+          cpf_cnpj: string | null
+          created_at: string | null
+          email: string | null
+          endereco_imovel: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          origem: string | null
+          status_comercial: string | null
+          tipo_projeto: string | null
+          updated_at: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          area_m2?: number | null
+          cidade?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string | null
+          email?: string | null
+          endereco_imovel?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          origem?: string | null
+          status_comercial?: string | null
+          tipo_projeto?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          area_m2?: number | null
+          cidade?: string | null
+          cpf_cnpj?: string | null
+          created_at?: string | null
+          email?: string | null
+          endereco_imovel?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          origem?: string | null
+          status_comercial?: string | null
+          tipo_projeto?: string | null
+          updated_at?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       config_escritorio: {
         Row: {
           atualizado_em: string | null
@@ -745,6 +796,41 @@ export type Database = {
           },
         ]
       }
+      historico_clientes: {
+        Row: {
+          autor_id: string | null
+          cliente_id: string | null
+          data_hora: string | null
+          id: string
+          status_anterior: string | null
+          status_novo: string | null
+        }
+        Insert: {
+          autor_id?: string | null
+          cliente_id?: string | null
+          data_hora?: string | null
+          id?: string
+          status_anterior?: string | null
+          status_novo?: string | null
+        }
+        Update: {
+          autor_id?: string | null
+          cliente_id?: string | null
+          data_hora?: string | null
+          id?: string
+          status_anterior?: string | null
+          status_novo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_clientes_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       historico_conteudo: {
         Row: {
           conteudo: Json
@@ -844,6 +930,7 @@ export type Database = {
         Row: {
           area: number
           cidade: string
+          cliente_id: string | null
           created_at: string
           criado: string
           criado_por: string | null
@@ -868,6 +955,7 @@ export type Database = {
         Insert: {
           area?: number
           cidade?: string
+          cliente_id?: string | null
           created_at?: string
           criado?: string
           criado_por?: string | null
@@ -892,6 +980,7 @@ export type Database = {
         Update: {
           area?: number
           cidade?: string
+          cliente_id?: string | null
           created_at?: string
           criado?: string
           criado_por?: string | null
@@ -913,7 +1002,15 @@ export type Database = {
           updated_at?: string
           whats?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mensagens_cliente: {
         Row: {
