@@ -37,6 +37,7 @@ interface ProposalData {
   cliente: string;
   tipo: string;
   cidade: string;
+  estado: string;
   area: number;
   objetivo: string;
   valor_executivo?: number;
@@ -296,6 +297,7 @@ const PropostaCalculadora = () => {
               slug: attemptSlug,
               nome_cliente: proposal?.cliente,
               cidade: proposal?.cidade,
+              estado: proposal?.estado,
               area: proposal?.area || null,
               valor_executivo: Math.round(totals.valorExecutivo).toString(),
               valor_completo: Math.round(totals.valorCompleto).toString(),
