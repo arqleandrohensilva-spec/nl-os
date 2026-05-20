@@ -101,36 +101,36 @@ const PropostaCalculadora = () => {
       
       if (type === 'ArqInt') {
         initialPhases = [
-          { id: 'briefing_viab', label: 'Briefing & Viabilidade', hours: 0, included: true },
-          { id: 'conceito_mood', label: 'Conceito & Moodboard', hours: 0, included: true },
-          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true },
-          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true },
-          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true },
-          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: true },
-          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: true },
-          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_viab', label: 'Levantamento & Briefing', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true, planType: 'executivo' },
+          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true, planType: 'executivo' },
+          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: false, planType: 'completo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       } else if (type === 'Interiores') {
         initialPhases = [
-          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true },
-          { id: 'conceito_mood', label: 'Conceito & Moodboard', hours: 0, included: true },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true },
-          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, optional: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       } else if (type === 'Comercial') {
         initialPhases = [
-          { id: 'briefing_diag', label: 'Briefing & Diagnóstico do negócio', hours: 0, included: true },
-          { id: 'conceito_id', label: 'Conceito e Identidade do Espaço', hours: 0, included: true },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_diag', label: 'Briefing & Diagnóstico', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_id', label: 'Conceito e Identidade', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       }
       
