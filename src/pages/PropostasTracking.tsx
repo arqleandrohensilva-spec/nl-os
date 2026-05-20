@@ -894,7 +894,7 @@ Retorne APENAS JSON válido:
                         className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
                       >
                         <Calculator size={11} />
-                        Calcular Proposta
+                        CALCULAR
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
