@@ -84,7 +84,7 @@ const PropostaCalculadora = () => {
           area: 0,
           objetivo: ''
         });
-        setPhases([]); // Will be initialized by the effect below when tipo changes
+        setPhases([]);
         
         // Load default config
         const { data: configData } = await supabase
@@ -101,7 +101,7 @@ const PropostaCalculadora = () => {
         return;
       }
 
-      // 1. Fetch Proposal
+      // Fetch Proposal
       const { data: proposalData, error: proposalError } = await supabase
         .from('proposals')
         .select('*')
@@ -111,7 +111,7 @@ const PropostaCalculadora = () => {
       if (proposalError) throw proposalError;
       setProposal(proposalData);
 
-      // 2. Fetch Config
+      // Fetch Config
       const { data: configData, error: configError } = await supabase
         .from('config_escritorio')
         .select('custo_hora, margem_lucro')
@@ -129,46 +129,7 @@ const PropostaCalculadora = () => {
         preco_hora: preco
       });
 
-      // 3. Initialize Phases based on type
-      const type = proposalData.tipo;
-      let initialPhases: Phase[] = [];
-      
-      if (type === 'ArqInt') {
-        initialPhases = [
-          { id: 'briefing_viab', label: 'Levantamento & Briefing', hours: 0, included: true, planType: 'executivo' },
-          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
-          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true, planType: 'executivo' },
-          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true, planType: 'executivo' },
-          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true, planType: 'executivo' },
-          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true, planType: 'executivo' },
-          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: false, planType: 'completo' },
-          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: false, planType: 'completo' },
-          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: false, planType: 'completo' },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
-        ];
-      } else if (type === 'Interiores') {
-        initialPhases = [
-          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true, planType: 'executivo' },
-          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
-          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true, planType: 'executivo' },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
-          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, planType: 'completo', optional: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
-        ];
-      } else if (type === 'Comercial') {
-        initialPhases = [
-          { id: 'briefing_diag', label: 'Briefing & Diagnóstico', hours: 0, included: true, planType: 'executivo' },
-          { id: 'conceito_id', label: 'Conceito e Identidade', hours: 0, included: true, planType: 'executivo' },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
-          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true, planType: 'executivo' },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
-        ];
-      }
-      
-      // 4. Try to fetch existing calculation
+      // Try to fetch existing calculation
       const { data: calcData } = await supabase
         .from('calculos_proposta')
         .select('*')
@@ -178,20 +139,9 @@ const PropostaCalculadora = () => {
         .maybeSingle();
         
       if (calcData) {
-        const savedPhases = calcData.fases as unknown as Phase[];
-        // Merge saved phases with initial phases to ensure all current structure (like planType) is present
-        const mergedPhases = initialPhases.map(ip => {
-          const saved = savedPhases.find(s => s.id === ip.id);
-          if (saved) {
-            return { ...ip, hours: saved.hours, included: saved.included };
-          }
-          return ip;
-        });
-        setPhases(mergedPhases);
+        setPhases(calcData.fases as any);
         setComplexity(calcData.complexidade as any);
         setObservacoes(calcData.observacoes || '');
-      } else {
-        setPhases(initialPhases);
       }
 
     } catch (error: any) {
@@ -204,7 +154,6 @@ const PropostaCalculadora = () => {
 
   useEffect(() => {
     if (proposal?.tipo) {
-      // Re-initialize phases if type changes (useful for standalone)
       const type = proposal.tipo;
       let initialPhases: Phase[] = [];
       
@@ -243,10 +192,7 @@ const PropostaCalculadora = () => {
         ];
       }
       
-      // Only set initial phases if current phases are empty (new standalone)
-      if (phases.length === 0) {
-        setPhases(initialPhases);
-      }
+      if (phases.length === 0) setPhases(initialPhases);
     }
   }, [proposal?.tipo]);
 
@@ -261,36 +207,20 @@ const PropostaCalculadora = () => {
 
   const totals = useMemo(() => {
     const includedPhases = phases.filter(p => p.included);
-    
-    // Executive Plan Total: sum only marked phases that are of type 'executivo'
     const execPhases = includedPhases.filter(p => p.planType === 'executivo');
     const execHours = execPhases.reduce((acc, curr) => acc + curr.hours, 0);
     const valorExecutivo = execHours * config.preco_hora * complexity;
-
-    // Complete Plan Total: sum all marked phases
     const totalHours = includedPhases.reduce((acc, curr) => acc + curr.hours, 0);
     const valorCompleto = totalHours * config.preco_hora * complexity;
-
     const subtotal = totalHours * config.preco_hora;
     const impactComplexity = subtotal * (complexity - 1);
     const totalCusto = totalHours * config.custo_hora;
-    const lucro = valorCompleto - totalCusto; // Profit relative to the complete total (all marked phases)
+    const lucro = valorCompleto - totalCusto;
     
-    return {
-      totalHours,
-      subtotal,
-      impactComplexity,
-      valorExecutivo,
-      valorCompleto,
-      lucro,
-      includedPhases
-    };
+    return { totalHours, subtotal, impactComplexity, valorExecutivo, valorCompleto, lucro, includedPhases };
   }, [phases, complexity, config]);
 
-  const gerarSlug = (nome: string) => nome.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-').trim();
+  const gerarSlug = (nome: string) => nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').trim();
 
   const handleCopyLink = () => {
     if (generatedLink) {
@@ -334,7 +264,7 @@ const PropostaCalculadora = () => {
         currentProposalId = newProp.id;
       }
 
-      // 1. Save Calculation
+      // Save Calculation
       const { error: calcError } = await supabase
         .from('calculos_proposta')
         .upsert({
@@ -350,189 +280,68 @@ const PropostaCalculadora = () => {
         
       if (calcError) throw calcError;
       
-      // 2. Update Proposal with values
-      const { error: propError } = await supabase
-        .from('proposals')
-        .update({
-          valor_executivo: totals.valorExecutivo,
-          valor_completo: totals.valorCompleto
-        })
-        .eq('id', currentProposalId);
-        
-      if (propError) throw propError;
+      // Update Proposal
+      await supabase.from('proposals').update({
+        valor_executivo: totals.valorExecutivo,
+        valor_completo: totals.valorCompleto
+      }).eq('id', currentProposalId);
 
-      // 3. Generate Link and Save to External Supabase
-      const typeMapping: Record<string, string> = {
-        'ArqInt': 'arqint',
-        'Interiores': 'int',
-        'Comercial': 'comercial'
-      };
-      
+      // Generate Link...
+      const typeMapping: Record<string, string> = { 'ArqInt': 'arqint', 'Interiores': 'int', 'Comercial': 'comercial' };
       const typeSlug = typeMapping[proposal?.tipo || ''] || 'arqint';
-      let finalTipoNegocio = "";
-      if (typeSlug === 'arqint') finalTipoNegocio = "Residencial";
-      else if (typeSlug === 'int') finalTipoNegocio = "Interiores";
-      else if (typeSlug === 'comercial') finalTipoNegocio = tipoNegocio;
-
       const baseSlug = gerarSlug(proposal?.cliente || '');
-      const now = new Date();
-      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
-      const slugAttempts = [
-        baseSlug,
-        `${baseSlug}-${timestamp}`,
-        `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
-      ];
+      const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          tipo: typeSlug,
+          slug: baseSlug,
+          nome_cliente: proposal?.cliente,
+          valor_executivo: Math.round(totals.valorExecutivo).toString(),
+          valor_completo: Math.round(totals.valorCompleto).toString(),
+        })
+      });
 
-      let finalLink = "";
-      let finalSlug = "";
-
-      for (const attemptSlug of slugAttempts) {
-        try {
-          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Prefer': 'return=representation'
-            },
-            body: JSON.stringify({
-              tipo: typeSlug,
-              slug: attemptSlug,
-              nome_cliente: proposal?.cliente,
-              cidade: proposal?.cidade,
-              estado: proposal?.estado,
-              area: proposal?.area || null,
-              valor_executivo: Math.round(totals.valorExecutivo).toString(),
-              valor_completo: Math.round(totals.valorCompleto).toString(),
-              objetivo: proposal?.objetivo || "",
-              tipo_negocio: finalTipoNegocio,
-            })
-          });
-
-          if (response.ok) {
-            finalSlug = attemptSlug;
-            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${finalSlug}`;
-            break;
-          } else if (response.status === 409) {
-            continue;
-          } else {
-            throw new Error(`Erro no servidor externo (${response.status})`);
-          }
-        } catch (err) {
-          console.warn("Attempt failed", err);
-        }
+      if (response.ok) {
+        const finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${baseSlug}`;
+        await supabase.from('proposals').update({ link_proposta: finalLink }).eq('id', currentProposalId);
+        setGeneratedLink(finalLink);
+        toast.success('Proposta gerada!');
+      } else {
+        throw new Error('Erro ao salvar no servidor externo');
       }
 
-      if (!finalLink) throw new Error("Não foi possível gerar um link único.");
-
-      // 4. Update local proposal with the link
-      const { error: linkError } = await supabase
-        .from('proposals')
-        .update({ link_proposta: finalLink })
-        .eq('id', currentProposalId);
-
-      if (linkError) throw linkError;
-      
-      setGeneratedLink(finalLink);
-      toast.success('Proposta gerada com sucesso!');
-      
     } catch (error: any) {
-      console.error('Error generating link:', error);
-      toast.error(error.message || 'Erro ao gerar link da proposta');
+      toast.error(error.message);
     } finally {
       setSaving(false);
       setIsGeneratingLink(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white">
-        <Loader2 className="animate-spin text-bronze mr-2" /> Carregando calculadora...
-      </div>
-    );
-  }
-
-  if (!proposal) return <div>Proposta não encontrada</div>;
+  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      {/* Header */}
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
       <header className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-white/40 hover:text-white hover:bg-white/5 transition-colors gap-2"
-              onClick={() => navigate('/calculadora')}
-            >
-              <ChevronLeft size={16} /> Voltar
-            </Button>
-            <div className="h-8 w-px bg-white/10" />
-            <div className="flex-1">
-              {proposalId === 'nova' ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-4">
-                    <Input 
-                      placeholder="NOME DO CLIENTE"
-                      value={proposal.cliente}
-                      onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
-                      className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
-                    />
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
-                      <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ArqInt">ArqInt</SelectItem>
-                        <SelectItem value="Interiores">Interiores</SelectItem>
-                        <SelectItem value="Comercial">Comercial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <span className="text-white/20">·</span>
-                    <Input 
-                      placeholder="CIDADE"
-                      value={proposal.cidade}
-                      onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
-                      className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
-                    />
-                    <span className="text-white/20">·</span>
-                    <div className="flex items-center gap-1">
-                      <Input 
-                        type="number"
-                        placeholder="ÁREA"
-                        value={proposal.area || ''}
-                        onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
-                        className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
-                      />
-                      <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
-                    CALCULADORA DE PROPOSTA · {proposal.cliente}
-                  </h1>
-                  <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                    {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
-                  </p>
-                </>
-              )}
-            </div>
+          <Button variant="ghost" className="text-white/40 gap-2" onClick={() => navigate('/calculadora')}>
+            <ChevronLeft size={16} /> Voltar
+          </Button>
+          <div className="flex-1 px-8">
+            <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze">CALCULADORA DE PROPOSTA</h1>
+            <p className="text-[10px] uppercase tracking-widest text-white/40">{proposal.cliente}</p>
           </div>
         </div>
       </header>
-
       <main className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12 items-start">
-          
-          {/* Left Column - 60% */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12">
           <div className="lg:col-span-6 space-y-10">
             
             {/* Block 1 - Base Info */}
