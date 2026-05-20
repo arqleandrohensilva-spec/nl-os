@@ -12,9 +12,10 @@ interface LeadCardProps {
   onClick: () => void;
   onUpdateStatus?: (leadId: string, newStage: string) => void;
   onQuickNote?: (leadId: string, note: string) => void;
+  onViewFicha?: (clienteId: string) => void;
 }
 
-const LeadCard = ({ lead, onClick }: LeadCardProps) => {
+const LeadCard = ({ lead, onClick, onViewFicha }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   const { score } = calculateLeadScore(lead);
   
@@ -127,11 +128,22 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         </div>
       </div>
 
-      {/* Footer - Time in Stage */}
-      <div className="mt-3">
-        <span className="text-white/30 text-xs">
+      {/* Footer - Time in Stage & Action */}
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+        <span className="text-white/30 text-[9px] uppercase tracking-wider">
           há {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'}
         </span>
+        {lead.cliente_id && (
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewFicha?.(lead.cliente_id!);
+            }}
+            className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
+          >
+            VER FICHA
+          </button>
+        )}
       </div>
     </div>
   );
