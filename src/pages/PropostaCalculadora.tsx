@@ -144,7 +144,16 @@ const PropostaCalculadora = () => {
         .maybeSingle();
         
       if (calcData) {
-        setPhases(calcData.fases as unknown as Phase[]);
+        const savedPhases = calcData.fases as unknown as Phase[];
+        // Merge saved phases with initial phases to ensure all current structure (like planType) is present
+        const mergedPhases = initialPhases.map(ip => {
+          const saved = savedPhases.find(s => s.id === ip.id);
+          if (saved) {
+            return { ...ip, hours: saved.hours, included: saved.included };
+          }
+          return ip;
+        });
+        setPhases(mergedPhases);
         setComplexity(calcData.complexidade as any);
         setObservacoes(calcData.observacoes || '');
       } else {
