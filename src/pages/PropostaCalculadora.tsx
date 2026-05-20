@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { 
@@ -201,6 +202,54 @@ const PropostaCalculadora = () => {
     }
   };
 
+  useEffect(() => {
+    if (proposal?.tipo) {
+      // Re-initialize phases if type changes (useful for standalone)
+      const type = proposal.tipo;
+      let initialPhases: Phase[] = [];
+      
+      if (type === 'ArqInt') {
+        initialPhases = [
+          { id: 'briefing_viab', label: 'Levantamento & Briefing', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true, planType: 'executivo' },
+          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true, planType: 'executivo' },
+          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: false, planType: 'completo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
+        ];
+      } else if (type === 'Interiores') {
+        initialPhases = [
+          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
+        ];
+      } else if (type === 'Comercial') {
+        initialPhases = [
+          { id: 'briefing_diag', label: 'Briefing & Diagnóstico', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_id', label: 'Conceito e Identidade', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
+        ];
+      }
+      
+      // Only set initial phases if current phases are empty (new standalone)
+      if (phases.length === 0) {
+        setPhases(initialPhases);
+      }
+    }
+  }, [proposal?.tipo]);
+
   const handlePhaseToggle = (id: string) => {
     setPhases(prev => prev.map(p => p.id === id ? { ...p, included: !p.included } : p));
   };
@@ -354,7 +403,7 @@ const PropostaCalculadora = () => {
       const { error: linkError } = await supabase
         .from('proposals')
         .update({ link_proposta: finalLink })
-        .eq('id', proposalId);
+        .eq('id', currentProposalId);
 
       if (linkError) throw linkError;
       
@@ -392,16 +441,61 @@ const PropostaCalculadora = () => {
               className="text-white/40 hover:text-white hover:bg-white/5 transition-colors gap-2"
               onClick={() => navigate('/calculadora')}
             >
-              <ChevronLeft size={16} /> Voltar ao Tracking
+              <ChevronLeft size={16} /> Voltar
             </Button>
             <div className="h-8 w-px bg-white/10" />
-            <div>
-              <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze">
-                CALCULADORA DE PROPOSTA · {proposal.cliente}
-              </h1>
-              <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
-                {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
-              </p>
+            <div className="flex-1">
+              {proposalId === 'nova' ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-4">
+                    <Input 
+                      placeholder="NOME DO CLIENTE"
+                      value={proposal.cliente}
+                      onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
+                      className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
+                      <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ArqInt">ArqInt</SelectItem>
+                        <SelectItem value="Interiores">Interiores</SelectItem>
+                        <SelectItem value="Comercial">Comercial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <span className="text-white/20">·</span>
+                    <Input 
+                      placeholder="CIDADE"
+                      value={proposal.cidade}
+                      onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
+                      className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                    />
+                    <span className="text-white/20">·</span>
+                    <div className="flex items-center gap-1">
+                      <Input 
+                        type="number"
+                        placeholder="ÁREA"
+                        value={proposal.area || ''}
+                        onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
+                        className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                      />
+                      <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
+                    CALCULADORA DE PROPOSTA · {proposal.cliente}
+                  </h1>
+                  <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+                    {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -408,6 +408,12 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/propostas/tracking')} 
           />
           <NavItem 
+            label="04 · Calculadora" 
+            icon={<Calculator size={12} />}
+            active={location.pathname.startsWith('/calculadora')} 
+            onClick={() => navigate('/calculadora')} 
+          />
+          <NavItem 
             label="05 · Biblioteca" 
             active={location.pathname === '/propostas/biblioteca'} 
             onClick={() => navigate('/propostas/biblioteca')} 
