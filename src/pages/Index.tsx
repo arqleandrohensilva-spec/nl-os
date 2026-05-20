@@ -93,19 +93,7 @@ const Index = () => {
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'foco'>('kanban');
   const [smartFilter, setSmartFilter] = useState<'all' | 'ghosting' | 'score8' | 'premium' | 'high-ticket'>('all');
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'score', direction: 'desc' });
-  const [isNewLeadDialogOpen, setIsNewLeadDialogOpen] = useState(false);
   const [config, setConfig] = useState<ConfigEscritorio | null>(null);
-  const [newLead, setNewLead] = useState({
-    nome: '',
-    whats: '',
-    cidade: '',
-    tipo: 'Arq+Int' as TipoProjeto,
-    area: 0,
-    orcamento: 0,
-    origem: 'Instagram' as Origem,
-    temp: 'Morno' as Temp,
-    obs: ''
-  });
 
   // Project Conversion State
   const [showProjectConversion, setShowProjectConversion] = useState(false);
@@ -963,8 +951,9 @@ const Index = () => {
                     leads={filteredLeads.filter(l => l.stage === stage)}
                     onLeadClick={(lead) => setSelectedLeadId(lead.id)}
                     onUpdateStatus={handleUpdateStage}
-                    onQuickNote={handleQuickNote}
-                  />
+                          onQuickNote={handleQuickNote}
+                          onViewFicha={(clienteId) => navigate(`/clientes/${clienteId}`)}
+                        />
                 ))}
               </div>
 
