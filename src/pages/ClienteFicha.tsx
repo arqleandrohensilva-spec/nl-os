@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, History, User, Building, LayoutGrid, Clock, Pencil, Phone } from 'lucide-react';
+import { ArrowLeft, History, User, Phone, Pencil, Save, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -15,26 +15,66 @@ import { ptBR } from 'date-fns/locale';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
 
+const ShortcutCard = ({ label, value, actionLabel, onClick }: { label: string, value: string, actionLabel: string, onClick: () => void }) => (
+  <div className="bg-[#1A1816] border border-[#3A3A3A] p-6 flex flex-col justify-between h-40">
+    <div className="space-y-1">
+      <span className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-widest">{label}</span>
+      <p className="text-[#E8E4DF] text-lg font-medium">{value}</p>
+    </div>
+    <Button 
+      variant="outline" 
+      onClick={onClick}
+      className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none text-[10px] uppercase tracking-widest h-8"
+    >
+      {value === '—' ? 'CRIAR' : actionLabel}
+    </Button>
+  </div>
+);
+
 const ClienteFicha = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    nome: '', whatsapp: '', email: '', cpf_cnpj: '', cidade: '', endereco_imovel: '', origem: 'Instagram', observacoes: ''
+    nome: '',
+    whatsapp: '',
+    email: '',
+    cpf_cnpj: '',
+    cidade: '',
+    endereco_imovel: '',
+    origem: 'Instagram',
+    observacoes: ''
   });
 
-  const { data: cliente, isLoading } = useQuery({
+  const { data: cliente, isLoading: isClienteLoading } = useQuery({
     queryKey: ['cliente', id],
     queryFn: async () => {
-      const { data, error } = await supabase.from('clientes').select('*, historico:historico_clientes(*)').eq('id', id).single();
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const { data: historico } = useQuery({
+    queryKey: ['historico_cliente', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('historico_clientes')
+        .select('*')
+        .eq('cliente_id', id)
+        .order('data_hora', { ascending: false });
       if (error) throw error;
       return data;
     }
   });
 
   const { data: lead } = useQuery({
-    queryKey: ['lead', id],
+    queryKey: ['lead_status', id],
     queryFn: async () => {
       const { data } = await supabase.from('leads').select('stage').eq('cliente_id', id).maybeSingle();
       return data;
@@ -42,9 +82,29 @@ const ClienteFicha = () => {
   });
 
   const { data: projeto } = useQuery({
-    queryKey: ['projeto', id],
+    queryKey: ['projeto_status', id],
     queryFn: async () => {
-      const { data } = await supabase.from('projetos').select('status_geral').eq('cliente_id', id).maybeSingle();
+      const { data } = await supabase.from('projetos').select('status_geral, id').eq('cliente_id', id).maybeSingle();
+      return data;
+    }
+  });
+
+  const { data: financeiro } = useQuery({
+    queryKey: ['financeiro_resumo', projeto?.id],
+    enabled: !!projeto?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from('financeiro_parcelas').select('valor_recebido').eq('projeto_id', projeto?.id);
+      const total = data?.reduce((acc, curr) => acc + (Number(curr.valor_recebido) || 0), 0) || 0;
+      return total;
+    }
+  });
+
+  const { data: proposta } = useQuery({
+    queryKey: ['proposta_ultima', cliente?.nome],
+    enabled: !!cliente?.nome,
+    queryFn: async () => {
+      // Searching by name as fallback since there's no direct ID link in propostas table yet
+      const { data } = await supabase.from('proposals').select('valor_completo').eq('cliente', cliente.nome).order('created_at', { ascending: false }).limit(1).maybeSingle();
       return data;
     }
   });
@@ -70,76 +130,161 @@ const ClienteFicha = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success('Cliente atualizado');
-      setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+      setIsEditing(false);
     }
   });
 
-  if (isLoading) return <div className="text-white p-10">Carregando...</div>;
+  const handleBlurSave = () => {
+    saveMutation.mutate({ observacoes: formData.observacoes });
+  };
+
+  if (isClienteLoading) return <div className="min-h-screen bg-[#1A1816] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
+
+  const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
     <div className="flex min-h-screen bg-[#1A1816] text-[#E8E4DF]">
       <Sidebar user="User" />
-      <main className="flex-1 ml-[230px] p-10 max-w-5xl space-y-12">
-        {/* Topo */}
-        <header className="flex justify-between items-start">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold font-['Courier_New'] uppercase text-[#E8E4DF]">{formData.nome}</h1>
-            <p className="text-sm text-[#8B7355] font-['Courier_New']">{formData.cidade} • {formData.origem}</p>
-            <a href={`https://wa.me/55${formData.whatsapp.replace(/\D/g, '')}`} target="_blank" className="flex items-center gap-2 text-xs text-[#8B7355] hover:underline">
-              <Phone size={12} /> {formData.whatsapp}
+      
+      <main className="flex-1 ml-[230px] p-12 max-w-6xl mx-auto space-y-12">
+        {/* TOPO */}
+        <div className="flex justify-between items-start">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-[#E8E4DF] font-['Courier_New'] uppercase tracking-tight">{cliente?.nome}</h1>
+            <div className="flex items-center gap-4 text-white/50 text-sm">
+              <span>{cliente?.cidade}</span>
+              <span className="w-1 h-1 bg-white/20 rounded-full" />
+              <span>{cliente?.origem}</span>
+            </div>
+            <a 
+              href={`https://wa.me/55${cliente?.whatsapp?.replace(/\D/g, '')}`} 
+              target="_blank" 
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#8B7355]/10 text-[#8B7355] hover:bg-[#8B7355]/20 transition-colors text-xs font-medium"
+            >
+              <Phone size={14} /> {cliente?.whatsapp}
             </a>
           </div>
-          <Button onClick={() => setIsEditing(!isEditing)} className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none">
-            <Pencil size={16} className="mr-2" /> EDITAR
+          <Button 
+            onClick={() => setIsEditing(!isEditing)}
+            variant="outline"
+            className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none font-['Courier_New'] font-bold uppercase"
+          >
+            {isEditing ? <><Save size={16} className="mr-2" /> SALVAR</> : <><Pencil size={16} className="mr-2" /> EDITAR</>}
           </Button>
-        </header>
+        </div>
 
-        {/* Dados Pessoais */}
-        <section className="bg-[#0A0A0A] p-8 border border-[#3A3A3A]">
-          <h2 className="text-[#8B7355] font-['Courier_New'] uppercase tracking-widest mb-6">DADOS PESSOAIS</h2>
-          <div className="grid grid-cols-2 gap-6">
-            {Object.entries({ 'Nome': 'nome', 'WhatsApp': 'whatsapp', 'E-mail': 'email', 'CPF/CNPJ': 'cpf_cnpj', 'Cidade': 'cidade', 'Endereço': 'endereco_imovel', 'Origem': 'origem' }).map(([label, field]) => (
-              <div key={field} className="space-y-1">
-                <Label className="text-[10px] text-white/40 uppercase">{label}</Label>
+        {/* DADOS PESSOAIS */}
+        <section className="space-y-6">
+          <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">DADOS PESSOAIS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0A0A0A]">
+            {[
+              { label: 'Nome', key: 'nome' },
+              { label: 'WhatsApp', key: 'whatsapp' },
+              { label: 'E-mail', key: 'email' },
+              { label: 'CPF/CNPJ', key: 'cpf_cnpj' },
+              { label: 'Cidade', key: 'cidade' },
+              { label: 'Origem', key: 'origem', isSelect: true, options: ORIGENS },
+              { label: 'Endereço do imóvel', key: 'endereco_imovel', fullWidth: true },
+            ].map((field) => (
+              <div key={field.key} className={cn("space-y-2", field.fullWidth && "md:col-span-2 lg:col-span-3")}>
+                <Label className="text-[10px] uppercase tracking-widest text-white/30 font-['Courier_New']">{field.label}</Label>
                 {isEditing ? (
-                  <Input value={formData[field as keyof typeof formData]} onChange={(e) => setFormData({...formData, [field]: e.target.value})} className="bg-[#1A1816] border-[#3A3A3A]" />
+                  field.isSelect ? (
+                    <Select value={formData[field.key as keyof typeof formData]} onValueChange={(v) => setFormData({...formData, [field.key]: v})}>
+                      <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-10 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1A1816] border-white/10">
+                        {field.options?.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input 
+                      value={formData[field.key as keyof typeof formData]} 
+                      onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                    />
+                  )
                 ) : (
-                  <p className="text-[#E8E4DF]">{formData[field as keyof typeof formData] || '—'}</p>
+                  <p className="text-[#E8E4DF] text-sm">{formData[field.key as keyof typeof formData] || '—'}</p>
                 )}
               </div>
             ))}
           </div>
-          {isEditing && <Button onClick={() => saveMutation.mutate(formData)} className="mt-6 bg-[#8B7355] text-white rounded-none w-full">SALVAR ALTERAÇÕES</Button>}
-        </section>
-
-        {/* Cards Grid */}
-        <section className="grid grid-cols-2 gap-4">
-          {[ {title: 'PIPELINE', val: lead?.stage || '—', action: 'VER NO PIPELINE', link: '/pipeline'},
-             {title: 'PROPOSTA', val: '—', action: 'ABRIR PROPOSTA', link: '/calculadora'},
-             {title: 'PROJETO', val: projeto?.status_geral || '—', action: 'VER PROJETO', link: '/projetos'},
-             {title: 'FINANCEIRO', val: '—', action: 'VER PARCELAS', link: '/financeiro'}
-          ].map((card, i) => (
-            <div key={i} className="bg-[#1A1816] border border-[#3A3A3A] p-6 space-y-4">
-              <h3 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase">{card.title}</h3>
-              <p className="text-[#E8E4DF] text-lg">{card.val}</p>
-              <Button onClick={() => navigate(card.link)} className="bg-transparent border border-[#8B7355] text-[#8B7355] w-full text-[10px] uppercase">
-                {card.action}
-              </Button>
+          {isEditing && (
+            <div className="flex justify-end">
+              <Button onClick={() => saveMutation.mutate(formData)} className="bg-[#8B7355] text-white rounded-none px-8">SALVAR DADOS</Button>
             </div>
-          ))}
+          )}
         </section>
 
-        {/* Anotações */}
-        <section className="space-y-2">
-            <Label className="text-[#8B7355] font-['Courier_New'] uppercase text-xs">ANOTAÇÕES INTERNAS</Label>
-            <textarea 
-                value={formData.observacoes} 
-                onChange={(e) => setFormData({...formData, observacoes: e.target.value})} 
-                onBlur={() => saveMutation.mutate(formData)}
-                className="w-full h-32 bg-[#1A1816] border border-[#3A3A3A] p-4 text-[#E8E4DF]"
-            />
+        {/* ATALHOS GRID */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ShortcutCard 
+            label="PIPELINE" 
+            value={lead?.stage || '—'} 
+            actionLabel="VER NO PIPELINE" 
+            onClick={() => navigate('/pipeline')} 
+          />
+          <ShortcutCard 
+            label="PROPOSTA" 
+            value={proposta?.valor_completo ? formatCurrency(Number(proposta.valor_completo)) : '—'} 
+            actionLabel="ABRIR PROPOSTA" 
+            onClick={() => navigate('/calculadora')} 
+          />
+          <ShortcutCard 
+            label="PROJETO" 
+            value={projeto?.status_geral || '—'} 
+            actionLabel="VER PROJETO" 
+            onClick={() => navigate('/projetos')} 
+          />
+          <ShortcutCard 
+            label="FINANCEIRO" 
+            value={financeiro ? `${formatCurrency(financeiro)} recebido` : '—'} 
+            actionLabel="VER PARCELAS" 
+            onClick={() => navigate('/financeiro')} 
+          />
+        </section>
+
+        {/* ANOTAÇÕES */}
+        <section className="space-y-4">
+          <Label className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">ANOTAÇÕES INTERNAS</Label>
+          <textarea 
+            value={formData.observacoes} 
+            onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
+            onBlur={handleBlurSave}
+            placeholder="Digite aqui anotações sobre este cliente..."
+            className="w-full h-40 bg-[#0A0A0A] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
+          />
+        </section>
+
+        {/* HISTÓRICO */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+            <History size={16} className="text-[#8B7355]" />
+            <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B7355] font-['Courier_New']">HISTÓRICO</h2>
+          </div>
+          <div className="space-y-6 pl-2">
+            {!historico || historico.length === 0 ? (
+              <p className="text-[10px] text-white/20 uppercase tracking-widest font-['Courier_New']">Nenhuma alteração registrada</p>
+            ) : (
+              historico.map((h) => (
+                <div key={h.id} className="flex gap-4 items-start relative">
+                  <div className="mt-1.5 w-2 h-2 rounded-full bg-[#8B7355] shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-white/60 font-['Courier_New'] uppercase tracking-widest leading-relaxed">
+                      Status alterado de <span className="text-white/40">{h.status_anterior || 'INICIAL'}</span> para <span className="text-white font-bold">{h.status_novo}</span>
+                    </p>
+                    <div className="flex items-center gap-2 text-[8px] text-white/20 uppercase tracking-widest font-bold">
+                      <Clock size={10} />
+                      {format(new Date(h.data_hora), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </section>
       </main>
     </div>
