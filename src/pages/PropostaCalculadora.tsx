@@ -27,6 +27,7 @@ interface Phase {
   hours: number;
   included: boolean;
   optional?: boolean;
+  planType?: 'executivo' | 'completo';
 }
 
 interface ProposalData {
