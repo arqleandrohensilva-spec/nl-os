@@ -24,7 +24,7 @@ const ShortcutCard = ({ label, value, actionLabel, onClick }: { label: string, v
     <Button 
       variant="outline" 
       onClick={onClick}
-      className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none text-[10px] uppercase tracking-widest h-8"
+      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#1A1816] rounded-none text-[10px] uppercase tracking-widest h-8 font-['Courier_New'] transition-colors"
     >
       {value === '—' ? 'CRIAR' : actionLabel}
     </Button>
