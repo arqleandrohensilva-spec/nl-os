@@ -11,15 +11,17 @@ import {
   HelpCircle,
   ExternalLink,
   Save,
-  Loader2
+  Loader2,
+  Copy,
+  Check
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from '@/lib/utils';
-import GenerateLinkModal from '@/components/GenerateLinkModal';
 
 interface Phase {
   id: string;
@@ -56,8 +58,10 @@ const PropostaCalculadora = () => {
   const [phases, setPhases] = useState<Phase[]>([]);
   const [complexity, setComplexity] = useState<1.0 | 1.3 | 1.6>(1.0);
   const [observacoes, setObservacoes] = useState('');
-  
-  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [tipoNegocio, setTipoNegocio] = useState('');
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchInitialData();
@@ -205,9 +209,24 @@ const PropostaCalculadora = () => {
     };
   }, [phases, complexity, config]);
 
+  const gerarSlug = (nome: string) => nome.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-').trim();
+
+  const handleCopyLink = () => {
+    if (generatedLink) {
+      navigator.clipboard.writeText(generatedLink);
+      setCopied(true);
+      toast.success("Link copiado!");
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   const handleSaveAndGenerate = async () => {
     try {
       setSaving(true);
+      setIsGeneratingLink(true);
       
       // 1. Save Calculation
       const { error: calcError } = await supabase
@@ -225,7 +244,7 @@ const PropostaCalculadora = () => {
         
       if (calcError) throw calcError;
       
-      // 2. Update Proposal
+      // 2. Update Proposal with values
       const { error: propError } = await supabase
         .from('proposals')
         .update({
@@ -235,22 +254,89 @@ const PropostaCalculadora = () => {
         .eq('id', proposalId);
         
       if (propError) throw propError;
+
+      // 3. Generate Link and Save to External Supabase
+      const typeMapping: Record<string, string> = {
+        'ArqInt': 'arqint',
+        'Interiores': 'int',
+        'Comercial': 'comercial'
+      };
       
-      // Update local proposal state
-      setProposal(prev => prev ? { 
-        ...prev, 
-        valor_executivo: totals.valorExecutivo, 
-        valor_completo: totals.valorCompleto 
-      } : null);
+      const typeSlug = typeMapping[proposal?.tipo || ''] || 'arqint';
+      let finalTipoNegocio = "";
+      if (typeSlug === 'arqint') finalTipoNegocio = "Residencial";
+      else if (typeSlug === 'int') finalTipoNegocio = "Interiores";
+      else if (typeSlug === 'comercial') finalTipoNegocio = tipoNegocio;
+
+      const baseSlug = gerarSlug(proposal?.cliente || '');
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
-      toast.success('Cálculo salvo com sucesso!');
-      setIsGenerateModalOpen(true);
+      const slugAttempts = [
+        baseSlug,
+        `${baseSlug}-${timestamp}`,
+        `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
+      ];
+
+      let finalLink = "";
+      let finalSlug = "";
+
+      for (const attemptSlug of slugAttempts) {
+        try {
+          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              tipo: typeSlug,
+              slug: attemptSlug,
+              nome_cliente: proposal?.cliente,
+              cidade: proposal?.cidade,
+              area: proposal?.area || null,
+              valor_executivo: Math.round(totals.valorExecutivo).toString(),
+              valor_completo: Math.round(totals.valorCompleto).toString(),
+              objetivo: proposal?.objetivo || "",
+              tipo_negocio: finalTipoNegocio,
+            })
+          });
+
+          if (response.ok) {
+            finalSlug = attemptSlug;
+            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${finalSlug}`;
+            break;
+          } else if (response.status === 409) {
+            continue;
+          } else {
+            throw new Error(`Erro no servidor externo (${response.status})`);
+          }
+        } catch (err) {
+          console.warn("Attempt failed", err);
+        }
+      }
+
+      if (!finalLink) throw new Error("Não foi possível gerar um link único.");
+
+      // 4. Update local proposal with the link
+      const { error: linkError } = await supabase
+        .from('proposals')
+        .update({ link_proposta: finalLink })
+        .eq('id', proposalId);
+
+      if (linkError) throw linkError;
+      
+      setGeneratedLink(finalLink);
+      toast.success('Proposta gerada com sucesso!');
       
     } catch (error: any) {
-      console.error('Error saving calculation:', error);
-      toast.error('Erro ao salvar cálculo');
+      console.error('Error generating link:', error);
+      toast.error(error.message || 'Erro ao gerar link da proposta');
     } finally {
       setSaving(false);
+      setIsGeneratingLink(false);
     }
   };
 
@@ -407,15 +493,34 @@ const PropostaCalculadora = () => {
               </div>
             </section>
 
-            {/* Block 4 - Notes */}
+            {/* Block 4 - Notes & Extra Data */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">OBSERVAÇÕES INTERNAS</h2>
-              <Textarea 
-                placeholder="Notas sobre o cálculo (uso interno)..."
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-                className="min-h-[120px] bg-white/[0.02] border-white/10 rounded-2xl focus:border-bronze focus:ring-bronze/20"
-              />
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">OBSERVAÇÕES E DADOS</h2>
+              </div>
+              
+              {proposal.tipo === 'Comercial' && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">TIPO DE NEGÓCIO</Label>
+                  <Input
+                    id="tipoNegocio"
+                    value={tipoNegocio}
+                    onChange={(e) => setTipoNegocio(e.target.value)}
+                    placeholder="Ex: Barbearia, Clínica, Restaurante..."
+                    className="bg-white/[0.02] border-white/10 rounded-xl focus:border-bronze focus:ring-bronze/20"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">OBSERVAÇÕES INTERNAS</Label>
+                <Textarea 
+                  placeholder="Notas sobre o cálculo (uso interno)..."
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  className="min-h-[120px] bg-white/[0.02] border-white/10 rounded-2xl focus:border-bronze focus:ring-bronze/20"
+                />
+              </div>
             </section>
 
           </div>
@@ -495,31 +600,57 @@ const PropostaCalculadora = () => {
                 </div>
               </div>
 
-              <Button 
-                onClick={handleSaveAndGenerate}
-                disabled={saving || totals.totalHours === 0}
-                className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
-              >
-                {saving ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
-              </Button>
+              {!generatedLink ? (
+                <Button 
+                  onClick={handleSaveAndGenerate}
+                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio)}
+                  className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
+                >
+                  {isGeneratingLink ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
+                </Button>
+              ) : (
+                <div className="mt-10 p-6 bg-bronze/10 border border-bronze/20 rounded-2xl space-y-6 animate-in zoom-in-95 duration-500">
+                  <div className="text-center space-y-2">
+                    <p className="text-xs font-bold text-bronze uppercase tracking-[0.2em] flex items-center justify-center gap-2">
+                      <Check size={16} /> PROPOSTA GERADA
+                    </p>
+                    <p className="text-[10px] text-white/60 font-mono break-all px-4 py-2 bg-black/20 rounded-lg">
+                      {generatedLink}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleCopyLink}
+                      className="h-12 border-white/10 text-[10px] uppercase tracking-widest gap-2 hover:bg-white/5"
+                    >
+                      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                      {copied ? "COPIADO" : "COPIAR LINK"}
+                    </Button>
+                    <Button 
+                      onClick={() => window.open(generatedLink, '_blank')}
+                      className="h-12 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest gap-2"
+                    >
+                      <ExternalLink size={14} />
+                      ABRIR
+                    </Button>
+                  </div>
+
+                  <Button 
+                    variant="ghost"
+                    onClick={() => navigate('/propostas/tracking')}
+                    className="w-full h-12 text-[10px] uppercase tracking-widest text-white/40 hover:text-white"
+                  >
+                    IR PARA TRACKING
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
         </div>
       </main>
-
-      {/* Generate Link Modal */}
-      {proposal && (
-        <GenerateLinkModal 
-          isOpen={isGenerateModalOpen}
-          onClose={() => setIsGenerateModalOpen(false)}
-          proposal={{
-            ...proposal,
-            valor_executivo: totals.valorExecutivo,
-            valor_completo: totals.valorCompleto
-          }}
-        />
-      )}
     </div>
   );
 };
