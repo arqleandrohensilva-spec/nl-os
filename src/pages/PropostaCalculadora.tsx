@@ -27,6 +27,7 @@ interface Phase {
   hours: number;
   included: boolean;
   optional?: boolean;
+  planType?: 'executivo' | 'completo';
 }
 
 interface ProposalData {
@@ -100,36 +101,36 @@ const PropostaCalculadora = () => {
       
       if (type === 'ArqInt') {
         initialPhases = [
-          { id: 'briefing_viab', label: 'Briefing & Viabilidade', hours: 0, included: true },
-          { id: 'conceito_mood', label: 'Conceito & Moodboard', hours: 0, included: true },
-          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true },
-          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true },
-          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true },
-          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: true },
-          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: true },
-          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_viab', label: 'Levantamento & Briefing', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'estudo_3d', label: 'Estudo Preliminar 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_legal', label: 'Projeto Legal & Aprovações', hours: 0, included: true, planType: 'executivo' },
+          { id: 'projeto_executivo', label: 'Projeto Executivo', hours: 0, included: true, planType: 'executivo' },
+          { id: 'compat_tecnica', label: 'Compatibilização Técnica', hours: 0, included: true, planType: 'executivo' },
+          { id: 'int_briefing', label: 'Interiores — Briefing', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_conceito_3d', label: 'Interiores — Conceito 3D', hours: 0, included: false, planType: 'completo' },
+          { id: 'int_executivo', label: 'Interiores — Executivo', hours: 0, included: false, planType: 'completo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       } else if (type === 'Interiores') {
         initialPhases = [
-          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true },
-          { id: 'conceito_mood', label: 'Conceito & Moodboard', hours: 0, included: true },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true },
-          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, optional: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_lev', label: 'Briefing & Levantamentos', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_mood', label: 'Criação do Conceito', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_interiores', label: 'Projeto Executivo de Interiores', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'visitas_lojas', label: 'Visitas em Lojas', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       } else if (type === 'Comercial') {
         initialPhases = [
-          { id: 'briefing_diag', label: 'Briefing & Diagnóstico do negócio', hours: 0, included: true },
-          { id: 'conceito_id', label: 'Conceito e Identidade do Espaço', hours: 0, included: true },
-          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true },
-          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, optional: true },
-          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true },
-          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, optional: true },
+          { id: 'briefing_diag', label: 'Briefing & Diagnóstico', hours: 0, included: true, planType: 'executivo' },
+          { id: 'conceito_id', label: 'Conceito e Identidade', hours: 0, included: true, planType: 'executivo' },
+          { id: 'concepcao_3d', label: 'Concepção 3D', hours: 0, included: true, planType: 'executivo' },
+          { id: 'exec_comercial', label: 'Projeto Executivo Comercial', hours: 0, included: true, planType: 'executivo' },
+          { id: 'evf', label: 'EVF — Viabilidade Financeira', hours: 0, included: false, planType: 'completo', optional: true },
+          { id: 'acompanhamento', label: 'Acompanhamento de Obra', hours: 0, included: false, planType: 'completo', optional: true },
         ];
       }
       
@@ -143,7 +144,16 @@ const PropostaCalculadora = () => {
         .maybeSingle();
         
       if (calcData) {
-        setPhases(calcData.fases as unknown as Phase[]);
+        const savedPhases = calcData.fases as unknown as Phase[];
+        // Merge saved phases with initial phases to ensure all current structure (like planType) is present
+        const mergedPhases = initialPhases.map(ip => {
+          const saved = savedPhases.find(s => s.id === ip.id);
+          if (saved) {
+            return { ...ip, hours: saved.hours, included: saved.included };
+          }
+          return ip;
+        });
+        setPhases(mergedPhases);
         setComplexity(calcData.complexidade as any);
         setObservacoes(calcData.observacoes || '');
       } else {
@@ -169,13 +179,20 @@ const PropostaCalculadora = () => {
 
   const totals = useMemo(() => {
     const includedPhases = phases.filter(p => p.included);
+    
+    // Executive Plan Total: sum only marked phases that are of type 'executivo'
+    const execPhases = includedPhases.filter(p => p.planType === 'executivo');
+    const execHours = execPhases.reduce((acc, curr) => acc + curr.hours, 0);
+    const valorExecutivo = execHours * config.preco_hora * complexity;
+
+    // Complete Plan Total: sum all marked phases
     const totalHours = includedPhases.reduce((acc, curr) => acc + curr.hours, 0);
+    const valorCompleto = totalHours * config.preco_hora * complexity;
+
     const subtotal = totalHours * config.preco_hora;
     const impactComplexity = subtotal * (complexity - 1);
-    const valorExecutivo = subtotal * complexity;
-    const valorCompleto = valorExecutivo * 1.35; // Example: Complete is usually ~35% more
     const totalCusto = totalHours * config.custo_hora;
-    const lucro = valorExecutivo - totalCusto;
+    const lucro = valorCompleto - totalCusto; // Profit relative to the complete total (all marked phases)
     
     return {
       totalHours,
@@ -330,6 +347,9 @@ const PropostaCalculadora = () => {
                         className="text-sm font-medium flex items-center gap-2 cursor-pointer"
                       >
                         {phase.label}
+                        {phase.planType === 'completo' && (
+                          <Badge className="bg-bronze/20 text-bronze border-bronze/20 text-[8px] uppercase tracking-widest py-0 h-4">COMPLETO</Badge>
+                        )}
                         {phase.optional && (
                           <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-white/10 text-white/40 py-0 h-4">OPCIONAL</Badge>
                         )}
@@ -448,13 +468,19 @@ const PropostaCalculadora = () => {
 
               <div className="mt-8 space-y-4">
                 <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/5 space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold">PLANO EXECUTIVO</p>
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold flex items-center gap-2">
+                    PLANO EXECUTIVO 
+                    <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 py-0 h-3">BASE</Badge>
+                  </p>
                   <p className="text-3xl font-light text-bronze">R$ {totals.valorExecutivo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
                 
-                <div className="p-6 bg-white/[0.02] rounded-2xl border border-white/5 space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold">PLANO COMPLETO</p>
-                  <p className="text-2xl font-light text-white/80">R$ {totals.valorCompleto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                <div className="p-6 bg-bronze/[0.03] rounded-2xl border border-bronze/10 space-y-1">
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold flex items-center gap-2">
+                    PLANO COMPLETO
+                    <Badge className="bg-bronze text-white text-[7px] py-0 h-3 border-none">PREMIUM</Badge>
+                  </p>
+                  <p className="text-2xl font-light text-white/90">R$ {totals.valorCompleto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
 
