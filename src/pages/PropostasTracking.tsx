@@ -890,7 +890,7 @@ Retorne APENAS JSON válido:
                       <Button 
                         variant="outline"
                         size="sm"
-                        onClick={() => navigate(`/proposta/calculadora/${p.id}`)}
+                        onClick={() => navigate(`/calculadora/${p.id}`)}
                         className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
                       >
                         <Calculator size={11} />

@@ -72,6 +72,34 @@ const PropostaCalculadora = () => {
     try {
       setLoading(true);
       
+      // Handle Standalone case
+      if (proposalId === 'nova') {
+        setProposal({
+          id: 'nova',
+          cliente: '',
+          tipo: 'ArqInt',
+          cidade: '',
+          estado: 'SP',
+          area: 0,
+          objetivo: ''
+        });
+        setPhases([]); // Will be initialized by the effect below when tipo changes
+        
+        // Load default config
+        const { data: configData } = await supabase
+          .from('config_escritorio')
+          .select('custo_hora, margem_lucro')
+          .maybeSingle();
+        
+        const custo = configData?.custo_hora || 67.37;
+        const margem = configData?.margem_lucro || 40;
+        const preco = custo / (1 - margem / 100);
+        
+        setConfig({ custo_hora: custo, margem_lucro: margem, preco_hora: preco });
+        setLoading(false);
+        return;
+      }
+
       // 1. Fetch Proposal
       const { data: proposalData, error: proposalError } = await supabase
         .from('proposals')
@@ -362,7 +390,7 @@ const PropostaCalculadora = () => {
               variant="ghost" 
               size="sm" 
               className="text-white/40 hover:text-white hover:bg-white/5 transition-colors gap-2"
-              onClick={() => navigate('/propostas/tracking')}
+              onClick={() => navigate('/calculadora')}
             >
               <ChevronLeft size={16} /> Voltar ao Tracking
             </Button>
