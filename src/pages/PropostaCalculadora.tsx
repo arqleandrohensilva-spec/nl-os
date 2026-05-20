@@ -306,11 +306,39 @@ const PropostaCalculadora = () => {
       setSaving(true);
       setIsGeneratingLink(true);
       
+      let currentProposalId = proposalId;
+
+      // Handle standalone creation
+      if (proposalId === 'nova') {
+        if (!proposal?.cliente) {
+          toast.error("Por favor, informe o nome do cliente.");
+          setIsGeneratingLink(false);
+          setSaving(false);
+          return;
+        }
+        
+        const { data: newProp, error: propCreateError } = await supabase
+          .from('proposals')
+          .insert({
+            cliente: proposal.cliente,
+            tipo: proposal.tipo as any,
+            cidade: proposal.cidade,
+            area: proposal.area,
+            status: 'Enviada',
+            data: new Date().toISOString().split('T')[0]
+          })
+          .select()
+          .single();
+          
+        if (propCreateError) throw propCreateError;
+        currentProposalId = newProp.id;
+      }
+
       // 1. Save Calculation
       const { error: calcError } = await supabase
         .from('calculos_proposta')
         .upsert({
-          proposal_id: proposalId,
+          proposal_id: currentProposalId,
           fases: phases as any,
           horas_total: totals.totalHours,
           complexidade: complexity,
@@ -329,7 +357,7 @@ const PropostaCalculadora = () => {
           valor_executivo: totals.valorExecutivo,
           valor_completo: totals.valorCompleto
         })
-        .eq('id', proposalId);
+        .eq('id', currentProposalId);
         
       if (propError) throw propError;
 
