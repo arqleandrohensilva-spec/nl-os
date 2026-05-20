@@ -121,9 +121,9 @@ const LeadCard = ({ lead, onClick, onViewFicha }: LeadCardProps) => {
             {lead.nome}
           </h3>
 
-          {/* Project Type · Value */}
-          <p className="text-white/50 text-xs mt-1 truncate">
-            {lead.tipo} · {formatCurrency(lead.orcamento)}
+          {/* Project Type · City · Value */}
+          <p className="text-white/50 text-[10px] mt-1 truncate uppercase tracking-wider">
+            {lead.tipo} · {lead.cidade} · {formatCurrency(lead.orcamento)}
           </p>
         </div>
       </div>
