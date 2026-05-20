@@ -12,6 +12,7 @@ interface KanbanColumnProps {
   onLeadClick: (lead: Lead) => void;
   onUpdateStatus?: (leadId: string, newStage: string) => void;
   onQuickNote?: (leadId: string, note: string) => void;
+  onViewFicha?: (clienteId: string) => void;
 }
 
 const STAGE_THEME: Record<Stage, { indicator: string, bg: string }> = {
@@ -24,7 +25,7 @@ const STAGE_THEME: Record<Stage, { indicator: string, bg: string }> = {
   'Perdido': { indicator: '#999999', bg: 'bg-black/5' }
 };
 
-const KanbanColumn = ({ stage, leads, onLeadClick, onUpdateStatus, onQuickNote }: KanbanColumnProps) => {
+const KanbanColumn = ({ stage, leads, onLeadClick, onUpdateStatus, onQuickNote, onViewFicha }: KanbanColumnProps) => {
   const isLost = stage === 'Perdido';
   const totalValue = leads.reduce((acc, l) => acc + (l.orcamento || 0), 0);
   const theme = STAGE_THEME[stage];
@@ -100,6 +101,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick, onUpdateStatus, onQuickNote }
                 onClick={() => onLeadClick(lead)}
                 onUpdateStatus={onUpdateStatus}
                 onQuickNote={onQuickNote}
+                onViewFicha={onViewFicha}
               />
             ))
           ) : (
