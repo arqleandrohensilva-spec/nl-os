@@ -158,6 +158,56 @@ export type Database = {
           },
         ]
       }
+      calculos_proposta: {
+        Row: {
+          complexidade: number
+          created_at: string
+          custo_hora_momento: number
+          fases: Json
+          horas_total: number
+          id: string
+          observacoes: string | null
+          proposal_id: string
+          updated_at: string
+          valor_completo: number
+          valor_executivo: number
+        }
+        Insert: {
+          complexidade?: number
+          created_at?: string
+          custo_hora_momento?: number
+          fases?: Json
+          horas_total?: number
+          id?: string
+          observacoes?: string | null
+          proposal_id: string
+          updated_at?: string
+          valor_completo?: number
+          valor_executivo?: number
+        }
+        Update: {
+          complexidade?: number
+          created_at?: string
+          custo_hora_momento?: number
+          fases?: Json
+          horas_total?: number
+          id?: string
+          observacoes?: string | null
+          proposal_id?: string
+          updated_at?: string
+          valor_completo?: number
+          valor_executivo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calculos_proposta_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       config_escritorio: {
         Row: {
           atualizado_em: string | null
