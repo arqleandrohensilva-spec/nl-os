@@ -7,72 +7,46 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, History, User, Building, LayoutGrid, Clock } from 'lucide-react';
+import { ArrowLeft, Save, History, User, Building, LayoutGrid, Clock, Pencil, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-const STATUS_OPTIONS = [
-  'Novo Lead',
-  'Reunião Agendada',
-  'Briefing Preenchido',
-  'Proposta Enviada',
-  'Negociação',
-  'Fechado'
-];
-
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
-const TIPOS_PROJETO = ['ARQ+INT', 'Interiores', 'Comercial'];
 
 const ClienteFicha = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isNew = !id;
-
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    nome: '',
-    whatsapp: '',
-    email: '',
-    cpf_cnpj: '',
-    cidade: '',
-    endereco_imovel: '',
-    origem: 'Instagram',
-    status_comercial: 'Novo Lead',
-    tipo_projeto: 'ARQ+INT',
-    area_m2: '',
-    observacoes: ''
+    nome: '', whatsapp: '', email: '', cpf_cnpj: '', cidade: '', endereco_imovel: '', origem: 'Instagram', observacoes: ''
   });
 
-  const { data: cliente, isLoading: isClienteLoading } = useQuery({
+  const { data: cliente, isLoading } = useQuery({
     queryKey: ['cliente', id],
     queryFn: async () => {
-      if (isNew) return null;
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('*, historico:historico_clientes(*)')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('clientes').select('*, historico:historico_clientes(*)').eq('id', id).single();
       if (error) throw error;
       return data;
-    },
-    enabled: !!id
+    }
   });
 
-  const { data: historico } = useQuery({
-    queryKey: ['historico_cliente', id],
+  const { data: lead } = useQuery({
+    queryKey: ['lead', id],
     queryFn: async () => {
-      if (isNew) return [];
-      const { data, error } = await supabase
-        .from('historico_clientes')
-        .select('*')
-        .eq('cliente_id', id)
-        .order('data_hora', { ascending: false });
-      if (error) throw error;
+      const { data } = await supabase.from('leads').select('stage').eq('cliente_id', id).maybeSingle();
       return data;
-    },
-    enabled: !!id
+    }
+  });
+
+  const { data: projeto } = useQuery({
+    queryKey: ['projeto', id],
+    queryFn: async () => {
+      const { data } = await supabase.from('projetos').select('status_geral').eq('cliente_id', id).maybeSingle();
+      return data;
+    }
   });
 
   useEffect(() => {
@@ -85,9 +59,6 @@ const ClienteFicha = () => {
         cidade: cliente.cidade || '',
         endereco_imovel: cliente.endereco_imovel || '',
         origem: cliente.origem || 'Instagram',
-        status_comercial: cliente.status_comercial || 'Novo Lead',
-        tipo_projeto: cliente.tipo_projeto || 'ARQ+INT',
-        area_m2: cliente.area_m2?.toString() || '',
         observacoes: cliente.observacoes || ''
       });
     }
@@ -95,307 +66,81 @@ const ClienteFicha = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const payload = {
-        ...data,
-        area_m2: data.area_m2 ? parseFloat(data.area_m2) : null
-      };
-
-      let result;
-      if (isNew) {
-        result = await supabase.from('clientes').insert(payload).select().single();
-      } else {
-        result = await supabase.from('clientes').update(payload).eq('id', id).select().single();
-      }
-
-      if (result.error) throw result.error;
-
-      // Sincronizar com Pipeline (Leads)
-      const clienteSalvo = result.data;
-      
-      // Verificar se já existe lead vinculado
-      const { data: leadExistente } = await supabase
-        .from('leads')
-        .select('id')
-        .eq('cliente_id', clienteSalvo.id)
-        .single();
-
-      if (leadExistente) {
-        // Atualiza lead existente
-        await supabase.from('leads').update({
-          nome: clienteSalvo.nome,
-          whats: clienteSalvo.whatsapp,
-          cidade: clienteSalvo.cidade,
-          tipo: clienteSalvo.tipo_projeto,
-          area: clienteSalvo.area_m2 ? parseFloat(clienteSalvo.area_m2) : 0,
-          stage: clienteSalvo.status_comercial,
-          updated_at: new Date().toISOString()
-        }).eq('id', leadExistente.id);
-      } else {
-        // Cria novo lead se não for 'Fechado' ou 'Perdido' (embora o trigger no DB possa lidar com isso, fazemos aqui por segurança)
-        const { error: leadError } = await supabase.from('leads').insert({
-          cliente_id: clienteSalvo.id,
-          nome: clienteSalvo.nome,
-          whats: clienteSalvo.whatsapp,
-          cidade: clienteSalvo.cidade,
-          tipo: clienteSalvo.tipo_projeto,
-          area: clienteSalvo.area_m2 ? parseFloat(clienteSalvo.area_m2) : 0,
-          stage: clienteSalvo.status_comercial,
-          origem: clienteSalvo.origem,
-          temp: 'Morno',
-          criado: new Date().toISOString()
-        });
-
-        if (leadError) {
-          console.error('Erro ao criar lead:', leadError);
-          toast.error('Erro ao sincronizar com Pipeline: ' + leadError.message);
-        }
-      }
-
-      return clienteSalvo;
+      const { error } = await supabase.from('clientes').update(data).eq('id', id);
+      if (error) throw error;
     },
-    onSuccess: (data) => {
-      toast.success(isNew ? 'Cliente criado com sucesso' : 'Cliente atualizado');
-      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+    onSuccess: () => {
+      toast.success('Cliente atualizado');
+      setIsEditing(false);
       queryClient.invalidateQueries({ queryKey: ['cliente', id] });
-      queryClient.invalidateQueries({ queryKey: ['historico_cliente', id] });
-      if (isNew) navigate(`/clientes/${data.id}`);
-    },
-    onError: (error) => {
-      console.error(error);
-      toast.error('Erro ao salvar cliente');
     }
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    saveMutation.mutate(formData);
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  if (!isNew && isClienteLoading) {
-    return (
-      <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
-        <Sidebar user="User" />
-        <main className="flex-1 ml-[230px] flex justify-center items-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div>
-        </main>
-      </div>
-    );
-  }
+  if (isLoading) return <div className="text-white p-10">Carregando...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#1A1816] text-[#E8E4DF]">
       <Sidebar user="User" />
-      
-      <main className="flex-1 ml-[230px] p-10 max-w-5xl">
-        <div className="flex items-center gap-4 mb-8">
-          <button 
-            onClick={() => navigate('/clientes')}
-            className="p-2 hover:bg-white/5 text-white/40 hover:text-white transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-2xl font-['Courier_New'] font-bold text-[#8B7355] uppercase tracking-tighter">
-              {isNew ? 'NOVO CLIENTE' : `FICHA: ${formData.nome}`}
-            </h1>
-            <p className="text-[9px] text-white/30 uppercase tracking-[0.3em] font-['Courier_New']">Módulo CRM · Ecossistema NL OS</p>
+      <main className="flex-1 ml-[230px] p-10 max-w-5xl space-y-12">
+        {/* Topo */}
+        <header className="flex justify-between items-start">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold font-['Courier_New'] uppercase text-[#E8E4DF]">{formData.nome}</h1>
+            <p className="text-sm text-[#8B7355] font-['Courier_New']">{formData.cidade} • {formData.origem}</p>
+            <a href={`https://wa.me/55${formData.whatsapp.replace(/\D/g, '')}`} target="_blank" className="flex items-center gap-2 text-xs text-[#8B7355] hover:underline">
+              <Phone size={12} /> {formData.whatsapp}
+            </a>
           </div>
-        </div>
+          <Button onClick={() => setIsEditing(!isEditing)} className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none">
+            <Pencil size={16} className="mr-2" /> EDITAR
+          </Button>
+        </header>
 
-        <form onSubmit={handleSubmit} className="space-y-12">
-          {/* BLOCO 1: DADOS PESSOAIS */}
-          <section className="bg-[#1A1816] p-8 border border-white/5 space-y-6">
-            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
-              <User size={16} className="text-[#8B7355]" />
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-white font-['Courier_New']">DADOS PESSOAIS</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Nome Completo</Label>
-                <Input 
-                  value={formData.nome}
-                  onChange={(e) => handleInputChange('nome', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">WhatsApp</Label>
-                <Input 
-                  value={formData.whatsapp}
-                  onChange={(e) => handleInputChange('whatsapp', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">E-mail</Label>
-                <Input 
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">CPF ou CNPJ</Label>
-                <Input 
-                  value={formData.cpf_cnpj}
-                  onChange={(e) => handleInputChange('cpf_cnpj', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Cidade</Label>
-                <Input 
-                  value={formData.cidade}
-                  onChange={(e) => handleInputChange('cidade', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Origem</Label>
-                <Select value={formData.origem} onValueChange={(v) => handleInputChange('origem', v)}>
-                  <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1A1816] border-white/10 text-white font-['Courier_New']">
-                    {ORIGENS.map(o => <SelectItem key={o} value={o}>{o.toUpperCase()}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Endereço do Imóvel</Label>
-                <Input 
-                  value={formData.endereco_imovel}
-                  onChange={(e) => handleInputChange('endereco_imovel', e.target.value)}
-                  className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* BLOCO 2: STATUS COMERCIAL */}
-          <section className="bg-[#1A1816] p-8 border border-white/5 space-y-6">
-            <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
-              <Building size={16} className="text-[#8B7355]" />
-              <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-white font-['Courier_New']">STATUS COMERCIAL</h2>
-            </div>
-            
-            <div className="space-y-2 max-w-md">
-              <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Estágio Atual</Label>
-              <Select value={formData.status_comercial} onValueChange={(v) => handleInputChange('status_comercial', v)}>
-                <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1A1816] border-white/10 text-white font-['Courier_New']">
-                  {STATUS_OPTIONS.map(s => <SelectItem key={s} value={s}>{s.toUpperCase()}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <p className="text-[9px] text-white/20 mt-2 italic font-['Courier_New']">
-                * Ao salvar, o card no Pipeline será criado ou movido automaticamente.
-              </p>
-            </div>
-          </section>
-
-          {/* BLOCO 3: PROJETO VINCULADO */}
-          {formData.status_comercial === 'Fechado' && (
-            <section className="bg-[#1A1816] p-8 border border-white/5 space-y-6 animate-in fade-in slide-in-from-top-4">
-              <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
-                <LayoutGrid size={16} className="text-[#8B7355]" />
-                <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-white font-['Courier_New']">PROJETO VINCULADO</h2>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Tipo de Projeto</Label>
-                  <Select value={formData.tipo_projeto} onValueChange={(v) => handleInputChange('tipo_projeto', v)}>
-                    <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1A1816] border-white/10 text-white font-['Courier_New']">
-                      {TIPOS_PROJETO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Área (m²)</Label>
-                  <Input 
-                    type="number"
-                    value={formData.area_m2}
-                    onChange={(e) => handleInputChange('area_m2', e.target.value)}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-white font-['Courier_New'] text-xs tracking-widest"
-                  />
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-white/40 font-['Courier_New']">Observações</Label>
-                  <textarea 
-                    value={formData.observacoes}
-                    onChange={(e) => handleInputChange('observacoes', e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-none p-4 text-white font-['Courier_New'] text-xs tracking-widest min-h-[100px] outline-none focus:border-[#8B7355] transition-colors"
-                  />
-                </div>
-              </div>
-            </section>
-          )}
-
-          {/* BLOCO 4: HISTÓRICO */}
-          {!isNew && (
-            <section className="bg-[#1A1816] p-8 border border-white/5 space-y-6">
-              <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-6">
-                <History size={16} className="text-[#8B7355]" />
-                <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-white font-['Courier_New']">HISTÓRICO</h2>
-              </div>
-              
-              <div className="space-y-4">
-                {historico?.length === 0 && (
-                  <p className="text-[10px] text-white/20 uppercase tracking-widest font-['Courier_New']">Nenhuma alteração registrada</p>
+        {/* Dados Pessoais */}
+        <section className="bg-[#0A0A0A] p-8 border border-[#3A3A3A]">
+          <h2 className="text-[#8B7355] font-['Courier_New'] uppercase tracking-widest mb-6">DADOS PESSOAIS</h2>
+          <div className="grid grid-cols-2 gap-6">
+            {Object.entries({ 'Nome': 'nome', 'WhatsApp': 'whatsapp', 'E-mail': 'email', 'CPF/CNPJ': 'cpf_cnpj', 'Cidade': 'cidade', 'Endereço': 'endereco_imovel', 'Origem': 'origem' }).map(([label, field]) => (
+              <div key={field} className="space-y-1">
+                <Label className="text-[10px] text-white/40 uppercase">{label}</Label>
+                {isEditing ? (
+                  <Input value={formData[field as keyof typeof formData]} onChange={(e) => setFormData({...formData, [field]: e.target.value})} className="bg-[#1A1816] border-[#3A3A3A]" />
+                ) : (
+                  <p className="text-[#E8E4DF]">{formData[field as keyof typeof formData] || '—'}</p>
                 )}
-                {historico?.map((h) => (
-                  <div key={h.id} className="flex gap-4 items-start relative pb-4 last:pb-0">
-                    <div className="mt-1 w-2 h-2 rounded-full bg-[#8B7355] shrink-0" />
-                    <div className="space-y-1">
-                      <p className="text-[10px] text-white/60 font-['Courier_New'] uppercase tracking-widest">
-                        Status alterado de <span className="text-white/40">{h.status_anterior || 'INICIAL'}</span> para <span className="text-white font-bold">{h.status_novo}</span>
-                      </p>
-                      <div className="flex items-center gap-2 text-[8px] text-white/20 uppercase tracking-widest font-bold">
-                        <Clock size={10} />
-                        {format(new Date(h.data_hora), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
               </div>
-            </section>
-          )}
-
-          <div className="flex justify-end gap-4 pt-6">
-            <Button 
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/clientes')}
-              className="border-white/10 hover:bg-white/5 text-white/40 rounded-none px-10 font-['Courier_New'] text-xs font-bold uppercase tracking-widest h-14"
-            >
-              CANCELAR
-            </Button>
-            <Button 
-              type="submit"
-              disabled={saveMutation.isPending}
-              className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 font-['Courier_New'] text-xs font-bold uppercase tracking-widest h-14"
-            >
-              {saveMutation.isPending ? 'SALVANDO...' : (
-                <div className="flex items-center gap-2">
-                  <Save size={16} />
-                  SALVAR FICHA
-                </div>
-              )}
-            </Button>
+            ))}
           </div>
-        </form>
+          {isEditing && <Button onClick={() => saveMutation.mutate(formData)} className="mt-6 bg-[#8B7355] text-white rounded-none w-full">SALVAR ALTERAÇÕES</Button>}
+        </section>
+
+        {/* Cards Grid */}
+        <section className="grid grid-cols-2 gap-4">
+          {[ {title: 'PIPELINE', val: lead?.stage || '—', action: 'VER NO PIPELINE', link: '/pipeline'},
+             {title: 'PROPOSTA', val: '—', action: 'ABRIR PROPOSTA', link: '/calculadora'},
+             {title: 'PROJETO', val: projeto?.status_geral || '—', action: 'VER PROJETO', link: '/projetos'},
+             {title: 'FINANCEIRO', val: '—', action: 'VER PARCELAS', link: '/financeiro'}
+          ].map((card, i) => (
+            <div key={i} className="bg-[#1A1816] border border-[#3A3A3A] p-6 space-y-4">
+              <h3 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase">{card.title}</h3>
+              <p className="text-[#E8E4DF] text-lg">{card.val}</p>
+              <Button onClick={() => navigate(card.link)} className="bg-transparent border border-[#8B7355] text-[#8B7355] w-full text-[10px] uppercase">
+                {card.action}
+              </Button>
+            </div>
+          ))}
+        </section>
+
+        {/* Anotações */}
+        <section className="space-y-2">
+            <Label className="text-[#8B7355] font-['Courier_New'] uppercase text-xs">ANOTAÇÕES INTERNAS</Label>
+            <textarea 
+                value={formData.observacoes} 
+                onChange={(e) => setFormData({...formData, observacoes: e.target.value})} 
+                onBlur={() => saveMutation.mutate(formData)}
+                className="w-full h-32 bg-[#1A1816] border border-[#3A3A3A] p-4 text-[#E8E4DF]"
+            />
+        </section>
       </main>
     </div>
   );
