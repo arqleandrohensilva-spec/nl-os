@@ -108,22 +108,25 @@ const BriefingPublic = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('briefings').update({
+      const updateData: any = {
         status: 'preenchido',
         respostas: formData,
         tipo_projeto: projetoType,
         preenchido_em: new Date().toISOString()
-      }).eq('id', briefing.id);
+      };
+
+      const { error } = await supabase.from('briefings').update(updateData).eq('id', briefing.id);
 
       if (error) throw error;
       
       if (briefing.cliente_id) {
-        await (supabase.from('clientes') as any).update({
+        const clienteUpdate: any = {
           tipo_projeto: projetoType,
           area_m2: formData.area_estimada || formData.area_terreno,
           orcamento: formData.orcamento,
           briefing_preenchido: true
-        }).eq('id', briefing.cliente_id);
+        };
+        await (supabase.from('clientes') as any).update(clienteUpdate).eq('id', briefing.cliente_id);
       }
       
       setSubmitted(true);
