@@ -1,28 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  CheckCircle2, 
-  Send, 
-  User, 
-  Home, 
-  Palette, 
-  ClipboardList, 
-  Users,
-  Clock,
-  MapPin,
-  Camera,
-  Heart,
-  ChevronRight,
-  ChevronLeft
-} from 'lucide-react';
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Progress } from "@/components/ui/progress";
 
 const BriefingPublic = () => {
   const { token } = useParams();
@@ -31,39 +16,42 @@ const BriefingPublic = () => {
   const [step, setStep] = useState(1);
   const [briefing, setBriefing] = useState<any>(null);
   const [submitted, setSubmitted] = useState(false);
+  
+  const [projetoType, setProjetoType] = useState<'arq' | 'int' | 'com' | null>(null);
 
-  const [formData, setFormData] = useState({
-    // Dados Pessoais
+  const [formData, setFormData] = useState<any>({
     nome_completo: '',
-    data_nascimento: '',
-    profissao: '',
-    email: '',
     whatsapp: '',
+    email: '',
+    cidade: '',
+    origem: '',
     
-    // O Imóvel
-    endereco_obra: '',
-    tipo_imovel: 'Residencial',
+    // Flow-specific fields
+    imovel_definido: '',
+    endereco: '',
     area_terreno: '',
     area_estimada: '',
-    topografia: 'Plano',
-    
-    // Rotina e Necessidades
-    pessoas_casa: '',
+    moradores: '',
     pets: '',
-    recebe_visitas: 'Frequentemente',
-    estilo_vida: '',
+    ambientes_indispensaveis: [],
+    estilo_referencia: '',
+    fator_decisao: [],
+    orcamento: '',
+    prazo: '',
+    obs: '',
     
-    // O Projeto
-    estilo_arquitetonico: '',
-    ambientes_desejados: '',
-    materiais_favoritos: '',
-    cores_favoritas: '',
-    itens_indispensaveis: '',
+    // Interiores
+    tipo_imovel: '',
+    ambientes_reforma: [],
+    mobiliario_aproveitado: '',
     
-    // Investimento e Prazo
-    investimento_estimado: '',
-    prazo_desejado: '',
-    observacoes_adicionais: ''
+    // Comercial
+    tipo_negocio: '',
+    experiencia_cliente: '',
+    marca_definida: '',
+    perfil_cliente: '',
+    projeto_legal: '',
+    prazo_inauguracao: ''
   });
 
   useEffect(() => {
@@ -80,495 +68,300 @@ const BriefingPublic = () => {
         .single();
 
       if (error || !data) {
-        toast.error('Link de briefing inválido ou expirado');
+        toast.error('Briefing não encontrado.');
         return;
       }
-
-      if (data.status === 'Preenchido') {
-        setSubmitted(true);
-      }
-
       setBriefing(data);
+      if (data.status === 'preenchido') setSubmitted(true);
+      
       if (data.leads) {
-        setFormData(prev => ({
+        setFormData((prev: any) => ({
           ...prev,
           nome_completo: data.leads.nome || '',
-          whatsapp: data.leads.whats || ''
+          whatsapp: data.leads.whats || '',
+          cidade: data.leads.cidade || ''
         }));
       }
-    } catch (error) {
-      console.error('Error fetching briefing:', error);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleNext = () => {
-    setStep(prev => prev + 1);
-    window.scrollTo(0, 0);
-  };
-
-  const handleBack = () => {
-    setStep(prev => prev - 1);
-    window.scrollTo(0, 0);
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      const currentValues = formData[name] || [];
+      setFormData((prev: any) => ({
+        ...prev,
+        [name]: checked 
+          ? [...currentValues, value]
+          : currentValues.filter((i: any) => i !== value)
+      }));
+    } else {
+      setFormData((prev: any) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-      
-      const { error } = await supabase
-        .from('briefings')
-        .update({
-          status: 'Preenchido',
-          respostas: formData
-        })
-        .eq('id', briefing.id);
+      const updateData: any = {
+        status: 'preenchido',
+        respostas: formData,
+        tipo_projeto: projetoType,
+        preenchido_em: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('briefings').update(updateData).eq('id', briefing.id);
 
       if (error) throw error;
-
-      // Update lead status
-      if (briefing.lead_id) {
-        await supabase
-          .from('leads')
-          .update({ stage: 'Briefing Preenchido' })
-          .eq('id', briefing.lead_id);
+      
+      if (briefing.cliente_id) {
+        const clienteUpdate: any = {
+          tipo_projeto: projetoType,
+          area_m2: formData.area_estimada || formData.area_terreno,
+          orcamento: formData.orcamento,
+          briefing_preenchido: true
+        };
+        await (supabase.from('clientes') as any).update(clienteUpdate).eq('id', briefing.cliente_id);
       }
-
+      
       setSubmitted(true);
-      toast.success('Briefing enviado com sucesso!');
-    } catch (error) {
-      console.error('Error submitting briefing:', error);
-      toast.error('Erro ao enviar briefing');
+    } catch (e) {
+      console.error(e);
+      toast.error('Erro ao enviar.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="animate-pulse text-bronze uppercase tracking-[0.4em] text-xs font-bold">Carregando...</div>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex items-center justify-center italic font-cormorant text-2xl">
+      Carregando...
+    </div>
+  );
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white/[0.03] border border-white/10 p-12 text-center space-y-6">
-          <div className="w-16 h-16 bg-bronze/10 border border-bronze/30 rounded-full flex items-center justify-center mx-auto text-bronze mb-4">
-            <CheckCircle2 size={32} />
-          </div>
-          <h1 className="text-xl font-bold tracking-widest uppercase text-white">Obrigado!</h1>
-          <p className="text-white/60 text-sm leading-relaxed">
-            Seu briefing foi recebido com sucesso. Nossa equipe analisará suas respostas e entrará em contato em breve para os próximos passos do seu projeto.
-          </p>
-          <div className="pt-4">
-            <p className="text-[10px] text-bronze uppercase tracking-widest font-bold">NL Arquitetos</p>
-          </div>
+  if (submitted) return (
+    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] flex items-center justify-center p-8 font-['Courier_New']">
+      <div className="text-center space-y-8 max-w-md">
+        <CheckCircle2 size={64} className="text-[#8B7355] mx-auto opacity-80" />
+        <div className="space-y-2">
+          <h1 className="text-3xl font-cormorant italic tracking-wide">PRÉ-BRIEFING RECEBIDO</h1>
+          <p className="text-xs opacity-60 leading-relaxed uppercase tracking-widest">Nossa equipe analisará suas respostas antes da reunião. Em breve entraremos em contato.</p>
+        </div>
+        <div className="pt-8 border-t border-white/10">
+          <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.3em] font-bold">NL ARQUITETOS · A ARQUITETURA COMO DECISÃO</p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
-  const progress = (step / 5) * 100;
+  const renderStep = () => {
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
+            <div className="grid gap-4">
+              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <div className="space-y-2">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Como nos conheceu?</label>
+                <select name="origem" value={formData.origem} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355] transition-colors">
+                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
+                  <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
+                  <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
+                  <option value="Google" className="bg-[#0F0E0C]">Google</option>
+                  <option value="Outro" className="bg-[#0F0E0C]">Outro</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 2 — TIPO DE PROJETO</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { id: 'arq', label: 'ARQ + INTERIORES', desc: 'Construção nova com projeto completo' },
+                { id: 'int', label: 'INTERIORES', desc: 'Reforma e decoração' },
+                { id: 'com', label: 'COMERCIAL', desc: 'Espaço que trabalha por você' }
+              ].map((t) => (
+                <button 
+                  key={t.id}
+                  type="button"
+                  onClick={() => setProjetoType(t.id as any)}
+                  className={cn(
+                    "p-6 border text-left transition-all duration-300 flex flex-col justify-between h-32 group",
+                    projetoType === t.id ? "border-[#8B7355] bg-[#8B7355]/05 shadow-[0_0_15px_rgba(139,115,85,0.1)]" : "border-white/10 hover:border-white/20"
+                  )}
+                >
+                  <span className={cn("block text-[10px] font-bold tracking-widest", projetoType === t.id ? "text-[#8B7355]" : "text-white/60 group-hover:text-white")}>{t.label}</span>
+                  <span className="text-[9px] opacity-40 uppercase tracking-tighter leading-tight">{t.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      case 3:
+        if (projetoType === 'arq') {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
+              <div className="grid gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem lote/imóvel definido?</label>
+                  <div className="flex gap-4">
+                    {['Sim, já tenho', 'Estou buscando', 'Ainda não'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, imovel_definido: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.imovel_definido === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+                {formData.imovel_definido === 'Sim, já tenho' && <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />}
+                <div className="grid grid-cols-2 gap-4">
+                  <Input name="area_terreno" placeholder="Área do terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                  <Input name="area_estimada" placeholder="Área estimada (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                </div>
+                <Input name="moradores" placeholder="Quantas pessoas vão morar?" value={formData.moradores} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="pets" placeholder="Tem pets?" value={formData.pets} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+              </div>
+            </div>
+          );
+        } else if (projetoType === 'int') {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
+              <div className="grid gap-6">
+                <Input name="tipo_imovel" placeholder="Tipo de imóvel (Casa / Apartamento / Outro)" value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="endereco" placeholder="Endereço" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="area_estimada" placeholder="Área total a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <div className="space-y-3">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">O mobiliário existente será aproveitado?</label>
+                  <div className="flex flex-wrap gap-4">
+                    {['Tudo novo', 'Aproveitarei parte', 'Aproveitarei tudo'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, mobiliario_aproveitado: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.mobiliario_aproveitado === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O NEGÓCIO</h3>
+              <div className="grid gap-6">
+                <Input name="tipo_negocio" placeholder="Qual o tipo de negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Textarea name="experiencia_cliente" placeholder="Qual a experiência que você quer que o cliente sinta?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[100px]" />
+                <div className="space-y-3">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem marca definida?</label>
+                  <div className="flex flex-wrap gap-4">
+                    {['Sim, completa', 'Em desenvolvimento', 'Ainda não'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, marca_definida: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.marca_definida === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+                <Input name="perfil_cliente" placeholder="Qual o perfil do seu cliente?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+              </div>
+            </div>
+          );
+        }
+      case 4:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 4 — O PROJETO</h3>
+            <div className="grid gap-6">
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Referência de estilo</label>
+                <div className="flex flex-wrap gap-3">
+                  {['Minimalista', 'Contemporâneo', 'Rústico', 'Industrial', 'Outro'].map(opt => (
+                    <button key={opt} type="button" onClick={() => setFormData({...formData, estilo_referencia: opt})} className={cn("text-[9px] border px-3 py-1.5 uppercase tracking-widest", formData.estilo_referencia === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Orçamento estimado</label>
+                <select name="orcamento" value={formData.orcamento} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355]">
+                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
+                  <option value="Alto" className="bg-[#0F0E0C]">Acima da média</option>
+                  <option value="Medio" className="bg-[#0F0E0C]">Médio</option>
+                  <option value="Baixo" className="bg-[#0F0E0C]">Ajustado</option>
+                  <option value="Nao sei" className="bg-[#0F0E0C]">Ainda não sei</option>
+                </select>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Quando quer começar?</label>
+                <div className="flex flex-wrap gap-4">
+                  {['Imediato', 'Até 6 meses', 'Sem prazo'].map(opt => (
+                    <button key={opt} type="button" onClick={() => setFormData({...formData, prazo: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.prazo === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                  ))}
+                </div>
+              </div>
+              <Textarea name="obs" placeholder="Algo importante que devemos saber antes da nossa conversa?" value={formData.obs} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[120px]" />
+            </div>
+          </div>
+        );
+      default: return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white p-6 md:p-12">
-      <div className="max-w-3xl mx-auto">
-        <header className="text-center mb-12">
-          <div className="mb-6 flex justify-center">
-             <div className="w-16 h-[1px] bg-bronze/50" />
-          </div>
-          <h2 className="text-[10px] text-bronze uppercase tracking-[0.5em] font-bold mb-4">Briefing de Projeto</h2>
-          <h1 className="text-4xl font-light tracking-[0.2em] mb-2 font-cormorant italic">NL ARQUITETOS</h1>
-          <p className="text-white/30 text-[9px] uppercase tracking-[0.4em] font-bold">Atelier de Decisões</p>
+    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] p-4 md:p-8 font-['Courier_New'] overflow-x-hidden selection:bg-[#8B7355]/30">
+      <header className="max-w-xl mx-auto mb-16 mt-8 text-center space-y-4">
+        <h1 className="text-[11px] tracking-[0.5em] uppercase text-[#8B7355] font-bold">NL ARQUITETOS</h1>
+        <h2 className="font-cormorant italic text-4xl md:text-5xl text-white/90">Conte-nos sobre o seu projeto</h2>
+        <p className="text-[10px] opacity-40 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">Prepare sua proposta entendendo sua necessidade antes da primeira conversa.</p>
+        <div className="pt-8">
+          <Progress value={(step / 4) * 100} className="h-[2px] bg-white/5" indicatorClassName="bg-[#8B7355] transition-all duration-700" />
+        </div>
+      </header>
+
+      <main className="max-w-xl mx-auto bg-white/[0.01] border border-white/[0.05] p-6 md:p-12 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
+        <form onSubmit={handleSubmit} className="space-y-12">
+          {renderStep()}
           
-          <div className="mt-16 space-y-2 max-w-xs mx-auto">
-            <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2">
-              <span>Etapa {step} de 5</span>
-              <span>{Math.round(progress)}% completo</span>
-            </div>
-            <Progress value={progress} className="h-1 bg-white/5 rounded-none" indicatorClassName="bg-bronze transition-all duration-500" />
-          </div>
-        </header>
-
-        <form onSubmit={handleSubmit} className="bg-white/[0.03] border border-white/10 p-8 md:p-12 shadow-2xl space-y-12">
-          
-          {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center border border-bronze/20 text-bronze">
-                  <User size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold">Dados Pessoais</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Quem é você e sua família</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Nome Completo</label>
-                  <Input 
-                    name="nome_completo"
-                    value={formData.nome_completo}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Data de Nascimento</label>
-                  <Input 
-                    name="data_nascimento"
-                    type="date"
-                    value={formData.data_nascimento}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Profissão</label>
-                  <Input 
-                    name="profissao"
-                    value={formData.profissao}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">WhatsApp</label>
-                  <Input 
-                    name="whatsapp"
-                    value={formData.whatsapp}
-                    onChange={handleChange}
-                    placeholder="(00) 00000-0000"
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    required
-                  />
-                </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">E-mail</label>
-                  <Input 
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center border border-bronze/20 text-bronze">
-                  <Home size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold">O Imóvel</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Onde a mágica acontece</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Endereço da Obra</label>
-                  <Input 
-                    name="endereco_obra"
-                    value={formData.endereco_obra}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Tipo de Imóvel</label>
-                    <select 
-                      name="tipo_imovel"
-                      value={formData.tipo_imovel}
-                      onChange={handleChange}
-                      className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
-                    >
-                      <option value="Residencial" className="bg-[#0A0A0A]">Residencial</option>
-                      <option value="Comercial" className="bg-[#0A0A0A]">Comercial</option>
-                      <option value="Interiores" className="bg-[#0A0A0A]">Interiores (Reforma)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Área do Terreno (m²)</label>
-                    <Input 
-                      name="area_terreno"
-                      value={formData.area_terreno}
-                      onChange={handleChange}
-                      className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Área Estimada da Construção (m²)</label>
-                    <Input 
-                      name="area_estimada"
-                      value={formData.area_estimada}
-                      onChange={handleChange}
-                      className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Topografia</label>
-                    <select 
-                      name="topografia"
-                      value={formData.topografia}
-                      onChange={handleChange}
-                      className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
-                    >
-                      <option value="Plano" className="bg-[#0A0A0A]">Plano</option>
-                      <option value="Aclive" className="bg-[#0A0A0A]">Aclive (Sobe)</option>
-                      <option value="Declive" className="bg-[#0A0A0A]">Declive (Desce)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center border border-bronze/20 text-bronze">
-                  <Users size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold">Rotina e Estilo de Vida</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Como você vive seu espaço</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Quantas pessoas morarão na casa? (Idades e parentesco)</label>
-                  <Textarea 
-                    name="pessoas_casa"
-                    value={formData.pessoas_casa}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none min-h-[100px] text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Possui pets? Quais?</label>
-                  <Input 
-                    name="pets"
-                    value={formData.pets}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Com que frequência recebe visitas?</label>
-                  <select 
-                    name="recebe_visitas"
-                    value={formData.recebe_visitas}
-                    onChange={handleChange}
-                    className="w-full bg-white/5 border border-white/10 rounded-none h-12 text-sm focus:outline-none focus:border-bronze px-3"
-                  >
-                    <option value="Raramente" className="bg-[#0A0A0A]">Raramente</option>
-                    <option value="Mensalmente" className="bg-[#0A0A0A]">Mensalmente</option>
-                    <option value="Semanalmente" className="bg-[#0A0A0A]">Semanalmente</option>
-                    <option value="Frequentemente" className="bg-[#0A0A0A]">Frequentemente</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Descreva um pouco da sua rotina diária:</label>
-                  <Textarea 
-                    name="estilo_vida"
-                    value={formData.estilo_vida}
-                    onChange={handleChange}
-                    placeholder="Ex: Trabalho home-office, gosto de cozinhar, pratico exercícios em casa..."
-                    className="bg-white/5 border-white/10 rounded-none min-h-[100px] text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center border border-bronze/20 text-bronze">
-                  <Palette size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold">Desejos e Estética</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">A identidade do projeto</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Estilo Arquitetônico Preferido</label>
-                  <Input 
-                    name="estilo_arquitetonico"
-                    value={formData.estilo_arquitetonico}
-                    onChange={handleChange}
-                    placeholder="Ex: Minimalista, Contemporâneo, Clássico, Industrial..."
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Quais ambientes não podem faltar? (Programa de Necessidades)</label>
-                  <Textarea 
-                    name="ambientes_desejados"
-                    value={formData.ambientes_desejados}
-                    onChange={handleChange}
-                    placeholder="Ex: 3 suítes, área gourmet integrada, escritório..."
-                    className="bg-white/5 border-white/10 rounded-none min-h-[100px] text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Materiais que você gosta</label>
-                    <Input 
-                      name="materiais_favoritos"
-                      value={formData.materiais_favoritos}
-                      onChange={handleChange}
-                      placeholder="Ex: Madeira, concreto, pedras naturais..."
-                      className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Cores de preferência</label>
-                    <Input 
-                      name="cores_favoritas"
-                      value={formData.cores_favoritas}
-                      onChange={handleChange}
-                      placeholder="Ex: Tons neutros, preto, cinza..."
-                      className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Existe algo indispensável ou proibido?</label>
-                  <Textarea 
-                    name="itens_indispensaveis"
-                    value={formData.itens_indispensaveis}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none min-h-[100px] text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-8">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center border border-bronze/20 text-bronze">
-                  <Clock size={20} />
-                </div>
-                <div>
-                  <h3 className="text-xs uppercase tracking-[0.2em] font-bold">Investimento e Prazo</h3>
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Viabilizando o sonho</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Investimento Estimado para a Obra (R$)</label>
-                  <Input 
-                    name="investimento_estimado"
-                    value={formData.investimento_estimado}
-                    onChange={handleChange}
-                    placeholder="Sua expectativa de gasto global"
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Qual o seu prazo ideal para início e conclusão?</label>
-                  <Input 
-                    name="prazo_desejado"
-                    value={formData.prazo_desejado}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none h-12 text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-white/60 font-bold">Alguma observação adicional que queira compartilhar?</label>
-                  <Textarea 
-                    name="observacoes_adicionais"
-                    value={formData.observacoes_adicionais}
-                    onChange={handleChange}
-                    className="bg-white/5 border-white/10 rounded-none min-h-[150px] text-sm focus-visible:ring-bronze"
-                  />
-                </div>
-              </div>
-
-              <div className="pt-8 border-t border-white/5 flex flex-col items-center space-y-4">
-                <div className="flex items-center gap-2 text-[10px] text-white/40 uppercase tracking-widest font-bold">
-                  <Heart size={12} className="text-bronze" />
-                  Estamos quase lá
-                </div>
-                <p className="text-[11px] text-white/40 text-center italic max-w-sm">
-                  Ao clicar em enviar, suas informações serão processadas pelo atelier para dar início à concepção do seu projeto.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-between pt-12 border-t border-white/5">
-            {step > 1 ? (
+          <div className="flex justify-between items-center pt-8 border-t border-white/5">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              disabled={step === 1} 
+              onClick={() => setStep(s => s - 1)} 
+              className="rounded-none text-[10px] tracking-widest opacity-40 hover:opacity-100 hover:bg-transparent"
+            >
+              <ChevronLeft size={16} className="mr-2" /> ANTERIOR
+            </Button>
+            
+            {step < 4 ? (
               <Button 
                 type="button" 
-                onClick={handleBack}
-                variant="outline"
-                className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none px-8 h-12 text-[10px] uppercase tracking-[0.2em] font-bold"
+                disabled={step === 2 && !projetoType}
+                onClick={() => setStep(s => s + 1)} 
+                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-10 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
               >
-                <ChevronLeft size={16} className="mr-2" /> Voltar
-              </Button>
-            ) : (
-              <div></div>
-            )}
-
-            {step < 5 ? (
-              <Button 
-                type="button" 
-                onClick={handleNext}
-                className="bg-bronze hover:bg-bronze/90 text-white rounded-none px-8 h-12 text-[10px] uppercase tracking-[0.2em] font-bold"
-              >
-                Próximo <ChevronRight size={16} className="ml-2" />
+                PRÓXIMO <ChevronRight size={16} className="ml-2" />
               </Button>
             ) : (
               <Button 
                 type="submit" 
                 disabled={submitting}
-                className="bg-bronze hover:bg-bronze/90 text-white rounded-none px-12 h-12 text-[10px] uppercase tracking-[0.2em] font-bold"
+                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-12 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
               >
-                {submitting ? (
-                  <>ENVIANDO...</>
-                ) : (
-                  <>ENVIAR BRIEFING <Send size={16} className="ml-2" /></>
-                )}
+                {submitting ? 'ENVIANDO...' : 'SUBMETER'}
               </Button>
             )}
           </div>
-
         </form>
-
-        <footer className="mt-12 text-center pb-12">
-          <p className="text-[9px] text-white/20 uppercase tracking-[0.3em] font-bold">
-            NL Arquitetos · © {new Date().getFullYear()} · Atelier de Decisões
-          </p>
-        </footer>
-      </div>
+      </main>
+      
+      <footer className="max-w-xl mx-auto mt-20 text-center pb-20 opacity-20">
+        <p className="text-[9px] tracking-[0.4em] uppercase font-bold">A ARQUITETURA COMO DECISÃO · {new Date().getFullYear()}</p>
+      </footer>
     </div>
   );
 };
