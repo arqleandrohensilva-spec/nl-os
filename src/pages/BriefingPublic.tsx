@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const BriefingPublic = () => {
   const { token } = useParams();
@@ -25,11 +26,11 @@ const BriefingPublic = () => {
     cidade: '',
     origem: '',
     
-    // Etapa 3/4 campos (dinâmicos)
+    // Flow-specific fields
     imovel_definido: '',
     endereco: '',
     area_terreno: '',
-    area_construcao: '',
+    area_estimada: '',
     moradores: '',
     pets: '',
     ambientes_indispensaveis: [],
@@ -39,12 +40,12 @@ const BriefingPublic = () => {
     prazo: '',
     obs: '',
     
-    // Específicos Interiores
+    // Interiores
     tipo_imovel: '',
     ambientes_reforma: [],
     mobiliario_aproveitado: '',
     
-    // Específicos Comercial
+    // Comercial
     tipo_negocio: '',
     experiencia_cliente: '',
     marca_definida: '',
@@ -91,11 +92,12 @@ const BriefingPublic = () => {
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
+      const currentValues = formData[name] || [];
       setFormData((prev: any) => ({
         ...prev,
         [name]: checked 
-          ? [...(prev[name] || []), value]
-          : (prev[name] || []).filter((i: any) => i !== value)
+          ? [...currentValues, value]
+          : currentValues.filter((i: any) => i !== value)
       }));
     } else {
       setFormData((prev: any) => ({ ...prev, [name]: value }));
@@ -116,9 +118,9 @@ const BriefingPublic = () => {
       if (error) throw error;
       
       if (briefing.cliente_id) {
-        await supabase.from('clientes').update({
+        await (supabase.from('clientes') as any).update({
           tipo_projeto: projetoType,
-          area_m2: formData.area_construcao || formData.area_total,
+          area_m2: formData.area_estimada || formData.area_terreno,
           orcamento: formData.orcamento,
           briefing_preenchido: true
         }).eq('id', briefing.cliente_id);
@@ -133,66 +135,230 @@ const BriefingPublic = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex items-center justify-center italic">Carregando...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex items-center justify-center italic font-cormorant text-2xl">
+      Carregando...
+    </div>
+  );
+
   if (submitted) return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] flex items-center justify-center p-8">
-      <div className="text-center space-y-4">
-        <CheckCircle2 size={48} className="text-[#8B7355] mx-auto" />
-        <h1 className="text-2xl font-cormorant italic">PRÉ-BRIEFING RECEBIDO</h1>
-        <p className="text-sm font-['Courier_New'] opacity-60 uppercase">NL ARQUITETOS · A ARQUITETURA COMO DECISÃO</p>
+    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] flex items-center justify-center p-8 font-['Courier_New']">
+      <div className="text-center space-y-8 max-w-md">
+        <CheckCircle2 size={64} className="text-[#8B7355] mx-auto opacity-80" />
+        <div className="space-y-2">
+          <h1 className="text-3xl font-cormorant italic tracking-wide">PRÉ-BRIEFING RECEBIDO</h1>
+          <p className="text-xs opacity-60 leading-relaxed uppercase tracking-widest">Nossa equipe analisará suas respostas antes da reunião. Em breve entraremos em contato.</p>
+        </div>
+        <div className="pt-8 border-t border-white/10">
+          <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.3em] font-bold">NL ARQUITETOS · A ARQUITETURA COMO DECISÃO</p>
+        </div>
       </div>
     </div>
   );
 
-  return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] p-6 font-['Courier_New']">
-      <header className="max-w-2xl mx-auto mb-12 text-center">
-        <h1 className="font-['Courier_New'] text-sm tracking-[0.2em] uppercase text-[#8B7355] mb-4">NL ARQUITETOS</h1>
-        <h2 className="font-cormorant italic text-4xl mb-4">Conte-nos sobre o seu projeto</h2>
-        <p className="text-xs opacity-70 mb-8">Para que possamos preparar uma proposta precisa, precisamos entender sua necessidade antes da nossa primeira conversa.</p>
-        <Progress value={(step / 4) * 100} className="h-1 bg-[#8B7355]/20" indicatorClassName="bg-[#8B7355]" />
-      </header>
-
-      <main className="max-w-2xl mx-auto bg-[#0F0E0C] border border-white/[0.05] p-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {step === 1 && (
-            <div className="space-y-4">
-              <h3 className="text-[#8B7355] uppercase text-xs tracking-widest mb-6">Etapa 1: Dados Pessoais</h3>
-              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-transparent border-[#8B7355]/30 rounded-none focus:border-[#8B7355]" />
-              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-transparent border-[#8B7355]/30 rounded-none focus:border-[#8B7355]" />
-              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-transparent border-[#8B7355]/30 rounded-none focus:border-[#8B7355]" />
-              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-transparent border-[#8B7355]/30 rounded-none focus:border-[#8B7355]" />
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-4">
-              <h3 className="text-[#8B7355] uppercase text-xs tracking-widest mb-6">Etapa 2: Tipo de Projeto</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {(['arq', 'int', 'com'] as const).map((t) => (
-                  <button 
-                    key={t}
-                    type="button"
-                    onClick={() => setProjetoType(t)}
-                    className={cn("p-6 border text-left", projetoType === t ? "border-[#8B7355] bg-[#8B7355]/10" : "border-[#8B7355]/30")}
-                  >
-                    <span className="block text-xs uppercase font-bold">{t === 'arq' ? 'ARQ + INTERIORES' : t === 'int' ? 'INTERIORES' : 'COMERCIAL'}</span>
-                  </button>
-                ))}
+  const renderStep = () => {
+    switch(step) {
+      case 1:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
+            <div className="grid gap-4">
+              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <div className="space-y-2">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Como nos conheceu?</label>
+                <select name="origem" value={formData.origem} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355] transition-colors">
+                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
+                  <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
+                  <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
+                  <option value="Google" className="bg-[#0F0E0C]">Google</option>
+                  <option value="Outro" className="bg-[#0F0E0C]">Outro</option>
+                </select>
               </div>
             </div>
-          )}
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 2 — TIPO DE PROJETO</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { id: 'arq', label: 'ARQ + INTERIORES', desc: 'Construção nova com projeto completo' },
+                { id: 'int', label: 'INTERIORES', desc: 'Reforma e decoração' },
+                { id: 'com', label: 'COMERCIAL', desc: 'Espaço que trabalha por você' }
+              ].map((t) => (
+                <button 
+                  key={t.id}
+                  type="button"
+                  onClick={() => setProjetoType(t.id as any)}
+                  className={cn(
+                    "p-6 border text-left transition-all duration-300 flex flex-col justify-between h-32 group",
+                    projetoType === t.id ? "border-[#8B7355] bg-[#8B7355]/05 shadow-[0_0_15px_rgba(139,115,85,0.1)]" : "border-white/10 hover:border-white/20"
+                  )}
+                >
+                  <span className={cn("block text-[10px] font-bold tracking-widest", projetoType === t.id ? "text-[#8B7355]" : "text-white/60 group-hover:text-white")}>{t.label}</span>
+                  <span className="text-[9px] opacity-40 uppercase tracking-tighter leading-tight">{t.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      case 3:
+        if (projetoType === 'arq') {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
+              <div className="grid gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem lote/imóvel definido?</label>
+                  <div className="flex gap-4">
+                    {['Sim, já tenho', 'Estou buscando', 'Ainda não'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, imovel_definido: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.imovel_definido === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+                {formData.imovel_definido === 'Sim, já tenho' && <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />}
+                <div className="grid grid-cols-2 gap-4">
+                  <Input name="area_terreno" placeholder="Área do terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                  <Input name="area_estimada" placeholder="Área estimada (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                </div>
+                <Input name="moradores" placeholder="Quantas pessoas vão morar?" value={formData.moradores} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="pets" placeholder="Tem pets?" value={formData.pets} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+              </div>
+            </div>
+          );
+        } else if (projetoType === 'int') {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
+              <div className="grid gap-6">
+                <Input name="tipo_imovel" placeholder="Tipo de imóvel (Casa / Apartamento / Outro)" value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="endereco" placeholder="Endereço" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Input name="area_estimada" placeholder="Área total a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <div className="space-y-3">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">O mobiliário existente será aproveitado?</label>
+                  <div className="flex flex-wrap gap-4">
+                    {['Tudo novo', 'Aproveitarei parte', 'Aproveitarei tudo'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, mobiliario_aproveitado: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.mobiliario_aproveitado === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O NEGÓCIO</h3>
+              <div className="grid gap-6">
+                <Input name="tipo_negocio" placeholder="Qual o tipo de negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+                <Textarea name="experiencia_cliente" placeholder="Qual a experiência que você quer que o cliente sinta?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[100px]" />
+                <div className="space-y-3">
+                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem marca definida?</label>
+                  <div className="flex flex-wrap gap-4">
+                    {['Sim, completa', 'Em desenvolvimento', 'Ainda não'].map(opt => (
+                      <button key={opt} type="button" onClick={() => setFormData({...formData, marca_definida: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.marca_definida === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                    ))}
+                  </div>
+                </div>
+                <Input name="perfil_cliente" placeholder="Qual o perfil do seu cliente?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
+              </div>
+            </div>
+          );
+        }
+      case 4:
+        return (
+          <div className="space-y-6 animate-in fade-in duration-500">
+            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 4 — O PROJETO</h3>
+            <div className="grid gap-6">
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Referência de estilo</label>
+                <div className="flex flex-wrap gap-3">
+                  {['Minimalista', 'Contemporâneo', 'Rústico', 'Industrial', 'Outro'].map(opt => (
+                    <button key={opt} type="button" onClick={() => setFormData({...formData, estilo_referencia: opt})} className={cn("text-[9px] border px-3 py-1.5 uppercase tracking-widest", formData.estilo_referencia === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Orçamento estimado</label>
+                <select name="orcamento" value={formData.orcamento} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355]">
+                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
+                  <option value="Alto" className="bg-[#0F0E0C]">Acima da média</option>
+                  <option value="Medio" className="bg-[#0F0E0C]">Médio</option>
+                  <option value="Baixo" className="bg-[#0F0E0C]">Ajustado</option>
+                  <option value="Nao sei" className="bg-[#0F0E0C]">Ainda não sei</option>
+                </select>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Quando quer começar?</label>
+                <div className="flex flex-wrap gap-4">
+                  {['Imediato', 'Até 6 meses', 'Sem prazo'].map(opt => (
+                    <button key={opt} type="button" onClick={() => setFormData({...formData, prazo: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.prazo === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
+                  ))}
+                </div>
+              </div>
+              <Textarea name="obs" placeholder="Algo importante que devemos saber antes da nossa conversa?" value={formData.obs} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[120px]" />
+            </div>
+          </div>
+        );
+      default: return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] p-4 md:p-8 font-['Courier_New'] overflow-x-hidden selection:bg-[#8B7355]/30">
+      <header className="max-w-xl mx-auto mb-16 mt-8 text-center space-y-4">
+        <h1 className="text-[11px] tracking-[0.5em] uppercase text-[#8B7355] font-bold">NL ARQUITETOS</h1>
+        <h2 className="font-cormorant italic text-4xl md:text-5xl text-white/90">Conte-nos sobre o seu projeto</h2>
+        <p className="text-[10px] opacity-40 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">Prepare sua proposta entendendo sua necessidade antes da primeira conversa.</p>
+        <div className="pt-8">
+          <Progress value={(step / 4) * 100} className="h-[2px] bg-white/5" indicatorClassName="bg-[#8B7355] transition-all duration-700" />
+        </div>
+      </header>
+
+      <main className="max-w-xl mx-auto bg-white/[0.01] border border-white/[0.05] p-6 md:p-12 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
+        <form onSubmit={handleSubmit} className="space-y-12">
+          {renderStep()}
           
-          <div className="flex justify-between pt-8 border-t border-white/[0.05]">
-            <Button type="button" variant="ghost" disabled={step === 1} onClick={() => setStep(s => s - 1)} className="rounded-none"><ChevronLeft size={16} /></Button>
+          <div className="flex justify-between items-center pt-8 border-t border-white/5">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              disabled={step === 1} 
+              onClick={() => setStep(s => s - 1)} 
+              className="rounded-none text-[10px] tracking-widest opacity-40 hover:opacity-100 hover:bg-transparent"
+            >
+              <ChevronLeft size={16} className="mr-2" /> ANTERIOR
+            </Button>
+            
             {step < 4 ? (
-              <Button type="button" onClick={() => setStep(s => s + 1)} className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/80 text-[#0F0E0C]">PRÓXIMO</Button>
+              <Button 
+                type="button" 
+                disabled={step === 2 && !projetoType}
+                onClick={() => setStep(s => s + 1)} 
+                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-10 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
+              >
+                PRÓXIMO <ChevronRight size={16} className="ml-2" />
+              </Button>
             ) : (
-              <Button type="submit" className="rounded-none bg-[#8B7355] text-[#0F0E0C]">ENVIAR</Button>
+              <Button 
+                type="submit" 
+                disabled={submitting}
+                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-12 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
+              >
+                {submitting ? 'ENVIANDO...' : 'SUBMETER'}
+              </Button>
             )}
           </div>
         </form>
       </main>
+      
+      <footer className="max-w-xl mx-auto mt-20 text-center pb-20 opacity-20">
+        <p className="text-[9px] tracking-[0.4em] uppercase font-bold">A ARQUITETURA COMO DECISÃO · {new Date().getFullYear()}</p>
+      </footer>
     </div>
   );
 };
