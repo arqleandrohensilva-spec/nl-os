@@ -4,12 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import BriefingModal from '@/components/BriefingModal';
+
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
   'Novo Lead': { label: 'Novo Lead', color: 'bg-zinc-500/10 text-zinc-500' },
@@ -24,6 +26,9 @@ const STATUS_BADGES: Record<string, { label: string; color: string }> = {
 const ClientesLista = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [selectedBriefing, setSelectedBriefing] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const queryClient = useQueryClient();
   const { data: briefingsPendentes, isLoading: loadingBriefings } = useQuery({
@@ -189,6 +194,17 @@ const ClientesLista = () => {
 
                   <div className="flex items-center gap-3">
                     <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedBriefing(briefing);
+                        setIsModalOpen(true);
+                      }}
+                      className="border-[#2A2A2A] bg-transparent hover:bg-white/5 text-[#8B7355] rounded-none px-4 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-all"
+                    >
+                      <Eye size={14} className="mr-2" />
+                      VER BRIEFING
+                    </Button>
+                    <Button 
                       onClick={() => handleAprovar(briefing)}
                       className="bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
                     >
@@ -204,6 +220,7 @@ const ClientesLista = () => {
                       ARQUIVAR
                     </Button>
                   </div>
+
                 </div>
               ))}
             </div>
@@ -279,8 +296,16 @@ const ClientesLista = () => {
           </div>
         )}
       </main>
+      <BriefingModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        briefing={selectedBriefing}
+        onAprovar={handleAprovar}
+        onArquivar={handleArquivar}
+      />
     </div>
   );
 };
+
 
 export default ClientesLista;
