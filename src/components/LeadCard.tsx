@@ -150,7 +150,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                   e.stopPropagation();
                   try {
                     // 1. Criar cliente
-                    const { data: novoCliente, error: clientError } = await supabase.from('clientes').insert({
+                    const { data: novoCliente, error: clientError } = await (supabase.from('clientes') as any).insert({
                       nome: lead.nome,
                       whatsapp: lead.whats,
                       email: lead.email,
@@ -163,7 +163,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                     if (clientError) throw clientError;
 
                     // 2. Atualizar briefing
-                    await supabase.from('briefings').update({
+                    await (supabase.from('briefings') as any).update({
                       status: 'aprovado',
                       cliente_id: novoCliente.id
                     }).eq('id', lead.id);

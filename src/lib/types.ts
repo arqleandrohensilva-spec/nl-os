@@ -16,6 +16,7 @@ export interface Lead {
   cliente_id?: string;
   nome: string;
   whats: string;
+  email?: string;
   cidade: string;
   tipo: TipoProjeto;
   area: number;
