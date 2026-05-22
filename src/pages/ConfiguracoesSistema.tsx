@@ -22,7 +22,9 @@ import { cn } from '@/lib/utils';
 const iconMap: Record<string, any> = {
   ClipboardList,
   Star,
+  MessageCircle: MessageSquare,
   MessageSquare,
+  Instagram: Link2,
   Link2
 };
 
