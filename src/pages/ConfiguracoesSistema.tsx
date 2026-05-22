@@ -12,9 +12,9 @@ import {
   Box,
   ClipboardList,
   Star,
-  Instagram,
-  MessageCircle,
+  MessageSquare,
   Copy,
+  Link2,
   Layout
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,8 +22,120 @@ import { cn } from '@/lib/utils';
 const iconMap: Record<string, any> = {
   ClipboardList,
   Star,
-  Instagram,
-  MessageCircle
+  MessageSquare,
+  Link2
+};
+
+const UsefulLinks = () => {
+  const [links, setLinks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('configuracoes')
+          .select('value')
+          .eq('key', 'links_uteis')
+          .maybeSingle();
+        
+        if (data) {
+          setLinks(data.value);
+        }
+      } catch (err) {
+        console.error("Erro ao carregar links:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLinks();
+  }, []);
+
+  const updateLink = async (id: string, newUrl: string) => {
+    const updatedLinks = links.map(link => 
+      link.id === id ? { ...link, url: newUrl } : link
+    );
+    setLinks(updatedLinks);
+
+    const { error } = await supabase
+      .from('configuracoes')
+      .update({ value: updatedLinks })
+      .eq('key', 'links_uteis');
+
+    if (error) {
+      toast.error("Erro ao salvar link");
+    }
+  };
+
+  const copyToClipboard = (url: string) => {
+    const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+    navigator.clipboard.writeText(fullUrl);
+    toast.success("Link copiado", { 
+      duration: 2000,
+      style: {
+        background: '#1A1816',
+        border: '1px solid #8B7355',
+        color: '#E8E4DF'
+      }
+    });
+  };
+
+  if (loading || links.length === 0) return null;
+
+  return (
+    <section className="mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
+      <header className="mb-8 border-b border-white/5 pb-4">
+        <p className="font-mono text-[10px] text-bronze uppercase tracking-[0.5em] font-bold">LINKS ÚTEIS</p>
+      </header>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {links.map((link) => {
+          const IconComponent = iconMap[link.icon] || Link2;
+          return (
+            <div 
+              key={link.id}
+              className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]"
+            >
+              <div className="p-3 bg-white/5 text-bronze rounded-[1px] group-hover:bg-bronze/10 transition-colors">
+                <IconComponent size={18} />
+              </div>
+              
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[10px] font-bold text-white tracking-[0.1em] uppercase">{link.label}</h4>
+                  <button 
+                    onClick={() => copyToClipboard(link.url)}
+                    className="text-[9px] font-bold text-bronze border border-bronze/30 px-3 py-1 uppercase tracking-widest hover:bg-bronze hover:text-black transition-all flex items-center gap-2"
+                  >
+                    <Copy size={10} />
+                    COPIAR
+                  </button>
+                </div>
+                
+                {link.editable ? (
+                  <input 
+                    type="text"
+                    value={link.url}
+                    onChange={(e) => {
+                      const newLinks = links.map(l => l.id === link.id ? { ...l, url: e.target.value } : l);
+                      setLinks(newLinks);
+                    }}
+                    onBlur={(e) => updateLink(link.id, e.target.value)}
+                    placeholder="Clique para inserir a URL"
+                    className="w-full bg-transparent border-none p-0 text-[11px] text-white/40 focus:text-white/80 focus:ring-0 placeholder:text-white/10 italic transition-colors"
+                  />
+                ) : (
+                  <p className="text-[11px] text-white/40 italic font-medium">{link.url}</p>
+                )}
+                
+                <p className="text-[9px] text-white/20 uppercase tracking-widest">{link.desc}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 };
 
 const ConfiguracoesSistema = () => {
