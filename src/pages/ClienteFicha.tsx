@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Progress } from '@/components/ui/progress';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
 
@@ -44,7 +45,13 @@ const ClienteFicha = () => {
     cidade: '',
     endereco_imovel: '',
     origem: 'Instagram',
-    observacoes: ''
+    observacoes: '',
+    imovel_definido: '',
+    tipo_projeto: '',
+    area_m2: '',
+    orcamento: '',
+    prazo: '',
+    quem_decide: ''
   });
 
   const { data: cliente, isLoading: isClienteLoading } = useQuery({
@@ -124,10 +131,106 @@ const ClienteFicha = () => {
         cidade: cliente.cidade || '',
         endereco_imovel: cliente.endereco_imovel || '',
         origem: cliente.origem || 'Instagram',
-        observacoes: cliente.observacoes || ''
+        observacoes: cliente.observacoes || '',
+        imovel_definido: cliente.imovel_definido || '',
+        tipo_projeto: cliente.tipo_projeto || '',
+        area_m2: cliente.area_m2?.toString() || '',
+        orcamento: cliente.orcamento || '',
+        prazo: cliente.prazo || '',
+        quem_decide: cliente.quem_decide || ''
       });
     }
   }, [cliente]);
+
+  const { data: briefing } = useQuery({
+    queryKey: ['briefing_cliente', id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('briefings')
+        .select('*')
+        .eq('cliente_id', id)
+        .maybeSingle();
+      return data;
+    }
+  });
+
+  useEffect(() => {
+    if (briefing && briefing.respostas && !formData.imovel_definido && !formData.orcamento) {
+      const resp = briefing.respostas as any;
+      const mapping = {
+        'Sim, já tenho': 'Sim, definido',
+        'Estou buscando': 'Em busca',
+        'Ainda não': 'Não',
+        'arq': 'ARQ+INT',
+        'int': 'Interiores',
+        'com': 'Comercial',
+        'Ate 500k': 'R$300-700k',
+        '500k - 1M': 'Acima R$700k',
+        'Acima 1M': 'Acima R$700k',
+        'Imediato': 'Imediato',
+        'Próximos 6 meses': '6 meses'
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        imovel_definido: mapping[resp.imovel_definido as keyof typeof mapping] || '',
+        tipo_projeto: mapping[briefing.tipo_projeto as keyof typeof mapping] || '',
+        area_m2: resp.area_estimada || resp.area_terreno || '',
+        orcamento: mapping[resp.orcamento as keyof typeof mapping] || '',
+        prazo: mapping[resp.prazo as keyof typeof mapping] || '',
+        origem: resp.origem || prev.origem
+      }));
+    }
+  }, [briefing, formData.imovel_definido, formData.orcamento]);
+
+  const calcularScore = (dados: any) => {
+    let score = 0;
+    if (dados.imovel_definido === 'Sim, definido') score += 2;
+    else if (dados.imovel_definido === 'Em busca') score += 1;
+    
+    if (dados.tipo_projeto === 'ARQ+INT') score += 2;
+    else if (['Interiores', 'Comercial'].includes(dados.tipo_projeto)) score += 1;
+    
+    if (Number(dados.area_m2) >= 200) score += 1;
+    
+    if (dados.orcamento === 'Acima R$700k') score += 3;
+    else if (dados.orcamento === 'R$300-700k') score += 1;
+    
+    if (dados.prazo === 'Imediato') score += 2;
+    else if (dados.prazo === '6 meses') score += 1;
+    
+    if (dados.quem_decide === 'Sozinho') score += 2;
+    else if (dados.quem_decide === 'Com cônjuge') score += 1;
+    
+    if (dados.origem === 'Indicação') score += 3;
+    else if (dados.origem === 'Google') score += 2;
+    else if (dados.origem === 'Instagram') score += 1;
+    
+    return score;
+  };
+
+  const score = calcularScore(formData);
+  const temp = score >= 9 ? 'Quente' : score >= 5 ? 'Morno' : 'Frio';
+
+  const updateQualificacao = useCallback(async (key: string, value: any) => {
+    const newFormData = { ...formData, [key]: value };
+    setFormData(newFormData);
+    
+    const newScore = calcularScore(newFormData);
+    const newTemp = newScore >= 9 ? 'Quente' : newScore >= 5 ? 'Morno' : 'Frio';
+
+    // Atualiza cliente
+    await supabase.from('clientes').update({ [key]: value }).eq('id', id);
+    
+    // Sincroniza com o Lead
+    await supabase.from('leads').update({
+      score: newScore,
+      temp: newTemp
+    }).eq('cliente_id', id);
+    
+    queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+    queryClient.invalidateQueries({ queryKey: ['lead_status', id] });
+  }, [formData, id, queryClient]);
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
