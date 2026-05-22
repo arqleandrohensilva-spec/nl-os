@@ -164,8 +164,8 @@ const ClienteFicha = () => {
         'arq': 'ARQ+INT',
         'int': 'Interiores',
         'com': 'Comercial',
-        'Ate 500k': 'R$300-700k',
-        '500k - 1M': 'Acima R$700k',
+        'Ate 500k': 'Abaixo',
+        '500k - 1M': 'R$300-700k',
         'Acima 1M': 'Acima R$700k',
         'Imediato': 'Imediato',
         'Próximos 6 meses': '6 meses'
