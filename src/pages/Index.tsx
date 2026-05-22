@@ -247,6 +247,7 @@ const Index = () => {
         .order('preenchido_em', { ascending: false });
 
       if (briefingsError) throw briefingsError;
+      console.log('briefings carregados:', briefingsData);
 
       // Map Supabase data to our Lead type
       const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
@@ -543,7 +544,7 @@ const Index = () => {
   const filteredLeads = leads.filter(l => {
     const matchesSearch = l.nome.toLowerCase().includes(search.toLowerCase()) || 
                           l.cidade.toLowerCase().includes(search.toLowerCase());
-    const matchesType = filterType === 'Todos' || l.tipo === filterType;
+    const matchesType = l.isBriefingVirtual || filterType === 'Todos' || l.tipo === filterType;
     const matchesTemp = filterTemp.length === 0 || filterTemp.includes(l.temp);
     const matchesResponsavel = filterResponsavel === 'Todos' || l.criado_por === filterResponsavel;
     
