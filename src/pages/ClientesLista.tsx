@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
   'Novo Lead': { label: 'Novo Lead', color: 'bg-zinc-500/10 text-zinc-500' },
@@ -22,6 +25,20 @@ const ClientesLista = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
+  const queryClient = useQueryClient();
+  const { data: briefingsPendentes, isLoading: loadingBriefings } = useQuery({
+    queryKey: ['briefings-pendentes'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('briefings')
+        .select('*')
+        .eq('status', 'aguardando_triagem')
+        .order('preenchido_em', { ascending: false });
+      if (error) throw error;
+      return data;
+    }
+  });
+
   const { data: clientes, isLoading } = useQuery({
     queryKey: ['clientes'],
     queryFn: async () => {
@@ -33,6 +50,73 @@ const ClientesLista = () => {
       return data;
     }
   });
+
+  const handleAprovar = async (briefing: any) => {
+    try {
+      // 1. Criar cliente
+      const { data: novoCliente, error: clienteError } = await supabase.from('clientes').insert({
+        nome: briefing.nome,
+        whatsapp: briefing.whatsapp,
+        email: briefing.email,
+        cidade: briefing.cidade,
+        origem: briefing.origem,
+        tipo_projeto: briefing.tipo_projeto,
+        briefing_preenchido: true
+      }).select().single();
+
+      if (clienteError) throw clienteError;
+
+      // 2. Criar lead no Pipeline
+      const { error: leadError } = await supabase.from('leads').insert({
+        nome: briefing.nome,
+        whats: briefing.whatsapp,
+        cidade: briefing.cidade,
+        tipo: briefing.tipo_projeto === 'com' ? 'Comercial' : briefing.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int',
+        stage: 'Novo Lead',
+        origem: briefing.origem || 'Instagram',
+        temp: 'Frio',
+        score: 2,
+        criado: new Date().toISOString(),
+        area: 0,
+        cliente_id: novoCliente.id
+      });
+
+      if (leadError) throw leadError;
+
+      // 3. Atualizar briefing
+      const { error: briefingUpdateError } = await supabase.from('briefings').update({
+        status: 'aprovado',
+        cliente_id: novoCliente.id
+      }).eq('id', briefing.id);
+
+      if (briefingUpdateError) throw briefingUpdateError;
+
+      toast.success(`${briefing.nome} aprovado — ficha criada`);
+      queryClient.invalidateQueries({ queryKey: ['briefings-pendentes'] });
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+    } catch (error) {
+      console.error('Erro ao aprovar briefing:', error);
+      toast.error('Erro ao aprovar briefing');
+    }
+  };
+
+  const handleArquivar = async (briefingId: string) => {
+    try {
+      const { error } = await supabase
+        .from('briefings')
+        .update({ status: 'arquivado' })
+        .eq('id', briefingId);
+      
+      if (error) throw error;
+
+      toast.success("Arquivado");
+      queryClient.invalidateQueries({ queryKey: ['briefings-pendentes'] });
+    } catch (error) {
+      console.error('Erro ao arquivar briefing:', error);
+      toast.error('Erro ao arquivar briefing');
+    }
+  };
 
   const filteredClientes = clientes?.filter(c => 
     c.nome?.toLowerCase().includes(search.toLowerCase()) ||
@@ -58,6 +142,77 @@ const ClientesLista = () => {
             <Plus size={16} className="mr-2" />
             NOVO CLIENTE
           </Button>
+        </div>
+
+        {briefingsPendentes && briefingsPendentes.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-[#555555] text-white px-2 py-0.5 text-[10px] font-bold font-['Courier_New'] uppercase tracking-widest">
+                {briefingsPendentes.length}
+              </div>
+              <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF] tracking-widest uppercase">AGUARDANDO TRIAGEM</h2>
+            </div>
+
+            <div className="space-y-4">
+              {briefingsPendentes.map((briefing) => (
+                <div 
+                  key={briefing.id}
+                  className="bg-[#1A1816] border border-[#2A2A2A] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-[9px] font-['Courier_New'] font-bold text-[#555] uppercase tracking-[0.2em]">PRÉ-BRIEFING</span>
+                      <span className="text-[10px] text-white/20 uppercase tracking-widest font-medium">
+                        {briefing.preenchido_em ? `Recebido há ${formatDistanceToNow(new Date(briefing.preenchido_em), { locale: ptBR })}` : 'Recentemente'}
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-bold text-[#E8E4DF] mb-2 uppercase font-['Courier_New'] tracking-tight">
+                      {briefing.nome}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-white/40">
+                      <div className="flex items-center gap-2">
+                        <User size={14} className="text-[#8B7355]/40" />
+                        <span className="text-[10px] uppercase tracking-wider">
+                          {briefing.tipo_projeto === 'com' ? 'Comercial' : briefing.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin size={14} className="text-[#8B7355]/40" />
+                        <span className="text-[10px] uppercase tracking-wider">{briefing.cidade || 'Não informada'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={14} className="text-[#8B7355]/40" />
+                        <span className="text-[10px] uppercase tracking-wider">Orçamento: {briefing.respostas?.orcamento || 'Não informado'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      onClick={() => handleAprovar(briefing)}
+                      className="bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      <Check size={14} className="mr-2" />
+                      APROVAR
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => handleArquivar(briefing.id)}
+                      className="border-[#3A3A3A] bg-transparent hover:bg-white/5 text-white/40 rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      <XIcon size={14} className="mr-2" />
+                      ARQUIVAR
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="h-px bg-white/5 my-12" />
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 mb-8">
+          <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF]/40 tracking-widest uppercase">CARTEIRA DE CLIENTES</h2>
         </div>
 
         <div className="relative mb-8 group">

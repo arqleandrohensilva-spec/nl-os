@@ -51,9 +51,10 @@ interface SectionAccordionProps {
   isOpen: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  badge?: number;
 }
 
-const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAccordionProps) => (
+const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge }: SectionAccordionProps) => (
   <div className="mb-1">
     <button 
       onClick={onToggle}
@@ -66,9 +67,16 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children }: SectionAc
         <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/20")}>
           {icon}
         </div>
-        <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
-          {label}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
+            {label}
+          </span>
+          {badge !== undefined && badge > 0 && (
+            <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
+              {badge}
+            </span>
+          )}
+        </div>
       </div>
       <ChevronDown 
         size={10} 
@@ -167,6 +175,21 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   });
 
   const unreadCount = notifications.filter(n => !n.lida).length;
+
+  const { data: pendingBriefings = [] } = useQuery({
+    queryKey: ['pending-briefings-count'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('briefings')
+        .select('id')
+        .eq('status', 'aguardando_triagem');
+      if (error) throw error;
+      return data || [];
+    },
+    refetchInterval: 30000 // Refetch every 30s
+  });
+
+  const pendingBriefingsCount = pendingBriefings.length;
 
   const checkAndCreateNotifications = async () => {
 
@@ -340,6 +363,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<Users size={14} />}
           isOpen={!!openSections['CLIENTES']}
           onToggle={() => toggleSection('CLIENTES')}
+          badge={pendingBriefingsCount}
         >
           <NavItem 
             label="01 · Carteira de Clientes" 

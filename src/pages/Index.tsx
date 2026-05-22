@@ -69,7 +69,6 @@ import {
 } from "@/components/ui/select";
 
 const STAGES: Stage[] = [
-  'Aguardando Triagem',
   'Novo Lead', 
   'Reunião Agendada', 
   'Briefing Preenchido',
@@ -239,16 +238,6 @@ const Index = () => {
 
       if (leadsError) throw leadsError;
 
-      // Fetch briefings awaiting screening
-      const { data: briefingsData, error: briefingsError } = await supabase
-        .from('briefings')
-        .select('*')
-        .eq('status', 'aguardando_triagem')
-        .order('preenchido_em', { ascending: false });
-
-      if (briefingsError) throw briefingsError;
-      console.log('briefings carregados:', briefingsData);
-
       // Map Supabase data to our Lead type
       const mappedLeads: Lead[] = (leadsData || []).map((l: any) => ({
         ...l,
@@ -257,30 +246,7 @@ const Index = () => {
         )
       }));
 
-      // Add briefings as virtual leads in "Aguardando Triagem" stage
-      const virtualLeads: Lead[] = (briefingsData || []).map((b: any) => ({
-        id: b.id,
-        nome: b.nome || 'Sem nome',
-        whats: b.whatsapp || '',
-        email: b.email || '',
-        cidade: b.cidade || '',
-        tipo: b.tipo_projeto === 'com' ? 'Comercial' : b.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int',
-        stage: 'Aguardando Triagem',
-        origem: (b.origem as any) || 'Outro',
-        temp: 'Frio',
-        score: 2,
-        criado: b.preenchido_em || new Date().toISOString(),
-        etapa_desde: b.preenchido_em || new Date().toISOString(),
-        area: 0,
-        orcamento: 0, // Number type required
-        orcamentoVirtual: b.respostas?.orcamento || 'Não informado',
-        obs: '',
-        logs: [],
-        isBriefingVirtual: true,
-        briefingData: b
-      }));
-
-      setLeads([...virtualLeads, ...mappedLeads]);
+      setLeads(mappedLeads);
     } catch (error: any) {
       console.error('Error fetching leads:', error);
       toast.error('Erro ao carregar leads');
