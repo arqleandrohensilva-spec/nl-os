@@ -136,7 +136,7 @@ export type Database = {
           respostas: Json | null
           status: string
           tipo_projeto: string | null
-          token: string
+          token: string | null
           whatsapp: string | null
         }
         Insert: {
@@ -151,7 +151,7 @@ export type Database = {
           respostas?: Json | null
           status?: string
           tipo_projeto?: string | null
-          token: string
+          token?: string | null
           whatsapp?: string | null
         }
         Update: {
@@ -166,7 +166,7 @@ export type Database = {
           respostas?: Json | null
           status?: string
           tipo_projeto?: string | null
-          token?: string
+          token?: string | null
           whatsapp?: string | null
         }
         Relationships: [
