@@ -747,7 +747,7 @@ const Index = () => {
               onDragEnd={handleDragEnd}
               modifiers={[restrictToWindowEdges]}
             >
-              <div className="grid grid-cols-8 h-full gap-4 min-w-[1600px]">
+              <div className="grid grid-cols-7 h-full gap-4 min-w-[1400px]">
                 {STAGES.map(stage => (
                   <KanbanColumn 
                     key={stage}
