@@ -143,13 +143,11 @@ const BriefingModal = ({ isOpen, onClose, briefing, onAprovar, onArquivar }: Bri
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl bg-[#0F0E0C] border-[#2A2A2A] text-[#E8E4DF] p-0 gap-0 overflow-hidden rounded-none">
         <DialogHeader className="p-8 border-b border-[#2A2A2A]">
-          <div className="space-y-1">
-            <span className="text-[9px] font-['Courier_New'] font-bold text-[#555] uppercase tracking-[0.3em]">PRÉ-BRIEFING</span>
-            <DialogTitle className="text-2xl font-bold font-['Courier_New'] text-[#8B7355] uppercase tracking-tighter">
-              {briefing.nome}
-            </DialogTitle>
-          </div>
+          <DialogTitle className="text-lg font-bold font-['Courier_New'] text-[#8B7355] uppercase tracking-widest">
+            PRÉ-BRIEFING — {briefing.nome}
+          </DialogTitle>
         </DialogHeader>
+
 
         <div className="p-8 space-y-10 max-h-[70vh] overflow-y-auto scrollbar-thin scrollbar-thumb-[#2A2A2A] scrollbar-track-transparent">
           {renderContactInfo()}
