@@ -13,7 +13,7 @@ const BriefingPublic = () => {
   const { token } = useParams();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [briefing, setBriefing] = useState<any>(null);
   const [submitted, setSubmitted] = useState(false);
   
@@ -310,6 +310,26 @@ const BriefingPublic = () => {
       default: return null;
     }
   };
+
+  if (step === 0) return (
+    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center">
+      <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.5em] font-bold mb-8">NL Arquitetos</p>
+      <h1 className="font-cormorant italic text-5xl md:text-6xl text-[#E8E4DF] mb-6 leading-tight">
+        Conte-nos sobre<br/>o seu projeto
+      </h1>
+      <div className="w-16 h-[1px] bg-[#8B7355]/50 mb-8" />
+      <p className="text-[#E8E4DF]/40 max-w-sm leading-relaxed mb-12 uppercase tracking-widest text-[10px]">
+        Este formulário nos ajuda a entender sua necessidade antes da reunião. Com essas informações, chegamos preparados para uma conversa mais objetiva e precisa.
+      </p>
+      <button
+        onClick={() => setStep(1)}
+        className="bg-[#8B7355] text-[#0F0E0C] px-12 py-4 uppercase tracking-[0.3em] text-xs font-bold hover:bg-[#8B7355]/90 transition-colors"
+      >
+        COMEÇAR →
+      </button>
+      <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-widest mt-16">A Arquitetura como Decisão</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] p-4 md:p-8 font-['Courier_New'] overflow-x-hidden selection:bg-[#8B7355]/30">
