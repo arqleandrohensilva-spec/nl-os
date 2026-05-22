@@ -48,7 +48,11 @@ const BriefingPublic = () => {
   });
 
   useEffect(() => {
-    fetchBriefing();
+    if (token) {
+      fetchBriefing();
+    } else {
+      setLoading(false);
+    }
   }, [token]);
 
   const fetchBriefing = async () => {
@@ -65,7 +69,7 @@ const BriefingPublic = () => {
         return;
       }
       setBriefing(data);
-      if (data.status === 'preenchido') setSubmitted(true);
+      if (data.status === 'preenchido' || data.status === 'aprovado') setSubmitted(true);
       
       if (data.leads) {
         setFormData((prev: any) => ({
@@ -101,25 +105,43 @@ const BriefingPublic = () => {
     if (e) e.preventDefault();
     setSubmitting(true);
     try {
-      const updateData: any = {
-        status: 'preenchido',
-        respostas: formData,
-        tipo_projeto: projetoType,
-        preenchido_em: new Date().toISOString()
-      };
-
-      const { error } = await supabase.from('briefings').update(updateData).eq('id', briefing.id);
-
-      if (error) throw error;
-      
-      if (briefing.cliente_id) {
-        const clienteUpdate: any = {
+      if (token && briefing) {
+        // Modo com token - Atualizar existente
+        const updateData: any = {
+          status: 'preenchido',
+          respostas: formData,
           tipo_projeto: projetoType,
-          area_m2: formData.area_estimada || formData.area_terreno,
-          orcamento: formData.orcamento,
-          briefing_preenchido: true
+          preenchido_em: new Date().toISOString()
         };
-        await (supabase.from('clientes') as any).update(clienteUpdate).eq('id', briefing.cliente_id);
+
+        const { error } = await supabase.from('briefings').update(updateData).eq('id', briefing.id);
+        if (error) throw error;
+        
+        if (briefing.cliente_id) {
+          const clienteUpdate: any = {
+            tipo_projeto: projetoType,
+            area_m2: formData.area_estimada || formData.area_terreno,
+            orcamento: formData.orcamento,
+            briefing_preenchido: true
+          };
+          await (supabase.from('clientes') as any).update(clienteUpdate).eq('id', briefing.cliente_id);
+        }
+      } else {
+        // Modo público - Criar novo
+        const insertData: any = {
+          status: 'aguardando_triagem',
+          respostas: formData,
+          tipo_projeto: projetoType,
+          preenchido_em: new Date().toISOString(),
+          nome: formData.nome_completo,
+          whatsapp: formData.whatsapp,
+          email: formData.email,
+          cidade: formData.cidade,
+          origem: formData.origem
+        };
+
+        const { error } = await supabase.from('briefings').insert(insertData);
+        if (error) throw error;
       }
       
       setSubmitted(true);
