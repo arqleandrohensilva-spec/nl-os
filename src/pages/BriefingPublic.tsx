@@ -186,7 +186,22 @@ const BriefingPublic = () => {
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
             <div className="grid gap-4">
-...
+              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
+              <div className="space-y-2">
+                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Como nos conheceu?</label>
+                <select name="origem" value={formData.origem} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355] transition-colors">
+                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
+                  <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
+                  <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
+                  <option value="Google" className="bg-[#0F0E0C]">Google</option>
+                  <option value="Outro" className="bg-[#0F0E0C]">Outro</option>
+                </select>
+              </div>
+            </div>
+          </div>
         );
       case 2:
         return (
@@ -252,7 +267,7 @@ const BriefingPublic = () => {
       case 3:
         if (projetoType === 'arq') {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
               <div className="grid gap-6">
                 <div className="space-y-2">
@@ -275,7 +290,7 @@ const BriefingPublic = () => {
           );
         } else if (projetoType === 'int') {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
               <div className="grid gap-6">
                 <Input name="tipo_imovel" placeholder="Tipo de imóvel (Casa / Apartamento / Outro)" value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
@@ -294,7 +309,7 @@ const BriefingPublic = () => {
           );
         } else {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O NEGÓCIO</h3>
               <div className="grid gap-6">
                 <Input name="tipo_negocio" placeholder="Qual o tipo de negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
@@ -314,7 +329,7 @@ const BriefingPublic = () => {
         }
       case 4:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 4 — O PROJETO</h3>
             <div className="grid gap-6">
               <div className="space-y-3">
