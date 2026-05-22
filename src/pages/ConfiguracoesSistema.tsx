@@ -39,8 +39,8 @@ const UsefulLinks = () => {
           .eq('key', 'links_uteis')
           .maybeSingle();
         
-        if (data) {
-          setLinks(data.value);
+        if (data && data.value) {
+          setLinks(data.value as any[]);
         }
       } catch (err) {
         console.error("Erro ao carregar links:", err);
@@ -204,6 +204,7 @@ const ConfiguracoesSistema = () => {
             </div>
             <h1 className="text-4xl font-cormorant italic text-white">Configurações do Sistema</h1>
           </header>
+          <UsefulLinks />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Dropbox Card */}
