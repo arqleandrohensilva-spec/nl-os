@@ -224,6 +224,65 @@ const ClienteFicha = () => {
           )}
         </section>
 
+        {/* QUALIFICAÇÃO */}
+        <section className="space-y-6">
+          <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">QUALIFICAÇÃO</h2>
+          <div className="bg-[#0A0A0A] border border-[#3A3A3A] p-8 space-y-8">
+            {/* SCORE CARD */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-end">
+                <span className="text-[10px] text-[#8B7355] font-bold tracking-widest uppercase">Score de Qualificação</span>
+                <span className="text-xl font-medium">{score}/15 - {temp}</span>
+              </div>
+              <Progress value={(score / 15) * 100} indicatorClassName={cn(
+                "transition-all duration-500",
+                temp === 'Frio' ? 'bg-[#555555]' : temp === 'Morno' ? 'bg-[#8B7355]' : 'bg-[#C8A96E]'
+              )} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                { label: 'Tem imóvel/lote definido?', key: 'imovel_definido', options: ['Sim, definido', 'Em busca', 'Não'] },
+                { label: 'Tipo de projeto', key: 'tipo_projeto', options: ['ARQ+INT', 'Interiores', 'Comercial'] },
+                { label: 'Área estimada (m²)', key: 'area_m2', isNumeric: true },
+                { label: 'Orçamento estimado', key: 'orcamento', options: ['Acima R$700k', 'R$300-700k', 'Abaixo', 'Não sei'] },
+                { label: 'Quando quer começar', key: 'prazo', options: ['Imediato', '6 meses', 'Sem prazo'] },
+                { label: 'Quem decide', key: 'quem_decide', options: ['Sozinho', 'Com cônjuge', 'Com sócios'] },
+                { label: 'Origem', key: 'origem', options: ['Indicação', 'Google', 'Instagram', 'Outro'] },
+              ].map((field) => (
+                <div key={field.key} className="space-y-2">
+                  <Label className="text-[10px] uppercase tracking-widest text-white/30 font-['Courier_New']">{field.label}</Label>
+                  {field.isNumeric ? (
+                    <Input 
+                      type="number"
+                      value={formData[field.key as keyof typeof formData]} 
+                      onChange={(e) => updateQualificacao(field.key, e.target.value)}
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                    />
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {field.options?.map(opt => (
+                        <button
+                          key={opt}
+                          onClick={() => updateQualificacao(field.key, opt)}
+                          className={cn(
+                            "px-3 py-2 text-[10px] uppercase border transition-colors",
+                            formData[field.key as keyof typeof formData] === opt
+                              ? "bg-[#8B7355] border-[#8B7355] text-white"
+                              : "bg-transparent border-[#3A3A3A] text-white/50 hover:border-[#8B7355]"
+                          )}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ATALHOS GRID */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ShortcutCard 
