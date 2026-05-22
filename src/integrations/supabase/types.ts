@@ -128,24 +128,30 @@ export type Database = {
           criado_em: string
           id: string
           lead_id: string | null
+          preenchido_em: string | null
           respostas: Json | null
           status: string
+          tipo_projeto: string | null
           token: string
         }
         Insert: {
           criado_em?: string
           id?: string
           lead_id?: string | null
+          preenchido_em?: string | null
           respostas?: Json | null
           status?: string
+          tipo_projeto?: string | null
           token: string
         }
         Update: {
           criado_em?: string
           id?: string
           lead_id?: string | null
+          preenchido_em?: string | null
           respostas?: Json | null
           status?: string
+          tipo_projeto?: string | null
           token?: string
         }
         Relationships: [

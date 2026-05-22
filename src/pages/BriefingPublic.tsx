@@ -145,17 +145,37 @@ const BriefingPublic = () => {
   );
 
   if (submitted) return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] flex items-center justify-center p-8 font-['Courier_New']">
-      <div className="text-center space-y-8 max-w-md">
-        <CheckCircle2 size={64} className="text-[#8B7355] mx-auto opacity-80" />
-        <div className="space-y-2">
-          <h1 className="text-3xl font-cormorant italic tracking-wide">PRÉ-BRIEFING RECEBIDO</h1>
-          <p className="text-xs opacity-60 leading-relaxed uppercase tracking-widest">Nossa equipe analisará suas respostas antes da reunião. Em breve entraremos em contato.</p>
-        </div>
-        <div className="pt-8 border-t border-white/10">
-          <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.3em] font-bold">NL ARQUITETOS · A ARQUITETURA COMO DECISÃO</p>
-        </div>
+    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center font-['Courier_New']">
+      
+      <div className="w-12 h-12 border border-[#8B7355]/40 rounded-full flex items-center justify-center mb-8">
+        <div className="w-2 h-2 bg-[#8B7355] rounded-full" />
       </div>
+
+      <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.5em] font-bold mb-6">
+        Pré-briefing recebido
+      </p>
+
+      <h1 className="font-cormorant italic text-3xl md:text-4xl text-[#E8E4DF] mb-4 leading-tight">
+        {formData.nome_completo
+          ? `${formData.nome_completo.split(' ')[0]}, recebemos seu pré-briefing.`
+          : 'Recebemos seu pré-briefing.'}
+      </h1>
+
+      <div className="w-16 h-[1px] bg-[#8B7355]/30 my-6" />
+
+      <p className="text-[#E8E4DF]/40 text-[10px] uppercase tracking-widest max-w-xs leading-relaxed mb-4">
+        {projetoType === 'arq' && 'Arquitetura + Interiores'}
+        {projetoType === 'int' && 'Projeto de Interiores'}
+        {projetoType === 'com' && 'Projeto Comercial'}
+      </p>
+
+      <p className="text-[#E8E4DF]/40 text-[10px] uppercase tracking-widest max-w-xs leading-relaxed">
+        Nossa equipe analisará suas respostas antes da reunião. Em breve entraremos em contato para confirmar o próximo passo.
+      </p>
+
+      <p className="text-[#E8E4DF]/15 text-[9px] uppercase tracking-widest mt-16">
+        NL Arquitetos · A Arquitetura como Decisão
+      </p>
     </div>
   );
 
@@ -163,7 +183,7 @@ const BriefingPublic = () => {
     switch(step) {
       case 1:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
             <div className="grid gap-4">
               <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
@@ -185,34 +205,69 @@ const BriefingPublic = () => {
         );
       case 2:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 2 — TIPO DE PROJETO</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { id: 'arq', label: 'ARQ + INTERIORES', desc: 'Construção nova com projeto completo' },
-                { id: 'int', label: 'INTERIORES', desc: 'Reforma e decoração' },
-                { id: 'com', label: 'COMERCIAL', desc: 'Espaço que trabalha por você' }
-              ].map((t) => (
-                <button 
-                  key={t.id}
-                  type="button"
-                  onClick={() => setProjetoType(t.id as any)}
-                  className={cn(
-                    "p-6 border text-left transition-all duration-300 flex flex-col justify-between h-32 group",
-                    projetoType === t.id ? "border-[#8B7355] bg-[#8B7355]/05 shadow-[0_0_15px_rgba(139,115,85,0.1)]" : "border-white/10 hover:border-white/20"
-                  )}
-                >
-                  <span className={cn("block text-[10px] font-bold tracking-widest", projetoType === t.id ? "text-[#8B7355]" : "text-white/60 group-hover:text-white")}>{t.label}</span>
-                  <span className="text-[9px] opacity-40 uppercase tracking-tighter leading-tight">{t.desc}</span>
-                </button>
-              ))}
+              <div
+                onClick={() => setProjetoType('arq')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'arq' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  ARQ + INTERIORES
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Construção nova com projeto arquitetônico e interiores completos
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'arq' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
+
+              <div
+                onClick={() => setProjetoType('int')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'int' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  INTERIORES
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Reforma e decoração de ambientes existentes
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'int' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
+
+              <div
+                onClick={() => setProjetoType('com')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'com' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  COMERCIAL
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Espaço projetado para gerar resultado no seu negócio
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'com' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
             </div>
           </div>
         );
       case 3:
         if (projetoType === 'arq') {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
               <div className="grid gap-6">
                 <div className="space-y-2">
@@ -235,7 +290,7 @@ const BriefingPublic = () => {
           );
         } else if (projetoType === 'int') {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
               <div className="grid gap-6">
                 <Input name="tipo_imovel" placeholder="Tipo de imóvel (Casa / Apartamento / Outro)" value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
@@ -254,7 +309,7 @@ const BriefingPublic = () => {
           );
         } else {
           return (
-            <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
               <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O NEGÓCIO</h3>
               <div className="grid gap-6">
                 <Input name="tipo_negocio" placeholder="Qual o tipo de negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
@@ -274,7 +329,7 @@ const BriefingPublic = () => {
         }
       case 4:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 4 — O PROJETO</h3>
             <div className="grid gap-6">
               <div className="space-y-3">
