@@ -71,6 +71,7 @@ export interface Proposal {
   validade: number;
   data: string;
   status: 'Enviada' | 'Vista' | 'Aprovada' | 'Recusada';
+  cliente_id?: string;
   created_at: string;
   views_count?: number;
   last_view_at?: string;
@@ -111,6 +112,9 @@ const PropostasTracking = () => {
   const [reviewResult, setReviewResult] = useState<any>(null);
   const [isGenerateLinkModalOpen, setIsGenerateLinkModalOpen] = useState(false);
   const [proposalToGenerateLink, setProposalToGenerateLink] = useState<Proposal | null>(null);
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [proposalToApprove, setProposalToApprove] = useState<Proposal | null>(null);
+  const [isProcessingApproval, setIsProcessingApproval] = useState(false);
 
   const [newProposal, setNewProposal] = useState<Partial<Proposal>>({
     tipo: 'ArqInt',
@@ -212,6 +216,7 @@ const PropostasTracking = () => {
       setNewProposal(prev => ({
         ...prev,
         cliente: selectedLead.nome,
+        cliente_id: selectedLead.id,
         cidade: selectedLead.cidade || prev.cidade,
         estado: selectedLead.estado || prev.estado,
         area: selectedLead.area || prev.area,
@@ -221,6 +226,15 @@ const PropostasTracking = () => {
   };
 
   const handleStatusUpdate = async (id: string, newStatus: string) => {
+    if (newStatus === 'Aprovada') {
+      const proposal = proposals.find(p => p.id === id);
+      if (proposal) {
+        setProposalToApprove(proposal);
+        setIsApprovalModalOpen(true);
+        return;
+      }
+    }
+
     try {
       const { error } = await supabase
         .from('proposals')
@@ -234,6 +248,104 @@ const PropostasTracking = () => {
     } catch (error) {
       console.error('Error updating status:', error);
       toast.error('Erro ao atualizar status');
+    }
+  };
+
+  const handleApproveOnly = async () => {
+    if (!proposalToApprove) return;
+    try {
+      setIsProcessingApproval(true);
+      const { error } = await supabase
+        .from('proposals')
+        .update({ status: 'Aprovada' })
+        .eq('id', proposalToApprove.id);
+
+      if (error) throw error;
+
+      toast.success(`Proposta aprovada!`);
+      setIsApprovalModalOpen(false);
+      fetchProposals();
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Erro ao atualizar status');
+    } finally {
+      setIsProcessingApproval(false);
+    }
+  };
+
+  const handleApproveWithProject = async () => {
+    if (!proposalToApprove) return;
+    
+    try {
+      setIsProcessingApproval(true);
+
+      // 1. Buscar dados completos da proposta e do cliente
+      const { data: proposta, error: fetchError } = await supabase
+        .from('proposals')
+        .select('*, cliente_id')
+        .eq('id', proposalToApprove.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // 2. Criar projeto automaticamente
+      const { data: novoProjeto, error: projectError } = await supabase
+        .from('projetos')
+        .insert({
+          nome: `Projeto ${proposta.cliente}`,
+          nome_cliente: proposta.cliente,
+          tipo: proposta.tipo === 'ArqInt' ? 'Arq+Int' : proposta.tipo,
+          cidade: proposta.cidade || '',
+          area_m2: parseFloat(proposta.area?.toString()) || 0,
+          etapa_atual: 'Briefing',
+          status_geral: 'Em andamento',
+          data_inicio: new Date().toISOString().split('T')[0],
+          prazo_final: null,
+          cliente_id: proposta.cliente_id,
+          proposta_id: proposta.id
+        })
+        .select()
+        .single();
+
+      if (projectError) throw projectError;
+
+      // 3. Criar etapas padrão do projeto
+      const etapasPadrao = [
+        { etapa: 'Briefing', status: 'Em andamento', data_inicio: new Date().toISOString().split('T')[0] },
+        { etapa: 'Anteprojeto', status: 'Pendente' },
+        { etapa: 'Projeto Executivo', status: 'Pendente' },
+        { etapa: 'Entrega Final', status: 'Pendente' }
+      ];
+
+      await supabase.from('projeto_etapas').insert(
+        etapasPadrao.map(e => ({ ...e, projeto_id: novoProjeto.id }))
+      );
+
+      // 4. Atualizar status da proposta
+      await supabase
+        .from('proposals')
+        .update({ status: 'Aprovada' })
+        .eq('id', proposalToApprove.id);
+
+      // 5. Atualizar lead no Pipeline para Fechado
+      if (proposta.cliente_id) {
+        await supabase.from('leads').update({
+          stage: 'Fechado',
+          fechado_em: new Date().toISOString()
+        }).eq('cliente_id', proposta.cliente_id);
+      }
+
+      toast.success(`Projeto criado — ${proposta.cliente}`);
+      setIsApprovalModalOpen(false);
+      
+      // Navegar para o projeto criado
+      setTimeout(() => navigate(`/projetos/${novoProjeto.id}`), 1500);
+      
+    } catch (error: any) {
+      console.error('Error creating project from proposal:', error);
+      toast.error('Erro ao criar projeto: ' + error.message);
+    } finally {
+      setIsProcessingApproval(false);
     }
   };
 
@@ -1380,6 +1492,46 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
               className="bg-bronze hover:bg-bronze/90 text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
             >
               Copiar Relatório
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isApprovalModalOpen} onOpenChange={setIsApprovalModalOpen}>
+        <DialogContent className="max-w-md bg-[#0F0E0C] border-[#2A2A2A] text-[#E8E4DF] rounded-none">
+          <DialogHeader className="space-y-4">
+            <p className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.4em] font-bold">PROPOSTA APROVADA</p>
+            <DialogTitle className="text-2xl font-bold font-['Courier_New'] uppercase tracking-tight">
+              Criar projeto automaticamente para {proposalToApprove?.cliente}?
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="py-6 space-y-4">
+            <div className="grid grid-cols-2 gap-4 text-xs font-['Courier_New'] uppercase tracking-widest text-white/50">
+              <div className="space-y-1">
+                <p>Tipo: <span className="text-[#E8E4DF]">{proposalToApprove?.tipo}</span></p>
+                <p>Área: <span className="text-[#E8E4DF]">{proposalToApprove?.area}m²</span></p>
+              </div>
+              <div className="space-y-1">
+                <p>Valor: <span className="text-[#E8E4DF]">R$ {proposalToApprove?.valor_completo?.toLocaleString()}</span></p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              variant="outline"
+              onClick={handleApproveOnly}
+              disabled={isProcessingApproval}
+              className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355]/10 rounded-none h-12 font-['Courier_New'] uppercase tracking-widest text-[10px]"
+            >
+              SÓ APROVAR
+            </Button>
+            <Button 
+              onClick={handleApproveWithProject}
+              disabled={isProcessingApproval}
+              className="flex-1 bg-[#8B7355] hover:bg-[#A68B6A] text-[#0F0E0C] rounded-none h-12 font-['Courier_New'] uppercase tracking-widest text-[10px] font-bold"
+            >
+              {isProcessingApproval ? <Loader2 className="animate-spin w-4 h-4" /> : 'CRIAR PROJETO'}
             </Button>
           </DialogFooter>
         </DialogContent>

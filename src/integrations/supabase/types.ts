@@ -1328,6 +1328,7 @@ export type Database = {
           nome: string
           nome_cliente: string | null
           prazo_final: string | null
+          proposta_id: string | null
           slug_cliente: string | null
           status_geral: string | null
           tipo: string | null
@@ -1357,6 +1358,7 @@ export type Database = {
           nome: string
           nome_cliente?: string | null
           prazo_final?: string | null
+          proposta_id?: string | null
           slug_cliente?: string | null
           status_geral?: string | null
           tipo?: string | null
@@ -1386,6 +1388,7 @@ export type Database = {
           nome?: string
           nome_cliente?: string | null
           prazo_final?: string | null
+          proposta_id?: string | null
           slug_cliente?: string | null
           status_geral?: string | null
           tipo?: string | null
@@ -1435,6 +1438,7 @@ export type Database = {
           area: number | null
           cidade: string | null
           cliente: string
+          cliente_id: string | null
           created_at: string
           data: string | null
           estado: string | null
@@ -1452,6 +1456,7 @@ export type Database = {
           area?: number | null
           cidade?: string | null
           cliente: string
+          cliente_id?: string | null
           created_at?: string
           data?: string | null
           estado?: string | null
@@ -1469,6 +1474,7 @@ export type Database = {
           area?: number | null
           cidade?: string | null
           cliente?: string
+          cliente_id?: string | null
           created_at?: string
           data?: string | null
           estado?: string | null
@@ -1482,7 +1488,15 @@ export type Database = {
           valor_completo?: number | null
           valor_executivo?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "proposals_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proposta_engajamento: {
         Row: {

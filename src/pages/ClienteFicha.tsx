@@ -407,7 +407,7 @@ const ClienteFicha = () => {
           />
           <ShortcutCard 
             label="PROJETO" 
-            value={projeto?.status_geral || '—'} 
+            value={projeto?.status_geral ? `${projeto.status_geral} · VER PROJETO` : '—'} 
             actionLabel="VER PROJETO" 
             onClick={() => projeto?.id ? navigate(`/projetos/${projeto.id}`) : navigate('/projetos')} 
           />
