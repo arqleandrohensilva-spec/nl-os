@@ -298,7 +298,7 @@ const PropostasTracking = () => {
           cidade: proposta.cidade || '',
           area_m2: parseFloat(proposta.area?.toString()) || 0,
           etapa_atual: 'Briefing',
-          status_geral: 'Em andamento',
+          status_geral: 'ativo',
           data_inicio: new Date().toISOString().split('T')[0],
           prazo_final: null,
           cliente_id: proposta.cliente_id,
