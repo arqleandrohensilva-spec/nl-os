@@ -194,6 +194,17 @@ const ClientesLista = () => {
 
                   <div className="flex items-center gap-3">
                     <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedBriefing(briefing);
+                        setIsModalOpen(true);
+                      }}
+                      className="border-[#2A2A2A] bg-transparent hover:bg-white/5 text-[#8B7355] rounded-none px-4 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-all"
+                    >
+                      <Eye size={14} className="mr-2" />
+                      VER BRIEFING
+                    </Button>
+                    <Button 
                       onClick={() => handleAprovar(briefing)}
                       className="bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
                     >
@@ -209,6 +220,7 @@ const ClientesLista = () => {
                       ARQUIVAR
                     </Button>
                   </div>
+
                 </div>
               ))}
             </div>
