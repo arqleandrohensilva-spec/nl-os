@@ -220,7 +220,8 @@ const ClienteFicha = () => {
     const newTemp = newScore >= 9 ? 'Quente' : newScore >= 5 ? 'Morno' : 'Frio';
 
     // Atualiza cliente
-    await supabase.from('clientes').update({ [key]: value }).eq('id', id);
+    const updateValue = key === 'area_m2' ? Number(value) : value;
+    await supabase.from('clientes').update({ [key]: updateValue } as any).eq('id', id);
     
     // Sincroniza com o Lead
     await supabase.from('leads').update({
@@ -234,7 +235,11 @@ const ClienteFicha = () => {
 
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      const { error } = await supabase.from('clientes').update(data).eq('id', id);
+      // Garantir que area_m2 seja número se presente
+      const cleanData = { ...data };
+      if (cleanData.area_m2) cleanData.area_m2 = Number(cleanData.area_m2);
+      
+      const { error } = await supabase.from('clientes').update(cleanData).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
