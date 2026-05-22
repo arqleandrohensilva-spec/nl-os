@@ -339,7 +339,7 @@ const PropostasTracking = () => {
       setIsApprovalModalOpen(false);
       
       // Navegar para o projeto criado
-      setTimeout(() => navigate(`/projetos/${novoProjeto.id}`), 1500);
+      setTimeout(() => navigate(`/projetos/detalhe/${novoProjeto.id}`), 1500);
       
     } catch (error: any) {
       console.error('Error creating project from proposal:', error);
