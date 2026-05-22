@@ -1,4 +1,4 @@
-export type Stage = 'Novo Lead' | 'Reunião Agendada' | 'Briefing Preenchido' | 'Proposta Enviada' | 'Negociação' | 'Fechado' | 'Perdido';
+export type Stage = 'Aguardando Triagem' | 'Novo Lead' | 'Reunião Agendada' | 'Briefing Preenchido' | 'Proposta Enviada' | 'Negociação' | 'Fechado' | 'Perdido';
 export type Temp = 'Quente' | 'Morno' | 'Frio';
 export type Origem = 'Instagram' | 'Indicação' | 'Site' | 'Google' | 'Outro';
 export type TipoProjeto = 'Arq+Int' | 'Interiores' | 'Comercial';
@@ -33,6 +33,8 @@ export interface Lead {
   proxima_acao_nota?: string;
   proxima_acao_data?: string;
   criado_por?: string;
+  isBriefingVirtual?: boolean;
+  briefingData?: any;
 }
 
 export const calculateLeadScore = (lead: Lead) => {

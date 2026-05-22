@@ -2,7 +2,9 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lead, calculateLeadScore } from '@/lib/types';
 import { Star, Clock } from 'lucide-react';
-import { parseISO, differenceInDays } from 'date-fns';
+import { parseISO, differenceInDays, format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
@@ -15,7 +17,7 @@ interface LeadCardProps {
   onViewFicha?: (clienteId: string) => void;
 }
 
-const LeadCard = ({ lead, onClick, onViewFicha }: LeadCardProps) => {
+const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   const { score } = calculateLeadScore(lead);
   
@@ -34,6 +36,9 @@ const LeadCard = ({ lead, onClick, onViewFicha }: LeadCardProps) => {
   const isPremium = score >= 8;
 
   const formatCurrency = (val: number) => {
+    if (lead.isBriefingVirtual && (lead as any).orcamentoVirtual) {
+      return (lead as any).orcamentoVirtual;
+    }
     if (val === 0) return "—";
     return `R$ ${(val / 1000).toFixed(0)}k`;
   };
@@ -131,19 +136,93 @@ const LeadCard = ({ lead, onClick, onViewFicha }: LeadCardProps) => {
       {/* Footer - Time in Stage & Action */}
       <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
         <span className="text-white/30 text-[9px] uppercase tracking-wider">
-          há {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'}
+          {lead.isBriefingVirtual 
+            ? `recebido em ${format(parseISO(lead.criado), 'dd/MM')}`
+            : `há ${daysInStage} ${daysInStage === 1 ? 'dia' : 'dias'}`
+          }
         </span>
-        {lead.cliente_id && (
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewFicha?.(lead.cliente_id!);
-            }}
-            className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
-          >
-            VER FICHA
-          </button>
-        )}
+        
+        <div className="flex gap-3">
+          {lead.isBriefingVirtual ? (
+            <>
+              <button 
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    // 1. Criar cliente
+                    const { data: novoCliente, error: clientError } = await supabase.from('clientes').insert({
+                      nome: lead.nome,
+                      whatsapp: lead.whats,
+                      email: lead.email,
+                      cidade: lead.cidade,
+                      origem: lead.origem,
+                      tipo_projeto: lead.briefingData?.tipo_projeto,
+                      briefing_preenchido: true
+                    }).select().single();
+
+                    if (clientError) throw clientError;
+
+                    // 2. Atualizar briefing
+                    await supabase.from('briefings').update({
+                      status: 'aprovado',
+                      cliente_id: novoCliente.id
+                    }).eq('id', lead.id);
+
+                    // 3. Criar card no Pipeline como Novo Lead
+                    await supabase.from('leads').insert({
+                      nome: lead.nome,
+                      whats: lead.whats,
+                      cidade: lead.cidade,
+                      tipo: lead.tipo,
+                      stage: 'Novo Lead',
+                      origem: lead.origem,
+                      temp: 'Frio',
+                      score: 2,
+                      criado: new Date().toISOString(),
+                      etapa_desde: new Date().toISOString(),
+                      area: 0
+                    });
+
+                    toast.success("Briefing aprovado e lead criado!");
+                    if (onUpdateStatus) onUpdateStatus(lead.id, 'Novo Lead');
+                  } catch (err) {
+                    console.error(err);
+                    toast.error("Erro ao aprovar briefing");
+                  }
+                }}
+                className="text-[9px] font-bold text-green-500 uppercase tracking-widest hover:text-white transition-colors"
+              >
+                APROVAR
+              </button>
+              <button 
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    await supabase.from('briefings').delete().eq('id', lead.id);
+                    toast.success("Briefing arquivado");
+                    if (onUpdateStatus) onUpdateStatus(lead.id, 'Arquivado');
+                  } catch (err) {
+                    console.error(err);
+                    toast.error("Erro ao arquivar");
+                  }
+                }}
+                className="text-[9px] font-bold text-red-500 uppercase tracking-widest hover:text-white transition-colors"
+              >
+                ARQUIVAR
+              </button>
+            </>
+          ) : lead.cliente_id && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewFicha?.(lead.cliente_id!);
+              }}
+              className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
+            >
+              VER FICHA
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
