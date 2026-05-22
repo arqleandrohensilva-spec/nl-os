@@ -249,9 +249,13 @@ export type Database = {
           email: string | null
           endereco_imovel: string | null
           id: string
+          imovel_definido: string | null
           nome: string
           observacoes: string | null
+          orcamento: string | null
           origem: string | null
+          prazo: string | null
+          quem_decide: string | null
           status_comercial: string | null
           tipo_projeto: string | null
           updated_at: string | null
@@ -266,9 +270,13 @@ export type Database = {
           email?: string | null
           endereco_imovel?: string | null
           id?: string
+          imovel_definido?: string | null
           nome: string
           observacoes?: string | null
+          orcamento?: string | null
           origem?: string | null
+          prazo?: string | null
+          quem_decide?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
           updated_at?: string | null
@@ -283,9 +291,13 @@ export type Database = {
           email?: string | null
           endereco_imovel?: string | null
           id?: string
+          imovel_definido?: string | null
           nome?: string
           observacoes?: string | null
+          orcamento?: string | null
           origem?: string | null
+          prazo?: string | null
+          quem_decide?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
           updated_at?: string | null
