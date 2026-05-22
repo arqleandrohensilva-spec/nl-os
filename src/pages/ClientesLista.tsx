@@ -4,12 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import BriefingModal from '@/components/BriefingModal';
+
 
 const STATUS_BADGES: Record<string, { label: string; color: string }> = {
   'Novo Lead': { label: 'Novo Lead', color: 'bg-zinc-500/10 text-zinc-500' },
