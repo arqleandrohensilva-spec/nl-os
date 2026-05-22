@@ -130,6 +130,12 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
           <p className="text-white/50 text-[10px] mt-1 truncate uppercase tracking-wider">
             {lead.tipo} · {lead.cidade} · {formatCurrency(lead.orcamento)}
           </p>
+
+          {lead.isBriefingVirtual && (
+            <span className="mt-2 inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-400 border border-zinc-700 w-fit">
+              PRÉ-BRIEFING
+            </span>
+          )}
         </div>
       </div>
 
@@ -137,12 +143,12 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
       <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
         <span className="text-white/30 text-[9px] uppercase tracking-wider">
           {lead.isBriefingVirtual 
-            ? `recebido em ${format(parseISO(lead.criado), 'dd/MM')}`
+            ? `${format(parseISO(lead.criado), 'dd/MM/yyyy')}`
             : `há ${daysInStage} ${daysInStage === 1 ? 'dia' : 'dias'}`
           }
         </span>
         
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {lead.isBriefingVirtual ? (
             <>
               <button 
@@ -155,42 +161,45 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                       whatsapp: lead.whats,
                       email: lead.email,
                       cidade: lead.cidade,
-                      origem: lead.origem,
-                      tipo_projeto: lead.briefingData?.tipo_projeto,
+                      origem: lead.origem || 'Instagram',
+                      tipo_projeto: lead.briefingData?.tipo_projeto || 'Arq+Int',
                       briefing_preenchido: true
                     }).select().single();
 
                     if (clientError) throw clientError;
 
-                    // 2. Atualizar briefing
+                    // 2. Criar lead vinculado
+                    const { error: leadError } = await supabase.from('leads').insert({
+                      nome: lead.nome,
+                      whats: lead.whats,
+                      cidade: lead.cidade,
+                      tipo: (lead.briefingData?.tipo_projeto === 'com' ? 'Comercial' : lead.briefingData?.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int') as any,
+                      stage: 'Novo Lead',
+                      origem: lead.origem || 'Instagram',
+                      temp: 'Frio',
+                      score: 2,
+                      criado: new Date().toISOString(),
+                      etapa_desde: new Date().toISOString(),
+                      area: 0,
+                      cliente_id: novoCliente.id
+                    });
+
+                    if (leadError) throw leadError;
+
+                    // 3. Atualizar briefing
                     await (supabase.from('briefings') as any).update({
                       status: 'aprovado',
                       cliente_id: novoCliente.id
                     }).eq('id', lead.id);
 
-                    // 3. Criar card no Pipeline como Novo Lead
-                    await supabase.from('leads').insert({
-                      nome: lead.nome,
-                      whats: lead.whats,
-                      cidade: lead.cidade,
-                      tipo: lead.tipo,
-                      stage: 'Novo Lead',
-                      origem: lead.origem,
-                      temp: 'Frio',
-                      score: 2,
-                      criado: new Date().toISOString(),
-                      etapa_desde: new Date().toISOString(),
-                      area: 0
-                    });
-
-                    toast.success("Briefing aprovado e lead criado!");
+                    toast.success(`${lead.nome} aprovado — ficha criada em Clientes`);
                     if (onUpdateStatus) onUpdateStatus(lead.id, 'Novo Lead');
                   } catch (err) {
                     console.error(err);
-                    toast.error("Erro ao aprovar briefing");
+                    toast.error("Erro ao aprovar lead");
                   }
                 }}
-                className="text-[9px] font-bold text-green-500 uppercase tracking-widest hover:text-white transition-colors"
+                className="h-7 px-3 bg-[#8B7355] hover:bg-[#7a654a] text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
               >
                 APROVAR
               </button>
@@ -198,15 +207,15 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                 onClick={async (e) => {
                   e.stopPropagation();
                   try {
-                    await supabase.from('briefings').delete().eq('id', lead.id);
-                    toast.success("Briefing arquivado");
+                    await supabase.from('briefings').update({ status: 'arquivado' }).eq('id', lead.id);
+                    toast.success("Lead arquivado");
                     if (onUpdateStatus) onUpdateStatus(lead.id, 'Arquivado');
                   } catch (err) {
                     console.error(err);
                     toast.error("Erro ao arquivar");
                   }
                 }}
-                className="text-[9px] font-bold text-red-500 uppercase tracking-widest hover:text-white transition-colors"
+                className="h-7 px-3 border border-zinc-600 hover:border-zinc-500 text-zinc-400 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
               >
                 ARQUIVAR
               </button>
