@@ -236,7 +236,7 @@ const ClienteFicha = () => {
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       // Garantir que area_m2 seja número se presente
-      const cleanData = { ...data };
+      const cleanData: any = { ...data };
       if (cleanData.area_m2) cleanData.area_m2 = Number(cleanData.area_m2);
       
       const { error } = await supabase.from('clientes').update(cleanData).eq('id', id);
