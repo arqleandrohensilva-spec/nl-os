@@ -26,6 +26,9 @@ const STATUS_BADGES: Record<string, { label: string; color: string }> = {
 const ClientesLista = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [selectedBriefing, setSelectedBriefing] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const queryClient = useQueryClient();
   const { data: briefingsPendentes, isLoading: loadingBriefings } = useQuery({
