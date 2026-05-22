@@ -296,8 +296,16 @@ const ClientesLista = () => {
           </div>
         )}
       </main>
+      <BriefingModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        briefing={selectedBriefing}
+        onAprovar={handleAprovar}
+        onArquivar={handleArquivar}
+      />
     </div>
   );
 };
+
 
 export default ClientesLista;
