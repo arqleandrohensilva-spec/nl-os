@@ -3,10 +3,9 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,7 +16,6 @@ const BriefingPublic = () => {
   const [step, setStep] = useState(0);
   const [briefing, setBriefing] = useState<any>(null);
   const [submitted, setSubmitted] = useState(false);
-  
   const [projetoType, setProjetoType] = useState<'arq' | 'int' | 'com' | null>(null);
 
   const [formData, setFormData] = useState<any>({
@@ -26,8 +24,6 @@ const BriefingPublic = () => {
     email: '',
     cidade: '',
     origem: '',
-    
-    // Flow-specific fields
     imovel_definido: '',
     endereco: '',
     area_terreno: '',
@@ -40,13 +36,9 @@ const BriefingPublic = () => {
     orcamento: '',
     prazo: '',
     obs: '',
-    
-    // Interiores
     tipo_imovel: '',
     ambientes_reforma: [],
     mobiliario_aproveitado: '',
-    
-    // Comercial
     tipo_negocio: '',
     experiencia_cliente: '',
     marca_definida: '',
@@ -105,8 +97,8 @@ const BriefingPublic = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setSubmitting(true);
     try {
       const updateData: any = {
@@ -139,44 +131,121 @@ const BriefingPublic = () => {
     }
   };
 
+  const GrainOverlay = () => (
+    <div className="fixed inset-0 pointer-events-none z-[50] opacity-[0.03] mix-blend-overlay select-none" 
+         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+  );
+
+  const BackgroundGlow = () => (
+    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#8B7355]/5 blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#8B7355]/5 blur-[120px]" />
+    </div>
+  );
+
   if (loading) return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex items-center justify-center italic font-cormorant text-2xl">
-      Carregando...
+    <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex flex-col items-center justify-center font-cormorant italic text-2xl gap-4 selection:bg-[#8B7355]/30">
+      <div className="w-8 h-[1px] bg-[#8B7355] animate-pulse" />
+      <p className="animate-pulse">Carregando...</p>
     </div>
   );
 
   if (submitted) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center font-['Courier_New']">
+    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center font-['Courier_New'] relative overflow-hidden selection:bg-[#8B7355]/30">
+      <GrainOverlay />
+      <BackgroundGlow />
       
-      <div className="w-12 h-12 border border-[#8B7355]/40 rounded-full flex items-center justify-center mb-8">
-        <div className="w-2 h-2 bg-[#8B7355] rounded-full" />
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-10 flex flex-col items-center"
+      >
+        <div className="w-16 h-16 border border-[#8B7355]/20 rounded-full flex items-center justify-center mb-10 relative">
+          <motion.div 
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+            className="w-2 h-2 bg-[#8B7355] rounded-full" 
+          />
+          <div className="absolute inset-[-4px] border border-[#8B7355]/10 rounded-full animate-[ping_3s_linear_infinite]" />
+        </div>
 
-      <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.5em] font-bold mb-6">
-        Pré-briefing recebido
-      </p>
+        <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.6em] font-bold mb-8 opacity-70">
+          Pré-briefing recebido
+        </p>
 
-      <h1 className="font-cormorant italic text-3xl md:text-4xl text-[#E8E4DF] mb-4 leading-tight">
-        {formData.nome_completo
-          ? `${formData.nome_completo.split(' ')[0]}, recebemos seu pré-briefing.`
-          : 'Recebemos seu pré-briefing.'}
-      </h1>
+        <h1 className="font-cormorant italic text-4xl md:text-5xl text-[#E8E4DF] mb-6 leading-tight max-w-2xl">
+          {formData.nome_completo
+            ? `${formData.nome_completo.split(' ')[0]}, recebemos seu pré-briefing.`
+            : 'Recebemos seu pré-briefing.'}
+        </h1>
 
-      <div className="w-16 h-[1px] bg-[#8B7355]/30 my-6" />
+        <div className="w-12 h-[1px] bg-[#8B7355]/30 my-8" />
 
-      <p className="text-[#E8E4DF]/40 text-[10px] uppercase tracking-widest max-w-xs leading-relaxed mb-4">
-        {projetoType === 'arq' && 'Arquitetura + Interiores'}
-        {projetoType === 'int' && 'Projeto de Interiores'}
-        {projetoType === 'com' && 'Projeto Comercial'}
-      </p>
+        <div className="space-y-4 max-w-sm mx-auto text-center">
+          <p className="text-[#8B7355] text-[10px] uppercase tracking-[0.3em] font-medium">
+            {projetoType === 'arq' && 'Arquitetura + Interiores'}
+            {projetoType === 'int' && 'Projeto de Interiores'}
+            {projetoType === 'com' && 'Projeto Comercial'}
+          </p>
 
-      <p className="text-[#E8E4DF]/40 text-[10px] uppercase tracking-widest max-w-xs leading-relaxed">
-        Nossa equipe analisará suas respostas antes da reunião. Em breve entraremos em contato para confirmar o próximo passo.
-      </p>
+          <p className="text-[#E8E4DF]/50 text-[11px] uppercase tracking-widest leading-relaxed">
+            Nossa equipe analisará cada detalhe. Em breve entraremos em contato para o próximo passo.
+          </p>
+        </div>
 
-      <p className="text-[#E8E4DF]/15 text-[9px] uppercase tracking-widest mt-16">
-        NL Arquitetos · A Arquitetura como Decisão
-      </p>
+        <div className="mt-20 pt-10 border-t border-white/5 w-full max-w-xs">
+          <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-[0.4em]">
+            NL Arquitetos · A Arquitetura como Decisão
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+
+  if (step === 0) return (
+    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden selection:bg-[#8B7355]/30">
+      <GrainOverlay />
+      <BackgroundGlow />
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        className="relative z-10 flex flex-col items-center"
+      >
+        <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.8em] font-bold mb-12 opacity-80">
+          NL Arquitetos
+        </p>
+        
+        <h1 className="font-cormorant italic text-5xl md:text-7xl text-[#E8E4DF] mb-8 leading-tight max-w-3xl">
+          {formData.nome_completo 
+            ? `Seja bem-vindo, ${formData.nome_completo.split(' ')[0]}.`
+            : 'Sua jornada começa aqui.'}
+        </h1>
+
+        <div className="w-[1px] h-16 bg-gradient-to-b from-[#8B7355] to-transparent mb-12 opacity-30" />
+
+        <p className="text-[#E8E4DF]/60 text-[11px] md:text-xs max-w-lg mx-auto leading-relaxed mb-16 uppercase tracking-[0.3em] font-light">
+          Este pré-briefing é o primeiro passo para traduzirmos sua visão em arquitetura. 
+          Dedique alguns minutos para que possamos chegar preparados à nossa reunião.
+        </p>
+
+        <motion.button
+          whileHover={{ scale: 1.05, letterSpacing: "0.4em" }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setStep(1)}
+          className="group relative flex items-center gap-4 bg-[#8B7355] text-[#0F0E0C] px-14 py-5 uppercase tracking-[0.3em] text-[10px] font-bold transition-all duration-500 hover:bg-[#8B7355]/90"
+        >
+          <span>Começar</span>
+          <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
+        </motion.button>
+
+        <div className="mt-24">
+          <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-[0.5em]">A Arquitetura como Decisão</p>
+        </div>
+      </motion.div>
     </div>
   );
 
@@ -185,268 +254,376 @@ const BriefingPublic = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={step}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          exit={{ opacity: 0, y: -15 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full"
         >
           {(() => {
             switch(step) {
-      case 1:
-        return (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
-            <div className="grid gap-4">
-              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <div className="space-y-2">
-                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Como nos conheceu?</label>
-                <select name="origem" value={formData.origem} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355] transition-colors">
-                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
-                  <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
-                  <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
-                  <option value="Google" className="bg-[#0F0E0C]">Google</option>
-                  <option value="Outro" className="bg-[#0F0E0C]">Outro</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 2 — TIPO DE PROJETO</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div
-                onClick={() => setProjetoType('arq')}
-                className={`
-                  cursor-pointer border p-8 transition-all duration-300 group
-                  ${projetoType === 'arq' 
-                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
-                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
-                `}
-              >
-                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
-                  ARQ + INTERIORES
-                </p>
-                <p className="text-[#E8E4DF] text-sm leading-relaxed">
-                  Construção nova com projeto arquitetônico e interiores completos
-                </p>
-                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'arq' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
-              </div>
+              case 1:
+                return (
+                  <div className="space-y-10">
+                    <div className="space-y-2">
+                      <p className="text-[#8B7355] uppercase text-[9px] tracking-[0.5em] font-bold">Etapa 01</p>
+                      <h3 className="font-cormorant italic text-3xl text-white/90">Dados de Contato</h3>
+                    </div>
+                    
+                    <div className="grid gap-6">
+                      <div className="space-y-4">
+                        <Input 
+                          name="nome_completo" 
+                          placeholder="Nome completo" 
+                          value={formData.nome_completo} 
+                          onChange={handleChange} 
+                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                        />
+                        <Input 
+                          name="whatsapp" 
+                          placeholder="WhatsApp" 
+                          value={formData.whatsapp} 
+                          onChange={handleChange} 
+                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                        />
+                        <Input 
+                          name="email" 
+                          placeholder="E-mail" 
+                          value={formData.email} 
+                          onChange={handleChange} 
+                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                        />
+                        <Input 
+                          name="cidade" 
+                          placeholder="Cidade / Estado" 
+                          value={formData.cidade} 
+                          onChange={handleChange} 
+                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                        />
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold ml-1">Como nos conheceu?</label>
+                        <select 
+                          name="origem" 
+                          value={formData.origem} 
+                          onChange={handleChange} 
+                          className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500 appearance-none cursor-pointer"
+                        >
+                          <option value="" className="bg-[#0F0E0C]">Selecione uma opção...</option>
+                          <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
+                          <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
+                          <option value="Google" className="bg-[#0F0E0C]">Google</option>
+                          <option value="Outro" className="bg-[#0F0E0C]">Outros Canais</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                );
+              case 2:
+                return (
+                  <div className="space-y-10">
+                    <div className="space-y-2 text-center">
+                      <p className="text-[#8B7355] uppercase text-[9px] tracking-[0.5em] font-bold">Etapa 02</p>
+                      <h3 className="font-cormorant italic text-3xl text-white/90">Tipo de Projeto</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-6">
+                      {[
+                        { id: 'arq', title: 'ARQUITETURA + INTERIORES', desc: 'Projeto arquitetônico completo e design de interiores para construções novas.' },
+                        { id: 'int', title: 'INTERIORES', desc: 'Transformação de ambientes existentes, reformas e curadoria de mobiliário.' },
+                        { id: 'com', title: 'COMERCIAL', desc: 'Estratégia espacial para negócios, focada em branding e experiência do cliente.' }
+                      ].map((item) => (
+                        <motion.div
+                          key={item.id}
+                          whileHover={{ x: 5 }}
+                          onClick={() => setProjetoType(item.id as any)}
+                          className={cn(
+                            "cursor-pointer border p-8 transition-all duration-500 flex flex-col gap-4 relative overflow-hidden group",
+                            projetoType === item.id 
+                              ? "border-[#8B7355] bg-[#8B7355]/5 shadow-[0_10px_30px_rgba(139,115,85,0.05)]" 
+                              : "border-white/5 bg-white/[0.01] hover:border-white/10"
+                          )}
+                        >
+                          <div className="flex justify-between items-center">
+                            <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">
+                              {item.title}
+                            </p>
+                            {projetoType === item.id && (
+                              <motion.div 
+                                initial={{ scale: 0 }} 
+                                animate={{ scale: 1 }} 
+                                className="w-1.5 h-1.5 bg-[#8B7355] rounded-full" 
+                              />
+                            )}
+                          </div>
+                          <p className="text-[#E8E4DF]/60 text-[11px] leading-relaxed tracking-wider uppercase">
+                            {item.desc}
+                          </p>
+                          <div className={cn(
+                            "absolute bottom-0 left-0 h-[2px] transition-all duration-700",
+                            projetoType === item.id ? "bg-[#8B7355] w-full" : "bg-[#8B7355]/20 w-0 group-hover:w-12"
+                          )} />
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              case 3:
+                const isArq = projetoType === 'arq';
+                const isInt = projetoType === 'int';
+                return (
+                  <div className="space-y-10">
+                    <div className="space-y-2">
+                      <p className="text-[#8B7355] uppercase text-[9px] tracking-[0.5em] font-bold">Etapa 03</p>
+                      <h3 className="font-cormorant italic text-3xl text-white/90">
+                        {projetoType === 'com' ? 'O Negócio' : 'O Imóvel'}
+                      </h3>
+                    </div>
+                    
+                    <div className="grid gap-8">
+                      {isArq && (
+                        <>
+                          <div className="space-y-4">
+                            <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">Tem lote definido?</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {['Sim, já tenho', 'Estou buscando', 'Ainda não'].map(opt => (
+                                <button 
+                                  key={opt} 
+                                  type="button" 
+                                  onClick={() => setFormData({...formData, imovel_definido: opt})} 
+                                  className={cn(
+                                    "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all duration-500", 
+                                    formData.imovel_definido === opt 
+                                      ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
+                                      : "border-white/5 text-white/40 hover:border-white/10 hover:text-white/60"
+                                  )}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {formData.imovel_definido === 'Sim, já tenho' && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+                              <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                            </motion.div>
+                          )}
+                          <div className="grid grid-cols-2 gap-4">
+                            <Input name="area_terreno" placeholder="Área Terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                            <Input name="area_estimada" placeholder="Área Construída (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          </div>
+                        </>
+                      )}
 
-              <div
-                onClick={() => setProjetoType('int')}
-                className={`
-                  cursor-pointer border p-8 transition-all duration-300 group
-                  ${projetoType === 'int' 
-                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
-                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
-                `}
-              >
-                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
-                  INTERIORES
-                </p>
-                <p className="text-[#E8E4DF] text-sm leading-relaxed">
-                  Reforma e decoração de ambientes existentes
-                </p>
-                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'int' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
-              </div>
+                      {isInt && (
+                        <>
+                          <Input name="tipo_imovel" placeholder="Ex: Apartamento novo, Casa antiga..." value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Input name="area_estimada" placeholder="Área a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <div className="space-y-4">
+                            <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">Mobiliário Existente?</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              {['Tudo novo', 'Parte nova', 'Tudo existente'].map(opt => (
+                                <button 
+                                  key={opt} 
+                                  type="button" 
+                                  onClick={() => setFormData({...formData, mobiliario_aproveitado: opt})} 
+                                  className={cn(
+                                    "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all", 
+                                    formData.mobiliario_aproveitado === opt 
+                                      ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
+                                      : "border-white/5 text-white/40 hover:border-white/10"
+                                  )}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
 
-              <div
-                onClick={() => setProjetoType('com')}
-                className={`
-                  cursor-pointer border p-8 transition-all duration-300 group
-                  ${projetoType === 'com' 
-                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
-                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
-                `}
-              >
-                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
-                  COMERCIAL
-                </p>
-                <p className="text-[#E8E4DF] text-sm leading-relaxed">
-                  Espaço projetado para gerar resultado no seu negócio
-                </p>
-                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'com' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
-              </div>
-            </div>
-          </div>
-        );
-      case 3:
-        if (projetoType === 'arq') {
-          return (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
-              <div className="grid gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem lote/imóvel definido?</label>
-                  <div className="flex gap-4">
-                    {['Sim, já tenho', 'Estou buscando', 'Ainda não'].map(opt => (
-                      <button key={opt} type="button" onClick={() => setFormData({...formData, imovel_definido: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.imovel_definido === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
-                    ))}
+                      {projetoType === 'com' && (
+                        <>
+                          <Input name="tipo_negocio" placeholder="Qual o segmento do negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Textarea name="experiencia_cliente" placeholder="Qual sensação o cliente deve ter ao entrar no espaço?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" />
+                          <Input name="perfil_cliente" placeholder="Qual o perfil do seu público-alvo?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                {formData.imovel_definido === 'Sim, já tenho' && <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />}
-                <div className="grid grid-cols-2 gap-4">
-                  <Input name="area_terreno" placeholder="Área do terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                  <Input name="area_estimada" placeholder="Área estimada (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                </div>
-                <Input name="moradores" placeholder="Quantas pessoas vão morar?" value={formData.moradores} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                <Input name="pets" placeholder="Tem pets?" value={formData.pets} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-              </div>
-            </div>
-          );
-        } else if (projetoType === 'int') {
-          return (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O IMÓVEL</h3>
-              <div className="grid gap-6">
-                <Input name="tipo_imovel" placeholder="Tipo de imóvel (Casa / Apartamento / Outro)" value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                <Input name="endereco" placeholder="Endereço" value={formData.endereco} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                <Input name="area_estimada" placeholder="Área total a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                <div className="space-y-3">
-                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">O mobiliário existente será aproveitado?</label>
-                  <div className="flex flex-wrap gap-4">
-                    {['Tudo novo', 'Aproveitarei parte', 'Aproveitarei tudo'].map(opt => (
-                      <button key={opt} type="button" onClick={() => setFormData({...formData, mobiliario_aproveitado: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.mobiliario_aproveitado === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
-                    ))}
+                );
+              case 4:
+                return (
+                  <div className="space-y-10">
+                    <div className="space-y-2">
+                      <p className="text-[#8B7355] uppercase text-[9px] tracking-[0.5em] font-bold">Etapa 04</p>
+                      <h3 className="font-cormorant italic text-3xl text-white/90">Alinhamento Final</h3>
+                    </div>
+                    
+                    <div className="grid gap-8">
+                      <div className="space-y-4">
+                        <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">Estilo de Referência</label>
+                        <div className="flex flex-wrap gap-2">
+                          {['Minimalista', 'Contemporâneo', 'Industrial', 'Atemporal', 'Eclético'].map(opt => (
+                            <button 
+                              key={opt} 
+                              type="button" 
+                              onClick={() => setFormData({...formData, estilo_referencia: opt})} 
+                              className={cn(
+                                "text-[9px] border px-5 py-3 uppercase tracking-widest transition-all", 
+                                formData.estilo_referencia === opt 
+                                  ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
+                                  : "border-white/5 text-white/40 hover:border-white/10"
+                              )}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold ml-1">Expectativa de Investimento</label>
+                        <select 
+                          name="orcamento" 
+                          value={formData.orcamento} 
+                          onChange={handleChange} 
+                          className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] appearance-none cursor-pointer"
+                        >
+                          <option value="" className="bg-[#0F0E0C]">Não definido...</option>
+                          <option value="Ate 500k" className="bg-[#0F0E0C]">Ate R$ 500.000</option>
+                          <option value="500k - 1M" className="bg-[#0F0E0C]">R$ 500.000 a R$ 1.000.000</option>
+                          <option value="Acima 1M" className="bg-[#0F0E0C]">Acima de R$ 1.000.000</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-4">
+                        <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">Prazo Desejado</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {['Imediato', 'Próximos 6 meses'].map(opt => (
+                            <button 
+                              key={opt} 
+                              type="button" 
+                              onClick={() => setFormData({...formData, prazo: opt})} 
+                              className={cn(
+                                "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all", 
+                                formData.prazo === opt 
+                                  ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
+                                  : "border-white/5 text-white/40 hover:border-white/10"
+                              )}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <Textarea 
+                        name="obs" 
+                        placeholder="Observações adicionais ou algum detalhe específico que queira compartilhar..." 
+                        value={formData.obs} 
+                        onChange={handleChange} 
+                        className="bg-white/[0.02] border-white/5 rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" 
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          );
-        } else {
-          return (
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-              <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 3 — O NEGÓCIO</h3>
-              <div className="grid gap-6">
-                <Input name="tipo_negocio" placeholder="Qual o tipo de negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-                <Textarea name="experiencia_cliente" placeholder="Qual a experiência que você quer que o cliente sinta?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[100px]" />
-                <div className="space-y-3">
-                  <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Tem marca definida?</label>
-                  <div className="flex flex-wrap gap-4">
-                    {['Sim, completa', 'Em desenvolvimento', 'Ainda não'].map(opt => (
-                      <button key={opt} type="button" onClick={() => setFormData({...formData, marca_definida: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.marca_definida === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
-                    ))}
-                  </div>
-                </div>
-                <Input name="perfil_cliente" placeholder="Qual o perfil do seu cliente?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12" />
-              </div>
-            </div>
-          );
-        }
-      case 4:
-        return (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
-            <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 4 — O PROJETO</h3>
-            <div className="grid gap-6">
-              <div className="space-y-3">
-                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Referência de estilo</label>
-                <div className="flex flex-wrap gap-3">
-                  {['Minimalista', 'Contemporâneo', 'Rústico', 'Industrial', 'Outro'].map(opt => (
-                    <button key={opt} type="button" onClick={() => setFormData({...formData, estilo_referencia: opt})} className={cn("text-[9px] border px-3 py-1.5 uppercase tracking-widest", formData.estilo_referencia === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Orçamento estimado</label>
-                <select name="orcamento" value={formData.orcamento} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355]">
-                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
-                  <option value="Alto" className="bg-[#0F0E0C]">Acima da média</option>
-                  <option value="Medio" className="bg-[#0F0E0C]">Médio</option>
-                  <option value="Baixo" className="bg-[#0F0E0C]">Ajustado</option>
-                  <option value="Nao sei" className="bg-[#0F0E0C]">Ainda não sei</option>
-                </select>
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Quando quer começar?</label>
-                <div className="flex flex-wrap gap-4">
-                  {['Imediato', 'Até 6 meses', 'Sem prazo'].map(opt => (
-                    <button key={opt} type="button" onClick={() => setFormData({...formData, prazo: opt})} className={cn("text-[10px] border px-4 py-2 uppercase tracking-widest", formData.prazo === opt ? "border-[#8B7355] text-[#8B7355]" : "border-white/10 text-white/40")}>{opt}</button>
-                  ))}
-                </div>
-              </div>
-              <Textarea name="obs" placeholder="Algo importante que devemos saber antes da nossa conversa?" value={formData.obs} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none min-h-[120px]" />
-            </div>
-          </div>
-        );
-      default: return null;
-    }
+                );
+              default: return null;
+            }
+          })()}
+        </motion.div>
+      </AnimatePresence>
+    );
   };
 
-  if (step === 0) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center">
-      <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.5em] font-bold mb-8">NL Arquitetos</p>
-      <h1 className="font-cormorant italic text-5xl md:text-6xl text-[#E8E4DF] mb-6 leading-tight">
-        Conte-nos sobre<br/>o seu projeto
-      </h1>
-      <div className="w-16 h-[1px] bg-[#8B7355]/50 mb-8" />
-      <p className="text-[#E8E4DF]/40 max-w-sm leading-relaxed mb-12 uppercase tracking-widest text-[10px]">
-        Este formulário nos ajuda a entender sua necessidade antes da reunião. Com essas informações, chegamos preparados para uma conversa mais objetiva e precisa.
-      </p>
-      <button
-        onClick={() => setStep(1)}
-        className="bg-[#8B7355] text-[#0F0E0C] px-12 py-4 uppercase tracking-[0.3em] text-xs font-bold hover:bg-[#8B7355]/90 transition-colors"
-      >
-        COMEÇAR →
-      </button>
-      <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-widest mt-16">A Arquitetura como Decisão</p>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] p-4 md:p-8 font-['Courier_New'] overflow-x-hidden selection:bg-[#8B7355]/30">
-      <header className="max-w-xl mx-auto mb-16 mt-8 text-center space-y-4">
-        <h1 className="text-[11px] tracking-[0.5em] uppercase text-[#8B7355] font-bold">NL ARQUITETOS</h1>
-        <h2 className="font-cormorant italic text-4xl md:text-5xl text-white/90">Conte-nos sobre o seu projeto</h2>
-        <p className="text-[10px] opacity-40 max-w-sm mx-auto uppercase tracking-widest leading-relaxed">Prepare sua proposta entendendo sua necessidade antes da primeira conversa.</p>
-        <div className="pt-8">
-          <Progress value={(step / 4) * 100} className="h-[2px] bg-white/5" indicatorClassName="bg-[#8B7355] transition-all duration-700" />
+    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] font-['Courier_New'] selection:bg-[#8B7355]/30 relative overflow-hidden">
+      <GrainOverlay />
+      <BackgroundGlow />
+      
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute left-[10%] top-0 bottom-0 w-[1px] bg-white/[0.02]" />
+        <div className="absolute right-[10%] top-0 bottom-0 w-[1px] bg-white/[0.02]" />
+        <div className="absolute top-[100px] left-0 right-0 h-[1px] bg-white/[0.02]" />
+      </div>
+
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0F0E0C]/90 backdrop-blur-xl border-b border-white/5 px-8 py-6">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold tracking-[0.6em] text-[#8B7355] ml-[0.6em]">NL ARQUITETOS</span>
+            <span className="text-[8px] tracking-[0.4em] text-[#E8E4DF]/20 uppercase mt-1.5 ml-[0.4em]">Digital Briefing Experience</span>
+          </div>
+          <div className="text-[9px] text-[#8B7355] font-bold tracking-[0.3em] flex items-center gap-3">
+            <span className="opacity-40 font-light">PROGRESSO</span>
+            <span className="w-12 text-right">{Math.round((step / 4) * 100)}%</span>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/5">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${(step / 4) * 100}%` }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full bg-[#8B7355] shadow-[0_0_15px_rgba(139,115,85,0.3)]"
+          />
         </div>
       </header>
 
-      <main className="max-w-xl mx-auto bg-white/[0.01] border border-white/[0.05] p-6 md:p-12 shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
-        <form onSubmit={handleSubmit} className="space-y-12">
+      <main className="relative z-10 pt-40 pb-32 px-6">
+        <div className="max-w-xl mx-auto">
           {renderStep()}
-          
-          <div className="flex justify-between items-center pt-8 border-t border-white/5">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              disabled={step === 1} 
-              onClick={() => setStep(s => s - 1)} 
-              className="rounded-none text-[10px] tracking-widest opacity-40 hover:opacity-100 hover:bg-transparent"
-            >
-              <ChevronLeft size={16} className="mr-2" /> ANTERIOR
-            </Button>
-            
+
+          <div className="mt-20 pt-10 border-t border-white/5 flex justify-between items-center">
+            {step > 1 ? (
+              <motion.button
+                whileHover={{ x: -4 }}
+                onClick={() => setStep(step - 1)}
+                className="flex items-center gap-3 text-[10px] text-[#E8E4DF]/40 uppercase tracking-[0.4em] hover:text-[#8B7355] transition-all group"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100" />
+                <span>Anterior</span>
+              </motion.button>
+            ) : <div />}
+
             {step < 4 ? (
-              <Button 
-                type="button" 
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setStep(step + 1)}
                 disabled={step === 2 && !projetoType}
-                onClick={() => setStep(s => s + 1)} 
-                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-10 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
+                className="flex items-center gap-4 bg-[#8B7355] text-[#0F0E0C] px-10 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-20 disabled:grayscale group shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
               >
-                PRÓXIMO <ChevronRight size={16} className="ml-2" />
-              </Button>
+                <span className="ml-1">Próximo</span>
+                <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              </motion.button>
             ) : (
-              <Button 
-                type="submit" 
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleSubmit()}
                 disabled={submitting}
-                className="rounded-none bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] font-bold px-12 h-12 text-[10px] tracking-widest shadow-[0_5px_15px_rgba(139,115,85,0.2)]"
+                className="bg-[#8B7355] text-[#0F0E0C] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-50 shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
               >
-                {submitting ? 'ENVIANDO...' : 'SUBMETER'}
-              </Button>
+                <span className="ml-1">{submitting ? 'Enviando...' : 'Finalizar →'}</span>
+              </motion.button>
             )}
           </div>
-        </form>
+        </div>
       </main>
-      
-      <footer className="max-w-xl mx-auto mt-20 text-center pb-20 opacity-20">
-        <p className="text-[9px] tracking-[0.4em] uppercase font-bold">A ARQUITETURA COMO DECISÃO · {new Date().getFullYear()}</p>
+
+      <footer className="fixed bottom-8 left-0 right-0 pointer-events-none z-40 px-10 hidden md:block">
+        <div className="max-w-[1400px] mx-auto flex justify-between items-end">
+          <div className="flex flex-col gap-6 opacity-20">
+            <div className="w-[1px] h-12 bg-white/40 mx-auto" />
+            <div className="text-[8px] uppercase tracking-[0.6em] vertical-text transform -rotate-180" style={{ writingMode: 'vertical-rl' }}>
+              NL ARQUITETOS · 2026
+            </div>
+          </div>
+          <div className="flex flex-col gap-6 opacity-20">
+            <div className="text-[8px] uppercase tracking-[0.6em] vertical-text" style={{ writingMode: 'vertical-rl' }}>
+              A ARQUITETURA COMO DECISÃO
+            </div>
+            <div className="w-[1px] h-12 bg-white/40 mx-auto" />
+          </div>
+        </div>
       </footer>
     </div>
   );
