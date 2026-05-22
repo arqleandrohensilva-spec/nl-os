@@ -71,6 +71,7 @@ export interface Proposal {
   validade: number;
   data: string;
   status: 'Enviada' | 'Vista' | 'Aprovada' | 'Recusada';
+  cliente_id?: string;
   created_at: string;
   views_count?: number;
   last_view_at?: string;
@@ -215,6 +216,7 @@ const PropostasTracking = () => {
       setNewProposal(prev => ({
         ...prev,
         cliente: selectedLead.nome,
+        cliente_id: selectedLead.id,
         cidade: selectedLead.cidade || prev.cidade,
         estado: selectedLead.estado || prev.estado,
         area: selectedLead.area || prev.area,
