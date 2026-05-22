@@ -182,7 +182,7 @@ const ClientesLista = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock size={14} className="text-[#8B7355]/40" />
-                        <span className="text-[10px] uppercase tracking-wider">Orçamento: {briefing.respostas?.orcamento || 'Não informado'}</span>
+                        <span className="text-[10px] uppercase tracking-wider">Orçamento: {(briefing.respostas as any)?.orcamento || 'Não informado'}</span>
                       </div>
                     </div>
                   </div>
