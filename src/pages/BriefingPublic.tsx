@@ -6,8 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { CheckCircle2, ChevronRight, ChevronLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const BriefingPublic = () => {
   const { token } = useParams();
@@ -180,7 +181,17 @@ const BriefingPublic = () => {
   );
 
   const renderStep = () => {
-    switch(step) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
+          {(() => {
+            switch(step) {
       case 1:
         return (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
