@@ -126,6 +126,7 @@ export type Database = {
       briefings: {
         Row: {
           cidade: string | null
+          cliente_id: string | null
           criado_em: string
           email: string | null
           id: string
@@ -141,6 +142,7 @@ export type Database = {
         }
         Insert: {
           cidade?: string | null
+          cliente_id?: string | null
           criado_em?: string
           email?: string | null
           id?: string
@@ -156,6 +158,7 @@ export type Database = {
         }
         Update: {
           cidade?: string | null
+          cliente_id?: string | null
           criado_em?: string
           email?: string | null
           id?: string
@@ -170,6 +173,13 @@ export type Database = {
           whatsapp?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "briefings_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "briefings_lead_id_fkey"
             columns: ["lead_id"]
@@ -232,6 +242,7 @@ export type Database = {
       clientes: {
         Row: {
           area_m2: number | null
+          briefing_preenchido: boolean | null
           cidade: string | null
           cpf_cnpj: string | null
           created_at: string | null
@@ -248,6 +259,7 @@ export type Database = {
         }
         Insert: {
           area_m2?: number | null
+          briefing_preenchido?: boolean | null
           cidade?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
@@ -264,6 +276,7 @@ export type Database = {
         }
         Update: {
           area_m2?: number | null
+          briefing_preenchido?: boolean | null
           cidade?: string | null
           cpf_cnpj?: string | null
           created_at?: string | null
