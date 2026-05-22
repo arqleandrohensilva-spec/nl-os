@@ -9,9 +9,22 @@ import {
   CheckCircle2, 
   XCircle, 
   RefreshCcw,
-  Box
+  Box,
+  ClipboardList,
+  Star,
+  Instagram,
+  MessageCircle,
+  Copy,
+  Layout
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const iconMap: Record<string, any> = {
+  ClipboardList,
+  Star,
+  Instagram,
+  MessageCircle
+};
 
 const ConfiguracoesSistema = () => {
   const [dropboxStatus, setDropboxStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
