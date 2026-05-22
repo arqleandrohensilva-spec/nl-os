@@ -183,49 +183,69 @@ const BriefingPublic = () => {
     switch(step) {
       case 1:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 1 — DADOS PESSOAIS</h3>
             <div className="grid gap-4">
-              <Input name="nome_completo" placeholder="Nome completo" value={formData.nome_completo} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="whatsapp" placeholder="WhatsApp" value={formData.whatsapp} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="email" placeholder="E-mail" value={formData.email} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <Input name="cidade" placeholder="Cidade" value={formData.cidade} onChange={handleChange} className="bg-white/[0.03] border-white/10 rounded-none h-12 focus:border-[#8B7355] transition-colors" />
-              <div className="space-y-2">
-                <label className="text-[10px] text-[#8B7355] uppercase tracking-widest">Como nos conheceu?</label>
-                <select name="origem" value={formData.origem} onChange={handleChange} className="w-full bg-white/[0.03] border border-white/10 rounded-none h-12 px-3 text-sm focus:outline-none focus:border-[#8B7355] transition-colors">
-                  <option value="" className="bg-[#0F0E0C]">Selecione...</option>
-                  <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
-                  <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
-                  <option value="Google" className="bg-[#0F0E0C]">Google</option>
-                  <option value="Outro" className="bg-[#0F0E0C]">Outro</option>
-                </select>
-              </div>
-            </div>
-          </div>
+...
         );
       case 2:
         return (
-          <div className="space-y-6 animate-in fade-in duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-3 duration-500">
             <h3 className="text-[#8B7355] uppercase text-[10px] tracking-[0.3em] font-bold mb-8">ETAPA 2 — TIPO DE PROJETO</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { id: 'arq', label: 'ARQ + INTERIORES', desc: 'Construção nova com projeto completo' },
-                { id: 'int', label: 'INTERIORES', desc: 'Reforma e decoração' },
-                { id: 'com', label: 'COMERCIAL', desc: 'Espaço que trabalha por você' }
-              ].map((t) => (
-                <button 
-                  key={t.id}
-                  type="button"
-                  onClick={() => setProjetoType(t.id as any)}
-                  className={cn(
-                    "p-6 border text-left transition-all duration-300 flex flex-col justify-between h-32 group",
-                    projetoType === t.id ? "border-[#8B7355] bg-[#8B7355]/05 shadow-[0_0_15px_rgba(139,115,85,0.1)]" : "border-white/10 hover:border-white/20"
-                  )}
-                >
-                  <span className={cn("block text-[10px] font-bold tracking-widest", projetoType === t.id ? "text-[#8B7355]" : "text-white/60 group-hover:text-white")}>{t.label}</span>
-                  <span className="text-[9px] opacity-40 uppercase tracking-tighter leading-tight">{t.desc}</span>
-                </button>
-              ))}
+              <div
+                onClick={() => setProjetoType('arq')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'arq' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  ARQ + INTERIORES
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Construção nova com projeto arquitetônico e interiores completos
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'arq' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
+
+              <div
+                onClick={() => setProjetoType('int')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'int' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  INTERIORES
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Reforma e decoração de ambientes existentes
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'int' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
+
+              <div
+                onClick={() => setProjetoType('com')}
+                className={`
+                  cursor-pointer border p-8 transition-all duration-300 group
+                  ${projetoType === 'com' 
+                    ? 'border-[#8B7355] bg-[#8B7355]/5' 
+                    : 'border-white/10 hover:border-[#8B7355]/50 hover:bg-white/[0.02]'}
+                `}
+              >
+                <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] font-bold mb-3">
+                  COMERCIAL
+                </p>
+                <p className="text-[#E8E4DF] text-sm leading-relaxed">
+                  Espaço projetado para gerar resultado no seu negócio
+                </p>
+                <div className={`mt-4 w-6 h-[1px] transition-all duration-300 ${projetoType === 'com' ? 'bg-[#8B7355] w-12' : 'bg-white/20'}`} />
+              </div>
             </div>
           </div>
         );
