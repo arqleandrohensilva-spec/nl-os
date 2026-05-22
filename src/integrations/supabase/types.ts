@@ -125,34 +125,49 @@ export type Database = {
       }
       briefings: {
         Row: {
+          cidade: string | null
           criado_em: string
+          email: string | null
           id: string
           lead_id: string | null
+          nome: string | null
+          origem: string | null
           preenchido_em: string | null
           respostas: Json | null
           status: string
           tipo_projeto: string | null
-          token: string
+          token: string | null
+          whatsapp: string | null
         }
         Insert: {
+          cidade?: string | null
           criado_em?: string
+          email?: string | null
           id?: string
           lead_id?: string | null
+          nome?: string | null
+          origem?: string | null
           preenchido_em?: string | null
           respostas?: Json | null
           status?: string
           tipo_projeto?: string | null
-          token: string
+          token?: string | null
+          whatsapp?: string | null
         }
         Update: {
+          cidade?: string | null
           criado_em?: string
+          email?: string | null
           id?: string
           lead_id?: string | null
+          nome?: string | null
+          origem?: string | null
           preenchido_em?: string | null
           respostas?: Json | null
           status?: string
           tipo_projeto?: string | null
-          token?: string
+          token?: string | null
+          whatsapp?: string | null
         }
         Relationships: [
           {
