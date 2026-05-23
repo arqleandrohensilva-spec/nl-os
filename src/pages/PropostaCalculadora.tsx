@@ -93,7 +93,7 @@ const PropostaCalculadora = () => {
       // Handle Standalone case
       if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         setProposal({
-          id: 'nova',
+          id: proposalId,
           cliente: '',
           tipo: 'ArqInt',
           cidade: '',
