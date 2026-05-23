@@ -114,7 +114,7 @@ const ClienteFicha = () => {
       const { data } = await supabase
         .from('contratos')
         .select('*')
-        .eq('cliente_id', id)
+        .eq('cliente_id' as any, id)
         .maybeSingle();
       return data;
     },
