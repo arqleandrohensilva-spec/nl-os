@@ -258,9 +258,9 @@ const ClientesLista = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className={cn(
                     "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-[1px]",
-                    STATUS_BADGES[cliente.status_comercial]?.color || 'bg-white/10 text-white/40'
+                    STAGE_MAP[cliente.etapa_fluxo]?.color || 'bg-white/10 text-white/40'
                   )}>
-                    {cliente.status_comercial || 'Novo Lead'}
+                    {STAGE_MAP[cliente.etapa_fluxo]?.label || 'FICHA'}
                   </div>
                 </div>
 
