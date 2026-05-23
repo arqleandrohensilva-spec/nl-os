@@ -916,7 +916,7 @@ const DocumentosContratos = () => {
       
       <main className="flex-1 ml-[230px] p-10">
         <header className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-white mb-1">08 · Documentos e Contratos</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white mb-1">Documentos e Contratos</h1>
           <p className="text-[#8B7355] text-[11px] uppercase tracking-[0.2em] font-bold">BRIEFING · CONTRATOS · ARQUIVOS</p>
         </header>
 
