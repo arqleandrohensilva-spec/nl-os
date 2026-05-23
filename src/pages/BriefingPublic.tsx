@@ -59,10 +59,8 @@ const BriefingPublic = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('briefings')
-        .select('*, leads(*)')
-        .eq('token', token)
-        .single();
+        .rpc('get_briefing_by_token', { p_token: token })
+        .maybeSingle();
 
       if (error || !data) {
         toast.error('Briefing não encontrado.');
