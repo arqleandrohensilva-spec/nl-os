@@ -54,18 +54,9 @@ export default function PaginaCliente() {
     try {
       setLoading(true);
       
-      // Check if param is a valid UUID
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(param || "");
-      
-      let query = supabase.from('projetos').select('*');
-      
-      if (isUUID) {
-        query = query.or(`token_cliente.eq.${param},slug_cliente.eq.${param}`);
-      } else {
-        query = query.eq('slug_cliente', param);
-      }
-
-      const { data: proj, error: projError } = await (query as any).maybeSingle();
+      const { data: proj, error: projError } = await supabase
+        .rpc('get_project_by_token_or_slug', { p_val: param })
+        .maybeSingle();
 
       if (projError || !proj) {
         console.error("Erro ao buscar projeto:", projError);
