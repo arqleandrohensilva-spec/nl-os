@@ -330,7 +330,7 @@ const PropostasTracking = () => {
       // 5. Atualizar lead no Pipeline para Fechado
       if (proposta.cliente_id) {
         await supabase.from('leads').update({
-          stage: 'Fechado',
+          stage: 'FECHADO',
           fechado_em: new Date().toISOString()
         }).eq('cliente_id', proposta.cliente_id);
       }
