@@ -398,7 +398,7 @@ const PropostaCalculadora = () => {
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
-            {proposalId === 'nova' ? (
+            {(proposalId === 'nova' || proposalId === 'nova-proposta') ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-4">
                   <Input 
