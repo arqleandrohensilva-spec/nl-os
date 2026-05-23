@@ -356,19 +356,21 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
-        <NavItem 
-          label="CLIENTES" 
-          icon={<Users size={14} />}
-          active={location.pathname === '/clientes'} 
-          onClick={() => navigate('/clientes')} 
-        />
-        {pendingBriefingsCount > 0 && (
-          <div className="absolute left-[85px] top-[372px] pointer-events-none">
-             <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
-              {pendingBriefingsCount}
-            </span>
-          </div>
-        )}
+        <div className="relative">
+          <NavItem 
+            label="CLIENTES" 
+            icon={<Users size={14} />}
+            active={location.pathname === '/clientes'} 
+            onClick={() => navigate('/clientes')} 
+          />
+          {pendingBriefingsCount > 0 && (
+            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
+               <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
+                {pendingBriefingsCount}
+              </span>
+            </div>
+          )}
+        </div>
 
         <NavItem 
           label="PIPELINE" 
