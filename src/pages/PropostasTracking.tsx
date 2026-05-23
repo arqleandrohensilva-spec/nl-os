@@ -576,7 +576,7 @@ Gere a mensagem de WhatsApp.`;
       setReviewResult(null);
       setIsReviewModalOpen(true);
 
-      let proposalText = proposal.objetivo || "Esta é uma proposta teste para a NL Arquitetos.";
+      let proposalText = proposal.objetivo || "Sem objetivo definido.";
       
       try {
         const { data: contractData } = await supabase
