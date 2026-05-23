@@ -256,7 +256,7 @@ const PropostaCalculadora = () => {
       let currentProposalId = proposalId;
 
       // Handle standalone creation
-      if (proposalId === 'nova') {
+      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         if (!proposal?.cliente) {
           toast.error("Por favor, informe o nome do cliente.");
           setIsGeneratingLink(false);
