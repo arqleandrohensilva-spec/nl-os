@@ -89,7 +89,7 @@ export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: num
 
 const StageBadge = ({ stage }: { stage: string }) => {
   const configs: Record<string, { bg: string, text: string }> = {
-    'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
+    'Briefing': { bg: 'bg-[#1E1E1E]/15', text: 'text-[#1E1E1E]' },
     'Conceito': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
     'Estudo Preliminar': { bg: 'bg-[#D4AF37]/15', text: 'text-[#D4AF37]' },
     'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
@@ -97,7 +97,7 @@ const StageBadge = ({ stage }: { stage: string }) => {
     'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
   };
 
-  const config = configs[stage] || { bg: 'bg-muted/15', text: 'text-white/40' };
+  const config = configs[stage] || { bg: 'bg-muted/15', text: 'text-white/[0.4]' };
 
   return (
     <span className={cn(
@@ -577,24 +577,24 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div className="min-h-screen bg-[#0D0D0D] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 font-mono">Módulo 03 · Registro de tempo por projeto</p>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-white/[0.4] font-mono">Módulo 03 · Registro de tempo por projeto</p>
           </div>
           <div className="flex gap-3">
             <Button 
               onClick={() => setIsManualModalOpen(true)}
               variant="ghost" 
-              className="text-white/40 text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none hover:text-bronze hover:bg-transparent"
+              className="text-white/[0.4] text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none hover:text-bronze hover:bg-transparent"
             >
               <Plus size={14} className="mr-2" />
               Registrar Horas
             </Button>
-            <Button variant="outline" className="border-white/10 hover:border-bronze text-white text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
+            <Button variant="outline" className="border-white/[0.12] hover:border-bronze text-white text-[10px] uppercase font-bold tracking-widest h-10 px-6 rounded-none">
               + Novo Projeto
             </Button>
           </div>
@@ -602,7 +602,7 @@ const ControleHoras = () => {
 
         {/* Weekly Summary Card */}
         {showWeeklySummary && lastWeekSummary && (
-          <div className="mb-12 bg-[#E8E4DF] border border-bronze/30 p-8 rounded-[4px] relative animate-in fade-in slide-in-from-top duration-500">
+          <div className="mb-12 bg-[#F0EDE8] border border-bronze/30 p-8 rounded-[4px] relative animate-in fade-in slide-in-from-top duration-500">
             <button 
               onClick={() => {
                 setShowWeeklySummary(false);
@@ -618,27 +618,27 @@ const ControleHoras = () => {
             </div>
             <div className="grid grid-cols-4 gap-8 mb-8">
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Horas registradas</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/[0.4] mb-1 font-bold font-mono">Horas registradas</p>
                 <p className="text-2xl font-cormorant font-bold">{Math.round(lastWeekSummary.total)}h total</p>
-                <p className="text-[9px] text-white/40 font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
+                <p className="text-[9px] text-white/[0.4] font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Projeto mais consumido</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/[0.4] mb-1 font-bold font-mono">Projeto mais consumido</p>
                 <p className="text-2xl font-cormorant font-bold">{lastWeekSummary.topProject}</p>
-                <p className="text-[9px] text-white/40 font-mono">{lastWeekSummary.topHours}h investidas</p>
+                <p className="text-[9px] text-white/[0.4] font-mono">{lastWeekSummary.topHours}h investidas</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Eficiência Média</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/[0.4] mb-1 font-bold font-mono">Eficiência Média</p>
                 <p className="text-2xl font-cormorant font-bold">93%</p>
                 <p className="text-[9px] text-emerald-600 font-bold font-mono">ALTA PERFORMANCE</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Meta atingida</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/[0.4] mb-1 font-bold font-mono">Meta atingida</p>
                 <div className="flex items-center gap-2">
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
                   </span>
-                  <span className="text-white/20">|</span>
+                  <span className="text-white/[0.18]">|</span>
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.neandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.neandro >= 30 ? '✓' : '✗'} Neandro
                   </span>
@@ -652,10 +652,10 @@ const ControleHoras = () => {
         )}
 
         {/* Weekly Goals Bar */}
-        <div className="mb-12 bg-white/[0.03] border border-white/10 p-6 rounded-[4px] border-l-4 border-l-bronze">
+        <div className="mb-12 bg-white/[0.03] border border-white/[0.12] p-6 rounded-[4px] border-l-4 border-l-bronze">
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Meta de Horas Semanal</h4>
-            <span className="text-[9px] text-white/40 font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
+            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/[0.4]">Meta de Horas Semanal</h4>
+            <span className="text-[9px] text-white/[0.4] font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
           </div>
           <div className="grid grid-cols-2 gap-12">
             {[
@@ -685,26 +685,26 @@ const ControleHoras = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">HORAS NO MÊS</span>
+          <div className="bg-[#0D0D0D] border border-white/[0.12] p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">HORAS NO MÊS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
+          <div className="bg-[#0D0D0D] border border-white/[0.12] p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">PROJETOS ATIVOS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {metrics.ativos}
             </span>
           </div>
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">CUSTO INTERNO</span>
+          <div className="bg-[#0D0D0D] border border-white/[0.12] p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">CUSTO INTERNO</span>
             <span className="text-[22px] font-normal text-white font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
-          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">EFICIÊNCIA</span>
+          <div className="bg-[#0D0D0D] border border-white/[0.12] p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+            <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">EFICIÊNCIA</span>
             <span className="text-[22px] font-normal text-white font-inter">
               92%
             </span>
@@ -720,7 +720,7 @@ const ControleHoras = () => {
             const isRunning = activeTimer?.id === p.id;
 
             return (
-              <div key={p.id} className="bg-white/[0.03] border border-white/10 p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
+              <div key={p.id} className="bg-white/[0.03] border border-white/[0.12] p-6 rounded-[4px] group relative transition-all duration-300 hover:border-bronze/30 flex flex-col justify-between min-h-[280px]">
                 <div>
                   <div className="flex justify-between items-start mb-1">
                     <h3 className="text-xl font-cormorant font-bold text-white group-hover:text-bronze transition-colors truncate pr-4">{p.nome}</h3>
@@ -731,12 +731,12 @@ const ControleHoras = () => {
                       </div>
                     )}
                   </div>
-                  <p className="text-[9px] text-white/40 uppercase tracking-wider mb-6 font-bold truncate">
+                  <p className="text-[9px] text-white/[0.4] uppercase tracking-wider mb-6 font-bold truncate">
                     {p.nome_cliente} · {p.tipo} · {p.area_m2}m²
                   </p>
 
                   <div className="mb-8">
-                    <div className="flex justify-between text-[9px] uppercase tracking-wider text-white/40 mb-1.5 font-bold">
+                    <div className="flex justify-between text-[9px] uppercase tracking-wider text-white/[0.4] mb-1.5 font-bold">
                       <StageBadge stage={p.etapa_atual} />
                       <span className={cn(progress > 90 ? "text-rose-500" : "text-white")}>
                         {Math.round(totalHoras)}h / {p.horas_estimadas}h
@@ -757,7 +757,7 @@ const ControleHoras = () => {
                     aiPredictions[p.id].status === 'alert' 
                       ? "border-rose-500 bg-rose-50/50 font-mono" 
                       : aiPredictions[p.id].status === 'info'
-                        ? "border-muted-foreground/20 bg-muted/10 font-mono text-white/40"
+                        ? "border-muted-foreground/20 bg-muted/10 font-mono text-white/[0.4]"
                         : "border-emerald-500 bg-emerald-50/50 font-mono"
                   )}>
                     <div className="flex items-start gap-2">
@@ -772,7 +772,7 @@ const ControleHoras = () => {
                 {p.status_geral === 'ativo' && !aiPredictions[p.id] && loadingPredictions[p.id] && (
                   <div className="mb-6 p-2.5 border-l-2 border-bronze/20 bg-muted/20 animate-pulse flex items-center gap-2">
                     <Clock size={12} className="text-bronze/30" />
-                    <span className="text-[10px] text-white/40 font-mono">Analisando ritmo...</span>
+                    <span className="text-[10px] text-white/[0.4] font-mono">Analisando ritmo...</span>
                   </div>
                 )}
                 </div>
@@ -790,7 +790,7 @@ const ControleHoras = () => {
                     <Button 
                       onClick={() => openTimerModal(p)}
                       variant="outline"
-                      className="flex-1 border-white/40 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                      className="flex-1 border-white/[0.4] text-white hover:bg-white/[0.12] hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
                     >
                       <Play size={10} className="mr-2" />
                       Iniciar
@@ -799,7 +799,7 @@ const ControleHoras = () => {
                   <Button 
                     variant="ghost"
                     onClick={() => openPanel(p)}
-                    className="flex-1 text-white/40 hover:text-bronze hover:bg-transparent rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
+                    className="flex-1 text-white/[0.4] hover:text-bronze hover:bg-transparent rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
                   >
                     Sessões
                   </Button>
@@ -810,7 +810,7 @@ const ControleHoras = () => {
         </div>
 
         {/* Profitability Report */}
-        <div className="bg-white/[0.03] border border-white/10 rounded-[4px] overflow-hidden">
+        <div className="bg-white/[0.03] border border-white/[0.12] rounded-[4px] overflow-hidden">
           <button 
             onClick={() => setIsReportExpanded(!isReportExpanded)}
             className="w-full flex items-center justify-between p-6 hover:bg-white/[0.02] transition-colors"
@@ -819,19 +819,19 @@ const ControleHoras = () => {
               <TrendingUp size={18} className="text-bronze" />
               <h3 className="text-[12px] font-bold uppercase tracking-[0.2em]">Relatório de Lucratividade</h3>
             </div>
-            <ChevronRight className={cn("transition-transform text-white/40/30", isReportExpanded && "rotate-90")} />
+            <ChevronRight className={cn("transition-transform text-white/[0.4]/30", isReportExpanded && "rotate-90")} />
           </button>
           
           {isReportExpanded && (
-            <div className="px-6 pb-6 border-t border-white/10 pt-6">
+            <div className="px-6 pb-6 border-t border-white/[0.12] pt-6">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-widest text-white/40 border-b border-white/10">
-                    <th className="pb-4 font-bold text-white/40">Projeto</th>
-                    <th className="pb-4 font-bold text-white/40">Receita</th>
-                    <th className="pb-4 font-bold text-white/40">Custo Int.</th>
-                    <th className="pb-4 font-bold text-white/40">Margem</th>
-                    <th className="pb-4 font-bold text-right text-white/40">Status</th>
+                  <tr className="text-[9px] uppercase tracking-widest text-white/[0.4] border-b border-white/[0.12]">
+                    <th className="pb-4 font-bold text-white/[0.4]">Projeto</th>
+                    <th className="pb-4 font-bold text-white/[0.4]">Receita</th>
+                    <th className="pb-4 font-bold text-white/[0.4]">Custo Int.</th>
+                    <th className="pb-4 font-bold text-white/[0.4]">Margem</th>
+                    <th className="pb-4 font-bold text-right text-white/[0.4]">Status</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px]">
@@ -844,8 +844,8 @@ const ControleHoras = () => {
                     return (
                       <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
                         <td className="py-4 font-medium text-white">{p.nome}</td>
-                        <td className="py-4 text-white/40 font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
-                        <td className="py-4 text-white/40 font-mono">R$ {Math.round(custo).toLocaleString()}</td>
+                        <td className="py-4 text-white/[0.4] font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
+                        <td className="py-4 text-white/[0.4] font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(
                           "py-4 font-bold font-mono",
                           margem > 30 ? "text-emerald-600" : margem > 15 ? "text-bronze" : "text-rose-500"
@@ -855,7 +855,7 @@ const ControleHoras = () => {
                         <td className="py-4 text-right">
                           <span className={cn(
                             "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
-                            p.status_geral === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-white/40"
+                            p.status_geral === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-white/[0.4]"
                           )}>
                             {p.status_geral}
                           </span>
@@ -867,7 +867,7 @@ const ControleHoras = () => {
               </table>
               
               <div className="mt-8 flex justify-end">
-                <Button className="bg-[#1A1A1A] border border-white/10 hover:bg-[#2A2A2A] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
+                <Button className="bg-[#161616] border border-white/[0.12] hover:bg-[#1E1E1E] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
                   <BarChart3 size={14} className="mr-2" />
                   Análise com IA
                 </Button>
@@ -879,19 +879,19 @@ const ControleHoras = () => {
 
       {/* Timer Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Iniciar Sessão</h2>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8">{selectedProjeto?.nome}</p>
+            <p className="text-[10px] uppercase tracking-widest text-white/[0.4] mb-8">{selectedProjeto?.nome}</p>
             
             <div className="space-y-6">
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Etapa</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Etapa</label>
                 <Select value={newSession.etapa} onValueChange={(v) => setNewSession({...newSession, etapa: v})}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                  <SelectTrigger className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
+                  <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white">
                     <SelectItem value="Briefing">01 · Briefing</SelectItem>
                     <SelectItem value="Conceito">02 · Conceito</SelectItem>
                     <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
@@ -903,7 +903,7 @@ const ControleHoras = () => {
               </div>
 
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Responsável</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Responsável</label>
                 <div className="flex gap-4">
                   {['Leandro', 'Neandro'].map(r => (
                     <button 
@@ -911,7 +911,7 @@ const ControleHoras = () => {
                       onClick={() => setNewSession({...newSession, responsavel: r})}
                       className={cn(
                         "flex-1 py-3 border text-[10px] uppercase font-bold tracking-widest transition-all",
-                        newSession.responsavel === r ? "border-bronze bg-bronze/10 text-white" : "border-white/10 text-white/30 hover:border-white/30"
+                        newSession.responsavel === r ? "border-bronze bg-bronze/10 text-white" : "border-white/[0.12] text-white/30 hover:border-white/30"
                       )}
                     >
                       {r}
@@ -921,17 +921,17 @@ const ControleHoras = () => {
               </div>
 
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Observação (Opcional)</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Observação (Opcional)</label>
                 <Input 
                   placeholder="O que você está fazendo?"
                   value={newSession.obs}
                   onChange={(e) => setNewSession({...newSession, obs: e.target.value})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                  className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11 placeholder:text-white/[0.12]"
                 />
               </div>
 
               <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/[0.4] hover:text-white">Cancelar</Button>
                 <Button onClick={startTimer} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">▶ Iniciar Agora</Button>
               </div>
             </div>
@@ -941,11 +941,11 @@ const ControleHoras = () => {
 
       {/* Sessions Panel */}
       <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
-        <SheetContent className="w-[420px] bg-[#0A0A0A] border-l border-white/5 text-white p-0 overflow-y-auto">
+        <SheetContent className="w-[420px] bg-[#0D0D0D] border-l border-white/[0.06] text-white p-0 overflow-y-auto">
           <div className="p-10">
             <div className="mb-10">
               <h2 className="text-3xl font-cormorant font-bold mb-1">{panelProjeto?.nome}</h2>
-              <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold">{panelProjeto?.nome_cliente} · {panelProjeto?.tipo}</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">{panelProjeto?.nome_cliente} · {panelProjeto?.tipo}</p>
             </div>
 
             {panelProjeto && (
@@ -984,7 +984,7 @@ const ControleHoras = () => {
                 </div>
 
                 <div className="space-y-6">
-                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Orçado vs Realizado</h4>
+                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/[0.4]">Orçado vs Realizado</h4>
                   {[
                     { label: 'Briefing', estim: panelProjeto.horas_briefing },
                     { label: 'Conceito', estim: panelProjeto.horas_conceito },
@@ -1001,17 +1001,17 @@ const ControleHoras = () => {
                       <div key={e.label} className="space-y-1.5">
                         <div className="flex justify-between items-center text-[10px] text-white/60 font-bold uppercase tracking-wider">
                           <StageBadge stage={e.label} />
-                          <span className={cn(isOver ? "text-rose-500" : "text-white/40")}>
+                          <span className={cn(isOver ? "text-rose-500" : "text-white/[0.4]")}>
                             {Math.round(real)}h / {e.estim}h {desvio !== 0 && `(${desvio > 0 ? '+' : ''}${Math.round(desvio)}%)`}
                           </span>
                         </div>
                         <div className="space-y-1">
                           {/* Orçado (Bege) */}
-                          <div className="h-[4px] bg-[#E8E4DF]/20 rounded-full w-full overflow-hidden">
-                            <div className="h-full bg-[#E8E4DF]" style={{ width: '100%' }} />
+                          <div className="h-[4px] bg-[#F0EDE8]/20 rounded-full w-full overflow-hidden">
+                            <div className="h-full bg-[#F0EDE8]" style={{ width: '100%' }} />
                           </div>
                           {/* Realizado (Bronze ou Vermelho se estourar) */}
-                          <div className="h-[4px] bg-[#2A2A2A] rounded-full w-full overflow-hidden">
+                          <div className="h-[4px] bg-[#1E1E1E] rounded-full w-full overflow-hidden">
                             <div 
                               className={cn("h-full transition-all duration-500", isOver ? "bg-rose-500" : "bg-bronze")} 
                               style={{ width: `${Math.min((real / (e.estim || 1)) * 100, 100)}%` }} 
@@ -1024,7 +1024,7 @@ const ControleHoras = () => {
                 </div>
 
                 <div className="space-y-6 pt-6">
-                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/40">Sessões de Trabalho</h4>
+                  <h4 className="text-[9px] uppercase tracking-widest font-bold text-white/[0.4]">Sessões de Trabalho</h4>
                   <div className="space-y-4">
                     {sessoes.filter(s => s.projeto_id === panelProjeto.id).map(s => (
                       <div key={s.id} className="group flex justify-between items-start border-b border-white/[0.03] pb-4 last:border-0">
@@ -1034,10 +1034,10 @@ const ControleHoras = () => {
                             <StageBadge stage={s.etapa} />
                           </div>
                           <div className="flex items-center gap-2">
-                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
-                            {s.is_manual && <Pencil size={10} className="text-white/20" />}
+                            <p className="text-[10px] text-white/[0.4] uppercase font-bold tracking-wider">{s.responsavel} · {Math.round(s.duracao_minutos || 0)} min</p>
+                            {s.is_manual && <Pencil size={10} className="text-white/[0.18]" />}
                           </div>
-                          {s.observacao && <p className="text-[10px] text-white/20 italic">"{s.observacao}"</p>}
+                          {s.observacao && <p className="text-[10px] text-white/[0.18] italic">"{s.observacao}"</p>}
                         </div>
                         <button onClick={() => deleteSessao(s.id)} className="opacity-0 group-hover:opacity-100 transition-opacity text-rose-500 hover:text-rose-400 p-1">
                           <Trash2 size={12} />
@@ -1048,7 +1048,7 @@ const ControleHoras = () => {
                 </div>
 
                 <div className="pt-10">
-                  <Button className="w-full bg-transparent border border-white/10 hover:border-bronze hover:bg-bronze/10 text-white rounded-none text-[10px] uppercase font-bold tracking-widest h-12">
+                  <Button className="w-full bg-transparent border border-white/[0.12] hover:border-bronze hover:bg-bronze/10 text-white rounded-none text-[10px] uppercase font-bold tracking-widest h-12">
                     Exportar Relatório do Projeto
                   </Button>
                 </div>
@@ -1060,19 +1060,19 @@ const ControleHoras = () => {
 
       {/* Manual Registration Modal */}
       <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Registrar Horas</h2>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Registro retroativo — Sem timer</p>
+            <p className="text-[10px] uppercase tracking-widest text-white/[0.4] mb-8 font-mono">Registro retroativo — Sem timer</p>
             
             <div className="space-y-6">
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Projeto</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Projeto</label>
                 <Select value={manualSession.projetoId} onValueChange={(v) => setManualSession({...manualSession, projetoId: v})}>
-                  <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                  <SelectTrigger className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11">
                     <SelectValue placeholder="Selecione o projeto" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
+                  <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white">
                     {projetos.filter(p => p.status_geral === 'ativo').map(p => (
                       <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
                     ))}
@@ -1082,12 +1082,12 @@ const ControleHoras = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Etapa</label>
+                  <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Etapa</label>
                   <Select value={manualSession.etapa} onValueChange={(v) => setManualSession({...manualSession, etapa: v})}>
-                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                    <SelectTrigger className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
+                    <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white">
                       <SelectItem value="Briefing">01 · Briefing</SelectItem>
                       <SelectItem value="Conceito">02 · Conceito</SelectItem>
                       <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
@@ -1098,12 +1098,12 @@ const ControleHoras = () => {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Responsável</label>
+                  <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Responsável</label>
                   <Select value={manualSession.responsavel} onValueChange={(v: any) => setManualSession({...manualSession, responsavel: v})}>
-                    <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
+                    <SelectTrigger className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
+                    <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white">
                       <SelectItem value="Leandro">Leandro</SelectItem>
                       <SelectItem value="Neandro">Neandro</SelectItem>
                     </SelectContent>
@@ -1112,15 +1112,15 @@ const ControleHoras = () => {
               </div>
 
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Data</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Data</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white rounded-none h-11 px-3 hover:bg-white/10">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11 px-3 hover:bg-white/[0.12]">
                       <Calendar className="mr-2 h-4 w-4" />
                       {manualSession.data ? format(manualSession.data, "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-[#1A1A1A] border border-white/10 border-white/10">
+                  <PopoverContent className="w-auto p-0 bg-[#161616] border border-white/[0.12] border-white/[0.12]">
                     <CalendarComponent
                       mode="single"
                       selected={manualSession.data}
@@ -1132,16 +1132,16 @@ const ControleHoras = () => {
               </div>
 
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Duração</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Duração</label>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 flex items-center gap-2">
                     <Input 
                       type="number" 
                       value={manualSession.horas} 
                       onChange={(e) => setManualSession({...manualSession, horas: e.target.value})}
-                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                      className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11 text-center"
                     />
-                    <span className="text-[10px] text-white/40 font-bold uppercase">h</span>
+                    <span className="text-[10px] text-white/[0.4] font-bold uppercase">h</span>
                   </div>
                   <div className="flex-1 flex items-center gap-2">
                     <Input 
@@ -1149,25 +1149,25 @@ const ControleHoras = () => {
                       max="59"
                       value={manualSession.minutos} 
                       onChange={(e) => setManualSession({...manualSession, minutos: e.target.value})}
-                      className="bg-white/5 border-white/10 text-white rounded-none h-11 text-center"
+                      className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11 text-center"
                     />
-                    <span className="text-[10px] text-white/40 font-bold uppercase">min</span>
+                    <span className="text-[10px] text-white/[0.4] font-bold uppercase">min</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Observação (Opcional)</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/[0.4] font-bold block mb-2">Observação (Opcional)</label>
                 <Input 
                   placeholder="Descrição da atividade..."
                   value={manualSession.obs}
                   onChange={(e) => setManualSession({...manualSession, obs: e.target.value})}
-                  className="bg-white/5 border-white/10 text-white rounded-none h-11 placeholder:text-white/10"
+                  className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-11 placeholder:text-white/[0.12]"
                 />
               </div>
 
               <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/[0.4] hover:text-white">Cancelar</Button>
                 <Button onClick={handleManualRegistration} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">
                   <CheckCircle2 size={14} className="mr-2" />
                   Registrar
@@ -1180,11 +1180,11 @@ const ControleHoras = () => {
 
       {/* Inactivity Modal */}
       <Dialog open={showInactivityModal} onOpenChange={setShowInactivityModal}>
-        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-sm">
+        <DialogContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white rounded-none p-0 max-w-sm">
           <div className="p-8 text-center">
             <AlertCircle size={32} className="mx-auto text-bronze mb-4" />
             <h2 className="text-xl font-cormorant font-bold mb-2">Ausência detectada</h2>
-            <p className="text-[11px] text-white/40 mb-8 leading-relaxed">
+            <p className="text-[11px] text-white/[0.4] mb-8 leading-relaxed">
               Não detectamos atividade nos últimos 10 minutos. O que deseja fazer com o timer atual?
             </p>
             
@@ -1201,7 +1201,7 @@ const ControleHoras = () => {
               <Button 
                 variant="outline"
                 onClick={() => pauseInactivity(false)}
-                className="w-full border-white/10 hover:border-white/20 text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
+                className="w-full border-white/[0.12] hover:border-white/[0.18] text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
               >
                 Pausar agora
               </Button>

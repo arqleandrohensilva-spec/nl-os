@@ -42,12 +42,12 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
   
   if (engagements.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 bg-white border border-dashed border-[#E8E4DF] rounded-[2px] text-center animate-fade-in">
+      <div className="flex flex-col items-center justify-center p-12 bg-white border border-dashed border-[#F0EDE8] rounded-[2px] text-center animate-fade-in">
         <div className="w-16 h-16 bg-muted-foreground/5 rounded-full flex items-center justify-center mb-6">
-          <AlertCircle size={32} className="text-white/40/30" />
+          <AlertCircle size={32} className="text-white/[0.4]/30" />
         </div>
         <h3 className="text-xl font-bold font-cormorant text-graphite mb-3 uppercase tracking-tight">Aguardando Engajamento</h3>
-        <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] max-w-[320px] leading-relaxed">
+        <p className="text-[10px] text-white/[0.4] uppercase tracking-[0.2em] max-w-[320px] leading-relaxed">
           Esta proposta ainda não foi visualizada. Assim que o cliente abrir o link, os dados aparecerão aqui em tempo real.
         </p>
       </div>
@@ -63,7 +63,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
     { name: 'Capa', time: engagements.reduce((acc, curr) => acc + (curr.secao_capa_tempo || 0), 0), color: '#8E9196' },
     { name: 'Manifesto', time: engagements.reduce((acc, curr) => acc + (curr.secao_manifesto_tempo || 0), 0), color: '#C5A16F' },
     { name: 'Diagnóstico', time: engagements.reduce((acc, curr) => acc + (curr.secao_diagnostico_tempo || 0), 0), color: '#8B7355' },
-    { name: 'Escopo', time: engagements.reduce((acc, curr) => acc + (curr.secao_escopo_tempo || 0), 0), color: '#1A1A1A' },
+    { name: 'Escopo', time: engagements.reduce((acc, curr) => acc + (curr.secao_escopo_tempo || 0), 0), color: '#161616' },
     { name: 'Investimento', time: engagements.reduce((acc, curr) => acc + (curr.secao_investimento_tempo || 0), 0), color: '#D4AF37' },
     { name: 'Fechamento', time: engagements.reduce((acc, curr) => acc + (curr.secao_fechamento_tempo || 0), 0), color: '#71717A' },
   ].filter(s => s.time > 0);
@@ -116,8 +116,8 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           { label: 'Foco Principal', value: mostViewed?.name || '-', icon: Target, color: 'text-bronze' },
           { label: 'Último Dispositivo', value: lastEngagement.dispositivo || 'Desktop', icon: lastEngagement.dispositivo?.toLowerCase().includes('mobile') ? Smartphone : Monitor, color: 'text-bronze' },
         ].map((card, i) => (
-          <div key={i} className="bg-white p-4 border border-[#E8E4DF] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group">
-            <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 mb-1 font-bold group-hover:text-bronze transition-colors">{card.label}</p>
+          <div key={i} className="bg-white p-4 border border-[#F0EDE8] rounded-[2px] shadow-sm hover:border-bronze/30 transition-all group">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-white/[0.4] mb-1 font-bold group-hover:text-bronze transition-colors">{card.label}</p>
             <div className="flex items-center gap-2">
               <card.icon size={16} className={card.color} />
               <h3 className="text-lg font-bold text-graphite font-cormorant">{card.value}</h3>
@@ -128,13 +128,13 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Section Retention Chart */}
-        <div className="md:col-span-2 bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm">
+        <div className="md:col-span-2 bg-white p-6 border border-[#F0EDE8] rounded-[2px] shadow-sm">
           <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-8 flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Activity size={14} className="text-bronze" />
               Retenção por Seção (Tempo Acumulado)
             </span>
-            <Info size={14} className="text-white/40/30" />
+            <Info size={14} className="text-white/[0.4]/30" />
           </h4>
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -153,7 +153,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                   cursor={{ fill: '#F8F9FA' }}
                   contentStyle={{ 
                     borderRadius: '2px', 
-                    border: '1px solid #E8E4DF',
+                    border: '1px solid #F0EDE8',
                     fontSize: '11px',
                     fontWeight: 'bold',
                     textTransform: 'uppercase',
@@ -178,7 +178,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
         </div>
 
         {/* Device Distribution Pie Chart */}
-        <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm flex flex-col">
+        <div className="bg-white p-6 border border-[#F0EDE8] rounded-[2px] shadow-sm flex flex-col">
           <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-8 flex items-center gap-2">
             <Smartphone size={14} className="text-bronze" />
             Distribuição de Dispositivos
@@ -196,12 +196,12 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                   dataKey="value"
                 >
                   <Cell fill="#C5A16F" />
-                  <Cell fill="#1A1A1A" />
+                  <Cell fill="#161616" />
                 </Pie>
                 <Tooltip 
                   contentStyle={{ 
                     borderRadius: '2px', 
-                    border: '1px solid #E8E4DF',
+                    border: '1px solid #F0EDE8',
                     fontSize: '10px',
                     fontWeight: 'bold'
                   }}
@@ -212,8 +212,8 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           <div className="flex justify-center gap-6 mt-4">
             {deviceData.map((d, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: i === 0 ? '#C5A16F' : '#1A1A1A' }} />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">{d.name}: {d.value}</span>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: i === 0 ? '#C5A16F' : '#161616' }} />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/[0.4]">{d.name}: {d.value}</span>
               </div>
             ))}
           </div>
@@ -232,7 +232,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
           </h4>
           
           <div className="space-y-4 relative z-10">
-            <div className="p-4 bg-white/5 border border-white/10 rounded-[2px] backdrop-blur-sm">
+            <div className="p-4 bg-white/[0.06] border border-white/[0.12] rounded-[2px] backdrop-blur-sm">
               <p id="recommended-strategy-text" className="text-xs leading-relaxed font-medium">
                 {proposal.status === 'Aprovada' 
                   ? "A proposta já foi aprovada! O foco agora deve ser no envio do contrato e início do projeto. A análise mostra o que mais interessou o cliente para servir de base para o briefing."
@@ -262,7 +262,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                   onGenerateFollowup(strategyText);
                 }}
                 variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10 rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
+                className="w-full border-white/[0.18] text-white hover:bg-white/[0.12] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em] transition-all shadow-lg"
               >
                 <MessageSquare size={16} className="mr-2 text-bronze" />
                 Script de Venda
@@ -272,7 +272,7 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
         </div>
 
         {/* Session History */}
-        <div className="bg-white p-6 border border-[#E8E4DF] rounded-[2px] shadow-sm overflow-hidden">
+        <div className="bg-white p-6 border border-[#F0EDE8] rounded-[2px] shadow-sm overflow-hidden">
           <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-graphite mb-6 flex items-center gap-2">
             <History size={14} className="text-bronze" />
             Histórico de Sessões
@@ -288,14 +288,14 @@ const EngagementDashboard = ({ proposal, onGenerateFollowup }: EngagementDashboa
                     <p className="text-[10px] font-bold text-graphite uppercase tracking-wide">
                       Sessão {engagements.length - idx}
                     </p>
-                    <p className="text-[9px] text-white/40 uppercase tracking-wider">
+                    <p className="text-[9px] text-white/[0.4] uppercase tracking-wider">
                       {eng.dispositivo || 'Desktop'}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] font-bold text-bronze">{formatTime(eng.tempo_total || 0)}</p>
-                  <p className="text-[8px] text-white/40 uppercase">Duração</p>
+                  <p className="text-[8px] text-white/[0.4] uppercase">Duração</p>
                 </div>
               </div>
             ))}

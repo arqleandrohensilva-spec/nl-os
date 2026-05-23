@@ -12,7 +12,7 @@
     background: transparent;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: #E8E4DF;
+    background: #F0EDE8;
     border-radius: 10px;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
@@ -81,7 +81,7 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #E8E4DF;
+  background: #F0EDE8;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -115,7 +115,7 @@
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #1A1A1A 0%, #8B7355 100%);
+  background: linear-gradient(135deg, #161616 0%, #8B7355 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

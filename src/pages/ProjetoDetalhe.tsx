@@ -567,25 +567,25 @@ const ProjetoDetalhe = () => {
     }
   };
 
-  if (!projeto || loading) return <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white/40 font-mono">CARREGANDO DETALHES...</div>;
+  if (!projeto || loading) return <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center text-white/[0.4] font-mono">CARREGANDO DETALHES...</div>;
 
   const getEtapaColor = (status: string) => {
     switch(status) {
       case 'Aprovado': return 'text-emerald-500';
       case 'Aguardando aprovação': return 'text-amber-500';
-      default: return 'text-white/40';
+      default: return 'text-white/[0.4]';
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0D0D0D] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
         <div className="flex justify-between items-center mb-8">
           <button 
             onClick={() => navigate('/projetos/gestao')}
-            className="flex items-center gap-2 text-[10px] text-white/40 uppercase tracking-widest font-bold hover:text-white transition-colors"
+            className="flex items-center gap-2 text-[10px] text-white/[0.4] uppercase tracking-widest font-bold hover:text-white transition-colors"
           >
             <ArrowLeft size={14} /> Voltar para lista
           </button>
@@ -607,7 +607,7 @@ const ProjetoDetalhe = () => {
                 "rounded-none text-[9px] uppercase font-bold tracking-[0.2em] px-6 h-10 border transition-all duration-500",
                 clientMode 
                   ? "bg-[#8B7355] text-white border-[#8B7355]" 
-                  : "bg-white/5 text-white/40 border-white/10 hover:border-[#8B7355]/40 hover:text-white"
+                  : "bg-white/[0.06] text-white/[0.4] border-white/[0.12] hover:border-[#8B7355]/40 hover:text-white"
               )}
             >
               {clientMode ? (
@@ -619,7 +619,7 @@ const ProjetoDetalhe = () => {
 
             <Button 
               onClick={() => navigate(`/apresentacao/${id}`)}
-              className="bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 hover:border-bronze rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500 flex items-center gap-2 group/pres"
+              className="bg-white/[0.06] hover:bg-white/[0.12] text-white/60 hover:text-white border border-white/[0.12] hover:border-bronze rounded-none px-6 h-10 text-[9px] uppercase font-bold tracking-[0.2em] transition-all duration-500 flex items-center gap-2 group/pres"
             >
               <Monitor size={14} className="group-hover/pres:text-bronze transition-colors" /> Modo Apresentação
             </Button>
@@ -633,7 +633,7 @@ const ProjetoDetalhe = () => {
                   <Trash2 size={14} className="mr-2" /> {isDeleting ? "EXCLUINDO..." : "EXCLUIR PROJETO"}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#0A0A0A] border border-white/10 text-white">
+              <AlertDialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="font-cormorant italic text-2xl">Confirmar exclusão?</AlertDialogTitle>
                   <AlertDialogDescription className="text-white/60 font-inter text-sm">
@@ -641,7 +641,7 @@ const ProjetoDetalhe = () => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-transparent border-white/[0.12] text-white hover:bg-white/[0.06] rounded-none">Cancelar</AlertDialogCancel>
                   <AlertDialogAction 
                     onClick={handleDeleteProject}
                     className="bg-rose-500 hover:bg-rose-600 text-white rounded-none"
@@ -655,7 +655,7 @@ const ProjetoDetalhe = () => {
         </div>
 
         {/* Header do Projeto */}
-        <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 pb-16 border-b border-white/5 relative">
+        <header className="mb-16 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 pb-16 border-b border-white/[0.06] relative">
           <div className="absolute -top-10 -left-10 text-[120px] font-cormorant text-white/[0.02] select-none pointer-events-none italic">
             Atelier
           </div>
@@ -669,16 +669,16 @@ const ProjetoDetalhe = () => {
             </div>
             
             <div className="flex flex-wrap gap-8 text-[11px] text-[#777777] uppercase font-normal font-inter">
-              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#F0EDE8] transition-colors cursor-default">
                 <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#F0EDE8] transition-colors cursor-default">
                 <Maximize2 size={14} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2} m²` : 'Área não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#F0EDE8] transition-colors cursor-default">
                 <Calendar size={14} className="text-[#8B7355]" /> Início: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#F0EDE8] transition-colors cursor-default">
                 <Clock size={14} className="text-[#8B7355]" /> Prazo: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'Sob consulta'}
               </div>
             </div>
@@ -686,7 +686,7 @@ const ProjetoDetalhe = () => {
 
           <div className="text-right">
             <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-3">Status do Ativo</p>
-            <span className="text-3xl font-cormorant italic text-[#E8E4DF] leading-none">
+            <span className="text-3xl font-cormorant italic text-[#F0EDE8] leading-none">
               {projeto.status_geral}
             </span>
           </div>
@@ -697,7 +697,7 @@ const ProjetoDetalhe = () => {
         {clientMode ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Status do Projeto Card */}
-            <div className="mb-12 bg-white/[0.03] p-8 border border-white/10 flex flex-col items-center text-center animate-in fade-in duration-1000">
+            <div className="mb-12 bg-white/[0.03] p-8 border border-white/[0.12] flex flex-col items-center text-center animate-in fade-in duration-1000">
               <span className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-4">Status do Projeto</span>
               <p className="text-[15px] text-white font-inter leading-relaxed max-w-2xl">
                 {gerarResumo(
@@ -723,10 +723,10 @@ const ProjetoDetalhe = () => {
                       <div className={cn(
                         "w-3 h-3 rounded-full border transition-all duration-700",
                         isDone ? "bg-[#8B7355] border-[#8B7355]" : 
-                        isCurrent ? "bg-[#8B7355]/40 border-[#8B7355] animate-pulse" : "bg-white/5 border-white/10"
+                        isCurrent ? "bg-[#8B7355]/40 border-[#8B7355] animate-pulse" : "bg-white/[0.06] border-white/[0.12]"
                       )} />
                       {config.id !== 'ACOMPANHAMENTO' && (
-                        <div className={cn("w-16 h-[1px]", isDone ? "bg-[#8B7355]/40" : "bg-white/5")} />
+                        <div className={cn("w-16 h-[1px]", isDone ? "bg-[#8B7355]/40" : "bg-white/[0.06]")} />
                       )}
                     </div>
                   );
@@ -739,7 +739,7 @@ const ProjetoDetalhe = () => {
                 <h3 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold border-b border-[#8B7355]/20 pb-4">Conceitos e Atmosfera</h3>
                 <div className="grid grid-cols-1 gap-8">
                   {etapas.filter(e => e.moodboard_url).map((e) => (
-                    <div key={e.id} className="group relative overflow-hidden bg-white/[0.03] border border-white/10 p-6 hover:border-[#8B7355]/30 transition-all duration-500">
+                    <div key={e.id} className="group relative overflow-hidden bg-white/[0.03] border border-white/[0.12] p-6 hover:border-[#8B7355]/30 transition-all duration-500">
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <span className="text-[8px] uppercase tracking-widest text-white/30 font-bold">Ref: {e.etapa}</span>
@@ -751,18 +751,18 @@ const ProjetoDetalhe = () => {
                           </a>
                         )}
                       </div>
-                      <div className="aspect-video bg-white/[0.01] border border-white/5 overflow-hidden relative">
+                      <div className="aspect-video bg-white/[0.01] border border-white/[0.06] overflow-hidden relative">
                         {e.moodboard_url ? (
                           <img src={e.moodboard_url} alt="Concept" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-white/5 italic text-[10px] tracking-widest">Aguardando curadoria visual</div>
+                          <div className="w-full h-full flex items-center justify-center text-white/[0.06] italic text-[10px] tracking-widest">Aguardando curadoria visual</div>
                         )}
                       </div>
                     </div>
                   ))}
                   {etapas.filter(e => e.moodboard_url).length === 0 && (
-                    <div className="py-20 text-center border border-dashed border-white/5">
-                      <p className="text-[10px] uppercase tracking-widest text-white/20 italic font-bold">Nenhum conceito visual publicado ainda.</p>
+                    <div className="py-20 text-center border border-dashed border-white/[0.06]">
+                      <p className="text-[10px] uppercase tracking-widest text-white/[0.18] italic font-bold">Nenhum conceito visual publicado ainda.</p>
                     </div>
                   )}
                 </div>
@@ -771,7 +771,7 @@ const ProjetoDetalhe = () => {
               <div className="space-y-12">
                 <h3 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold border-b border-[#8B7355]/20 pb-4">Timeline de Evolução</h3>
                 <div className="space-y-12 relative">
-                  <div className="absolute left-[15px] top-4 bottom-4 w-[1px] bg-white/5" />
+                  <div className="absolute left-[15px] top-4 bottom-4 w-[1px] bg-white/[0.06]" />
                   
                   {ETAPAS_CONFIG.map((config) => {
                     const etapaData = etapas.find(e => e.etapa === config.id);
@@ -787,7 +787,7 @@ const ProjetoDetalhe = () => {
                         <div className={cn(
                           "absolute left-0 top-0 w-8 h-8 flex items-center justify-center border transition-all duration-500",
                           isDone ? "bg-[#8B7355] border-[#8B7355] text-white" : 
-                          isCurrent || isWaiting ? "bg-white/5 border-[#8B7355] text-[#8B7355]" : "bg-white/5 border-white/10 text-white/20"
+                          isCurrent || isWaiting ? "bg-white/[0.06] border-[#8B7355] text-[#8B7355]" : "bg-white/[0.06] border-white/[0.12] text-white/[0.18]"
                         )}>
                           {isDone ? <Check size={14} /> : <Clock size={14} />}
                         </div>
@@ -795,7 +795,7 @@ const ProjetoDetalhe = () => {
                         <div className="space-y-2">
                           <div className="flex justify-between items-start">
                             <h4 className="text-sm font-bold tracking-[0.1em] uppercase">{config.label}</h4>
-                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
+                            <span className="text-[10px] font-bold text-white/[0.4] uppercase tracking-widest">
                               {etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'MMM yyyy', { locale: ptBR }) : 'A definir'}
                             </span>
                           </div>
@@ -832,14 +832,14 @@ const ProjetoDetalhe = () => {
 
                 {/* Atendimento Prime & Moodboard Link */}
                 <div className="space-y-6">
-                  <div className="bg-white/[0.03] border border-white/10 p-10 space-y-4">
+                  <div className="bg-white/[0.03] border border-white/[0.12] p-10 space-y-4">
                     <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold">Atendimento Prime</h4>
                     <p className="text-xs text-white/60 leading-relaxed italic font-light">
                       Sua jornada é única. Se desejar ajustes finos em qualquer uma das etapas acima, contate seu concierge via canal direto.
                     </p>
                   </div>
 
-                  <div className="bg-white/[0.03] border border-white/10 p-10 space-y-6">
+                  <div className="bg-white/[0.03] border border-white/[0.12] p-10 space-y-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 flex items-center justify-center bg-[#8B7355]/10 border border-[#8B7355]/20 text-[#8B7355]">
                         <ImageIcon size={18} />
@@ -850,7 +850,7 @@ const ProjetoDetalhe = () => {
                       </div>
                     </div>
                     
-                    <p className="text-[11px] text-white/50 leading-relaxed italic">
+                    <p className="text-[11px] text-white/[0.06]0 leading-relaxed italic">
                       Acesse a curadoria visual completa do seu projeto através do nosso board exclusivo de referências e inspirações.
                     </p>
                     
@@ -887,7 +887,7 @@ const ProjetoDetalhe = () => {
                     <AccordionItem 
                       key={config.id} 
                       value={config.id} 
-                      className="border border-white/10 bg-white/[0.03] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
+                      className="border border-white/[0.12] bg-white/[0.03] px-10 py-4 rounded-none data-[state=open]:bg-white/[0.03] data-[state=open]:border-[#8B7355]/30 transition-all duration-500 overflow-hidden relative group"
                     >
                       <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-data-[state=open]:scale-y-100 transition-transform duration-500 origin-top" />
                       <AccordionTrigger className="hover:no-underline py-6">
@@ -905,14 +905,14 @@ const ProjetoDetalhe = () => {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-[8px] text-white/20 uppercase font-bold">Previsão</p>
+                            <p className="text-[8px] text-white/[0.18] uppercase font-bold">Previsão</p>
                             <p className="text-[10px] font-bold">
                               {etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'dd/MM/yyyy') : '--/--/----'}
                             </p>
                           </div>
                         </div>
                       </AccordionTrigger>
-                      <AccordionContent className="pb-8 pt-4 border-t border-white/5">
+                      <AccordionContent className="pb-8 pt-4 border-t border-white/[0.06]">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                           <div>
                             <div className="flex justify-between items-center mb-4">
@@ -952,7 +952,7 @@ const ProjetoDetalhe = () => {
                                     id={item.id} 
                                     checked={item.concluido}
                                     onCheckedChange={() => toggleChecklistItem(item.id, item.concluido)}
-                                    className="mt-0.5 border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]"
+                                    className="mt-0.5 border-white/[0.18] data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]"
                                   />
                                   <div className="space-y-1">
                                     <label htmlFor={item.id} className={cn(
@@ -962,7 +962,7 @@ const ProjetoDetalhe = () => {
                                       {item.item}
                                     </label>
                                     {item.concluido && (
-                                      <p className="text-[8px] text-white/20 italic">
+                                      <p className="text-[8px] text-white/[0.18] italic">
                                         Concluído por {item.concluido_por} em {format(parseISO(item.concluido_em), 'dd/MM HH:mm')}
                                       </p>
                                     )}
@@ -982,7 +982,7 @@ const ProjetoDetalhe = () => {
                                 defaultValue={etapaData?.moodboard_url || ''}
                                 onBlur={(e) => updateMoodboard(etapaData?.id || '', e.target.value)}
                                 placeholder="Link do Pinterest, Drive ou Imagem..."
-                                className="w-full bg-white/5 border border-white/10 rounded-none text-xs p-3 focus:outline-none focus:border-[#8B7355] placeholder:text-white/10 mb-6"
+                                className="w-full bg-white/[0.06] border border-white/[0.12] rounded-none text-xs p-3 focus:outline-none focus:border-[#8B7355] placeholder:text-white/[0.12] mb-6"
                               />
 
                               <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold mb-4 flex items-center gap-2">
@@ -993,7 +993,7 @@ const ProjetoDetalhe = () => {
                                   defaultValue={etapaData?.notas || ''}
                                   onBlur={(e) => saveNotas(etapaData?.id || '', e.target.value)}
                                   placeholder="Registros da equipe (Leandro/Neandro)..."
-                                  className="bg-white/5 border-white/10 rounded-none text-xs min-h-[100px] focus-visible:ring-[#8B7355] placeholder:text-white/10"
+                                  className="bg-white/[0.06] border-white/[0.12] rounded-none text-xs min-h-[100px] focus-visible:ring-[#8B7355] placeholder:text-white/[0.12]"
                                 />
                               </div>
                             </div>
@@ -1002,7 +1002,7 @@ const ProjetoDetalhe = () => {
                               <Button 
                                 onClick={() => updateEtapaStatus(etapaData?.id || '', 'Aguardando aprovação')}
                                 disabled={etapaData?.status === 'Aguardando aprovação' || etapaData?.status === 'Aprovado'}
-                                className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[9px] uppercase font-bold tracking-widest h-10 px-4"
+                                className="bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.12] rounded-none text-[9px] uppercase font-bold tracking-widest h-10 px-4"
                               >
                                 Marcar como entregue
                               </Button>
@@ -1026,21 +1026,21 @@ const ProjetoDetalhe = () => {
             <div className="space-y-8">
               <h2 className="text-[11px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-6">Eficiência</h2>
               
-              <div className="bg-white/[0.01] border border-white/5 p-10 space-y-10 relative overflow-hidden group">
+              <div className="bg-white/[0.01] border border-white/[0.06] p-10 space-y-10 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
                 <div>
                   <p className="text-[10px] text-[#8B7355] uppercase tracking-[0.4em] mb-6 font-bold">Investimento Temporal</p>
                   <div className="flex justify-between items-end mb-4">
                     <span className="text-5xl font-cormorant italic">{horasReais}h</span>
                     <div className="text-right">
-                      <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Estimativa</p>
+                      <p className="text-[8px] text-white/[0.18] uppercase font-bold tracking-widest">Estimativa</p>
                       <p className="text-sm font-mono text-white/60">{projeto.horas_estimadas || 0}h</p>
                     </div>
                   </div>
                   
                   {projeto.horas_estimadas ? (
                     <>
-                      <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden mt-4">
+                      <div className="w-full bg-white/[0.06] h-1.5 rounded-none overflow-hidden mt-4">
                         <div 
                           className={cn(
                             "h-full transition-all duration-1000",
@@ -1049,7 +1049,7 @@ const ProjetoDetalhe = () => {
                           style={{ width: `${Math.min((horasReais / projeto.horas_estimadas) * 100, 100)}%` }}
                         />
                       </div>
-                      <p className="text-[9px] mt-2 text-right font-bold uppercase tracking-widest text-white/40">
+                      <p className="text-[9px] mt-2 text-right font-bold uppercase tracking-widest text-white/[0.4]">
                         {Math.round((horasReais / projeto.horas_estimadas) * 100)}% do planejado
                       </p>
                     </>
@@ -1058,7 +1058,7 @@ const ProjetoDetalhe = () => {
                   )}
                 </div>
 
-                <div className="pt-8 border-t border-white/5">
+                <div className="pt-8 border-t border-white/[0.06]">
                   <p className="text-[9px] text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">Equipe Responsável</p>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
@@ -1074,7 +1074,7 @@ const ProjetoDetalhe = () => {
               </div>
 
               {/* Financeiro do Projeto - Internal Only */}
-              <div className="bg-[#0A0A0A] border border-white/5 p-10 relative overflow-hidden space-y-6">
+              <div className="bg-[#0D0D0D] border border-white/[0.06] p-10 relative overflow-hidden space-y-6">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
                 <div className="flex justify-between items-start">
                   <div>
@@ -1087,10 +1087,10 @@ const ProjetoDetalhe = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Valor Total (R$)</label>
+                    <label className="text-[8px] uppercase tracking-widest text-white/[0.4] font-bold">Valor Total (R$)</label>
                     <Input 
                       type="number" 
-                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                       placeholder="0,00"
                       value={projeto.valor_total || ''}
                       onChange={(e) => setProjeto(prev => prev ? {...prev, valor_total: parseFloat(e.target.value)} : null)}
@@ -1104,49 +1104,49 @@ const ProjetoDetalhe = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Entrada (R$)</label>
+                      <label className="text-[8px] uppercase tracking-widest text-white/[0.4] font-bold">Entrada (R$)</label>
                       <Input 
                         type="number" 
                         id="valor_entrada"
-                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                         placeholder="0,00"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Parcelas</label>
+                      <label className="text-[8px] uppercase tracking-widest text-white/[0.4] font-bold">Parcelas</label>
                       <Input 
                         type="number" 
                         id="num_parcelas"
-                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                        className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                         placeholder="Ex: 4"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2 pt-2 border-t border-white/5">
+                  <div className="space-y-2 pt-2 border-t border-white/[0.06]">
                     <div className="flex justify-between items-center mb-1">
-                      <label className="text-[8px] uppercase tracking-widest text-white/40 font-bold">Alíquota ISS (%)</label>
+                      <label className="text-[8px] uppercase tracking-widest text-white/[0.4] font-bold">Alíquota ISS (%)</label>
                       <span className="text-[7px] text-bronze uppercase font-bold italic">Alíquota sugerida. Confirme com seu contador.</span>
                     </div>
                     <Input 
                       type="number" 
-                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                       value={issAliquota}
                       onChange={(e) => setIssAliquota(parseFloat(e.target.value) || 0)}
                     />
                   </div>
 
-                  <div className="p-4 bg-white/5 border border-white/5 space-y-2">
+                  <div className="p-4 bg-white/[0.06] border border-white/[0.06] space-y-2">
                     <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                      <span className="text-white/40">Valor Bruto</span>
+                      <span className="text-white/[0.4]">Valor Bruto</span>
                       <span className="font-bold">R$ {(projeto.valor_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                     <div className="flex justify-between text-[10px] uppercase tracking-widest text-bronze">
                       <span>ISS ({issAliquota}%)</span>
                       <span>- R$ {((projeto.valor_total || 0) * (issAliquota / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
-                    <div className="flex justify-between text-[11px] uppercase tracking-[0.2em] pt-2 border-t border-white/10">
-                      <span className="text-white/40 font-bold">Valor Líquido</span>
+                    <div className="flex justify-between text-[11px] uppercase tracking-[0.2em] pt-2 border-t border-white/[0.12]">
+                      <span className="text-white/[0.4] font-bold">Valor Líquido</span>
                       <span className="font-bold">R$ {((projeto.valor_total || 0) * (1 - issAliquota / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
@@ -1217,13 +1217,13 @@ const ProjetoDetalhe = () => {
               </div>
 
               {/* Profitability Index - Internal Only */}
-              <div className="bg-[#0A0A0A] border border-[#8B7355]/30 p-10 relative overflow-hidden">
+              <div className="bg-[#0D0D0D] border border-[#8B7355]/30 p-10 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
                 
                 <div className="flex justify-between items-start mb-8">
                   <div>
                     <h4 className="text-[10px] uppercase tracking-[0.4em] text-[#8B7355] font-bold mb-2">Índice de Lucratividade</h4>
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Saúde Financeira do Ativo</p>
+                    <p className="text-[8px] text-white/[0.18] uppercase font-bold tracking-widest">Saúde Financeira do Ativo</p>
                   </div>
                   <Badge className="bg-[#8B7355]/20 text-[#8B7355] border-none text-[8px] tracking-widest rounded-none">INTERNO</Badge>
                 </div>
@@ -1236,19 +1236,19 @@ const ProjetoDetalhe = () => {
                         : '100%'}
                     </span>
                     <div className="text-right">
-                      <p className="text-[8px] text-white/20 uppercase font-bold tracking-widest">Margem Operacional</p>
+                      <p className="text-[8px] text-white/[0.18] uppercase font-bold tracking-widest">Margem Operacional</p>
                       <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Saudável</p>
                     </div>
                   </div>
 
-                  <div className="w-full bg-white/5 h-[2px]">
+                  <div className="w-full bg-white/[0.06] h-[2px]">
                     <div 
                       className="h-full bg-[#8B7355] transition-all duration-1000"
                       style={{ width: `${projeto.horas_estimadas ? Math.max(0, (1 - (horasReais / projeto.horas_estimadas)) * 100) : 100}%` }}
                     />
                   </div>
 
-                  <p className="text-[9px] text-white/40 leading-relaxed italic">
+                  <p className="text-[9px] text-white/[0.4] leading-relaxed italic">
                     Este índice reflete a eficiência produtiva em relação ao investimento temporal planejado. Valores acima de 20% indicam alta performance.
                   </p>
                 </div>
@@ -1284,7 +1284,7 @@ const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[]
   return (
     <div className="mb-16 space-y-6">
       <div className="relative">
-        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/5 -translate-y-1/2" />
+        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/[0.06] -translate-y-1/2" />
         
         <div className="relative flex justify-between">
           {ETAPAS_CONFIG_LOC.map((config, index) => {
@@ -1306,9 +1306,9 @@ const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[]
                 
                 <div className={cn(
                   "w-4 h-4 rounded-full border-2 z-10 transition-all duration-700 flex items-center justify-center",
-                  isDone ? "bg-[#3A3A3A] border-[#3A3A3A]" :
+                  isDone ? "bg-[#1E1E1E] border-[#1E1E1E]" :
                   isCurrent ? (isOverdue ? "bg-[#8B2020] border-[#8B2020] animate-pulse" : "bg-[#8B7355] border-[#8B7355] animate-pulse") :
-                  "bg-[#0A0A0A] border-white/10"
+                  "bg-[#0D0D0D] border-white/[0.12]"
                 )}>
                   {isDone && <Check size={8} className="text-white" />}
                   {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -1317,11 +1317,11 @@ const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[]
                 <div className="mt-4 text-center">
                   <p className={cn(
                     "text-[10px] font-bold uppercase tracking-widest",
-                    isCurrent ? "text-[#8B7355]" : isDone ? "text-white/60" : "text-white/20"
+                    isCurrent ? "text-[#8B7355]" : isDone ? "text-white/60" : "text-white/[0.18]"
                   )}>
                     {config.label}
                   </p>
-                  <p className="text-[8px] text-white/20 mt-1 font-bold">
+                  <p className="text-[8px] text-white/[0.18] mt-1 font-bold">
                     {etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'dd/MM/yy') : '--/--/--'}
                   </p>
                 </div>

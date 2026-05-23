@@ -166,14 +166,14 @@ const BriefingPublic = () => {
   );
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#8B7355] flex flex-col items-center justify-center font-cormorant italic text-2xl gap-4 selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0D0D0D] text-[#8B7355] flex flex-col items-center justify-center font-cormorant italic text-2xl gap-4 selection:bg-[#8B7355]/30">
       <div className="w-8 h-[1px] bg-[#8B7355] animate-pulse" />
       <p className="animate-pulse">Carregando...</p>
     </div>
   );
 
   if (submitted) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center font-['Courier_New'] relative overflow-hidden selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0D0D0D] flex flex-col items-center justify-center p-8 text-center font-['Courier_New'] relative overflow-hidden selection:bg-[#8B7355]/30">
       <GrainOverlay />
       <BackgroundGlow />
       
@@ -197,7 +197,7 @@ const BriefingPublic = () => {
           Pré-briefing recebido
         </p>
 
-        <h1 className="font-cormorant italic text-4xl md:text-5xl text-[#E8E4DF] mb-6 leading-tight max-w-2xl">
+        <h1 className="font-cormorant italic text-4xl md:text-5xl text-[#F0EDE8] mb-6 leading-tight max-w-2xl">
           {formData.nome_completo
             ? `${formData.nome_completo.split(' ')[0]}, recebemos seu pré-briefing.`
             : 'Recebemos seu pré-briefing.'}
@@ -212,13 +212,13 @@ const BriefingPublic = () => {
             {projetoType === 'com' && 'Projeto Comercial'}
           </p>
 
-          <p className="text-[#E8E4DF]/50 text-[11px] uppercase tracking-widest leading-relaxed">
+          <p className="text-[#F0EDE8]/50 text-[11px] uppercase tracking-widest leading-relaxed">
             Nossa equipe analisará cada detalhe. Em breve entraremos em contato para o próximo passo.
           </p>
         </div>
 
-        <div className="mt-20 pt-10 border-t border-white/5 w-full max-w-xs">
-          <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-[0.4em]">
+        <div className="mt-20 pt-10 border-t border-white/[0.06] w-full max-w-xs">
+          <p className="text-[#F0EDE8]/20 text-[9px] uppercase tracking-[0.4em]">
             NL Arquitetos · A Arquitetura como Decisão
           </p>
         </div>
@@ -227,7 +227,7 @@ const BriefingPublic = () => {
   );
 
   if (step === 0) return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0D0D0D] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden selection:bg-[#8B7355]/30">
       <GrainOverlay />
       <BackgroundGlow />
 
@@ -241,7 +241,7 @@ const BriefingPublic = () => {
           NL Arquitetos
         </p>
         
-        <h1 className="font-cormorant italic text-5xl md:text-7xl text-[#E8E4DF] mb-8 leading-tight max-w-3xl">
+        <h1 className="font-cormorant italic text-5xl md:text-7xl text-[#F0EDE8] mb-8 leading-tight max-w-3xl">
           {formData.nome_completo 
             ? `Seja bem-vindo, ${formData.nome_completo.split(' ')[0]}.`
             : 'Sua jornada começa aqui.'}
@@ -249,7 +249,7 @@ const BriefingPublic = () => {
 
         <div className="w-[1px] h-16 bg-gradient-to-b from-[#8B7355] to-transparent mb-12 opacity-30" />
 
-        <p className="text-[#E8E4DF]/60 text-[11px] md:text-xs max-w-lg mx-auto leading-relaxed mb-16 uppercase tracking-[0.3em] font-light">
+        <p className="text-[#F0EDE8]/60 text-[11px] md:text-xs max-w-lg mx-auto leading-relaxed mb-16 uppercase tracking-[0.3em] font-light">
           Este pré-briefing é o primeiro passo para traduzirmos sua visão em arquitetura. 
           Dedique alguns minutos para que possamos chegar preparados à nossa reunião.
         </p>
@@ -258,14 +258,14 @@ const BriefingPublic = () => {
           whileHover={{ scale: 1.05, letterSpacing: "0.4em" }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setStep(1)}
-          className="group relative flex items-center gap-4 bg-[#8B7355] text-[#0F0E0C] px-14 py-5 uppercase tracking-[0.3em] text-[10px] font-bold transition-all duration-500 hover:bg-[#8B7355]/90"
+          className="group relative flex items-center gap-4 bg-[#8B7355] text-[#0D0D0D] px-14 py-5 uppercase tracking-[0.3em] text-[10px] font-bold transition-all duration-500 hover:bg-[#8B7355]/90"
         >
           <span>Começar</span>
           <ArrowRight className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />
         </motion.button>
 
         <div className="mt-24">
-          <p className="text-[#E8E4DF]/20 text-[9px] uppercase tracking-[0.5em]">A Arquitetura como Decisão</p>
+          <p className="text-[#F0EDE8]/20 text-[9px] uppercase tracking-[0.5em]">A Arquitetura como Decisão</p>
         </div>
       </motion.div>
     </div>
@@ -299,28 +299,28 @@ const BriefingPublic = () => {
                           placeholder="Nome completo" 
                           value={formData.nome_completo} 
                           onChange={handleChange} 
-                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                          className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
                         />
                         <Input 
                           name="whatsapp" 
                           placeholder="WhatsApp" 
                           value={formData.whatsapp} 
                           onChange={handleChange} 
-                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                          className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
                         />
                         <Input 
                           name="email" 
                           placeholder="E-mail" 
                           value={formData.email} 
                           onChange={handleChange} 
-                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                          className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
                         />
                         <Input 
                           name="cidade" 
                           placeholder="Cidade / Estado" 
                           value={formData.cidade} 
                           onChange={handleChange} 
-                          className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
+                          className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[11px] uppercase tracking-widest focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500" 
                         />
                       </div>
                       
@@ -330,13 +330,13 @@ const BriefingPublic = () => {
                           name="origem" 
                           value={formData.origem} 
                           onChange={handleChange} 
-                          className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500 appearance-none cursor-pointer"
+                          className="w-full bg-white/[0.02] border border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500 appearance-none cursor-pointer"
                         >
-                          <option value="" className="bg-[#0A0A0A]">Selecione uma opção...</option>
-                          <option value="Instagram" className="bg-[#0A0A0A]">Instagram</option>
-                          <option value="Indicação" className="bg-[#0A0A0A]">Indicação</option>
-                          <option value="Google" className="bg-[#0A0A0A]">Google</option>
-                          <option value="Outro" className="bg-[#0A0A0A]">Outros Canais</option>
+                          <option value="" className="bg-[#0D0D0D]">Selecione uma opção...</option>
+                          <option value="Instagram" className="bg-[#0D0D0D]">Instagram</option>
+                          <option value="Indicação" className="bg-[#0D0D0D]">Indicação</option>
+                          <option value="Google" className="bg-[#0D0D0D]">Google</option>
+                          <option value="Outro" className="bg-[#0D0D0D]">Outros Canais</option>
                         </select>
                       </div>
                     </div>
@@ -364,7 +364,7 @@ const BriefingPublic = () => {
                             "cursor-pointer border p-8 transition-all duration-500 flex flex-col gap-4 relative overflow-hidden group",
                             projetoType === item.id 
                               ? "border-[#8B7355] bg-[#8B7355]/5 shadow-[0_10px_30px_rgba(139,115,85,0.05)]" 
-                              : "border-white/5 bg-white/[0.01] hover:border-white/10"
+                              : "border-white/[0.06] bg-white/[0.01] hover:border-white/[0.12]"
                           )}
                         >
                           <div className="flex justify-between items-center">
@@ -379,7 +379,7 @@ const BriefingPublic = () => {
                               />
                             )}
                           </div>
-                          <p className="text-[#E8E4DF]/60 text-[11px] leading-relaxed tracking-wider uppercase">
+                          <p className="text-[#F0EDE8]/60 text-[11px] leading-relaxed tracking-wider uppercase">
                             {item.desc}
                           </p>
                           <div className={cn(
@@ -418,7 +418,7 @@ const BriefingPublic = () => {
                                     "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all duration-500", 
                                     formData.imovel_definido === opt 
                                       ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
-                                      : "border-white/5 text-white/40 hover:border-white/10 hover:text-white/60"
+                                      : "border-white/[0.06] text-white/[0.4] hover:border-white/[0.12] hover:text-white/60"
                                   )}
                                 >
                                   {opt}
@@ -428,20 +428,20 @@ const BriefingPublic = () => {
                           </div>
                           {formData.imovel_definido === 'Sim, já tenho' && (
                             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                              <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                              <Input name="endereco" placeholder="Endereço do imóvel/lote" value={formData.endereco} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
                             </motion.div>
                           )}
                           <div className="grid grid-cols-2 gap-4">
-                            <Input name="area_terreno" placeholder="Área Terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
-                            <Input name="area_estimada" placeholder="Área Construída (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                            <Input name="area_terreno" placeholder="Área Terreno (m²)" value={formData.area_terreno} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                            <Input name="area_estimada" placeholder="Área Construída (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
                           </div>
                         </>
                       )}
 
                       {isInt && (
                         <>
-                          <Input name="tipo_imovel" placeholder="Ex: Apartamento novo, Casa antiga..." value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
-                          <Input name="area_estimada" placeholder="Área a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Input name="tipo_imovel" placeholder="Ex: Apartamento novo, Casa antiga..." value={formData.tipo_imovel} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Input name="area_estimada" placeholder="Área a reformar (m²)" value={formData.area_estimada} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
                           <div className="space-y-4">
                             <label className="text-[9px] text-[#8B7355] uppercase tracking-[0.4em] font-bold">Mobiliário Existente?</label>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -454,7 +454,7 @@ const BriefingPublic = () => {
                                     "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all", 
                                     formData.mobiliario_aproveitado === opt 
                                       ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
-                                      : "border-white/5 text-white/40 hover:border-white/10"
+                                      : "border-white/[0.06] text-white/[0.4] hover:border-white/[0.12]"
                                   )}
                                 >
                                   {opt}
@@ -467,9 +467,9 @@ const BriefingPublic = () => {
 
                       {projetoType === 'com' && (
                         <>
-                          <Input name="tipo_negocio" placeholder="Qual o segmento do negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
-                          <Textarea name="experiencia_cliente" placeholder="Qual sensação o cliente deve ter ao entrar no espaço?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" />
-                          <Input name="perfil_cliente" placeholder="Qual o perfil do seu público-alvo?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Input name="tipo_negocio" placeholder="Qual o segmento do negócio?" value={formData.tipo_negocio} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
+                          <Textarea name="experiencia_cliente" placeholder="Qual sensação o cliente deve ter ao entrar no espaço?" value={formData.experiencia_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" />
+                          <Input name="perfil_cliente" placeholder="Qual o perfil do seu público-alvo?" value={formData.perfil_cliente} onChange={handleChange} className="bg-white/[0.02] border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:border-[#8B7355]" />
                         </>
                       )}
                     </div>
@@ -496,7 +496,7 @@ const BriefingPublic = () => {
                                 "text-[9px] border px-5 py-3 uppercase tracking-widest transition-all", 
                                 formData.estilo_referencia === opt 
                                   ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
-                                  : "border-white/5 text-white/40 hover:border-white/10"
+                                  : "border-white/[0.06] text-white/[0.4] hover:border-white/[0.12]"
                               )}
                             >
                               {opt}
@@ -511,12 +511,12 @@ const BriefingPublic = () => {
                           name="orcamento" 
                           value={formData.orcamento} 
                           onChange={handleChange} 
-                          className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] appearance-none cursor-pointer"
+                          className="w-full bg-white/[0.02] border border-white/[0.06] rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] appearance-none cursor-pointer"
                         >
-                          <option value="" className="bg-[#0A0A0A]">Não definido...</option>
-                          <option value="Ate 500k" className="bg-[#0A0A0A]">Ate R$ 500.000</option>
-                          <option value="500k - 1M" className="bg-[#0A0A0A]">R$ 500.000 a R$ 1.000.000</option>
-                          <option value="Acima 1M" className="bg-[#0A0A0A]">Acima de R$ 1.000.000</option>
+                          <option value="" className="bg-[#0D0D0D]">Não definido...</option>
+                          <option value="Ate 500k" className="bg-[#0D0D0D]">Ate R$ 500.000</option>
+                          <option value="500k - 1M" className="bg-[#0D0D0D]">R$ 500.000 a R$ 1.000.000</option>
+                          <option value="Acima 1M" className="bg-[#0D0D0D]">Acima de R$ 1.000.000</option>
                         </select>
                       </div>
 
@@ -532,7 +532,7 @@ const BriefingPublic = () => {
                                 "text-[9px] border px-4 py-4 uppercase tracking-[0.2em] transition-all", 
                                 formData.prazo === opt 
                                   ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/5" 
-                                  : "border-white/5 text-white/40 hover:border-white/10"
+                                  : "border-white/[0.06] text-white/[0.4] hover:border-white/[0.12]"
                               )}
                             >
                               {opt}
@@ -546,7 +546,7 @@ const BriefingPublic = () => {
                         placeholder="Observações adicionais ou algum detalhe específico que queira compartilhar..." 
                         value={formData.obs} 
                         onChange={handleChange} 
-                        className="bg-white/[0.02] border-white/5 rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" 
+                        className="bg-white/[0.02] border-white/[0.06] rounded-none min-h-[140px] p-6 text-[10px] uppercase tracking-widest leading-loose focus:border-[#8B7355]" 
                       />
                     </div>
                   </div>
@@ -560,7 +560,7 @@ const BriefingPublic = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-[#E8E4DF] font-['Courier_New'] selection:bg-[#8B7355]/30 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0D0D0D] text-[#F0EDE8] font-['Courier_New'] selection:bg-[#8B7355]/30 relative overflow-hidden">
       <GrainOverlay />
       <BackgroundGlow />
       
@@ -570,18 +570,18 @@ const BriefingPublic = () => {
         <div className="absolute top-[100px] left-0 right-0 h-[1px] bg-white/[0.02]" />
       </div>
 
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5 px-8 py-6">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0D0D0D]/90 backdrop-blur-xl border-b border-white/[0.06] px-8 py-6">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex flex-col">
             <span className="text-[11px] font-bold tracking-[0.6em] text-[#8B7355] ml-[0.6em]">NL ARQUITETOS</span>
-            <span className="text-[8px] tracking-[0.4em] text-[#E8E4DF]/20 uppercase mt-1.5 ml-[0.4em]">Digital Briefing Experience</span>
+            <span className="text-[8px] tracking-[0.4em] text-[#F0EDE8]/20 uppercase mt-1.5 ml-[0.4em]">Digital Briefing Experience</span>
           </div>
           <div className="text-[9px] text-[#8B7355] font-bold tracking-[0.3em] flex items-center gap-3">
             <span className="opacity-40 font-light">PROGRESSO</span>
             <span className="w-12 text-right">{Math.round((step / 4) * 100)}%</span>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/5">
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/[0.06]">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${(step / 4) * 100}%` }}
@@ -595,12 +595,12 @@ const BriefingPublic = () => {
         <div className="max-w-xl mx-auto">
           {renderStep()}
 
-          <div className="mt-20 pt-10 border-t border-white/5 flex justify-between items-center">
+          <div className="mt-20 pt-10 border-t border-white/[0.06] flex justify-between items-center">
             {step > 1 ? (
               <motion.button
                 whileHover={{ x: -4 }}
                 onClick={() => setStep(step - 1)}
-                className="flex items-center gap-3 text-[10px] text-[#E8E4DF]/40 uppercase tracking-[0.4em] hover:text-[#8B7355] transition-all group"
+                className="flex items-center gap-3 text-[10px] text-[#F0EDE8]/40 uppercase tracking-[0.4em] hover:text-[#8B7355] transition-all group"
               >
                 <ChevronLeft className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100" />
                 <span>Anterior</span>
@@ -612,7 +612,7 @@ const BriefingPublic = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setStep(step + 1)}
                 disabled={step === 2 && !projetoType}
-                className="flex items-center gap-4 bg-[#8B7355] text-[#0F0E0C] px-10 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-20 disabled:grayscale group shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
+                className="flex items-center gap-4 bg-[#8B7355] text-[#0D0D0D] px-10 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-20 disabled:grayscale group shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
               >
                 <span className="ml-1">Próximo</span>
                 <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -622,7 +622,7 @@ const BriefingPublic = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleSubmit()}
                 disabled={submitting}
-                className="bg-[#8B7355] text-[#0F0E0C] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-50 shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
+                className="bg-[#8B7355] text-[#0D0D0D] px-12 py-4 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-[#8B7355]/90 transition-all disabled:opacity-50 shadow-[0_10px_20px_rgba(0,0,0,0.2)]"
               >
                 <span className="ml-1">{submitting ? 'Enviando...' : 'Finalizar →'}</span>
               </motion.button>
@@ -634,7 +634,7 @@ const BriefingPublic = () => {
       <footer className="fixed bottom-8 left-0 right-0 pointer-events-none z-40 px-10 hidden md:block">
         <div className="max-w-[1400px] mx-auto flex justify-between items-end">
           <div className="flex flex-col gap-6 opacity-20">
-            <div className="w-[1px] h-12 bg-white/40 mx-auto" />
+            <div className="w-[1px] h-12 bg-white/[0.4] mx-auto" />
             <div className="text-[8px] uppercase tracking-[0.6em] vertical-text transform -rotate-180" style={{ writingMode: 'vertical-rl' }}>
               NL ARQUITETOS · 2026
             </div>
@@ -643,7 +643,7 @@ const BriefingPublic = () => {
             <div className="text-[8px] uppercase tracking-[0.6em] vertical-text" style={{ writingMode: 'vertical-rl' }}>
               A ARQUITETURA COMO DECISÃO
             </div>
-            <div className="w-[1px] h-12 bg-white/40 mx-auto" />
+            <div className="w-[1px] h-12 bg-white/[0.4] mx-auto" />
           </div>
         </div>
       </footer>

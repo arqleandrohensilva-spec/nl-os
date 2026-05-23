@@ -17,15 +17,15 @@ import { Progress } from '@/components/ui/progress';
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
 
 const ShortcutCard = ({ label, value, actionLabel, onClick }: { label: string, value: string, actionLabel: string, onClick: () => void }) => (
-  <div className="bg-[#1A1A1A] border border-white/10 border border-[#3A3A3A] p-6 flex flex-col justify-between h-40">
+  <div className="bg-[#161616] border border-white/[0.12] border border-[#1E1E1E] p-6 flex flex-col justify-between h-40">
     <div className="space-y-1">
       <span className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-widest">{label}</span>
-      <p className="text-[#E8E4DF] text-lg font-medium">{value}</p>
+      <p className="text-[#F0EDE8] text-lg font-medium">{value}</p>
     </div>
     <Button 
       variant="outline" 
       onClick={onClick}
-      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#1A1816] rounded-none text-[10px] uppercase tracking-widest h-8 font-['Courier_New'] transition-colors"
+      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#161616] rounded-none text-[10px] uppercase tracking-widest h-8 font-['Courier_New'] transition-colors"
     >
       {value === '—' ? 'CRIAR' : actionLabel}
     </Button>
@@ -252,22 +252,22 @@ const ClienteFicha = () => {
     saveMutation.mutate({ observacoes: formData.observacoes });
   };
 
-  if (isClienteLoading) return <div className="min-h-screen bg-[#1A1A1A] border border-white/10 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
+  if (isClienteLoading) return <div className="min-h-screen bg-[#161616] border border-white/[0.12] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
-    <div className="flex min-h-screen bg-[#1A1A1A] border border-white/10 text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#161616] border border-white/[0.12] text-[#F0EDE8]">
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-12 max-w-6xl mx-auto space-y-12">
         {/* TOPO */}
         <div className="flex justify-between items-start">
           <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-[#E8E4DF] font-['Courier_New'] uppercase tracking-tight">{cliente?.nome}</h1>
-            <div className="flex items-center gap-4 text-white/50 text-sm">
+            <h1 className="text-4xl font-bold text-[#F0EDE8] font-['Courier_New'] uppercase tracking-tight">{cliente?.nome}</h1>
+            <div className="flex items-center gap-4 text-white/[0.06]0 text-sm">
               <span>{cliente?.cidade}</span>
-              <span className="w-1 h-1 bg-white/20 rounded-full" />
+              <span className="w-1 h-1 bg-white/[0.18] rounded-full" />
               <span>{cliente?.origem}</span>
             </div>
             <a 
@@ -290,7 +290,7 @@ const ClienteFicha = () => {
         {/* DADOS PESSOAIS */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">DADOS PESSOAIS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0A0A0A]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#1E1E1E] bg-[#0D0D0D]">
             {[
               { label: 'Nome', key: 'nome' },
               { label: 'WhatsApp', key: 'whatsapp' },
@@ -305,10 +305,10 @@ const ClienteFicha = () => {
                 {isEditing ? (
                   field.isSelect ? (
                     <Select value={formData[field.key as keyof typeof formData]} onValueChange={(v) => setFormData({...formData, [field.key]: v})}>
-                      <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-10 text-xs">
+                      <SelectTrigger className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/10">
+                      <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12]">
                         {field.options?.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -316,11 +316,11 @@ const ClienteFicha = () => {
                     <Input 
                       value={formData[field.key as keyof typeof formData]} 
                       onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
-                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                     />
                   )
                 ) : (
-                  <p className="text-[#E8E4DF] text-sm">{formData[field.key as keyof typeof formData] || '—'}</p>
+                  <p className="text-[#F0EDE8] text-sm">{formData[field.key as keyof typeof formData] || '—'}</p>
                 )}
               </div>
             ))}
@@ -335,7 +335,7 @@ const ClienteFicha = () => {
         {/* QUALIFICAÇÃO */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">QUALIFICAÇÃO</h2>
-          <div className="bg-[#0A0A0A] border border-[#3A3A3A] p-8 space-y-8">
+          <div className="bg-[#0D0D0D] border border-[#1E1E1E] p-8 space-y-8">
             {/* SCORE CARD */}
             <div className="space-y-4">
               <div className="flex justify-between items-end">
@@ -365,7 +365,7 @@ const ClienteFicha = () => {
                       type="number"
                       value={formData[field.key as keyof typeof formData]} 
                       onChange={(e) => updateQualificacao(field.key, e.target.value)}
-                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
+                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
                     />
                   ) : (
                     <div className="grid grid-cols-2 gap-2">
@@ -377,7 +377,7 @@ const ClienteFicha = () => {
                             "px-3 py-2 text-[10px] uppercase border transition-colors",
                             formData[field.key as keyof typeof formData] === opt
                               ? "bg-[#8B7355] border-[#8B7355] text-white"
-                              : "bg-transparent border-[#3A3A3A] text-white/50 hover:border-[#8B7355]"
+                              : "bg-transparent border-[#1E1E1E] text-white/[0.06]0 hover:border-[#8B7355]"
                           )}
                         >
                           {opt}
@@ -427,28 +427,28 @@ const ClienteFicha = () => {
             onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
             onBlur={handleBlurSave}
             placeholder="Digite aqui anotações sobre este cliente..."
-            className="w-full h-40 bg-[#0A0A0A] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
+            className="w-full h-40 bg-[#0D0D0D] border border-[#1E1E1E] p-6 text-[#F0EDE8] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
           />
         </section>
 
         {/* HISTÓRICO */}
         <section className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+          <div className="flex items-center gap-3 border-b border-white/[0.06] pb-4">
             <History size={16} className="text-[#8B7355]" />
             <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-[#8B7355] font-['Courier_New']">HISTÓRICO</h2>
           </div>
           <div className="space-y-6 pl-2">
             {!historico || historico.length === 0 ? (
-              <p className="text-[10px] text-white/20 uppercase tracking-widest font-['Courier_New']">Nenhuma alteração registrada</p>
+              <p className="text-[10px] text-white/[0.18] uppercase tracking-widest font-['Courier_New']">Nenhuma alteração registrada</p>
             ) : (
               historico.map((h) => (
                 <div key={h.id} className="flex gap-4 items-start relative">
                   <div className="mt-1.5 w-2 h-2 rounded-full bg-[#8B7355] shrink-0" />
                   <div className="space-y-1">
                     <p className="text-[10px] text-white/60 font-['Courier_New'] uppercase tracking-widest leading-relaxed">
-                      Status alterado de <span className="text-white/40">{h.status_anterior || 'INICIAL'}</span> para <span className="text-white font-bold">{h.status_novo}</span>
+                      Status alterado de <span className="text-white/[0.4]">{h.status_anterior || 'INICIAL'}</span> para <span className="text-white font-bold">{h.status_novo}</span>
                     </p>
-                    <div className="flex items-center gap-2 text-[8px] text-white/20 uppercase tracking-widest font-bold">
+                    <div className="flex items-center gap-2 text-[8px] text-white/[0.18] uppercase tracking-widest font-bold">
                       <Clock size={10} />
                       {format(new Date(h.data_hora), "dd MMM yyyy 'às' HH:mm", { locale: ptBR })}
                     </div>

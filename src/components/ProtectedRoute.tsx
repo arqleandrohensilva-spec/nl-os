@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-4 border-bronze/20 border-t-bronze rounded-full animate-spin" />
-          <p className="text-[10px] uppercase tracking-widest text-white/40">Carregando...</p>
+          <p className="text-[10px] uppercase tracking-widest text-white/[0.4]">Carregando...</p>
         </div>
       </div>
     );

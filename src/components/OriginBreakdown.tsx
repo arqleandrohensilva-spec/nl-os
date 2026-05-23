@@ -29,7 +29,7 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
   const maxCount = sortedOrigins[0]?.count || 0;
 
   return (
-    <div className="border-b border-white/10 bg-[#0A0A0A]">
+    <div className="border-b border-white/[0.12] bg-[#0D0D0D]">
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-10 py-2.5 flex items-center justify-between hover:bg-white/[0.03] transition-colors"
@@ -43,14 +43,14 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
         <div className="flex items-center gap-4">
           <div className="flex gap-3">
             {sortedOrigins.slice(0, 3).map(origin => (
-              <span key={origin.name} className="text-[8px] font-bold text-white/40 uppercase tracking-tighter">
+              <span key={origin.name} className="text-[8px] font-bold text-white/[0.4] uppercase tracking-tighter">
                 {origin.name}: {origin.count}
               </span>
             ))}
           </div>
           <ChevronDown 
             size={12} 
-            className={cn("text-white/40 transition-transform duration-300", isOpen && "rotate-180")} 
+            className={cn("text-white/[0.4] transition-transform duration-300", isOpen && "rotate-180")} 
           />
         </div>
       </button>
@@ -66,11 +66,11 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
                 <span className="text-[9px] font-bold text-white uppercase tracking-widest">
                   {origin.name}
                 </span>
-                <span className="text-[9px] font-mono text-white/40">
+                <span className="text-[9px] font-mono text-white/[0.4]">
                   {origin.count} {origin.count === 1 ? 'lead' : 'leads'} · {origin.percentage.toFixed(1)}%
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
                 <div 
                   className={cn(
                     "h-full transition-all duration-1000 ease-out",
