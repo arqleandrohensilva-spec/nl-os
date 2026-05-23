@@ -141,8 +141,7 @@ const ClienteFicha = () => {
         area_m2: cliente.area_m2?.toString() || '',
         orcamento: cliente.orcamento || '',
         prazo: cliente.prazo || '',
-        quem_decide: cliente.quem_decide || '',
-        etapa_fluxo: cliente.etapa_fluxo || 'ficha'
+        quem_decide: cliente.quem_decide || ''
       }));
       if (cliente.etapa_fluxo) {
         setOpenSections([cliente.etapa_fluxo]);
