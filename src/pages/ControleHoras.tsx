@@ -89,15 +89,15 @@ export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: num
 
 const StageBadge = ({ stage }: { stage: string }) => {
   const configs: Record<string, { bg: string, text: string }> = {
-    'Briefing': { bg: 'bg-[#3A3A3A]/15', text: 'text-[#3A3A3A]' },
-    'Conceito': { bg: 'bg-[#8B7355]/15', text: 'text-[#8B7355]' },
-    'Estudo Preliminar': { bg: 'bg-[#D4AF37]/15', text: 'text-[#D4AF37]' },
-    'Projeto Executivo': { bg: 'bg-[#2C4A7C]/15', text: 'text-[#2C4A7C]' },
-    'Detalhamento': { bg: 'bg-[#6B4E71]/15', text: 'text-[#6B4E71]' },
-    'Acompanhamento': { bg: 'bg-[#2E5C3A]/15', text: 'text-[#2E5C3A]' },
+    'Briefing': { bg: 'bg-[#3A3A3A]/25', text: 'text-zinc-300' },
+    'Conceito': { bg: 'bg-[#8B7355]/25', text: 'text-bronze' },
+    'Estudo Preliminar': { bg: 'bg-[#D4AF37]/25', text: 'text-amber-400' },
+    'Projeto Executivo': { bg: 'bg-[#2C4A7C]/25', text: 'text-blue-400' },
+    'Detalhamento': { bg: 'bg-[#6B4E71]/25', text: 'text-purple-400' },
+    'Acompanhamento': { bg: 'bg-[#2E5C3A]/25', text: 'text-green-400' },
   };
 
-  const config = configs[stage] || { bg: 'bg-muted/15', text: 'text-white/40' };
+  const config = configs[stage] || { bg: 'bg-muted/30', text: 'text-white/70' };
 
   return (
     <span className={cn(
@@ -618,22 +618,22 @@ const ControleHoras = () => {
             </div>
             <div className="grid grid-cols-4 gap-8 mb-8">
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Horas registradas</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/70 mb-1 font-bold font-mono">Horas registradas</p>
                 <p className="text-2xl font-cormorant font-bold">{Math.round(lastWeekSummary.total)}h total</p>
-                <p className="text-[9px] text-white/40 font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
+                <p className="text-[9px] text-white/60 font-mono">Leandro: {Math.round(lastWeekSummary.leandro)}h · Neandro: {Math.round(lastWeekSummary.neandro)}h</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Projeto mais consumido</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/70 mb-1 font-bold font-mono">Projeto mais consumido</p>
                 <p className="text-2xl font-cormorant font-bold">{lastWeekSummary.topProject}</p>
-                <p className="text-[9px] text-white/40 font-mono">{lastWeekSummary.topHours}h investidas</p>
+                <p className="text-[9px] text-white/60 font-mono">{lastWeekSummary.topHours}h investidas</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Eficiência Média</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/70 mb-1 font-bold font-mono">Eficiência Média</p>
                 <p className="text-2xl font-cormorant font-bold">93%</p>
                 <p className="text-[9px] text-emerald-600 font-bold font-mono">ALTA PERFORMANCE</p>
               </div>
               <div>
-                <p className="text-[9px] uppercase tracking-widest text-white/40 mb-1 font-bold font-mono">Meta atingida</p>
+                <p className="text-[9px] uppercase tracking-widest text-white/70 mb-1 font-bold font-mono">Meta atingida</p>
                 <div className="flex items-center gap-2">
                   <span className={cn("text-[9px] font-bold font-mono", lastWeekSummary.leandro >= 30 ? "text-emerald-600" : "text-rose-600")}>
                     {lastWeekSummary.leandro >= 30 ? '✓' : '✗'} Leandro
@@ -654,8 +654,8 @@ const ControleHoras = () => {
         {/* Weekly Goals Bar */}
         <div className="mb-12 bg-white/[0.03] border border-white/10 p-6 rounded-[4px] border-l-4 border-l-bronze">
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/40">Meta de Horas Semanal</h4>
-            <span className="text-[9px] text-white/40 font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
+            <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-white/70">Meta de Horas Semanal</h4>
+            <span className="text-[9px] text-white/60 font-mono uppercase tracking-widest">Seg a Dom · 30h p/ arquiteto</span>
           </div>
           <div className="grid grid-cols-2 gap-12">
             {[
@@ -686,25 +686,25 @@ const ControleHoras = () => {
 
         <div className="grid grid-cols-4 gap-6 mb-12">
           <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">HORAS NO MÊS</span>
+            <span className="text-[11px] text-white/70 uppercase font-normal font-inter">HORAS NO MÊS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
           <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
+            <span className="text-[11px] text-white/70 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {metrics.ativos}
             </span>
           </div>
           <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">CUSTO INTERNO</span>
+            <span className="text-[11px] text-white/70 uppercase font-normal font-inter">CUSTO INTERNO</span>
             <span className="text-[22px] font-normal text-white font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
           <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
-            <span className="text-[11px] text-white/40 uppercase font-normal font-inter">EFICIÊNCIA</span>
+            <span className="text-[11px] text-white/70 uppercase font-normal font-inter">EFICIÊNCIA</span>
             <span className="text-[22px] font-normal text-white font-inter">
               92%
             </span>
@@ -731,12 +731,12 @@ const ControleHoras = () => {
                       </div>
                     )}
                   </div>
-                  <p className="text-[9px] text-white/40 uppercase tracking-wider mb-6 font-bold truncate">
+                  <p className="text-[9px] text-white/70 uppercase tracking-wider mb-6 font-bold truncate">
                     {p.nome_cliente} · {p.tipo} · {p.area_m2}m²
                   </p>
 
                   <div className="mb-8">
-                    <div className="flex justify-between text-[9px] uppercase tracking-wider text-white/40 mb-1.5 font-bold">
+                    <div className="flex justify-between text-[9px] uppercase tracking-wider text-white/70 mb-1.5 font-bold">
                       <StageBadge stage={p.etapa_atual} />
                       <span className={cn(progress > 90 ? "text-rose-500" : "text-white")}>
                         {Math.round(totalHoras)}h / {p.horas_estimadas}h
@@ -757,7 +757,7 @@ const ControleHoras = () => {
                     aiPredictions[p.id].status === 'alert' 
                       ? "border-rose-500 bg-rose-50/50 font-mono" 
                       : aiPredictions[p.id].status === 'info'
-                        ? "border-muted-foreground/20 bg-muted/10 font-mono text-white/40"
+                        ? "border-muted-foreground/30 bg-muted/10 font-mono text-white/60"
                         : "border-emerald-500 bg-emerald-50/50 font-mono"
                   )}>
                     <div className="flex items-start gap-2">
@@ -772,7 +772,7 @@ const ControleHoras = () => {
                 {p.status_geral === 'ativo' && !aiPredictions[p.id] && loadingPredictions[p.id] && (
                   <div className="mb-6 p-2.5 border-l-2 border-bronze/20 bg-muted/20 animate-pulse flex items-center gap-2">
                     <Clock size={12} className="text-bronze/30" />
-                    <span className="text-[10px] text-white/40 font-mono">Analisando ritmo...</span>
+                    <span className="text-[10px] text-white/60 font-mono">Analisando ritmo...</span>
                   </div>
                 )}
                 </div>
@@ -790,7 +790,7 @@ const ControleHoras = () => {
                     <Button 
                       onClick={() => openTimerModal(p)}
                       variant="outline"
-                      className="flex-1 border-white/40 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                      className="flex-1 border-white/60 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
                     >
                       <Play size={10} className="mr-2" />
                       Iniciar
@@ -799,7 +799,7 @@ const ControleHoras = () => {
                   <Button 
                     variant="ghost"
                     onClick={() => openPanel(p)}
-                    className="flex-1 text-white/40 hover:text-bronze hover:bg-transparent rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
+                    className="flex-1 text-white/70 hover:text-bronze hover:bg-transparent rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em]"
                   >
                     Sessões
                   </Button>
@@ -826,12 +826,12 @@ const ControleHoras = () => {
             <div className="px-6 pb-6 border-t border-white/10 pt-6">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] uppercase tracking-widest text-white/40 border-b border-white/10">
-                    <th className="pb-4 font-bold text-white/40">Projeto</th>
-                    <th className="pb-4 font-bold text-white/40">Receita</th>
-                    <th className="pb-4 font-bold text-white/40">Custo Int.</th>
-                    <th className="pb-4 font-bold text-white/40">Margem</th>
-                    <th className="pb-4 font-bold text-right text-white/40">Status</th>
+                  <tr className="text-[9px] uppercase tracking-widest text-white/70 border-b border-white/10">
+                    <th className="pb-4 font-bold text-white/70">Projeto</th>
+                    <th className="pb-4 font-bold text-white/70">Receita</th>
+                    <th className="pb-4 font-bold text-white/70">Custo Int.</th>
+                    <th className="pb-4 font-bold text-white/70">Margem</th>
+                    <th className="pb-4 font-bold text-right text-white/70">Status</th>
                   </tr>
                 </thead>
                 <tbody className="text-[11px]">
@@ -844,8 +844,8 @@ const ControleHoras = () => {
                     return (
                       <tr key={p.id} className="border-b border-[#F5F2EF] last:border-0">
                         <td className="py-4 font-medium text-white">{p.nome}</td>
-                        <td className="py-4 text-white/40 font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
-                        <td className="py-4 text-white/40 font-mono">R$ {Math.round(custo).toLocaleString()}</td>
+                        <td className="py-4 text-white/70 font-mono">R$ {p.valor_proposta.toLocaleString()}</td>
+                        <td className="py-4 text-white/70 font-mono">R$ {Math.round(custo).toLocaleString()}</td>
                         <td className={cn(
                           "py-4 font-bold font-mono",
                           margem > 30 ? "text-emerald-600" : margem > 15 ? "text-bronze" : "text-rose-500"
@@ -855,7 +855,7 @@ const ControleHoras = () => {
                         <td className="py-4 text-right">
                           <span className={cn(
                             "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
-                            p.status_geral === 'ativo' ? "bg-bronze/15 text-bronze" : "bg-muted text-white/60"
+                            p.status_geral === 'ativo' ? "bg-bronze/15 text-bronze" : "bg-muted text-white/80"
                           )}>
                             {p.status_geral}
                           </span>
@@ -882,11 +882,11 @@ const ControleHoras = () => {
         <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Iniciar Sessão</h2>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8">{selectedProjeto?.nome}</p>
+            <p className="text-[10px] uppercase tracking-widest text-white/60 mb-8">{selectedProjeto?.nome}</p>
             
             <div className="space-y-6">
               <div>
-                <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Etapa</label>
+                <label className="text-[9px] uppercase tracking-widest text-white/60 font-bold block mb-2">Etapa</label>
                 <Select value={newSession.etapa} onValueChange={(v) => setNewSession({...newSession, etapa: v})}>
                   <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
                     <SelectValue />
