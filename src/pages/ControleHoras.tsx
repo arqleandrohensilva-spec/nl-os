@@ -790,9 +790,9 @@ const ControleHoras = () => {
                     <Button 
                       onClick={() => openTimerModal(p)}
                       variant="outline"
-                      className="flex-1 border-white/60 text-white hover:bg-white/10 hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all"
+                      className="flex-1 border-bronze/50 text-bronze hover:bg-bronze hover:text-white rounded-none h-10 text-[9px] uppercase font-bold tracking-[0.1em] transition-all bg-transparent"
                     >
-                      <Play size={10} className="mr-2" />
+                      <Play size={10} className="mr-2 fill-current" />
                       Iniciar
                     </Button>
                   )}
