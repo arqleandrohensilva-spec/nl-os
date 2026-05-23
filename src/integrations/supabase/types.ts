@@ -1797,8 +1797,8 @@ export type Database = {
           whatsapp: string
         }[]
       }
-      get_project_by_token: {
-        Args: { p_token: string }
+      get_project_by_token_or_slug: {
+        Args: { p_val: string }
         Returns: {
           area_m2: number | null
           cidade: string | null
@@ -1832,6 +1832,47 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "projetos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_files_by_token: {
+        Args: { p_val: string }
+        Returns: {
+          created_at: string | null
+          dropbox_path: string
+          etapa: string | null
+          id: string
+          liberado: boolean | null
+          nome_arquivo: string
+          projeto_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "arquivos_projeto"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_stages_by_token: {
+        Args: { p_val: string }
+        Returns: {
+          aprovado_por: string | null
+          criado_em: string
+          data_aprovacao: string | null
+          data_entrega: string | null
+          data_inicio: string | null
+          etapa: string
+          id: string
+          moodboard_url: string | null
+          notas: string | null
+          projeto_id: string | null
+          status: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "projeto_etapas"
           isOneToOne: false
           isSetofReturn: true
         }
