@@ -36,10 +36,8 @@ const PesquisaSatisfacao = () => {
     const fetchSurvey = async () => {
       if (!token) return;
       const { data, error } = await supabase
-        .from('pesquisas_satisfacao')
-        .select('*')
-        .eq('token', token)
-        .single();
+        .rpc('get_survey_by_token', { p_token: token })
+        .maybeSingle();
 
       if (error || !data) {
         toast({

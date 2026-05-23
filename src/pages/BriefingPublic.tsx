@@ -59,10 +59,8 @@ const BriefingPublic = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('briefings')
-        .select('*, leads(*)')
-        .eq('token', token)
-        .single();
+        .rpc('get_briefing_by_token', { p_token: token })
+        .maybeSingle();
 
       if (error || !data) {
         toast.error('Briefing não encontrado.');
@@ -72,11 +70,12 @@ const BriefingPublic = () => {
       if (data.status === 'preenchido' || data.status === 'aprovado') setSubmitted(true);
       
       if (data.leads) {
+        const leadData = data.leads as any;
         setFormData((prev: any) => ({
           ...prev,
-          nome_completo: data.leads.nome || '',
-          whatsapp: data.leads.whats || '',
-          cidade: data.leads.cidade || ''
+          nome_completo: leadData.nome || '',
+          whatsapp: leadData.whats || '',
+          cidade: leadData.cidade || ''
         }));
       }
     } catch (e) {

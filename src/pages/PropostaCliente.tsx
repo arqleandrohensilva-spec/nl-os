@@ -15,23 +15,14 @@ const PropostaCliente = () => {
   useEffect(() => {
     const buscarProposta = async () => {
       const { data, error } = await supabase
-        .from('propostas_clientes')
-        .select('*')
-        .eq('tipo', tipo)
-        .eq('slug', slug)
+        .rpc('get_proposal_by_slug', { p_tipo: tipo, p_slug: slug })
         .maybeSingle();
 
       if (error || !data) {
         setError(true);
       } else {
         // Incrementar acessos
-        await supabase
-          .from('propostas_clientes')
-          .update({ 
-            acessos: (data.acessos || 0) + 1,
-            ultimo_acesso: new Date().toISOString()
-          })
-          .eq('id', data.id);
+        await supabase.rpc('increment_proposal_access', { p_id: data.id });
 
         setProposta(data);
       }

@@ -54,18 +54,9 @@ export default function PaginaCliente() {
     try {
       setLoading(true);
       
-      // Check if param is a valid UUID
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(param || "");
-      
-      let query = supabase.from('projetos').select('*');
-      
-      if (isUUID) {
-        query = query.or(`token_cliente.eq.${param},slug_cliente.eq.${param}`);
-      } else {
-        query = query.eq('slug_cliente', param);
-      }
-
-      const { data: proj, error: projError } = await (query as any).maybeSingle();
+      const { data: proj, error: projError } = await supabase
+        .rpc('get_project_by_token_or_slug', { p_val: param })
+        .maybeSingle();
 
       if (projError || !proj) {
         console.error("Erro ao buscar projeto:", projError);
@@ -75,19 +66,13 @@ export default function PaginaCliente() {
 
       setProjeto(proj);
 
-      const { data: etps } = await (supabase
-        .from('projeto_etapas') as any)
-        .select('*')
-        .eq('projeto_id', proj.id)
-        .order('criado_em', { ascending: true });
+      const { data: etps } = await supabase
+        .rpc('get_project_stages_by_token', { p_val: param });
       
       setEtapas(etps || []);
 
-      const { data: arqs } = await (supabase
-        .from('arquivos_projeto') as any)
-        .select('*')
-        .eq('projeto_id', proj.id)
-        .order('created_at', { ascending: true });
+      const { data: arqs } = await supabase
+        .rpc('get_project_files_by_token', { p_val: param });
 
       setArquivos(arqs || []);
     } catch (err) {

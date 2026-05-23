@@ -1777,7 +1777,175 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_briefing_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          cidade: string
+          cliente_id: string
+          criado_em: string
+          email: string
+          id: string
+          lead_id: string
+          leads: Json
+          nome: string
+          origem: string
+          preenchido_em: string
+          respostas: Json
+          status: string
+          tipo_projeto: string
+          token: string
+          whatsapp: string
+        }[]
+      }
+      get_document_link_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          criado_em: string
+          documento_id: string | null
+          expira_em: string
+          id: string
+          token: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "documento_links"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_by_token_or_slug: {
+        Args: { p_val: string }
+        Returns: {
+          area_m2: number | null
+          cidade: string | null
+          cliente_id: string | null
+          criado_em: string | null
+          criado_por: string | null
+          data_inicio: string | null
+          dropbox_folder: string | null
+          etapa_atual: string | null
+          horas_acompanhamento: number | null
+          horas_anteprojeto: number | null
+          horas_briefing: number | null
+          horas_conceito: number | null
+          horas_detalhamento: number | null
+          horas_estimadas: number | null
+          horas_executivo: number | null
+          id: string
+          link_apresentacao: string | null
+          nome: string
+          nome_cliente: string | null
+          prazo_final: string | null
+          proposta_id: string | null
+          slug_cliente: string | null
+          status_geral: string | null
+          tipo: string | null
+          token_cliente: string | null
+          updated_at: string | null
+          valor_proposta: number | null
+          valor_total: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "projetos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_files_by_token: {
+        Args: { p_val: string }
+        Returns: {
+          created_at: string | null
+          dropbox_path: string
+          etapa: string | null
+          id: string
+          liberado: boolean | null
+          nome_arquivo: string
+          projeto_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "arquivos_projeto"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_stages_by_token: {
+        Args: { p_val: string }
+        Returns: {
+          aprovado_por: string | null
+          criado_em: string
+          data_aprovacao: string | null
+          data_entrega: string | null
+          data_inicio: string | null
+          etapa: string
+          id: string
+          moodboard_url: string | null
+          notas: string | null
+          projeto_id: string | null
+          status: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "projeto_etapas"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_proposal_by_slug: {
+        Args: { p_slug: string; p_tipo: string }
+        Returns: {
+          acessos: number | null
+          area: string | null
+          cidade: string | null
+          criado_em: string | null
+          estado: string | null
+          id: string
+          nome_cliente: string | null
+          objetivo: string | null
+          slug: string
+          tipo: string
+          tipo_negocio: string | null
+          ultimo_acesso: string | null
+          validade: string | null
+          valor_completo: string | null
+          valor_executivo: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "propostas_clientes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_survey_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          avaliacao_processo: string | null
+          avaliacao_resultado: string | null
+          cliente_nome: string
+          comentario: string | null
+          criado_em: string
+          id: string
+          nota_geral: number | null
+          projeto_id: string | null
+          respondida_em: string | null
+          status: string
+          tipo: string | null
+          token: string
+          updated_at: string
+          video_dropbox_path: string | null
+          video_url: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "pesquisas_satisfacao"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      increment_proposal_access: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
       notification_type:
