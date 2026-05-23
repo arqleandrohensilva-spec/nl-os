@@ -380,7 +380,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         >
           <NavItem 
             label="Gestão de Projetos" 
-            active={location.pathname === '/projetos/gestao' || location.pathname.startsWith('/projetos/detalhe/')} 
+            active={location.pathname === '/projetos/gestao'} 
             onClick={() => navigate('/projetos/gestao')} 
           />
           <NavItem 
@@ -458,7 +458,6 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={() => navigate('/propostas/documentos')} 
           />
         </SectionAccordion>
-      </div>
       </div>
 
       <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
