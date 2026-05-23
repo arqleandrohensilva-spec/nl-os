@@ -22,13 +22,7 @@ const PropostaCliente = () => {
         setError(true);
       } else {
         // Incrementar acessos
-        await supabase
-          .from('propostas_clientes')
-          .update({ 
-            acessos: (data.acessos || 0) + 1,
-            ultimo_acesso: new Date().toISOString()
-          })
-          .eq('id', data.id);
+        await supabase.rpc('increment_proposal_access', { p_id: data.id });
 
         setProposta(data);
       }
