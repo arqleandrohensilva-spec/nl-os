@@ -308,7 +308,7 @@ const SatisfacaoDashboard = () => {
       <Sidebar user="Equipe NL" />
       <main className="flex-1 ml-[230px] p-12">
         <div className="mb-10">
-          <h1 className="text-3xl font-bold uppercase tracking-[0.2em] font-cormorant">09 · Pesquisa de Satisfação</h1>
+          <h1 className="text-3xl font-bold uppercase tracking-[0.2em] font-cormorant">Pesquisa de Satisfação</h1>
           <p className="text-bronze uppercase tracking-widest text-[10px] font-bold mt-1">PÓS-ENTREGA · DEPOIMENTOS · PAINEL NPS</p>
         </div>
 
