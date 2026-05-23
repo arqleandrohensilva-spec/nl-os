@@ -457,21 +457,21 @@ Retorne APENAS JSON válido:
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white font-sans">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-sans">
       <Sidebar user="Sócio" />
       <div className="ml-[230px] flex-1 p-8 grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-8">
         {/* COLUNA ESQUERDA */}
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-white/[0.4] block">LEAD ATIVO</label>
+            <label className="text-[10px] uppercase tracking-widest text-white/40 block">LEAD ATIVO</label>
             <Select onValueChange={handleLeadChange} value={selectedLeadId}>
-              <SelectTrigger className="bg-[#0D0D0D] border-white/[0.06] text-white h-11">
+              <SelectTrigger className="bg-[#141414] border-white/5 text-white h-11">
                 <SelectValue placeholder="Selecione um lead..." />
               </SelectTrigger>
-              <SelectContent className="bg-[#0D0D0D] border-white/[0.12] text-white">
+              <SelectContent className="bg-[#141414] border-white/10 text-white">
                 {leads.map(l => (
                   <SelectItem key={l.id} value={l.id} className="focus:bg-bronze/20 focus:text-white">
-                    <span className="font-bold">{l.nome}</span> · <span className="text-white/60">{l.tipo}</span> · <span className="text-white/[0.4] text-[10px] uppercase">{l.stage}</span>
+                    <span className="font-bold">{l.nome}</span> · <span className="text-white/60">{l.tipo}</span> · <span className="text-white/40 text-[10px] uppercase">{l.stage}</span>
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -479,16 +479,16 @@ Retorne APENAS JSON válido:
           </div>
 
           {leadAtivo && (
-            <div className="bg-[#0D0D0D] p-5 border border-white/[0.06] space-y-1 relative overflow-hidden group">
+            <div className="bg-[#141414] p-5 border border-white/5 space-y-1 relative overflow-hidden group">
               <div className="absolute top-0 left-0 w-1 h-full bg-bronze" />
               <p className="font-bold text-lg">{leadAtivo.nome}</p>
               <p className="text-bronze text-sm font-medium">{leadAtivo.tipo}</p>
               <div className="flex items-center gap-2 pt-2">
-                <span className="text-[9px] text-white/[0.4] uppercase tracking-widest">{leadAtivo.cidade}</span>
-                <span className="text-[9px] text-white/[0.4] uppercase tracking-widest">·</span>
-                <span className="text-[9px] text-white/[0.4] uppercase tracking-widest">{leadAtivo.area ? `${leadAtivo.area}m²` : 'Área não inf.'}</span>
-                <span className="text-[9px] text-white/[0.4] uppercase tracking-widest">·</span>
-                <span className="text-[9px] text-white/[0.4] uppercase tracking-widest">{leadAtivo.origem || 'Origem não inf.'}</span>
+                <span className="text-[9px] text-white/40 uppercase tracking-widest">{leadAtivo.cidade}</span>
+                <span className="text-[9px] text-white/40 uppercase tracking-widest">·</span>
+                <span className="text-[9px] text-white/40 uppercase tracking-widest">{leadAtivo.area ? `${leadAtivo.area}m²` : 'Área não inf.'}</span>
+                <span className="text-[9px] text-white/40 uppercase tracking-widest">·</span>
+                <span className="text-[9px] text-white/40 uppercase tracking-widest">{leadAtivo.origem || 'Origem não inf.'}</span>
               </div>
               <div className="mt-3">
                 <span className="text-[9px] bg-bronze/20 text-bronze px-2 py-0.5 font-bold uppercase tracking-wider">{leadAtivo.stage}</span>
@@ -499,7 +499,7 @@ Retorne APENAS JSON válido:
           {/* BLOCO — DETECTOR DE MOMENTO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeAccordion === 'detector' ? "border-bronze bg-[#0D0D0D]" : "border-white/[0.06] bg-[#0D0D0D]"
+            activeAccordion === 'detector' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
               className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
@@ -512,13 +512,13 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">Identifique em qual das 11 etapas o lead está agora</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/[0.18] transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'detector' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'detector' && "rotate-180 text-bronze")} size={16} />
             </button>
 
             {activeAccordion === 'detector' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <Textarea 
-                  className="bg-[#0D0D0D] border-white/[0.06] text-white min-h-[100px] focus-visible:ring-bronze text-xs" 
+                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[100px] focus-visible:ring-bronze text-xs" 
                   placeholder="Cole aqui a última mensagem recebida do cliente..."
                   value={mensagemDetector}
                   onChange={(e) => setMensagemDetector(e.target.value)}
@@ -532,17 +532,17 @@ Retorne APENAS JSON válido:
                 </Button>
 
                 {resultadoDetector && (
-                  <div className="mt-4 p-4 bg-[#0D0D0D] border border-bronze/30 rounded-md space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 rounded-md space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-bronze text-black">
                       ETAPA {String(resultadoDetector.etapa_numero).padStart(2, '0')} — {resultadoDetector.etapa_nome}
                     </div>
                     
-                    <p className="text-xs text-[#777777] leading-relaxed">
+                    <p className="text-xs text-[#CCCCCC] leading-relaxed">
                       {resultadoDetector.motivo}
                     </p>
 
-                    <div className="pt-2 border-t border-white/[0.06]">
-                      <p className="text-[9px] text-white/[0.4] uppercase tracking-widest mb-1">Script Recomendado</p>
+                    <div className="pt-2 border-t border-white/5">
+                      <p className="text-[9px] text-white/40 uppercase tracking-widest mb-1">Script Recomendado</p>
                       <p className="text-xs font-semibold text-bronze">{resultadoDetector.script_recomendado}</p>
                     </div>
 
@@ -562,7 +562,7 @@ Retorne APENAS JSON válido:
           {/* BLOCO — GERADOR DE OBJEÇÃO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeAccordion === 'objecao' ? "border-bronze bg-[#0D0D0D]" : "border-white/[0.06] bg-[#0D0D0D]"
+            activeAccordion === 'objecao' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
               className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
@@ -575,16 +575,16 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">A IA gera a resposta certa no tom NL para situações fora do padrão</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/[0.18] transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'objecao' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'objecao' && "rotate-180 text-bronze")} size={16} />
             </button>
 
             {activeAccordion === 'objecao' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <div className="space-y-3">
                   <div className="space-y-1.5">
-                    <label className="text-[9px] uppercase tracking-widest text-white/[0.4] block">O QUE O CLIENTE DISSE</label>
+                    <label className="text-[9px] uppercase tracking-widest text-white/40 block">O QUE O CLIENTE DISSE</label>
                     <Textarea 
-                      className="bg-[#0D0D0D] border-white/[0.06] text-white min-h-[80px] focus-visible:ring-bronze text-xs" 
+                      className="bg-[#0F0F0F] border-white/5 text-white min-h-[80px] focus-visible:ring-bronze text-xs" 
                       placeholder="Ex: Cliente disse que vai construir com o cunhado que é engenheiro..."
                       value={descricaoObjecao}
                       onChange={(e) => setDescricaoObjecao(e.target.value)}
@@ -592,12 +592,12 @@ Retorne APENAS JSON válido:
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[9px] uppercase tracking-widest text-white/[0.4] block">ETAPA ATUAL</label>
+                    <label className="text-[9px] uppercase tracking-widest text-white/40 block">ETAPA ATUAL</label>
                     <Select onValueChange={setEtapaAtualObjecao} value={etapaAtualObjecao}>
-                      <SelectTrigger className="bg-[#0D0D0D] border-white/[0.06] text-white h-9 text-xs">
+                      <SelectTrigger className="bg-[#0F0F0F] border-white/5 text-white h-9 text-xs">
                         <SelectValue placeholder="Selecione a etapa..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0D0D0D] border-white/[0.12] text-white">
+                      <SelectContent className="bg-[#141414] border-white/10 text-white">
                         {scriptsContent.map((etapa) => (
                           <SelectItem key={etapa.id} value={etapa.titulo} className="focus:bg-bronze/20 focus:text-white text-xs">
                             {etapa.id} - {etapa.titulo}
@@ -617,26 +617,26 @@ Retorne APENAS JSON válido:
                 </Button>
 
                 {resultadoObjecao && (
-                  <div className="mt-4 p-4 bg-[#0D0D0D] border border-bronze/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="mt-4 p-4 bg-[#0F0F0F] border border-bronze/30 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center justify-between">
                       <span className="text-[8px] px-2 py-0.5 font-bold bg-bronze text-black uppercase tracking-widest font-mono">SCRIPT GERADO · NL</span>
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-6 w-6 text-white/[0.4] hover:text-white"
+                        className="h-6 w-6 text-white/40 hover:text-white"
                         onClick={() => copyToClipboard(resultadoObjecao.script)}
                       >
                         <Copy size={12} />
                       </Button>
                     </div>
                     
-                    <p className="text-[13px] text-[#777777] leading-relaxed whitespace-pre-wrap font-sans">
+                    <p className="text-[13px] text-[#CCCCCC] leading-relaxed whitespace-pre-wrap font-sans">
                       {resultadoObjecao.script}
                     </p>
 
-                    <div className="pt-2 border-t border-white/[0.06] space-y-3">
+                    <div className="pt-2 border-t border-white/5 space-y-3">
                       <div>
-                        <p className="text-[8px] text-white/[0.4] uppercase tracking-widest mb-0.5">ESTRATÉGIA USADA</p>
+                        <p className="text-[8px] text-white/40 uppercase tracking-widest mb-0.5">ESTRATÉGIA USADA</p>
                         <p className="text-[10px] text-white/60 italic leading-tight">{resultadoObjecao.estrategia}</p>
                       </div>
                       
@@ -656,7 +656,7 @@ Retorne APENAS JSON válido:
           {/* BLOCO — ASSISTENTE DE ATENDIMENTO */}
           <div className={cn(
             "border transition-all duration-300",
-            activeAccordion === 'assistente' ? "border-bronze bg-[#0D0D0D]" : "border-white/[0.06] bg-[#0D0D0D]"
+            activeAccordion === 'assistente' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
               className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
@@ -669,13 +669,13 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">Cole a mensagem do cliente e receba uma sugestão no tom NL</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/[0.18] transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'assistente' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'assistente' && "rotate-180 text-bronze")} size={16} />
             </button>
 
             {activeAccordion === 'assistente' && (
               <div className="px-5 pb-5 space-y-4 animate-in slide-in-from-top-2 duration-200">
                 <Textarea 
-                  className="bg-[#0D0D0D] border-white/[0.06] text-white min-h-[120px] focus-visible:ring-bronze text-xs" 
+                  className="bg-[#0F0F0F] border-white/5 text-white min-h-[120px] focus-visible:ring-bronze text-xs" 
                   placeholder="Cole aqui a mensagem ou pergunta do cliente..."
                   value={mensagemCliente}
                   onChange={(e) => setMensagemCliente(e.target.value)}
@@ -690,22 +690,22 @@ Retorne APENAS JSON válido:
 
                 {sugestaoIA && (
                   <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-500">
-                    <div className="bg-[#0D0D0D] p-4 border border-bronze/30 space-y-3 relative group">
+                    <div className="bg-[#0F0F0F] p-4 border border-bronze/30 space-y-3 relative group">
                       <div className="flex items-center justify-between">
                         <span className="text-[8px] uppercase tracking-widest font-bold text-bronze font-mono">RESPOSTA SUGERIDA</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-6 w-6 text-white/[0.4] hover:text-white"
+                          className="h-6 w-6 text-white/40 hover:text-white"
                           onClick={() => copyToClipboard(sugestaoIA.resposta)}
                         >
                           <Copy size={12} />
                         </Button>
                       </div>
-                      <p className="text-[14px] text-[#777777] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
-                      <div className="pt-2 border-t border-white/[0.06] mt-2">
-                        <p className="text-[9px] text-white/[0.4] uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
-                        <p className="text-[9px] text-white/[0.4] uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
+                      <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">{sugestaoIA.resposta}</p>
+                      <div className="pt-2 border-t border-white/5 mt-2">
+                        <p className="text-[9px] text-white/40 uppercase mb-1">TOM: <span className="text-white/60 italic">{sugestaoIA.tom}</span></p>
+                        <p className="text-[9px] text-white/40 uppercase">PRÓXIMO PASSO: <span className="text-white/60 font-bold">{sugestaoIA.proximo_passo}</span></p>
                       </div>
                     </div>
                   </div>
@@ -717,7 +717,7 @@ Retorne APENAS JSON válido:
           {/* NOVO BLOCO — SCRIPTS DE ATENDIMENTO · NL */}
           <div className={cn(
             "border transition-all duration-300",
-            activeAccordion === 'scripts' ? "border-bronze bg-[#0D0D0D]" : "border-white/[0.06] bg-[#0D0D0D]"
+            activeAccordion === 'scripts' ? "border-bronze bg-[#0F0F0F]" : "border-white/5 bg-[#0F0F0F]"
           )}>
             <button 
               className="w-full px-5 py-4 flex items-center justify-between group cursor-pointer"
@@ -730,7 +730,7 @@ Retorne APENAS JSON válido:
                   <p className="text-[9px] text-white/30 italic">Selecione uma etapa para ver os scripts</p>
                 </div>
               </div>
-              <ChevronDown className={cn("text-white/[0.18] transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'scripts' && "rotate-180 text-bronze")} size={16} />
+              <ChevronDown className={cn("text-white/20 transition-transform duration-300 group-hover:text-bronze", activeAccordion === 'scripts' && "rotate-180 text-bronze")} size={16} />
             </button>
 
             {activeAccordion === 'scripts' && (
@@ -742,8 +742,8 @@ Retorne APENAS JSON válido:
                     className={cn(
                       "w-full p-3 flex items-center gap-4 border transition-all duration-200 text-left",
                       selectedEtapaId === etapa.id 
-                        ? "bg-[#0D0D0D] border-bronze" 
-                        : "bg-[#0D0D0D] border-[#161616] hover:border-bronze/30"
+                        ? "bg-[#141414] border-bronze" 
+                        : "bg-[#0F0F0F] border-[#1A1A1A] hover:border-bronze/30"
                     )}
                   >
                     <span className="text-bronze font-bold font-mono text-xs">{etapa.id}</span>
@@ -759,15 +759,15 @@ Retorne APENAS JSON válido:
         </div>
 
         {/* COLUNA DIREITA */}
-        <div className="overflow-y-auto max-h-[calc(100vh-64px)] pr-4 scrollbar-thin scrollbar-thumb-white/[0.12]">
+        <div className="overflow-y-auto max-h-[calc(100vh-64px)] pr-4 scrollbar-thin scrollbar-thumb-white/10">
           {!selectedEtapaId ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40 py-20">
-              <FileText size={48} className="text-white/[0.18]" />
+              <FileText size={48} className="text-white/20" />
               <p className="text-lg font-cormorant uppercase tracking-widest">Selecione uma etapa para ver os scripts.</p>
             </div>
           ) : (
             <div key={selectedEtapaId} className="space-y-8 animate-in fade-in duration-300">
-              <div className="space-y-1 border-b border-white/[0.06] pb-6">
+              <div className="space-y-1 border-b border-white/5 pb-6">
                 <div className="flex items-center gap-4 mb-2">
                   <span className="text-bronze font-cormorant text-5xl font-bold opacity-40 leading-none">
                     {selectedEtapaId}
@@ -776,7 +776,7 @@ Retorne APENAS JSON válido:
                     <h1 className="text-3xl font-cormorant text-white uppercase tracking-wider">
                       {scriptsContent.find(e => e.id === selectedEtapaId)?.titulo}
                     </h1>
-                    <p className="text-[10px] uppercase text-white/[0.4] tracking-[0.3em] font-medium">
+                    <p className="text-[10px] uppercase text-white/40 tracking-[0.3em] font-medium">
                       {scriptsContent.find(e => e.id === selectedEtapaId)?.objetivo}
                     </p>
                   </div>
@@ -786,18 +786,18 @@ Retorne APENAS JSON válido:
               <div className="grid grid-cols-1 gap-6">
                 {scriptsContent.find(e => e.id === selectedEtapaId)?.scripts.map((script, idx) => (
                   <div key={idx} className={cn(
-                    "bg-[#0D0D0D] p-6 relative group border-l-[3px] transition-all hover:bg-[#0D0D0D]",
+                    "bg-[#0F0F0F] p-6 relative group border-l-[3px] transition-all hover:bg-[#141414]",
                     script.especial ? "border-[#4A4846]" : "border-bronze"
                   )}>
                     <div className="flex items-center justify-between mb-4">
                       <span className={cn(
                         "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
-                        script.especial ? "bg-white/[0.06] text-white/[0.4]" : "bg-bronze/10 text-bronze"
+                        script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
                       )}>
                         {script.situacao}
                       </span>
                     </div>
-                    <p className="text-[15px] text-[#777777] leading-[1.7] mb-12 font-sans whitespace-pre-wrap">
+                    <p className="text-[15px] text-[#CCCCCC] leading-[1.7] mb-12 font-sans whitespace-pre-wrap">
                       {replaceVariables(script.texto)}
                     </p>
                     <div className="flex gap-3 absolute bottom-6 left-6 right-6">
@@ -827,19 +827,19 @@ Retorne APENAS JSON válido:
 
         {/* MODAL ADAPTADOR DE TOM */}
         <Dialog open={modalAdaptarAberto} onOpenChange={setModalAdaptarAberto}>
-          <DialogContent className="bg-[#0D0D0D] border-bronze/20 text-white max-w-2xl">
+          <DialogContent className="bg-[#0F0F0F] border-bronze/20 text-white max-w-2xl">
             <DialogHeader>
               <DialogTitle className="text-2xl font-cormorant text-bronze uppercase tracking-widest">
                 ADAPTAR TOM · {scriptParaAdaptar?.situacao}
               </DialogTitle>
-              <DialogDescription className="text-white/[0.4] text-[10px] uppercase tracking-widest">
+              <DialogDescription className="text-white/40 text-[10px] uppercase tracking-widest">
                 Ajuste a abordagem do script para o perfil do cliente
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 py-4">
               <div className="space-y-3">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] block font-bold">COMO ESSE CLIENTE SE COMUNICA?</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 block font-bold">COMO ESSE CLIENTE SE COMUNICA?</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {['TÉCNICO', 'EMOCIONAL', 'DESCONFIADO', 'INDECISO'].map((perfil) => (
                     <Button
@@ -850,7 +850,7 @@ Retorne APENAS JSON válido:
                         "h-10 text-[10px] font-bold tracking-widest uppercase border",
                         perfilCliente === perfil 
                           ? "bg-bronze text-black border-bronze hover:bg-bronze hover:text-black" 
-                          : "border-white/[0.06] text-white/60 hover:text-white hover:bg-white/[0.06]"
+                          : "border-white/5 text-white/60 hover:text-white hover:bg-white/5"
                       )}
                     >
                       {perfil}
@@ -860,12 +860,12 @@ Retorne APENAS JSON válido:
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] block font-bold">OBSERVAÇÃO SOBRE O CLIENTE (OPCIONAL)</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 block font-bold">OBSERVAÇÃO SOBRE O CLIENTE (OPCIONAL)</label>
                 <Textarea
                   value={obsCliente}
                   onChange={(e) => setObsCliente(e.target.value)}
                   placeholder="Ex: Cliente tem muita pressa / Já teve problema com outro arquiteto..."
-                  className="bg-black/50 border-white/[0.06] text-white text-xs min-h-[60px]"
+                  className="bg-black/50 border-white/5 text-white text-xs min-h-[60px]"
                 />
               </div>
 
@@ -877,17 +877,17 @@ Retorne APENAS JSON válido:
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-6 w-6 text-white/[0.4] hover:text-white"
+                        className="h-6 w-6 text-white/40 hover:text-white"
                         onClick={() => copyToClipboard(resultadoAdaptacao.script_adaptado)}
                       >
                         <Copy size={12} />
                       </Button>
                     </div>
-                    <p className="text-[14px] text-[#777777] leading-[1.6] whitespace-pre-wrap font-sans">
+                    <p className="text-[14px] text-[#CCCCCC] leading-[1.6] whitespace-pre-wrap font-sans">
                       {resultadoAdaptacao.script_adaptado}
                     </p>
-                    <div className="pt-2 border-t border-white/[0.06]">
-                      <p className="text-[9px] text-white/[0.4] uppercase tracking-widest">
+                    <div className="pt-2 border-t border-white/5">
+                      <p className="text-[9px] text-white/40 uppercase tracking-widest">
                         O que mudou: <span className="text-bronze italic lowercase">{resultadoAdaptacao.o_que_mudou}</span>
                       </p>
                     </div>
@@ -899,7 +899,7 @@ Retorne APENAS JSON válido:
                 <Button
                   variant="ghost"
                   onClick={() => setModalAdaptarAberto(false)}
-                  className="flex-1 text-[10px] font-bold tracking-widest uppercase text-white/[0.4] hover:text-white"
+                  className="flex-1 text-[10px] font-bold tracking-widest uppercase text-white/40 hover:text-white"
                 >
                   CANCELAR
                 </Button>

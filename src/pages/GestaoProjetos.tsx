@@ -239,7 +239,7 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
@@ -286,7 +286,7 @@ const GestaoProjetos = () => {
             return (
               <div 
                 key={projeto.id} 
-                className="bg-white/[0.02] border border-white/[0.06] p-10 flex flex-col md:flex-row items-center gap-12 group hover:bg-white/[0.04] hover:border-[#8B7355]/30 transition-all duration-500 relative overflow-hidden"
+                className="bg-white/[0.02] border border-white/5 p-10 flex flex-col md:flex-row items-center gap-12 group hover:bg-white/[0.04] hover:border-[#8B7355]/30 transition-all duration-500 relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-1 h-full bg-[#8B7355] scale-y-0 group-hover:scale-y-100 transition-transform duration-500 origin-top" />
                 <div className="flex-1 min-w-0">
@@ -297,7 +297,7 @@ const GestaoProjetos = () => {
                       {projeto.tipo}
                     </span>
                   </div>
-                  <div className="flex items-center gap-6 text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">
+                  <div className="flex items-center gap-6 text-[10px] text-white/40 uppercase tracking-widest font-bold">
                     <span>{projeto.cidade || 'N/A'}</span>
                     <span>{projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'}</span>
                   </div>
@@ -375,19 +375,19 @@ const GestaoProjetos = () => {
                         toast.error("Erro ao gerar link do cliente");
                       }
                     }}
-                    className="bg-white/[0.06] border border-white/[0.12] text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/link"
+                    className="bg-white/5 border border-white/10 text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/link"
                   >
                     <Share2 size={12} className="mr-2 group-hover/link:text-bronze" /> COPIAR LINK DO CLIENTE
                   </Button>
                   <Button 
                     onClick={() => navigate(`/apresentacao/${projeto.id}`)}
-                    className="bg-white/[0.06] border border-white/[0.12] text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/pres"
+                    className="bg-white/5 border border-white/10 text-white/60 hover:border-bronze hover:text-bronze rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap group/pres"
                   >
                     <Monitor size={12} className="mr-2 group-hover/pres:text-bronze transition-colors" /> MODO APRESENTAÇÃO
                   </Button>
                   <Button 
                     onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                    className="bg-white/[0.06] hover:bg-[#8B7355] text-white border border-white/[0.12] rounded-none h-9 px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
+                    className="bg-white/5 hover:bg-[#8B7355] text-white border border-white/10 rounded-none h-9 px-6 text-[10px] uppercase font-bold tracking-widest transition-all duration-300 whitespace-nowrap"
                   >
                     Abrir projeto
                   </Button>
@@ -403,12 +403,12 @@ const GestaoProjetos = () => {
                     <AlertDialogTrigger asChild>
                       <Button 
                         disabled={isDeleting === projeto.id}
-                        className="bg-white/[0.06] hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
+                        className="bg-white/5 hover:bg-rose-500/10 text-rose-500 border border-rose-500/10 rounded-none h-9 px-4 text-[9px] uppercase font-bold tracking-widest transition-all duration-300"
                       >
                         <Trash2 size={12} className={cn(isDeleting === projeto.id && "animate-spin")} />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white">
+                    <AlertDialogContent className="bg-[#0A0A0A] border border-white/10 text-white">
                       <AlertDialogHeader>
                         <AlertDialogTitle className="font-cormorant italic text-2xl">Excluir Projeto?</AlertDialogTitle>
                         <AlertDialogDescription className="text-white/60 font-inter text-sm">
@@ -417,7 +417,7 @@ const GestaoProjetos = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="bg-transparent border-white/[0.12] text-white hover:bg-white/[0.06] rounded-none">Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
                         <AlertDialogAction 
                           onClick={() => handleDeleteProject(projeto.id, projeto.nome_cliente, projeto.tipo)}
                           className="bg-rose-500 hover:bg-rose-600 text-white rounded-none"
@@ -433,8 +433,8 @@ const GestaoProjetos = () => {
           })}
 
           {projetos.length === 0 && !loading && (
-            <div className="text-center py-24 border border-dashed border-white/[0.12]">
-              <p className="text-white/[0.4] uppercase tracking-widest text-[11px]">Nenhum projeto ativo encontrado.</p>
+            <div className="text-center py-24 border border-dashed border-white/10">
+              <p className="text-white/40 uppercase tracking-widest text-[11px]">Nenhum projeto ativo encontrado.</p>
             </div>
           )}
         </div>
@@ -444,14 +444,14 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, icon, accent, warning }: { label: string, value: string | number, icon: React.ReactNode, accent?: boolean, warning?: boolean }) => (
-  <div className="bg-white/[0.02] border border-white/[0.06] p-8 flex flex-col gap-4 relative overflow-hidden group hover:border-[#8B7355]/20 transition-all duration-500">
-    <div className="absolute -right-4 -top-4 text-white/[0.06] rotate-12 group-hover:rotate-0 transition-transform duration-700">
+  <div className="bg-white/[0.02] border border-white/5 p-8 flex flex-col gap-4 relative overflow-hidden group hover:border-[#8B7355]/20 transition-all duration-500">
+    <div className="absolute -right-4 -top-4 text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-700">
       {React.cloneElement(icon as React.ReactElement, { size: 64 })}
     </div>
     <div className={cn(
       "w-10 h-10 flex items-center justify-center border",
       accent ? "border-[#8B7355]/40 text-[#8B7355] bg-[#8B7355]/5" : 
-      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/[0.12] text-white/30 bg-white/[0.06]"
+      warning ? "border-rose-500/40 text-rose-500 bg-rose-500/5" : "border-white/10 text-white/30 bg-white/5"
     )}>
       {icon}
     </div>
@@ -459,7 +459,7 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
       <p className="text-[11px] uppercase text-[#777777] mb-2 font-normal font-inter">{label}</p>
       <p className={cn(
         "text-[22px] font-normal font-inter",
-        accent ? "text-[#F0EDE8]" : warning ? "text-[#F0EDE8]" : "text-[#F0EDE8]"
+        accent ? "text-[#FFFFFF]" : warning ? "text-[#FFFFFF]" : "text-[#FFFFFF]"
       )}>
         {value}
       </p>
@@ -476,7 +476,7 @@ const CompactTimeline = ({ projeto, projetoEtapas }: { projeto: Projeto, projeto
         <span className="text-[9px] text-[#8B7355] font-bold uppercase tracking-widest">
           {projeto.etapa_atual}
         </span>
-        <span className="text-[9px] text-white/[0.4] font-bold uppercase tracking-widest">
+        <span className="text-[9px] text-white/40 font-bold uppercase tracking-widest">
           Evolução do Ativo
         </span>
       </div>
@@ -496,16 +496,16 @@ const CompactTimeline = ({ projeto, projetoEtapas }: { projeto: Projeto, projeto
               key={etapaNome}
               className={cn(
                 "flex-1 transition-all duration-500",
-                isDone ? "bg-[#1E1E1E]" : 
+                isDone ? "bg-[#3A3A3A]" : 
                 isCurrent ? (isOverdue ? "bg-[#8B2020]" : "bg-[#8B7355]") :
-                isFuture ? "bg-white/[0.06]" : "bg-white/[0.06]"
+                isFuture ? "bg-white/5" : "bg-white/5"
               )}
             />
           );
         })}
       </div>
       
-      <div className="flex justify-between text-[7px] text-white/[0.18] font-bold uppercase tracking-tighter">
+      <div className="flex justify-between text-[7px] text-white/20 font-bold uppercase tracking-tighter">
         {ETAPAS_ORDER.map(e => (
           <span key={e} className={cn(projeto.etapa_atual.toUpperCase() === e && "text-[#8B7355]")}>
             {e.slice(0, 4)}

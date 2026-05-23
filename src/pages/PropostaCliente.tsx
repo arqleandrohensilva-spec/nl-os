@@ -44,18 +44,18 @@ const PropostaCliente = () => {
   }, [tipo, slug]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
-      <div className="text-white/[0.4] text-xs uppercase tracking-widest animate-pulse">Carregando proposta...</div>
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="text-white/40 text-xs uppercase tracking-widest animate-pulse">Carregando proposta...</div>
     </div>
   );
 
   if (error || !proposta) return (
-    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
       <div className="text-center space-y-4 p-6">
         <p className="font-display italic text-2xl text-white">NL Arquitetos</p>
         <div className="h-px w-8 bg-bronze/30 mx-auto" />
-        <p className="text-white/[0.4] text-[10px] uppercase tracking-[0.3em] font-bold">Proposta não encontrada</p>
-        <p className="text-white/[0.18] text-[10px] uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">
+        <p className="text-white/40 text-[10px] uppercase tracking-[0.3em] font-bold">Proposta não encontrada</p>
+        <p className="text-white/20 text-[10px] uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">
           Este link pode ter expirado ou é inválido.
         </p>
       </div>

@@ -238,7 +238,7 @@ const PesquisaSatisfacao = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bronze"></div>
       </div>
     );
@@ -252,8 +252,8 @@ const PesquisaSatisfacao = () => {
     };
 
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center space-y-8 border border-white/[0.06]">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center space-y-8 border border-white/5">
           <div className="w-20 h-20 bg-bronze/20 rounded-full flex items-center justify-center mx-auto mb-2">
             <CheckCircle2 className="text-bronze w-10 h-10" />
           </div>
@@ -265,7 +265,7 @@ const PesquisaSatisfacao = () => {
             Sua opinião é fundamental para mantermos o padrão de excelência da NL Arquitetos.
           </p>
           {isPromoter && (
-            <div className="pt-8 border-t border-white/[0.06] space-y-6">
+            <div className="pt-8 border-t border-white/5 space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full">
                 <Star className="w-4 h-4 fill-current" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Você é um Promotor NL</span>
@@ -282,8 +282,8 @@ const PesquisaSatisfacao = () => {
 
   if (!survey) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center border border-white/[0.06]">
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white/[0.03] p-8 text-center border border-white/5">
           <h1 className="text-2xl font-bold text-white uppercase tracking-[0.2em] font-cormorant">Link inválido ou expirado</h1>
         </div>
       </div>
@@ -291,7 +291,7 @@ const PesquisaSatisfacao = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white font-inter pb-12">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-inter pb-12">
       <div className="max-w-2xl mx-auto px-6 py-12 space-y-12">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-bronze flex items-center justify-center text-white font-cormorant text-2xl mx-auto shadow-lg mb-6">NL</div>
@@ -313,7 +313,7 @@ const PesquisaSatisfacao = () => {
             <p className="text-lg font-medium">2. Como você avalia nosso processo e comunicação durante o projeto?</p>
             <div className="grid grid-cols-2 gap-3">
               {['Excelente', 'Bom', 'Regular', 'Ruim'].map((opt) => (
-                <button key={opt} onClick={() => setAvaliacaoProcesso(opt)} className={cn("py-4 px-6 text-sm uppercase tracking-widest font-bold border transition-all", avaliacaoProcesso === opt ? "bg-bronze border-bronze text-white" : "bg-white/[0.06] border-white/[0.06] text-white/[0.4] hover:bg-white/[0.12]")}>{opt}</button>
+                <button key={opt} onClick={() => setAvaliacaoProcesso(opt)} className={cn("py-4 px-6 text-sm uppercase tracking-widest font-bold border transition-all", avaliacaoProcesso === opt ? "bg-bronze border-bronze text-white" : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10")}>{opt}</button>
               ))}
             </div>
           </div>
@@ -322,34 +322,34 @@ const PesquisaSatisfacao = () => {
             <p className="text-lg font-medium">3. O resultado final atendeu às suas expectativas?</p>
             <div className="grid grid-cols-2 gap-3">
               {['Superou', 'Atendeu', 'Parcialmente', 'Não atendeu'].map((opt) => (
-                <button key={opt} onClick={() => setAvaliacaoResultado(opt)} className={cn("py-4 px-6 text-sm uppercase tracking-widest font-bold border transition-all", avaliacaoResultado === opt ? "bg-bronze border-bronze text-white" : "bg-white/[0.06] border-white/[0.06] text-white/[0.4] hover:bg-white/[0.12]")}>{opt}</button>
+                <button key={opt} onClick={() => setAvaliacaoResultado(opt)} className={cn("py-4 px-6 text-sm uppercase tracking-widest font-bold border transition-all", avaliacaoResultado === opt ? "bg-bronze border-bronze text-white" : "bg-white/5 border-white/5 text-white/40 hover:bg-white/10")}>{opt}</button>
               ))}
             </div>
           </div>
 
           <div className="space-y-4">
             <p className="text-lg font-medium">4. Deixe um comentário (opcional)</p>
-            <Textarea value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Sua opinião é muito importante para nós..." className="bg-white/[0.06] border-white/[0.12] focus:border-bronze text-white min-h-[120px]" />
+            <Textarea value={comentario} onChange={(e) => setComentario(e.target.value)} placeholder="Sua opinião é muito importante para nós..." className="bg-white/5 border-white/10 focus:border-bronze text-white min-h-[120px]" />
           </div>
 
-          <div className="space-y-6 pt-6 border-t border-white/[0.06]">
+          <div className="space-y-6 pt-6 border-t border-white/5">
             <p className="text-lg font-medium">5. Quer deixar um vídeo-depoimento? (opcional)</p>
             {!videoUrl ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button onClick={startRecording} disabled={isRecording} variant="outline" className="bg-white/[0.06] border-white/[0.12] h-24 flex flex-col gap-2 text-white hover:bg-white/[0.12] hover:text-white">
+                <Button onClick={startRecording} disabled={isRecording} variant="outline" className="bg-white/5 border-white/10 h-24 flex flex-col gap-2 text-white hover:bg-white/10 hover:text-white">
                   <Camera className="w-6 h-6 text-bronze" /> <span className="text-[10px] uppercase font-bold">Gravar Vídeo</span>
                 </Button>
                 <div className="relative">
                   <input type="file" accept="video/*" onChange={handleVideoUpload} className="hidden" id="video-upload" />
-                  <Button onClick={() => document.getElementById('video-upload')?.click()} variant="outline" className="w-full bg-white/[0.06] border-white/[0.12] h-24 flex flex-col gap-2 text-white hover:bg-white/[0.12] hover:text-white">
+                  <Button onClick={() => document.getElementById('video-upload')?.click()} variant="outline" className="w-full bg-white/5 border-white/10 h-24 flex flex-col gap-2 text-white hover:bg-white/10 hover:text-white">
                     <Upload className="w-6 h-6 text-bronze" /> <span className="text-[10px] uppercase font-bold">Enviar Arquivo</span>
                   </Button>
                 </div>
               </div>
             ) : (
               <div className="space-y-4">
-                <video src={videoUrl} controls className="w-full aspect-video bg-black border border-white/[0.12]" />
-                <Button onClick={deleteVideo} variant="link" className="text-white/[0.4] uppercase text-[10px] font-bold p-0">Gravar novamente</Button>
+                <video src={videoUrl} controls className="w-full aspect-video bg-black border border-white/10" />
+                <Button onClick={deleteVideo} variant="link" className="text-white/40 uppercase text-[10px] font-bold p-0">Gravar novamente</Button>
               </div>
             )}
             {isRecording && (

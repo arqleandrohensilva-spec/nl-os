@@ -23,12 +23,12 @@ const NavItem = ({ label, icon, active, disabled, onClick }: NavItemProps) => (
     onClick={!disabled ? onClick : undefined}
     className={cn(
       "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
-      active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/[0.4]",
-      disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/[0.06]"
+      active ? "border-bronze bg-bronze/10 text-white" : "border-transparent text-white/40",
+      disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/5"
     )}>
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/[0.18] group-hover:text-white/[0.4]")}>{icon}</div>}
+        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/20 group-hover:text-white/40")}>{icon}</div>}
         <span className={cn(
           "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase",
           active ? "text-white" : "group-hover:text-white/70"
@@ -60,11 +60,11 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge }: Se
       onClick={onToggle}
       className={cn(
         "w-full flex items-center justify-between px-6 py-3 transition-colors duration-200",
-        isOpen ? "bg-white/[0.06] text-white" : "text-white/[0.4] hover:text-white/60 hover:bg-white/[0.02]"
+        isOpen ? "bg-white/5 text-white" : "text-white/40 hover:text-white/60 hover:bg-white/[0.02]"
       )}
     >
       <div className="flex items-center gap-3">
-        <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/[0.18]")}>
+        <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/20")}>
           {icon}
         </div>
         <div className="flex items-center gap-2">
@@ -314,7 +314,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   }, [location.pathname]);
 
   return (
-    <div className="w-[230px] h-screen bg-[#0D0D0D] border-r border-white/[0.06] flex flex-col fixed left-0 top-0 z-50">
+    <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
       <div className="p-8 mb-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -336,7 +336,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
               onClick={() => setShowNotifications(!showNotifications)}
               className={cn(
                 "p-2 rounded-full transition-colors relative",
-                showNotifications ? "text-bronze" : "text-white/[0.4] hover:text-bronze"
+                showNotifications ? "text-bronze" : "text-white/40 hover:text-bronze"
               )}
             >
               <Bell size={18} />
@@ -489,7 +489,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         </SectionAccordion>
       </div>
 
-      <div className="p-6 border-t border-white/[0.06] bg-white/[0.02] mt-auto">
+      <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase">
             {initials}
@@ -502,7 +502,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             onClick={async () => {
               await supabase.auth.signOut();
             }}
-            className="text-white/[0.18] hover:text-white transition-colors p-1"
+            className="text-white/20 hover:text-white transition-colors p-1"
           >
             <LogOut size={12} />
           </button>

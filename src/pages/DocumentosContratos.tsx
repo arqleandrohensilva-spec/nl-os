@@ -911,7 +911,7 @@ const DocumentosContratos = () => {
   }, [activeTab, selectedProjetoArquivos]);
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-10">
@@ -922,10 +922,10 @@ const DocumentosContratos = () => {
 
         <Tabs defaultValue="briefing" className="space-y-6" onValueChange={setActiveTab}>
           <div className="flex justify-between items-center">
-            <TabsList className="bg-white/[0.03] border border-white/[0.12] p-1">
-              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
-              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
-              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#0D0D0D] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
+            <TabsList className="bg-white/[0.03] border border-white/10 p-1">
+              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
+              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
+              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
             </TabsList>
 
             {activeTab === 'briefing' && (
@@ -948,7 +948,7 @@ const DocumentosContratos = () => {
                   onClick={handleRefresh} 
                   disabled={dropboxLoading}
                   variant="outline"
-                  className="bg-[#2A2825] border-[#444] text-[#777777] hover:bg-[#333] hover:text-white border rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold transition-colors"
+                  className="bg-[#2A2825] border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white border rounded-none h-9 px-6 text-[10px] tracking-widest uppercase font-bold transition-colors"
                 >
                   <RefreshCw size={14} className={cn("mr-2", dropboxLoading && "animate-spin")} /> ATUALIZAR
                 </Button>
@@ -960,10 +960,10 @@ const DocumentosContratos = () => {
           </div>
 
           <TabsContent value="briefing">
-            <div className="bg-white/[0.03] border border-white/[0.12]">
+            <div className="bg-white/[0.03] border border-white/10">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[11px]">
-                  <thead className="bg-black/20 text-white/[0.4] uppercase tracking-widest border-b border-white/[0.06]">
+                  <thead className="bg-black/20 text-white/40 uppercase tracking-widest border-b border-white/5">
                     <tr>
                       <th className="px-6 py-4 font-bold">Lead</th>
                       <th className="px-6 py-4 font-bold">Data de Envio</th>
@@ -971,7 +971,7 @@ const DocumentosContratos = () => {
                       <th className="px-6 py-4 font-bold text-right">Ações</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/[0.06]">
+                  <tbody className="divide-y divide-white/5">
                     {briefings.map((b) => (
                       <tr key={b.id} className="hover:bg-white/[0.02] transition-colors">
                         <td className="px-6 py-4 font-medium">{b.leads?.nome}</td>
@@ -1018,7 +1018,7 @@ const DocumentosContratos = () => {
                     ))}
                     {briefings.length === 0 && (
                       <tr>
-                        <td colSpan={4} className="px-6 py-20 text-center text-white/[0.18] italic">
+                        <td colSpan={4} className="px-6 py-20 text-center text-white/20 italic">
                           Nenhum briefing enviado no momento.
                         </td>
                       </tr>
@@ -1032,11 +1032,11 @@ const DocumentosContratos = () => {
           <TabsContent value="contratos">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {contratos.map((c) => (
-                <div key={c.id} className="bg-white/[0.03] border border-white/[0.12] p-6 flex flex-col gap-4">
+                <div key={c.id} className="bg-white/[0.03] border border-white/10 p-6 flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest">{c.numero} · {c.tipo}</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
                     </div>
                     <Badge className={cn(
                       "text-[8px] uppercase tracking-tighter",
@@ -1070,7 +1070,7 @@ const DocumentosContratos = () => {
                             <ExternalLink size={12} className="mr-1" /> ASSINATURA
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-[#0D0D0D] border-white/[0.12] text-white text-[10px] uppercase tracking-widest">
+                        <TooltipContent className="bg-[#0A0A0A] border-white/10 text-white text-[10px] uppercase tracking-widest">
                           Integração com ClickSign em breve
                         </TooltipContent>
                       </Tooltip>
@@ -1090,7 +1090,7 @@ const DocumentosContratos = () => {
               ))}
 
               {contratos.length === 0 && (
-                <div className="col-span-3 bg-white/[0.03] border border-white/[0.12] p-20 text-center text-white/[0.18] italic">
+                <div className="col-span-3 bg-white/[0.03] border border-white/10 p-20 text-center text-white/20 italic">
                   Nenhum contrato gerado.
                 </div>
               )}
@@ -1098,7 +1098,7 @@ const DocumentosContratos = () => {
 
             {/* Checklist de Documentos Section */}
             <div className="mt-12 space-y-8">
-              <div className="flex items-center gap-3 border-b border-white/[0.12] pb-4">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <ClipboardList className="text-bronze" size={20} />
                 <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">CHECKLIST DE DOCUMENTAÇÃO</h2>
               </div>
@@ -1108,7 +1108,7 @@ const DocumentosContratos = () => {
                   <DocumentosChecklist key={p.id} projeto={p} />
                 ))}
                 {projetos.length === 0 && (
-                  <div className="bg-white/[0.03] border border-white/[0.12] p-10 text-center text-white/[0.18] italic">
+                  <div className="bg-white/[0.03] border border-white/10 p-10 text-center text-white/20 italic">
                     Nenhum projeto encontrado para exibir checklist.
                   </div>
                 )}
@@ -1117,29 +1117,29 @@ const DocumentosContratos = () => {
 
             {/* Version Timeline Section */}
             <div className="mt-16 space-y-8">
-              <div className="flex items-center gap-3 border-b border-white/[0.12] pb-4">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                 <RefreshCw className="text-bronze" size={20} />
                 <h2 className="text-lg font-bold uppercase tracking-[0.2em] text-white">LINHA DO TEMPO DE VERSÕES</h2>
               </div>
               
-              <div className="bg-white/[0.03] border border-white/[0.12] p-0 overflow-hidden shadow-2xl">
+              <div className="bg-white/[0.03] border border-white/10 p-0 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Data/Hora</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Contrato</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Ação</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Detalhes</th>
-                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/[0.4] text-right">Arquivo</th>
+                      <tr className="border-b border-white/5 bg-white/[0.02]">
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Data/Hora</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Contrato</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Ação</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40">Detalhes</th>
+                        <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-white/40 text-right">Arquivo</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/[0.06]">
+                    <tbody className="divide-y divide-white/5">
                       {historico.map((h) => (
                         <tr key={h.id} className="hover:bg-white/[0.01] transition-colors group">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2 text-[11px] text-white/60">
-                              <Calendar size={12} className="text-white/[0.18]" />
+                              <Calendar size={12} className="text-white/20" />
                               {format(new Date(h.criado_em), 'dd/MM/yyyy HH:mm')}
                             </div>
                           </td>
@@ -1158,7 +1158,7 @@ const DocumentosContratos = () => {
                             </Badge>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-[11px] text-white/[0.06]0 max-w-xs truncate" title={h.observacao}>
+                            <p className="text-[11px] text-white/50 max-w-xs truncate" title={h.observacao}>
                               {h.observacao}
                             </p>
                           </td>
@@ -1178,7 +1178,7 @@ const DocumentosContratos = () => {
                       ))}
                       {historico.length === 0 && (
                         <tr>
-                          <td colSpan={5} className="px-6 py-12 text-center text-white/[0.18] italic text-[11px]">
+                          <td colSpan={5} className="px-6 py-12 text-center text-white/20 italic text-[11px]">
                             Nenhum histórico registrado ainda.
                           </td>
                         </tr>
@@ -1192,8 +1192,8 @@ const DocumentosContratos = () => {
 
           <TabsContent value="arquivos">
             <div className="flex gap-6 min-h-[600px]">
-              <div className="w-64 bg-white/[0.03] border border-white/[0.12] p-4 flex flex-col">
-                <h3 className="text-[10px] uppercase font-bold text-white/[0.4] tracking-widest mb-4">Dropbox Integration</h3>
+              <div className="w-64 bg-white/[0.03] border border-white/10 p-4 flex flex-col">
+                <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-4">Dropbox Integration</h3>
                 <div className="flex-1 overflow-y-auto space-y-1">
                   <div 
                     onClick={() => {
@@ -1201,32 +1201,32 @@ const DocumentosContratos = () => {
                       fetchDropboxFiles('/NL Arquitetos/07 - Projetos NL OS/01 - Clientes');
                     }}
                     className={cn(
-                      "p-2 hover:bg-white/[0.06] cursor-pointer flex items-center gap-2 text-[11px]",
-                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes' || currentPath === '')) && "bg-white/[0.06] border-l-2 border-bronze"
+                      "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
+                      (!selectedProjetoArquivos && (currentPath === '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes' || currentPath === '')) && "bg-white/5 border-l-2 border-bronze"
                     )}
                   >
                     <Cloud size={14} className="text-blue-400" />
                     <span>01 - Clientes</span>
                   </div>
-                  <div className="h-px bg-white/[0.06] my-4" />
-                  <h3 className="text-[10px] uppercase font-bold text-white/[0.4] tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
+                  <div className="h-px bg-white/5 my-4" />
+                  <h3 className="text-[10px] uppercase font-bold text-white/40 tracking-widest mb-2 px-2">PROJETOS NL OS</h3>
                   {dropboxProjectsFolders.map(p => (
                     <div 
                       key={p.id} 
                       onClick={() => handleSelectProjectFolder(p)}
                       className={cn(
-                        "p-2 hover:bg-white/[0.06] cursor-pointer flex items-center gap-2 text-[11px]",
-                        selectedProjetoArquivos?.id === p.id && "bg-white/[0.06] border-l-2 border-bronze text-bronze font-bold"
+                        "p-2 hover:bg-white/5 cursor-pointer flex items-center gap-2 text-[11px]",
+                        selectedProjetoArquivos?.id === p.id && "bg-white/5 border-l-2 border-bronze text-bronze font-bold"
                       )}
                     >
-                      <Folder size={14} className={selectedProjetoArquivos?.id === p.id ? "text-bronze" : "text-white/[0.4]"} />
+                      <Folder size={14} className={selectedProjetoArquivos?.id === p.id ? "text-bronze" : "text-white/40"} />
                       <span className="truncate">{p.name}</span>
                     </div>
                   ))}
                 </div>
               </div>
               
-              <div className="flex-1 bg-white/[0.03] border border-white/[0.12] p-6 overflow-y-auto">
+              <div className="flex-1 bg-white/[0.03] border border-white/10 p-6 overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-bold uppercase tracking-tight">
@@ -1244,7 +1244,7 @@ const DocumentosContratos = () => {
                           parts.pop();
                           fetchDropboxFiles(parts.join('/'));
                         }}
-                        className="bg-[#2A2825] border border-[#444] text-[#777777] hover:bg-[#333] hover:text-white rounded-none text-[9px] uppercase tracking-widest transition-colors h-8 px-4"
+                        className="bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[9px] uppercase tracking-widest transition-colors h-8 px-4"
                       >
                         VOLTAR
                       </Button>
@@ -1270,13 +1270,13 @@ const DocumentosContratos = () => {
                   {selectedProjetoArquivos ? (
                     selectedStage ? (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between mb-4 border-b border-white/[0.06] pb-2">
+                        <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
                           <div className="flex items-center gap-2">
                             <Button 
                               variant="ghost" 
                               size="sm" 
                               onClick={() => setSelectedStage(null)}
-                              className="h-8 text-[10px] uppercase tracking-widest text-white/[0.4] hover:text-white px-0"
+                              className="h-8 text-[10px] uppercase tracking-widest text-white/40 hover:text-white px-0"
                             >
                               <ChevronDown className="rotate-90 mr-1" size={14} /> VOLTAR
                             </Button>
@@ -1299,12 +1299,12 @@ const DocumentosContratos = () => {
                         <div className="space-y-2">
                           {(projectSubfoldersFiles[selectedStage] || []).length > 0 ? (
                             projectSubfoldersFiles[selectedStage].map(file => (
-                              <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/[0.06] hover:border-bronze/30 transition-colors">
+                              <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
                                 <div className="flex items-center gap-3 flex-1">
-                                  <FileText size={16} className="text-white/[0.4]" />
+                                  <FileText size={16} className="text-white/40" />
                                   <div>
                                     <p className="text-[11px] font-medium">{file.name}</p>
-                                    <p className="text-[9px] text-white/[0.4] uppercase tracking-widest">
+                                    <p className="text-[9px] text-white/40 uppercase tracking-widest">
                                       {(file.size / 1024).toFixed(1)} KB · {format(parseISO(file.client_modified), 'dd/MM/yyyy', { locale: ptBR })}
                                     </p>
                                   </div>
@@ -1314,7 +1314,7 @@ const DocumentosContratos = () => {
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={() => handleViewFile(file)}
-                                    className="h-7 w-7 text-white/[0.4] hover:text-white"
+                                    className="h-7 w-7 text-white/40 hover:text-white"
                                     title="Visualizar"
                                   >
                                     <Eye size={14} />
@@ -1323,7 +1323,7 @@ const DocumentosContratos = () => {
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={() => handleDownloadDropbox(file.path_display)}
-                                    className="h-7 w-7 text-white/[0.4] hover:text-white"
+                                    className="h-7 w-7 text-white/40 hover:text-white"
                                     title="Baixar"
                                   >
                                     <Download size={14} />
@@ -1332,7 +1332,7 @@ const DocumentosContratos = () => {
                                     variant="ghost" 
                                     size="icon" 
                                     onClick={() => handleShareFile(file.path_display)}
-                                    className="h-7 w-7 text-white/[0.4] hover:text-white"
+                                    className="h-7 w-7 text-white/40 hover:text-white"
                                     title="Compartilhar"
                                   >
                                     <Share2 size={14} />
@@ -1341,8 +1341,8 @@ const DocumentosContratos = () => {
                               </div>
                             ))
                           ) : (
-                            <div className="text-center py-10 bg-black/10 border border-dashed border-white/[0.06]">
-                              <p className="text-[10px] text-white/[0.18] italic">Nenhum arquivo nesta etapa.</p>
+                            <div className="text-center py-10 bg-black/10 border border-dashed border-white/5">
+                              <p className="text-[10px] text-white/20 italic">Nenhum arquivo nesta etapa.</p>
                             </div>
                           )}
                         </div>
@@ -1354,11 +1354,11 @@ const DocumentosContratos = () => {
                             <div 
                               key={stage} 
                               onClick={() => setSelectedStage(stage)}
-                              className="group p-6 bg-black/20 border border-white/[0.06] hover:border-bronze/40 cursor-pointer transition-all hover:bg-black/40 flex flex-col justify-between h-32"
+                              className="group p-6 bg-black/20 border border-white/5 hover:border-bronze/40 cursor-pointer transition-all hover:bg-black/40 flex flex-col justify-between h-32"
                             >
                               <div className="flex justify-between items-start">
                                 <Folder size={24} className="text-bronze/60 group-hover:text-bronze transition-colors" />
-                                <Badge variant="outline" className="text-[8px] border-white/[0.12] text-white/[0.4]">
+                                <Badge variant="outline" className="text-[8px] border-white/10 text-white/40">
                                   {projectSubfoldersFiles[stage]?.length || 0} ARQUIVOS
                                 </Badge>
                               </div>
@@ -1366,21 +1366,21 @@ const DocumentosContratos = () => {
                                 <h4 className="text-[11px] uppercase font-bold text-white tracking-widest mb-1 group-hover:text-bronze transition-colors">
                                   {stage}
                                 </h4>
-                                <p className="text-[9px] text-white/[0.4] uppercase tracking-widest">Acessar documentos</p>
+                                <p className="text-[9px] text-white/40 uppercase tracking-widest">Acessar documentos</p>
                               </div>
                             </div>
                           ))
                         ) : (
                           <div className="col-span-2 text-center py-20">
                             <Loader2 className="animate-spin mx-auto text-bronze mb-2" size={24} />
-                            <p className="text-[10px] text-white/[0.4] uppercase tracking-widest">Carregando etapas do projeto...</p>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest">Carregando etapas do projeto...</p>
                           </div>
                         )}
                       </div>
                     )
                   ) : (
                     dropboxFiles.map(file => (
-                      <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/[0.06] hover:border-bronze/30 transition-colors">
+                      <div key={file.id} className="flex items-center justify-between p-3 bg-black/20 border border-white/5 hover:border-bronze/30 transition-colors">
                         <div 
                           className="flex items-center gap-3 cursor-pointer flex-1"
                           onClick={() => file['.tag'] === 'folder' ? fetchDropboxFiles(file.path_display) : handleDownloadDropbox(file.path_display)}
@@ -1388,11 +1388,11 @@ const DocumentosContratos = () => {
                           {file['.tag'] === 'folder' ? (
                             <Folder size={16} className="text-blue-400" />
                           ) : (
-                            <FileText size={16} className="text-white/[0.4]" />
+                            <FileText size={16} className="text-white/40" />
                           )}
                           <div>
                             <p className="text-[11px] font-medium">{file.name}</p>
-                            <p className="text-[9px] text-white/[0.4] uppercase tracking-widest">
+                            <p className="text-[9px] text-white/40 uppercase tracking-widest">
                               {file['.tag'] === 'folder' ? 'Pasta' : `${(file.size / 1024).toFixed(1)} KB`}
                             </p>
                           </div>
@@ -1403,7 +1403,7 @@ const DocumentosContratos = () => {
                               variant="ghost" 
                               size="icon" 
                               onClick={() => handleDownloadDropbox(file.path_display)}
-                              className="h-7 w-7 text-white/[0.4] hover:text-white"
+                              className="h-7 w-7 text-white/40 hover:text-white"
                             >
                               <Download size={14} />
                             </Button>
@@ -1412,7 +1412,7 @@ const DocumentosContratos = () => {
                             variant="ghost" 
                             size="icon" 
                             onClick={() => handleShareFile(file.path_display)}
-                            className="h-7 w-7 text-white/[0.4] hover:text-white"
+                            className="h-7 w-7 text-white/40 hover:text-white"
                           >
                             <Share2 size={14} />
                           </Button>
@@ -1421,7 +1421,7 @@ const DocumentosContratos = () => {
                     ))
                   )}
                   {dropboxFiles.length === 0 && !dropboxLoading && !selectedProjetoArquivos && (
-                    <div className="text-center py-20 text-white/[0.18] italic text-[11px]">
+                    <div className="text-center py-20 text-white/20 italic text-[11px]">
                       Nenhum arquivo encontrado nesta pasta do Dropbox.
                     </div>
                   )}
@@ -1432,26 +1432,26 @@ const DocumentosContratos = () => {
         </Tabs>
 
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">UPLOAD DE ARQUIVO</DialogTitle>
             </DialogHeader>
             <div className="py-4 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">SELECIONAR ARQUIVO</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">SELECIONAR ARQUIVO</label>
                 <Input 
                   type="file" 
                   onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)}
-                  className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze text-white"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">ETAPA DO PROJETO</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">ETAPA DO PROJETO</label>
                 <Select value={uploadStage} onValueChange={setUploadStage}>
-                  <SelectTrigger className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze">
+                  <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white/[0.03] border-white/[0.12] text-white">
+                  <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                     <SelectItem value="01 - Briefing">01 - Briefing</SelectItem>
                     <SelectItem value="02 - Anteprojeto">02 - Anteprojeto</SelectItem>
                     <SelectItem value="03 - Projeto Executivo">03 - Projeto Executivo</SelectItem>
@@ -1473,18 +1473,18 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isBriefingModalOpen} onOpenChange={setIsBriefingModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">GERAR LINK DE BRIEFING</DialogTitle>
             </DialogHeader>
             <div className="py-4 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">SELECIONAR LEAD</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">SELECIONAR LEAD</label>
                 <Select onValueChange={setSelectedLeadId}>
-                  <SelectTrigger className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze">
+                  <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze">
                     <SelectValue placeholder="Escolha um lead..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-white/[0.03] border-white/[0.12] text-white">
+                  <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                     {leads.map(l => (
                       <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>
                     ))}
@@ -1501,7 +1501,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isContratoModalOpen} onOpenChange={setIsContratoModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <FileCheck size={18} className="text-bronze" /> GERAR NOVO CONTRATO - {contractFormData.numero}
@@ -1511,22 +1511,22 @@ const DocumentosContratos = () => {
             <div className="py-4 space-y-8">
               {/* DADOS DO CLIENTE */}
               <section className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <User size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS DO CLIENTE</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Selecionar Lead</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Selecionar Lead</Label>
                     <Select onValueChange={(val) => {
                       setSelectedLeadId(val);
                       handleSelectLeadForContract(val);
                     }}>
-                      <SelectTrigger className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10">
+                      <SelectTrigger className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10">
                         <SelectValue placeholder="Selecione um lead para preencher..." />
                       </SelectTrigger>
-                      <SelectContent className="bg-white/[0.03] border-white/[0.12] text-white">
+                      <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                         {leads.map(l => (
                           <SelectItem key={l.id} value={l.id}>{l.nome}</SelectItem>
                         ))}
@@ -1535,68 +1535,68 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Nome Completo</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nome Completo</Label>
                     <Input 
                       value={contractFormData.cliente.nome}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nome: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">CPF</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CPF</Label>
                     <Input 
                       value={contractFormData.cliente.cpf}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, cpf: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                       placeholder="000.000.000-00"
                     />
                   </div>
                   
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Endereço</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Endereço</Label>
                     <Input 
                       value={contractFormData.cliente.endereco}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, endereco: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Nacionalidade</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nacionalidade</Label>
                     <Input 
                       value={contractFormData.cliente.nacionalidade}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nacionalidade: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Estado Civil</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Estado Civil</Label>
                     <Input 
                       value={contractFormData.cliente.estadoCivil}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, estadoCivil: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Profissão</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Profissão</Label>
                     <Input 
                       value={contractFormData.cliente.profissao}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, profissao: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Data de Assinatura</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Data de Assinatura</Label>
                     <Input 
                       type="text"
                       placeholder="Ex: 14 de maio de 2026"
                       value={contractFormData.dataAssinatura || ''}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, dataAssinatura: e.target.value }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                 </div>
@@ -1604,14 +1604,14 @@ const DocumentosContratos = () => {
 
               {/* DADOS DO PROJETO */}
               <section className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <ClipboardList size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS DO PROJETO</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Tipo de Projeto</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Tipo de Projeto</Label>
                     <RadioGroup 
                       value={contractFormData.projeto.tipo} 
                       onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, tipo: val } }))}
@@ -1633,7 +1633,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Plano</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Plano</Label>
                     <RadioGroup 
                       value={contractFormData.projeto.plano} 
                       onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, plano: val } }))}
@@ -1651,21 +1651,21 @@ const DocumentosContratos = () => {
                   </div>
 
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Endereço do Imóvel</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Endereço do Imóvel</Label>
                     <Input 
                       value={contractFormData.projeto.endereco}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, endereco: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Tipo do Imóvel</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Tipo do Imóvel</Label>
                     <Select value={contractFormData.projeto.tipoImovel} onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, tipoImovel: val } }))}>
-                      <SelectTrigger className="bg-black/20 border-white/[0.12] rounded-none h-10">
+                      <SelectTrigger className="bg-black/20 border-white/10 rounded-none h-10">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white/[0.03] border-white/[0.12] text-white">
+                      <SelectContent className="bg-white/[0.03] border-white/10 text-white">
                         <SelectItem value="Terreno">Terreno</SelectItem>
                         <SelectItem value="Residência">Residência</SelectItem>
                         <SelectItem value="Apartamento">Apartamento</SelectItem>
@@ -1675,38 +1675,38 @@ const DocumentosContratos = () => {
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Área do Terreno (m²)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área do Terreno (m²)</Label>
                     <Input 
                       value={contractFormData.projeto.areaTerreno}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Área Construída Estimada (m²)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área Construída Estimada (m²)</Label>
                     <Input 
                       value={contractFormData.projeto.areaConstruida}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Nº Matrícula</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nº Matrícula</Label>
                     <Input 
                       value={contractFormData.projeto.matricula}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, matricula: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Cartório</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Cartório</Label>
                     <Input 
                       value={contractFormData.projeto.cartorio}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, cartorio: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze h-10"
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
                     />
                   </div>
                 </div>
@@ -1714,50 +1714,50 @@ const DocumentosContratos = () => {
 
               {/* PRAZOS POR ETAPA */}
               <section className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <Calendar size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">PRAZOS POR ETAPA (DIAS ÚTEIS)</h3>
                 </div>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Briefing</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Briefing</Label>
                     <Input 
                       value={contractFormData.prazos.briefing}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, briefing: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Estudo 3D</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Estudo 3D</Label>
                     <Input 
                       value={contractFormData.prazos.estudo}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, estudo: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Projeto Legal</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Projeto Legal</Label>
                     <Input 
                       value={contractFormData.prazos.legal}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, legal: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Executivo</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Executivo</Label>
                     <Input 
                       value={contractFormData.prazos.executivo}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, executivo: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5 md:col-span-4">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Prazo Total (Semanas)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Prazo Total (Semanas)</Label>
                     <Input 
                       value={contractFormData.prazos.total}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, prazos: { ...prev.prazos, total: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10 border-bronze/30"
+                      className="bg-black/20 border-white/10 rounded-none h-10 border-bronze/30"
                     />
                   </div>
                 </div>
@@ -1765,52 +1765,52 @@ const DocumentosContratos = () => {
 
               {/* HONORÁRIOS */}
               <section className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <span className="text-bronze font-bold text-[14px]">R$</span>
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">HONORÁRIOS</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Total Plano Executivo</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Total Plano Executivo</Label>
                     <Input 
                       value={contractFormData.honorarios.totalExecutivo}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, totalExecutivo: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                       placeholder="Ex: 5.000,00"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Total Plano Completo</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Total Plano Completo</Label>
                     <Input 
                       value={contractFormData.honorarios.totalCompleto}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, totalCompleto: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                       placeholder="Ex: 8.500,00"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Marco 1 — Entrada (30%)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 1 — Entrada (30%)</Label>
                     <Input 
                       value={contractFormData.honorarios.marco1}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco1: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Marco 2 — Anteprojeto (40%)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 2 — Anteprojeto (40%)</Label>
                     <Input 
                       value={contractFormData.honorarios.marco2}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco2: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">Marco 3 — Executivo (30%)</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 3 — Executivo (30%)</Label>
                     <Input 
                       value={contractFormData.honorarios.marco3}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco3: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                 </div>
@@ -1818,41 +1818,41 @@ const DocumentosContratos = () => {
 
               {/* DADOS FIXOS NL */}
               <section className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <MapPin size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS FIXOS NL</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">CAU Leandro</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CAU Leandro</Label>
                     <Input 
                       value={contractFormData.nl.cauLeandro}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cauLeandro: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">CAU Neandro</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CAU Neandro</Label>
                     <Input 
                       value={contractFormData.nl.cauNeandro}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cauNeandro: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/[0.4]">CPF Neandro</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CPF Neandro</Label>
                     <Input 
                       value={contractFormData.nl.cpfNeandro}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, nl: { ...prev.nl, cpfNeandro: e.target.value } }))}
-                      className="bg-black/20 border-white/[0.12] rounded-none h-10"
+                      className="bg-black/20 border-white/10 rounded-none h-10"
                     />
                   </div>
                 </div>
               </section>
             </div>
 
-            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/[0.06]">
+            <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/5">
               <Button 
                 variant="outline"
                 onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
@@ -1881,36 +1881,36 @@ const DocumentosContratos = () => {
 
 
         <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">NOVO PROJETO NO DROPBOX</DialogTitle>
             </DialogHeader>
             <div className="py-4 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">NOME DO CLIENTE</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">NOME DO CLIENTE</label>
                 <Input 
                   value={newProjectClient}
                   onChange={(e) => setNewProjectClient(e.target.value)}
                   placeholder="Ex: João Silva"
-                  className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze text-white"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">TIPO DE PROJETO</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">TIPO DE PROJETO</label>
                 <Input 
                   value={newProjectType}
                   onChange={(e) => setNewProjectType(e.target.value)}
                   placeholder="Ex: Residencial"
-                  className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze text-white"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">IDENTIFICADOR (NOME)</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40 font-bold">IDENTIFICADOR (NOME)</label>
                 <Input 
                   value={newProjectName}
                   onChange={(e) => setNewProjectName(e.target.value)}
                   placeholder="Ex: Residência Modernista"
-                  className="bg-black/20 border-white/[0.12] rounded-none focus:ring-bronze text-white"
+                  className="bg-black/20 border-white/10 rounded-none focus:ring-bronze text-white"
                 />
               </div>
             </div>
@@ -1928,7 +1928,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none max-w-md">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-md">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Trash2 size={16} className="text-red-500" /> CONFIRMAR EXCLUSÃO
@@ -1938,7 +1938,7 @@ const DocumentosContratos = () => {
               <p className="text-[11px] text-white/60 leading-relaxed uppercase tracking-wider">
                 Tem certeza que deseja apagar permanentemente este item? 
               </p>
-              <p className="text-[10px] font-mono mt-4 p-3 bg-black/40 border border-white/[0.06] break-all text-bronze/80">
+              <p className="text-[10px] font-mono mt-4 p-3 bg-black/40 border border-white/5 break-all text-bronze/80">
                 {pathToDelete}
               </p>
               <p className="text-[9px] text-red-500/60 mt-4 uppercase tracking-[0.2em] font-bold">
@@ -1949,7 +1949,7 @@ const DocumentosContratos = () => {
               <Button 
                 variant="ghost"
                 onClick={() => setIsDeleteConfirmOpen(false)} 
-                className="flex-1 bg-[#2A2825] border border-[#444] text-[#777777] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
+                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 CANCELAR
               </Button>
@@ -1965,7 +1965,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none max-w-lg">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-lg">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Ban size={16} className="text-red-500" /> CANCELAR CONTRATO
@@ -1973,30 +1973,30 @@ const DocumentosContratos = () => {
             </DialogHeader>
             <div className="py-4 space-y-6">
               <div className="space-y-3">
-                <Label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Categoria do Motivo</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Categoria do Motivo</Label>
                 <RadioGroup 
                   value={categoriaCancelamento} 
                   onValueChange={setCategoriaCancelamento}
                   className="grid grid-cols-2 gap-4"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Cliente desistiu" id="desistiu" className="border-white/[0.18] text-bronze" />
+                    <RadioGroupItem value="Cliente desistiu" id="desistiu" className="border-white/20 text-bronze" />
                     <Label htmlFor="desistiu" className="text-[11px] uppercase tracking-wider cursor-pointer">Cliente desistiu</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Valor não aprovado" id="valor" className="border-white/[0.18] text-bronze" />
+                    <RadioGroupItem value="Valor não aprovado" id="valor" className="border-white/20 text-bronze" />
                     <Label htmlFor="valor" className="text-[11px] uppercase tracking-wider cursor-pointer">Valor não aprovado</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Concorrente escolhido" id="concorrente" className="border-white/[0.18] text-bronze" />
+                    <RadioGroupItem value="Concorrente escolhido" id="concorrente" className="border-white/20 text-bronze" />
                     <Label htmlFor="concorrente" className="text-[11px] uppercase tracking-wider cursor-pointer">Concorrente escolhido</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Projeto inviável" id="inviavel" className="border-white/[0.18] text-bronze" />
+                    <RadioGroupItem value="Projeto inviável" id="inviavel" className="border-white/20 text-bronze" />
                     <Label htmlFor="inviavel" className="text-[11px] uppercase tracking-wider cursor-pointer">Projeto inviável</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Outro" id="outro" className="border-white/[0.18] text-bronze" />
+                    <RadioGroupItem value="Outro" id="outro" className="border-white/20 text-bronze" />
                     <Label htmlFor="outro" className="text-[11px] uppercase tracking-wider cursor-pointer">Outro</Label>
                   </div>
                 </RadioGroup>
@@ -2004,31 +2004,31 @@ const DocumentosContratos = () => {
 
               {categoriaCancelamento === 'Outro' && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                  <Label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Especifique o motivo</Label>
+                  <Label className="text-[10px] uppercase tracking-widest text-white/40">Especifique o motivo</Label>
                   <Input 
                     value={outroMotivo}
                     onChange={(e) => setOutroMotivo(e.target.value)}
                     placeholder="Digite a categoria do motivo..."
-                    className="bg-black/40 border-white/[0.12] rounded-none text-[11px] placeholder:text-white/[0.18]"
+                    className="bg-black/40 border-white/10 rounded-none text-[11px] placeholder:text-white/20"
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Descrição Detalhada (Obrigatório)</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">Descrição Detalhada (Obrigatório)</Label>
                 <Textarea 
                   value={motivoCancelamento}
                   onChange={(e) => setMotivoCancelamento(e.target.value)}
                   placeholder="Explique o motivo do cancelamento para o histórico..."
-                  className="bg-black/40 border-white/[0.12] rounded-none min-h-[100px] text-[11px] placeholder:text-white/[0.18]"
+                  className="bg-black/40 border-white/10 rounded-none min-h-[100px] text-[11px] placeholder:text-white/20"
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/[0.06] pt-4">
+            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
               <Button 
                 variant="ghost"
                 onClick={() => setIsCancelModalOpen(false)} 
-                className="flex-1 bg-[#2A2825] border border-[#444] text-[#777777] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
+                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 MANTER CONTRATO
               </Button>
@@ -2043,7 +2043,7 @@ const DocumentosContratos = () => {
           </DialogContent>
         </Dialog>
         <Dialog open={isBriefingResponseModalOpen} onOpenChange={setIsBriefingResponseModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <ClipboardList size={18} className="text-bronze" /> RESPOSTAS DO BRIEFING - {selectedBriefing?.leads?.nome}
@@ -2053,23 +2053,23 @@ const DocumentosContratos = () => {
             <div className="py-6 space-y-8">
               {selectedBriefing?.respostas ? (
                 Object.entries(selectedBriefing.respostas).map(([key, value]: [string, any]) => (
-                  <div key={key} className="space-y-1.5 border-b border-white/[0.06] pb-4">
+                  <div key={key} className="space-y-1.5 border-b border-white/5 pb-4">
                     <Label className="text-[9px] uppercase tracking-[0.2em] text-bronze font-bold block mb-2">
                       {key.replace(/_/g, ' ').toUpperCase()}
                     </Label>
-                    <p className="text-sm text-white/80 leading-relaxed bg-white/[0.02] p-4 border border-white/[0.06]">
-                      {value || <span className="text-white/[0.18] italic">Não informado</span>}
+                    <p className="text-sm text-white/80 leading-relaxed bg-white/[0.02] p-4 border border-white/5">
+                      {value || <span className="text-white/20 italic">Não informado</span>}
                     </p>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-20 bg-black/20 border border-dashed border-white/[0.12]">
-                  <p className="text-sm text-white/[0.4] italic">Aguardando preenchimento do cliente...</p>
+                <div className="text-center py-20 bg-black/20 border border-dashed border-white/10">
+                  <p className="text-sm text-white/40 italic">Aguardando preenchimento do cliente...</p>
                 </div>
               )}
             </div>
             
-            <DialogFooter className="sticky bottom-0 bg-[#0D0D0D] pt-4 border-t border-white/[0.12]">
+            <DialogFooter className="sticky bottom-0 bg-[#0A0A0A] pt-4 border-t border-white/10">
               <Button onClick={() => setIsBriefingResponseModalOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
                 FECHAR
               </Button>
@@ -2078,8 +2078,8 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
-          <DialogContent className="bg-[#0D0D0D] border border-white/[0.12] text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
-            <DialogHeader className="p-4 border-b border-white/[0.06] flex flex-row items-center justify-between">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
+            <DialogHeader className="p-4 border-b border-white/5 flex flex-row items-center justify-between">
               <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                 <Eye size={14} className="text-bronze" /> {viewerFile?.name}
               </DialogTitle>
@@ -2097,15 +2097,15 @@ const DocumentosContratos = () => {
                 />
               )}
             </div>
-            <DialogFooter className="p-4 border-t border-white/[0.06] flex justify-between items-center sm:justify-between">
-              <p className="text-[9px] text-white/[0.4] uppercase tracking-widest">
+            <DialogFooter className="p-4 border-t border-white/5 flex justify-between items-center sm:justify-between">
+              <p className="text-[9px] text-white/40 uppercase tracking-widest">
                 Modificado em: {viewerFile?.client_modified && format(parseISO(viewerFile.client_modified), 'dd/MM/yyyy HH:mm')}
               </p>
               <div className="flex gap-2">
                 <Button 
                   onClick={() => window.open(viewerFile?.url, '_blank')} 
                   variant="outline" 
-                  className="bg-transparent border-white/[0.12] text-white hover:bg-white/[0.06] rounded-none text-[9px] uppercase tracking-widest h-8"
+                  className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest h-8"
                 >
                   <ExternalLink size={12} className="mr-2" /> ABRIR ORIGINAL
                 </Button>

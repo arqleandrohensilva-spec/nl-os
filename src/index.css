@@ -12,7 +12,7 @@
     background: transparent;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb {
-    background: #F0EDE8;
+    background: #E8E4DF;
     border-radius: 10px;
   }
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
@@ -23,32 +23,49 @@
 
 @layer base {
   :root {
-    --background: 0 0% 5%; /* #0D0D0D */
-    --foreground: 33 15% 94%; /* #F0EDE8 */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%; /* #1A1A1A approx */
+    
+    --graphite: 0 0% 10%; /* #1A1A1A */
+    --white: 0 0% 100%;
+    --bronze: 32 23% 44%; /* #8B7355 */
+    --beige: 33 13% 88%; /* #E8E4DF */
+    --muted: 0 0% 60%; /* #999999 */
+    --red: 0 57% 46%; /* #B83232 */
+    --amber: 44% 67% 47%; /* #C49A2A approx */
 
-    --card: 0 0% 8.5%; /* #161616 */
-    --card-foreground: 33 15% 94%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
 
-    --popover: 0 0% 8.5%;
-    --popover-foreground: 33 15% 94%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 32 23% 44%; /* #8B7355 bronze */
-    --primary-foreground: 0 0% 5%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 12%; /* #1E1E1E */
-    --secondary-foreground: 33 15% 94%;
-
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 53%; /* #888888 */
+    --secondary: 33 13% 88%;
+    --secondary-foreground: 0 0% 10%;
 
     --accent: 32 23% 44%;
-    --accent-foreground: 0 0% 5%;
+    --accent-foreground: 0 0% 100%;
 
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
+    --destructive: 0 57% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 33 13% 88%;
+    --input: 33 13% 88%;
     --ring: 32 23% 44%;
 
-    --radius: 0rem; /* sem bordas arredondadas */
+    --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 32 23% 44%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 32 23% 44%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 32 23% 44%;
   }
 }
 
@@ -58,7 +75,7 @@
   }
 
   body {
-    @apply bg-[#0D0D0D] text-[#F0EDE8];
+    @apply bg-background text-foreground;
     font-family: 'DM Mono', monospace;
   }
 
@@ -81,7 +98,7 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #F0EDE8;
+  background: #E8E4DF;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -115,7 +132,7 @@
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #161616 0%, #8B7355 100%);
+  background: linear-gradient(135deg, #1A1A1A 0%, #8B7355 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

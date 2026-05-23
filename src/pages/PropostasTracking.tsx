@@ -711,12 +711,12 @@ Retorne APENAS JSON válido:
       case 'Vista': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
       case 'Aprovada': return 'bg-green-500/10 text-green-500 border-green-500/20';
       case 'Recusada': return 'bg-red-500/10 text-red-500 border-red-500/20';
-      default: return 'bg-white/[0.12] text-white/60 border-white/[0.18]';
+      default: return 'bg-white/10 text-white/60 border-white/20';
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
@@ -730,7 +730,7 @@ Retorne APENAS JSON válido:
                 </div>
 
               </div>
-              <p className="text-white/[0.4] mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
+              <p className="text-white/40 mt-1 text-xs uppercase tracking-widest font-bold">Módulo 04 · Gestão e Rastreamento de Propostas</p>
             </div>
             <Button 
               onClick={() => setIsModalOpen(true)}
@@ -742,39 +742,39 @@ Retorne APENAS JSON válido:
           </div>
 
           <div className="grid grid-cols-5 gap-4">
-            <div className="bg-[#0D0D0D] p-6 border border-white/[0.12] rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
+            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length}
               </span>
             </div>
-            <div className="bg-[#0D0D0D] p-6 border border-white/[0.12] rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">TAXA DE ABERTURA</span>
+            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">TAXA DE ABERTURA</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.views_count && p.views_count > 0).length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
-            <div className="bg-[#0D0D0D] p-6 border border-white/[0.12] rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">APROVAÇÃO</span>
+            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
                   ? `${Math.round((proposals.filter(p => p.status === 'Aprovada').length / proposals.length) * 100)}%`
                   : '0%'}
               </span>
             </div>
-            <div className="bg-[#0D0D0D] p-6 border border-white/[0.12] rounded-[2px] flex flex-col gap-1">
-              <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">LEADS NO FUNIL</span>
+            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS NO FUNIL</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {leads.length}
               </span>
             </div>
-            <div className="bg-[#0D0D0D] p-6 border border-bronze/20 rounded-[2px] flex flex-col gap-1 relative overflow-hidden group">
+            <div className="bg-[#0A0A0A] p-6 border border-bronze/20 rounded-[2px] flex flex-col gap-1 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
                 <TrendingUp size={12} className="text-bronze" />
               </div>
-              <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
+              <span className="text-[11px] text-white/40 uppercase font-normal font-inter">VALOR EM NEGOCIAÇÃO</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 R$ {proposals
                   .filter(p => p.status !== 'Aprovada' && p.status !== 'Recusada')
@@ -787,7 +787,7 @@ Retorne APENAS JSON válido:
 
         <div className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 border-b border-white/[0.12] pb-1">
+            <div className="flex items-center gap-2 border-b border-white/10 pb-1">
               {[
                 { id: 'all', label: 'Todas' },
                 { id: 'Enviada', label: 'Aguardando' },
@@ -802,7 +802,7 @@ Retorne APENAS JSON válido:
                     "px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold transition-all border-b-2 -mb-[2px]",
                     statusFilter === tab.id 
                       ? "border-bronze text-bronze" 
-                      : "border-transparent text-white/[0.4] hover:text-white hover:border-white/[0.12]"
+                      : "border-transparent text-white/40 hover:text-white hover:border-white/10"
                   )}
                 >
                   {tab.label}
@@ -810,10 +810,10 @@ Retorne APENAS JSON válido:
               ))}
             </div>
 
-            <div className="flex items-center justify-between bg-white/[0.03] p-4 border border-white/[0.12] rounded-[2px] shadow-sm">
+            <div className="flex items-center justify-between bg-white/[0.03] p-4 border border-white/10 rounded-[2px] shadow-sm">
               <div className="flex gap-4">
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                  <SelectTrigger className="h-9 w-40 border-white/[0.12] rounded-[2px] text-[10px] uppercase tracking-widest font-bold bg-white/[0.06] text-white">
+                  <SelectTrigger className="h-9 w-40 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest font-bold bg-white/5 text-white">
                     <SelectValue placeholder="TIPO" />
                   </SelectTrigger>
                   <SelectContent>
@@ -826,12 +826,12 @@ Retorne APENAS JSON válido:
               </div>
 
               <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/[0.4]" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                 <Input 
                   placeholder="BUSCAR CLIENTE..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 pl-9 w-64 border-white/[0.12] rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0D0D0D]"
+                  className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0A0A0A]"
                 />
               </div>
             </div>
@@ -840,14 +840,14 @@ Retorne APENAS JSON válido:
           {loading ? (
             <div className="flex flex-col items-center justify-center min-h-[400px]">
               <Loader2 className="w-10 h-10 text-bronze animate-spin mb-4" />
-              <p className="text-[11px] uppercase tracking-widest text-white/[0.4] font-medium">Carregando propostas...</p>
+              <p className="text-[11px] uppercase tracking-widest text-white/40 font-medium">Carregando propostas...</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredProposals.map((p) => (
                 <div 
                   key={p.id}
-                  className="bg-white/[0.03] border border-white/[0.12] rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-lg"
+                  className="bg-white/[0.03] border border-white/10 rounded-[2px] overflow-hidden hover:border-bronze/30 transition-all group flex flex-col hover:shadow-lg"
                 >
                   <div className="p-6 flex-1">
                     <div className="flex justify-between items-start mb-4">
@@ -857,7 +857,7 @@ Retorne APENAS JSON válido:
                       )}>
                         {p.status}
                       </span>
-                      <span className="text-[10px] text-white/[0.4] font-medium">
+                      <span className="text-[10px] text-white/40 font-medium">
                         {format(new Date(p.data), "dd 'de' MMM, yyyy", { locale: ptBR })}
                       </span>
                     </div>
@@ -867,29 +867,29 @@ Retorne APENAS JSON válido:
 
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="space-y-1">
-                        <p className="text-[9px] text-white/[0.4] uppercase tracking-wider font-bold">Executivo</p>
+                        <p className="text-[9px] text-white/40 uppercase tracking-wider font-bold">Executivo</p>
                         <p className="text-xs font-bold">R$ {p.valor_executivo?.toLocaleString()}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-[9px] text-white/[0.4] uppercase tracking-wider font-bold">Completo</p>
+                        <p className="text-[9px] text-white/40 uppercase tracking-wider font-bold">Completo</p>
                         <p className="text-xs font-bold">R$ {p.valor_completo?.toLocaleString()}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-white/[0.12] mb-4 relative overflow-hidden group/view">
+                    <div className="flex items-center gap-4 py-3 border-y border-dashed border-white/10 mb-4 relative overflow-hidden group/view">
                       <div className="flex items-center gap-2">
                         <Eye size={12} className="text-bronze" />
                         <span className="text-[10px] font-medium tracking-tight">Aberta {p.views_count} vezes</span>
                       </div>
                       {p.last_view_at && (
-                        <div className="flex items-center gap-2 border-l border-white/[0.12] pl-4">
+                        <div className="flex items-center gap-2 border-l border-white/10 pl-4">
                           <div className={cn(
                             "w-1.5 h-1.5 rounded-full",
                             new Date().getTime() - new Date(p.last_view_at).getTime() < 1000 * 60 * 60 * 24 
                               ? "bg-green-500 animate-pulse" 
                               : "bg-muted-foreground/30"
                           )} />
-                          <span className="text-[9px] text-white/[0.4] uppercase tracking-wider font-bold whitespace-nowrap">Visto em {format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
+                          <span className="text-[9px] text-white/40 uppercase tracking-wider font-bold whitespace-nowrap">Visto em {format(new Date(p.last_view_at), 'dd/MM HH:mm')}</span>
                         </div>
                       )}
                       
@@ -902,7 +902,7 @@ Retorne APENAS JSON válido:
                     </div>
 
                     {p.proposta_engajamento && p.proposta_engajamento.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-white/[0.12]">
+                      <div className="mt-4 pt-4 border-t border-white/10">
                         <button 
                           onClick={() => toggleEngagement(p.id)}
                           className="flex items-center justify-between w-full group/eng py-1"
@@ -913,7 +913,7 @@ Retorne APENAS JSON válido:
                             <ChevronDown 
                               size={12} 
                               className={cn(
-                                "text-white/[0.4] transition-transform duration-200",
+                                "text-white/40 transition-transform duration-200",
                                 expandedEngagements[p.id] && "rotate-180"
                               )} 
                             />
@@ -930,7 +930,7 @@ Retorne APENAS JSON válido:
                         {expandedEngagements[p.id] && (
                           <div className="mt-4 space-y-4 pb-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/[0.4] px-1 py-0.5 bg-muted rounded-[2px]">
+                              <span className="text-[8px] font-bold uppercase tracking-widest text-white/40 px-1 py-0.5 bg-muted rounded-[2px]">
                                 {getEngagementStats(p.proposta_engajamento)?.dispositivo}
                               </span>
                               <span className="text-[9px] font-bold uppercase tracking-widest text-bronze">
@@ -944,11 +944,11 @@ Retorne APENAS JSON válido:
                                   <div className="flex justify-between items-center text-[8px]">
                                     <span className={cn(
                                       "uppercase tracking-widest font-bold",
-                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-white/[0.4]"
+                                      getEngagementStats(p.proposta_engajamento)?.mostViewed?.id === section.id ? "text-bronze" : "text-white/40"
                                     )}>
                                       {section.label}
                                     </span>
-                                    <span className="font-medium text-white/[0.4]">{section.time}s</span>
+                                    <span className="font-medium text-white/40">{section.time}s</span>
                                   </div>
                                   <div className="h-1 w-full bg-[#F0EEEB] rounded-full overflow-hidden">
                                     <div 
@@ -968,12 +968,12 @@ Retorne APENAS JSON válido:
                     )}
                   </div>
 
-                  <div className="px-6 py-4 bg-white/[0.03] border-t border-white/[0.12] space-y-2">
+                  <div className="px-6 py-4 bg-white/[0.03] border-t border-white/10 space-y-2">
                     {/* Linha 1: VER DASHBOARD · GERAR FOLLOW-UP */}
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => handleOpenDashboard(p)}
-                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#777777] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
                         <LayoutDashboard size={14} className="mr-2" />
                         Ver Dashboard
@@ -981,7 +981,7 @@ Retorne APENAS JSON válido:
                       
                       <Button 
                         onClick={() => handleGenerateFollowup(p)}
-                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#777777] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
                         <MessageSquare size={14} className="mr-2" />
                         Gerar Follow-up
@@ -998,7 +998,7 @@ Retorne APENAS JSON válido:
                     </Button>
                     
                     {/* Outras ações */}
-                    <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/[0.06]">
+                    <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/5">
                       <Button 
                         variant="outline"
                         size="sm"
@@ -1010,7 +1010,7 @@ Retorne APENAS JSON válido:
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                        <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/[0.12] bg-transparent text-[#777777]">
+                        <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA]">
                           <SelectValue placeholder="STATUS" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1042,7 +1042,7 @@ Retorne APENAS JSON válido:
       </main>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white rounded-[2px]">
+        <DialogContent className="max-w-2xl bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">Nova Proposta</DialogTitle>
           </DialogHeader>
@@ -1050,7 +1050,7 @@ Retorne APENAS JSON válido:
           <div className="grid grid-cols-2 gap-6 py-6">
             <div className="space-y-4">
               <div className="space-y-1.5 relative">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Cliente</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Cliente</label>
                 <div className="relative">
                   <Input 
                     placeholder="Buscar lead ou digitar nome..."
@@ -1061,10 +1061,10 @@ Retorne APENAS JSON válido:
                     }}
                     onFocus={() => setShowLeads(true)}
                     onBlur={() => setTimeout(() => setShowLeads(false), 200)}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                   {showLeads && leads.length > 0 && (
-                    <div className="absolute top-full left-0 w-full mt-1 bg-[#161616] border border-white/[0.12] border border-white/[0.12] rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
+                    <div className="absolute top-full left-0 w-full mt-1 bg-[#1A1A1A] border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
                       {leads
                         .filter(lead => 
                           !newProposal.cliente || 
@@ -1073,14 +1073,14 @@ Retorne APENAS JSON válido:
                         .map(lead => (
                           <div 
                             key={lead.id}
-                            className="p-3 hover:bg-bronze/5 cursor-pointer text-sm border-b border-white/[0.06] last:border-0"
+                            className="p-3 hover:bg-bronze/5 cursor-pointer text-sm border-b border-white/5 last:border-0"
                             onClick={() => {
                               handleLeadSelect(lead.id);
                               setShowLeads(false);
                             }}
                           >
                             <div className="font-medium text-white">{lead.nome}</div>
-                            <div className="text-[10px] text-white/[0.4] uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
+                            <div className="text-[10px] text-white/40 uppercase tracking-wider">{lead.tipo} • {lead.cidade}</div>
                           </div>
                         ))
                       }
@@ -1088,7 +1088,7 @@ Retorne APENAS JSON válido:
                         !newProposal.cliente || 
                         lead.nome.toLowerCase().includes(newProposal.cliente.toLowerCase())
                       ).length === 0 && (
-                        <div className="p-3 text-xs text-white/[0.4] italic">Nenhum lead encontrado</div>
+                        <div className="p-3 text-xs text-white/40 italic">Nenhum lead encontrado</div>
                       )}
                     </div>
                   )}
@@ -1097,12 +1097,12 @@ Retorne APENAS JSON válido:
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Tipo</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Tipo</label>
                   <Select 
                     value={newProposal.tipo} 
                     onValueChange={(val: any) => setNewProposal({...newProposal, tipo: val})}
                   >
-                    <SelectTrigger className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white">
+                    <SelectTrigger className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1113,52 +1113,52 @@ Retorne APENAS JSON válido:
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Data</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Data</label>
                   <Input 
                     type="date"
                     value={newProposal.data}
                     onChange={(e) => setNewProposal({...newProposal, data: e.target.value})}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Cidade</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Cidade</label>
                   <Input 
                     value={newProposal.cidade || ''}
                     onChange={(e) => setNewProposal({...newProposal, cidade: e.target.value})}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Estado</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Estado</label>
                   <Input 
                     value={newProposal.estado || ''}
                     onChange={(e) => setNewProposal({...newProposal, estado: e.target.value})}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Área (m²)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Área (m²)</label>
                   <Input 
                     type="number"
                     value={newProposal.area || ''}
                     onChange={(e) => setNewProposal({...newProposal, area: Number(e.target.value)})}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Validade (dias)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Validade (dias)</label>
                   <Input 
                     type="number"
                     value={newProposal.validade}
                     onChange={(e) => setNewProposal({...newProposal, validade: Number(e.target.value)})}
-                    className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                    className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                 </div>
               </div>
@@ -1166,37 +1166,37 @@ Retorne APENAS JSON válido:
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Objetivo</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Objetivo</label>
                 <textarea 
                   value={newProposal.objetivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, objetivo: e.target.value})}
-                  className="w-full h-[106px] rounded-[2px] border border-white/[0.12] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20 bg-white/[0.06] text-white"
+                  className="w-full h-[106px] rounded-[2px] border border-white/10 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-bronze/20 bg-white/5 text-white"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Valor Executivo (R$)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Valor Executivo (R$)</label>
                 <Input 
                   type="number"
                   value={newProposal.valor_executivo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_executivo: Number(e.target.value)})}
-                  className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                  className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Valor Completo (R$)</label>
+                <label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Valor Completo (R$)</label>
                 <Input 
                   type="number"
                   value={newProposal.valor_completo || ''}
                   onChange={(e) => setNewProposal({...newProposal, valor_completo: Number(e.target.value)})}
-                  className="rounded-[2px] border-white/[0.12] h-10 bg-white/[0.06] text-white"
+                  className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                 />
               </div>
             </div>
           </div>
 
-          <DialogFooter className="border-t border-white/[0.12] pt-6">
+          <DialogFooter className="border-t border-white/10 pt-6">
             <Button 
               variant="outline" 
               onClick={() => setIsModalOpen(false)}
@@ -1207,7 +1207,7 @@ Retorne APENAS JSON válido:
             <Button 
               onClick={handleCreateProposal}
               disabled={isSaving}
-              className="bg-[#161616] border border-white/[0.12] hover:bg-[#1E1E1E] text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+              className="bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : 'Criar Proposta'}
             </Button>
@@ -1215,7 +1215,7 @@ Retorne APENAS JSON válido:
         </DialogContent>
       </Dialog>
       <Dialog open={isFollowupModalOpen} onOpenChange={setIsFollowupModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
+        <DialogContent className="sm:max-w-[500px] bg-[#1A1A1A] border-white/10 text-white p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
           <DialogHeader className="p-6 bg-graphite text-white">
             <DialogTitle className="text-xl font-bold font-cormorant flex items-center gap-2 uppercase tracking-tight">
               <MessageSquare size={20} className="text-bronze" />
@@ -1226,7 +1226,7 @@ Retorne APENAS JSON válido:
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Tom de Voz</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Tom de Voz</label>
                 <Select 
                   value={followupTone} 
                   onValueChange={(v: 'formal' | 'direto') => {
@@ -1234,17 +1234,17 @@ Retorne APENAS JSON válido:
                     if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, v, followupLang);
                   }}
                 >
-                  <SelectTrigger className="h-9 rounded-[2px] border-white/[0.12] text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white rounded-[2px]">
+                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="direto" className="text-xs font-bold uppercase tracking-wider">Direto / Amigável</SelectItem>
                     <SelectItem value="formal" className="text-xs font-bold uppercase tracking-wider">Formal / Polido</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">Idioma</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40">Idioma</label>
                 <Select 
                   value={followupLang} 
                   onValueChange={(v: 'pt' | 'en' | 'es') => {
@@ -1252,10 +1252,10 @@ Retorne APENAS JSON válido:
                     if (selectedProposal) handleGenerateFollowup(selectedProposal, undefined, followupTone, v);
                   }}
                 >
-                  <SelectTrigger className="h-9 rounded-[2px] border-white/[0.12] text-xs font-bold uppercase tracking-wider">
+                  <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white rounded-[2px]">
+                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="pt" className="text-xs font-bold uppercase tracking-wider">Português</SelectItem>
                     <SelectItem value="en" className="text-xs font-bold uppercase tracking-wider">English</SelectItem>
                     <SelectItem value="es" className="text-xs font-bold uppercase tracking-wider">Español</SelectItem>
@@ -1269,13 +1269,13 @@ Retorne APENAS JSON válido:
                 Script Recomendado
               </div>
               {isGeneratingFollowup ? (
-                <div className="h-32 flex flex-col items-center justify-center bg-white/[0.06] border border-white/[0.12] rounded-[2px]">
+                <div className="h-32 flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[2px]">
                   <Loader2 size={24} className="animate-spin text-bronze mb-2" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/[0.4] animate-pulse">Gerando análise...</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40 animate-pulse">Gerando análise...</span>
                 </div>
               ) : (
                 <textarea
-                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-white/[0.06] border border-white/[0.12] text-white rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
+                  className="w-full h-40 p-5 text-xs font-medium leading-relaxed bg-white/5 border border-white/10 text-white rounded-[2px] focus:border-bronze focus:ring-1 focus:ring-bronze outline-none resize-none transition-all"
                   value={followupMessage}
                   onChange={(e) => setFollowupMessage(e.target.value)}
                   placeholder="Aguardando geração do script..."
@@ -1287,7 +1287,7 @@ Retorne APENAS JSON válido:
               <Button 
                 onClick={copyFollowupMessage}
                 variant="outline"
-                className="border-white/[0.12] text-white hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
+                className="border-white/10 text-white hover:bg-[#FDFDFD] rounded-[2px] h-11 text-[11px] font-bold uppercase tracking-[0.2em]"
               >
                 <Copy size={16} className="mr-2 text-bronze" />
                 Copiar
@@ -1319,7 +1319,7 @@ Retorne APENAS JSON válido:
               <DialogTitle className="text-4xl font-bold font-cormorant text-white tracking-tight mb-1">
                 Análise de Engajamento
               </DialogTitle>
-              <p className="text-white/[0.06]0 text-[11px] uppercase tracking-[0.3em] font-bold">
+              <p className="text-white/50 text-[11px] uppercase tracking-[0.3em] font-bold">
                 {selectedProposal?.cliente} <span className="text-bronze mx-2">|</span> {selectedProposal?.tipo}
               </p>
             </div>
@@ -1336,7 +1336,7 @@ Retorne APENAS JSON válido:
       </Dialog>
       
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="max-w-3xl bg-[#0D0D0D] rounded-none p-0 overflow-hidden border-[#2A2826]">
+        <DialogContent className="max-w-3xl bg-[#0F0F0F] rounded-none p-0 overflow-hidden border-[#2A2826]">
           <DialogHeader className="p-8 bg-black text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Shield size={160} />
@@ -1346,22 +1346,22 @@ Retorne APENAS JSON válido:
               <DialogTitle className="text-3xl font-bold font-cormorant uppercase tracking-tight">
                 Revisão de Proposta · NL
               </DialogTitle>
-              <p className="text-white/[0.06]0 text-[10px] uppercase tracking-[0.2em] mt-2">
+              <p className="text-white/50 text-[10px] uppercase tracking-[0.2em] mt-2">
                 Cliente: <span className="text-white">{selectedProposal?.cliente}</span>
               </p>
             </div>
           </DialogHeader>
 
-          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0D0D0D]">
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0F0F0F]">
             {isReviewing ? (
               <div className="py-20 flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 text-bronze animate-spin" />
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/[0.4] animate-pulse">Auditando proposta...</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/40 animate-pulse">Auditando proposta...</p>
               </div>
             ) : reviewResult ? (
               <>
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.12] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <MessageSquare size={14} className="text-bronze" />
                       Tom de Voz
@@ -1378,21 +1378,21 @@ Retorne APENAS JSON válido:
                   {reviewResult.tom.problemas.length > 0 ? (
                     <div className="space-y-3">
                       {reviewResult.tom.problemas.map((prob: any, i: number) => (
-                        <div key={i} className="bg-white/[0.06] border border-white/[0.12] p-4 rounded-none space-y-2">
+                        <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-none space-y-2">
                           <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest">Trecho Problemático:</p>
-                          <p className="text-xs italic text-white/[0.4] border-l-2 border-red-200/20 pl-3">"{prob.trecho}"</p>
+                          <p className="text-xs italic text-white/40 border-l-2 border-red-200/20 pl-3">"{prob.trecho}"</p>
                           <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest mt-2">Sugestão NL:</p>
                           <p className="text-xs font-medium text-white">{prob.sugestao}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-white/[0.4] italic">Nenhum desvio de tom encontrado.</p>
+                    <p className="text-xs text-white/40 italic">Nenhum desvio de tom encontrado.</p>
                   )}
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.12] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <Ban size={14} className="text-bronze" />
                       Palavras Proibidas
@@ -1418,12 +1418,12 @@ Retorne APENAS JSON válido:
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-white/[0.4] italic">Nenhuma palavra proibida encontrada.</p>
+                    <p className="text-xs text-white/40 italic">Nenhuma palavra proibida encontrada.</p>
                   )}
                 </section>
 
                 <section className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-white/[0.12] pb-2">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-white flex items-center gap-2">
                       <ClipboardList size={14} className="text-bronze" />
                       Checklist Técnico
@@ -1439,8 +1439,8 @@ Retorne APENAS JSON válido:
                       { label: "Próximo passo definido", key: "proximo_passo" },
                       { label: "Sem urgência artificial", key: "sem_urgencia" }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-3 bg-white/[0.06] border border-white/[0.12] rounded-none">
-                        <span className="text-[11px] font-medium text-white/[0.4]">{item.label}</span>
+                      <div key={i} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-none">
+                        <span className="text-[11px] font-medium text-white/40">{item.label}</span>
                         {reviewResult.checklist[item.key] ? (
                           <CheckCircle2 size={16} className="text-green-500" />
                         ) : (
@@ -1452,11 +1452,11 @@ Retorne APENAS JSON válido:
                 </section>
               </>
             ) : (
-              <p className="text-center py-10 text-white/[0.4]">Erro ao carregar análise.</p>
+              <p className="text-center py-10 text-white/40">Erro ao carregar análise.</p>
             )}
           </div>
 
-          <DialogFooter className="p-6 bg-black border-t border-white/[0.12] flex justify-between items-center sm:justify-between rounded-none">
+          <DialogFooter className="p-6 bg-black border-t border-white/10 flex justify-between items-center sm:justify-between rounded-none">
             <Button 
               variant="outline" 
               onClick={() => setIsReviewModalOpen(false)}
@@ -1497,7 +1497,7 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
         </DialogContent>
       </Dialog>
       <Dialog open={isApprovalModalOpen} onOpenChange={setIsApprovalModalOpen}>
-        <DialogContent className="max-w-md bg-[#0D0D0D] border-[#1E1E1E] text-[#F0EDE8] rounded-none">
+        <DialogContent className="max-w-md bg-[#0F0E0C] border-[#2A2A2A] text-[#E8E4DF] rounded-none">
           <DialogHeader className="space-y-4">
             <p className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.4em] font-bold">PROPOSTA APROVADA</p>
             <DialogTitle className="text-2xl font-bold font-['Courier_New'] uppercase tracking-tight">
@@ -1506,13 +1506,13 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
           </DialogHeader>
 
           <div className="py-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-xs font-['Courier_New'] uppercase tracking-widest text-white/[0.06]0">
+            <div className="grid grid-cols-2 gap-4 text-xs font-['Courier_New'] uppercase tracking-widest text-white/50">
               <div className="space-y-1">
-                <p>Tipo: <span className="text-[#F0EDE8]">{proposalToApprove?.tipo}</span></p>
-                <p>Área: <span className="text-[#F0EDE8]">{proposalToApprove?.area}m²</span></p>
+                <p>Tipo: <span className="text-[#E8E4DF]">{proposalToApprove?.tipo}</span></p>
+                <p>Área: <span className="text-[#E8E4DF]">{proposalToApprove?.area}m²</span></p>
               </div>
               <div className="space-y-1">
-                <p>Valor: <span className="text-[#F0EDE8]">R$ {proposalToApprove?.valor_completo?.toLocaleString()}</span></p>
+                <p>Valor: <span className="text-[#E8E4DF]">R$ {proposalToApprove?.valor_completo?.toLocaleString()}</span></p>
               </div>
             </div>
           </div>
@@ -1529,7 +1529,7 @@ ${reviewResult.palavras_proibidas.encontradas.map((p: any) => `- Palavra: "${p.p
             <Button 
               onClick={handleApproveWithProject}
               disabled={isProcessingApproval}
-              className="flex-1 bg-[#8B7355] hover:bg-[#A68B6A] text-[#0D0D0D] rounded-none h-12 font-['Courier_New'] uppercase tracking-widest text-[10px] font-bold"
+              className="flex-1 bg-[#8B7355] hover:bg-[#A68B6A] text-[#0F0E0C] rounded-none h-12 font-['Courier_New'] uppercase tracking-widest text-[10px] font-bold"
             >
               {isProcessingApproval ? <Loader2 className="animate-spin w-4 h-4" /> : 'CRIAR PROJETO'}
             </Button>

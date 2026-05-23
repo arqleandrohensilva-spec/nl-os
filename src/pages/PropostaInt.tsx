@@ -14,8 +14,8 @@ const PropostaInt = () => {
   const proposalData = useProposta();
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[#161616] pb-20">
-      <div className="bg-[#0D0D0D] py-12 px-6 text-center">
+    <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
+      <div className="bg-[#0F0F0F] py-12 px-6 text-center">
         <div className="inline-block w-16 h-16 bg-bronze flex items-center justify-center text-white font-cormorant text-3xl mb-6 mx-auto shadow-lg">
           NL
         </div>
@@ -23,7 +23,7 @@ const PropostaInt = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 -mt-10">
-        <div className="bg-white border border-[#F0EDE8] shadow-xl p-8 md:p-12">
+        <div className="bg-white border border-[#E8E4DF] shadow-xl p-8 md:p-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 pb-12 border-b border-[#F0EDEA]">
             <div>
               <p className="text-bronze text-[11px] uppercase tracking-[0.3em] font-bold mb-2">Apresentação de Proposta</p>
@@ -100,13 +100,13 @@ const PropostaInt = () => {
                   <p className="text-[9px] text-black/40 mt-2 uppercase tracking-wider italic">*Projeto técnico e detalhamento para execução.</p>
                 </div>
 
-                <div className="bg-[#161616] border border-white/[0.12] p-6 border border-transparent relative overflow-hidden group">
+                <div className="bg-[#1A1A1A] p-6 border border-transparent relative overflow-hidden group">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-bronze/60 mb-2 font-bold">Pacote Completo (Premium)</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-xs font-bold text-bronze">R$</span>
                     <h4 className="text-3xl font-bold text-white">{proposalData.valor_completo}</h4>
                   </div>
-                  <p className="text-[9px] text-white/[0.4] mt-2 uppercase tracking-wider italic">*Executivo + Acompanhamento + Curadoria de mobiliário.</p>
+                  <p className="text-[9px] text-white/40 mt-2 uppercase tracking-wider italic">*Executivo + Acompanhamento + Curadoria de mobiliário.</p>
                   <div className="absolute top-4 right-4 text-bronze/20">
                     <CheckCircle2 size={32} />
                   </div>

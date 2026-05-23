@@ -105,7 +105,7 @@ const CalculadoraList = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#161616] border border-white/[0.12] text-[#F0EDE8]">
+    <div className="flex min-h-screen bg-[#1A1816] text-[#E8E4DF]">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 pl-[230px]">
@@ -114,7 +114,7 @@ const CalculadoraList = () => {
             <h1 className="text-4xl font-mono font-bold uppercase tracking-[0.2em] text-[#8B7355] mb-2">
               CALCULADORA DE PROPOSTA
             </h1>
-            <p className="text-sm text-[#F0EDE8]/60 font-light tracking-widest uppercase">
+            <p className="text-sm text-[#E8E4DF]/60 font-light tracking-widest uppercase">
               Selecione um lead para calcular a proposta
             </p>
           </header>
@@ -122,33 +122,33 @@ const CalculadoraList = () => {
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
               <div className="relative w-full md:w-96">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#F0EDE8]/30" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#E8E4DF]/30" />
                 <Input 
                   placeholder="BUSCAR LEAD PELO NOME..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-11 bg-white/[0.06] border-white/[0.12] rounded-none focus:border-[#8B7355] transition-all uppercase text-[10px] tracking-widest font-mono"
+                  className="pl-10 h-11 bg-white/5 border-white/10 rounded-none focus:border-[#8B7355] transition-all uppercase text-[10px] tracking-widest font-mono"
                 />
               </div>
 
               <Button 
                 onClick={handleStandalone}
                 variant="outline"
-                className="h-11 rounded-none border-white/[0.12] hover:border-[#8B7355] bg-transparent text-[#F0EDE8]/60 hover:text-[#F0EDE8] text-[10px] uppercase font-bold tracking-widest px-6 transition-all"
+                className="h-11 rounded-none border-white/10 hover:border-[#8B7355] bg-transparent text-[#E8E4DF]/60 hover:text-[#E8E4DF] text-[10px] uppercase font-bold tracking-widest px-6 transition-all"
               >
                 <Plus size={16} className="mr-2" />
                 Nova proposta avulsa
               </Button>
             </div>
 
-            <div className="bg-white/[0.02] border border-white/[0.12] rounded-none overflow-hidden">
+            <div className="bg-white/[0.02] border border-white/10 rounded-none overflow-hidden">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-24">
                   <Loader2 className="w-8 h-8 text-[#8B7355] animate-spin mb-4" />
-                  <span className="text-[10px] uppercase tracking-widest text-[#F0EDE8]/40 font-bold">Carregando leads...</span>
+                  <span className="text-[10px] uppercase tracking-widest text-[#E8E4DF]/40 font-bold">Carregando leads...</span>
                 </div>
               ) : filteredLeads.length > 0 ? (
-                <div className="divide-y divide-white/[0.06]">
+                <div className="divide-y divide-white/5">
                   {filteredLeads.map((lead) => (
                     <div 
                       key={lead.id}
@@ -160,14 +160,14 @@ const CalculadoraList = () => {
                           <Users size={20} className="text-[#8B7355]" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-medium text-[#F0EDE8] group-hover:text-white transition-colors">{lead.nome}</h3>
+                          <h3 className="text-lg font-medium text-[#E8E4DF] group-hover:text-white transition-colors">{lead.nome}</h3>
                           <div className="flex items-center gap-4 mt-1">
                             <span className="text-[10px] uppercase tracking-widest text-[#8B7355] font-bold">{lead.tipo}</span>
-                            <div className="flex items-center gap-1 text-[10px] text-[#F0EDE8]/40">
+                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/40">
                               <MapPin size={10} />
                               <span className="uppercase tracking-widest">{lead.cidade}</span>
                             </div>
-                            <div className="flex items-center gap-1 text-[10px] text-[#F0EDE8]/40">
+                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/40">
                               <Maximize2 size={10} />
                               <span className="uppercase tracking-widest">{lead.area}M²</span>
                             </div>
@@ -180,18 +180,18 @@ const CalculadoraList = () => {
                           "px-3 py-1 rounded-none text-[8px] font-bold uppercase tracking-[0.2em] border",
                           lead.temp === 'Quente' ? "bg-red-500/10 text-red-500 border-red-500/20" :
                           lead.temp === 'Morno' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
-                          "bg-white/[0.06] text-[#F0EDE8]/40 border-white/[0.12]"
+                          "bg-white/5 text-[#E8E4DF]/40 border-white/10"
                         )}>
                           {lead.temp}
                         </Badge>
-                        <ChevronRight size={18} className="text-[#F0EDE8]/20 group-hover:text-[#8B7355] group-hover:translate-x-1 transition-all" />
+                        <ChevronRight size={18} className="text-[#E8E4DF]/20 group-hover:text-[#8B7355] group-hover:translate-x-1 transition-all" />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-24 opacity-40">
-                  <Calculator size={32} className="mb-4 text-[#F0EDE8]/20" />
+                  <Calculator size={32} className="mb-4 text-[#E8E4DF]/20" />
                   <span className="text-[10px] uppercase tracking-widest font-bold">Nenhum lead encontrado</span>
                 </div>
               )}

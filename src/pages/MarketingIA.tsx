@@ -826,7 +826,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D]">
+    <div className="flex min-h-screen bg-[#0A0A0A]">
       <Sidebar user="Sócio" />
       <main className="flex-1 ml-[230px] p-8">
         <header className="mb-8 flex justify-between items-center">
@@ -841,20 +841,20 @@ Gere o artigo completo com título, subtítulos e meta description.`;
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white/[0.06] border border-white/[0.12] p-1 rounded-none h-12">
-            <TabsTrigger value="knowledge-base" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/[0.4] uppercase text-[10px] tracking-widest font-bold px-6">
+          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-none h-12">
+            <TabsTrigger value="knowledge-base" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <FileText className="w-3 h-3 mr-2" /> Base de Conhecimento
             </TabsTrigger>
-            <TabsTrigger value="captions" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/[0.4] uppercase text-[10px] tracking-widest font-bold px-6">
+            <TabsTrigger value="captions" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <Sparkles className="w-3 h-3 mr-2" /> Legendas
             </TabsTrigger>
-            <TabsTrigger value="reels" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/[0.4] uppercase text-[10px] tracking-widest font-bold px-6">
+            <TabsTrigger value="reels" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <Video className="w-3 h-3 mr-2" /> Reels
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/[0.4] uppercase text-[10px] tracking-widest font-bold px-6">
+            <TabsTrigger value="calendar" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <Calendar className="w-3 h-3 mr-2" /> Calendário
             </TabsTrigger>
-            <TabsTrigger value="history" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/[0.4] uppercase text-[10px] tracking-widest font-bold px-6">
+            <TabsTrigger value="history" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-white/40 uppercase text-[10px] tracking-widest font-bold px-6">
               <History className="w-3 h-3 mr-2" /> Histórico
             </TabsTrigger>
           </TabsList>
@@ -864,7 +864,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
               <div className="md:col-span-2 space-y-6">
                 <div>
                   <h2 className="text-xl font-cormorant font-bold text-white mb-1 uppercase tracking-tight">DOCUMENTOS DA NL</h2>
-                  <p className="text-white/[0.4] text-xs mb-6">A IA usa estes documentos como contexto em todo conteúdo gerado</p>
+                  <p className="text-white/40 text-xs mb-6">A IA usa estes documentos como contexto em todo conteúdo gerado</p>
                   <div className="space-y-3">
                     <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} accept=".pdf,.docx,.txt" />
                     {DEFAULT_DOCUMENTS.map((doc) => {
@@ -872,22 +872,22 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       const isActive = file?.is_active;
                       const isPending = !file;
                       return (
-                        <Card key={doc.name} className="bg-white/[0.02] border-white/[0.06] hover:border-bronze/30 transition-all duration-300 rounded-none">
+                        <Card key={doc.name} className="bg-white/[0.02] border-white/5 hover:border-bronze/30 transition-all duration-300 rounded-none">
                           <CardContent className="p-4 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                              <div className={`p-2 rounded ${isPending ? 'bg-white/[0.06] text-white/[0.18]' : 'bg-bronze/10 text-bronze'}`}>
+                              <div className={`p-2 rounded ${isPending ? 'bg-white/5 text-white/20' : 'bg-bronze/10 text-bronze'}`}>
                                 <FileText size={20} />
                               </div>
                               <div>
                                 <h3 className="text-white text-sm font-bold">{doc.name}</h3>
-                                {file && <p className="text-[10px] text-white/[0.4] uppercase tracking-tighter">{formatSize(file.size)} · {formatDate(file.server_modified)}</p>}
+                                {file && <p className="text-[10px] text-white/40 uppercase tracking-tighter">{formatSize(file.size)} · {formatDate(file.server_modified)}</p>}
                               </div>
                             </div>
                             <div className="flex items-center gap-6">
                               <div className="flex items-center gap-2 min-w-[100px] justify-end">
                                 {isPending ? (
-                                  <Badge variant="outline" className="bg-white/[0.06] border-white/[0.12] text-white/[0.4] text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none flex items-center gap-1">
-                                    <div className="w-2 h-2 border border-white/[0.18]"></div> PENDENTE
+                                  <Badge variant="outline" className="bg-white/5 border-white/10 text-white/40 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none flex items-center gap-1">
+                                    <div className="w-2 h-2 border border-white/20"></div> PENDENTE
                                   </Badge>
                                 ) : (
                                   <Badge variant="outline" className="bg-emerald-400/10 border-emerald-400/20 text-emerald-400 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none flex items-center gap-1">
@@ -895,7 +895,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                                   </Badge>
                                 )}
                               </div>
-                              <Button variant="outline" size="sm" className={`rounded-none uppercase text-[10px] font-bold tracking-widest h-8 px-4 ${isPending ? 'bg-white/[0.06] border-white/[0.12] text-white hover:bg-white/[0.12]' : 'bg-bronze/10 border-bronze/20 text-bronze hover:bg-bronze/20'}`} onClick={() => triggerUpload(doc.fileName)} disabled={uploading === doc.fileName}>
+                              <Button variant="outline" size="sm" className={`rounded-none uppercase text-[10px] font-bold tracking-widest h-8 px-4 ${isPending ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-bronze/10 border-bronze/20 text-bronze hover:bg-bronze/20'}`} onClick={() => triggerUpload(doc.fileName)} disabled={uploading === doc.fileName}>
                                 {uploading === doc.fileName ? <Loader2 className="w-3 h-3 animate-spin" /> : isPending ? <><Upload size={12} className="mr-2" /> Upload</> : <><RefreshCcw size={12} className="mr-2" /> Atualizar</>}
                               </Button>
                             </div>
@@ -907,20 +907,20 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                 </div>
               </div>
               <div className="space-y-6">
-                <Card className="bg-white/[0.02] border-white/[0.06] rounded-none">
-                  <CardHeader className="p-4 border-b border-white/[0.06]"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Diretrizes Rápidas</CardTitle></CardHeader>
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-4 border-b border-white/5"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Diretrizes Rápidas</CardTitle></CardHeader>
                   <CardContent className="p-4 space-y-4">
-                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Ex: Nunca usar 'casa dos sonhos', focar no técnico..." className="min-h-[150px] bg-white/[0.03] border-white/[0.06] text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
+                    <Textarea value={guidelines} onChange={(e) => setGuidelines(e.target.value)} placeholder="Ex: Nunca usar 'casa dos sonhos', focar no técnico..." className="min-h-[150px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" />
                     
-                    <div className="pt-4 border-t border-white/[0.06]">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold mb-2 block flex items-center gap-2">
+                    <div className="pt-4 border-t border-white/5">
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-2 block flex items-center gap-2">
                         <Sparkles className="w-3 h-3 text-bronze" /> Treinamento de Persona (Exemplos)
                       </label>
                       <Textarea 
                         value={personaExamples} 
                         onChange={(e) => setPersonaExamples(e.target.value)} 
                         placeholder="Cole aqui 2 ou 3 posts que performaram muito bem para a IA aprender seu estilo único..." 
-                        className="min-h-[200px] bg-white/[0.03] border-white/[0.06] text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" 
+                        className="min-h-[200px] bg-white/[0.03] border-white/5 text-white/80 text-sm focus:border-bronze/50 resize-none rounded-none" 
                       />
                     </div>
 
@@ -942,7 +942,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                 </div>
                 <button 
                   onClick={clearMarketingContext}
-                  className="hover:bg-white/[0.18] p-1.5 transition-colors rounded-full"
+                  className="hover:bg-white/20 p-1.5 transition-colors rounded-full"
                 >
                   <X size={16} />
                 </button>
@@ -950,11 +950,11 @@ Gere o artigo completo com título, subtítulos e meta description.`;
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <Card className="bg-white/[0.02] border-white/[0.06] rounded-none">
-                  <CardHeader className="p-6 border-b border-white/[0.06]"><CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Legendas</CardTitle></CardHeader>
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-6 border-b border-white/5"><CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Legendas</CardTitle></CardHeader>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">IMAGEM DO PROJETO</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">IMAGEM DO PROJETO</label>
                       <input type="file" ref={captionImageRef} className="hidden" accept="image/jpeg,image/png,image/webp" onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -966,31 +966,31 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           reader.readAsDataURL(file);
                         }
                       }} />
-                      <div onClick={() => captionImageRef.current?.click()} className="group relative h-40 border-2 border-dashed border-white/[0.12] hover:border-bronze/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden">
+                      <div onClick={() => captionImageRef.current?.click()} className="group relative h-40 border-2 border-dashed border-white/10 hover:border-bronze/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden">
                         {captionImage ? (
                           <><img src={captionImage} alt="Preview" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><p className="text-white text-[10px] font-bold uppercase tracking-widest">Alterar Imagem</p></div></>
                         ) : (
-                          <><Upload className="w-8 h-8 text-white/[0.18] mb-2 group-hover:text-bronze/50 transition-colors" /><p className="text-white/[0.4] text-[10px] font-bold uppercase tracking-widest text-center px-4">Arraste uma foto ou clique para selecionar</p></>
+                          <><Upload className="w-8 h-8 text-white/20 mb-2 group-hover:text-bronze/50 transition-colors" /><p className="text-white/40 text-[10px] font-bold uppercase tracking-widest text-center px-4">Arraste uma foto ou clique para selecionar</p></>
                         )}
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">DESCREVA O PROJETO OU CONTEXTO</label>
-                      <Textarea value={captionDescription} onChange={(e) => setCaptionDescription(e.target.value)} placeholder="Ex: Cozinha integrada à sala, revestimento Portobello..." className="min-h-[100px] bg-white/[0.03] border-white/[0.06] text-white focus:border-bronze/50 rounded-none text-sm" />
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">DESCREVA O PROJETO OU CONTEXTO</label>
+                      <Textarea value={captionDescription} onChange={(e) => setCaptionDescription(e.target.value)} placeholder="Ex: Cozinha integrada à sala, revestimento Portobello..." className="min-h-[100px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">TIPO DE POST</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">TIPO DE POST</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['FEED', 'REEL', 'STORY', 'CARROSSEL'] as const).map((type) => (
-                          <Button key={type} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${postType === type ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setPostType(type)}>{type}</Button>
+                          <Button key={type} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${postType === type ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setPostType(type)}>{type}</Button>
                         ))}
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">FOCO</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FOCO</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['TÉCNICO', 'PROCESSO', 'RESULTADO', 'EDUCATIVO'] as const).map((focus) => (
-                          <Button key={focus} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${captionFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
+                          <Button key={focus} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${captionFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
                         ))}
                       </div>
                     </div>
@@ -1003,20 +1003,20 @@ Gere o artigo completo com título, subtítulos e meta description.`;
               <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-250px)] pr-2">
                 {captionOptions.length > 0 ? (
                   captionOptions.map((option, index) => (
-                    <Card key={index} className="bg-white/[0.02] border-white/[0.12] rounded-none relative mt-4 first:mt-0">
+                    <Card key={index} className="bg-white/[0.02] border-white/10 rounded-none relative mt-4 first:mt-0">
                       <div className="absolute -top-3 left-4"><Badge className="bg-bronze text-white text-[10px] font-bold tracking-widest rounded-none border-none">OPÇÃO {index + 1}</Badge></div>
                       <CardContent className="p-6 pt-8 space-y-4">
                         <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{option.legenda}</div>
                         <div className="text-bronze text-xs font-medium tracking-tight">{option.hashtags}</div>
                         
-                        <div className="pt-4 border-t border-white/[0.06] flex flex-col gap-4">
+                        <div className="pt-4 border-t border-white/5 flex flex-col gap-4">
                           <div className="flex items-center justify-between">
-                            <span className="text-[9px] text-white/[0.18] uppercase tracking-[0.2em] font-bold">Expansão Multicanal Premium</span>
+                            <span className="text-[9px] text-white/20 uppercase tracking-[0.2em] font-bold">Expansão Multicanal Premium</span>
                             <div className="flex gap-2">
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#777777]/50 rounded-none flex items-center gap-2 transition-all duration-200"
+                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA]/50 rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => {
                                   console.log("Clique no botão LinkedIn", { index, legenda: option.legenda });
                                   expandContent(index, option.legenda, 'linkedin');
@@ -1029,7 +1029,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#777777]/50 rounded-none flex items-center gap-2 transition-all duration-200"
+                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA]/50 rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => {
                                   console.log("Clique no botão Blog", { index, legenda: option.legenda });
                                   expandContent(index, option.legenda, 'blog');
@@ -1045,19 +1045,19 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           {expandedResults[index] && (
                             <div className="space-y-4 animate-in fade-in duration-500">
                               {expandedResults[index].linkedin && (
-                                <div className="bg-white/[0.02] p-4 border border-white/[0.06] space-y-2">
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
                                   <div className="flex justify-between items-center">
                                     <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Post para LinkedIn</label>
-                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/[0.4] hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].linkedin!); toast({ title: "Copiado", description: "Post LinkedIn copiado." }); }}>COPIAR</Button>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].linkedin!); toast({ title: "Copiado", description: "Post LinkedIn copiado." }); }}>COPIAR</Button>
                                   </div>
                                   <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].linkedin}</div>
                                 </div>
                               )}
                               {expandedResults[index].blog && (
-                                <div className="bg-white/[0.02] p-4 border border-white/[0.06] space-y-2">
+                                <div className="bg-white/[0.02] p-4 border border-white/5 space-y-2">
                                   <div className="flex justify-between items-center">
                                     <label className="text-[9px] text-bronze uppercase tracking-widest font-bold">Artigo de Blog (SEO)</label>
-                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/[0.4] hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].blog!); toast({ title: "Copiado", description: "Artigo de Blog copiado." }); }}>COPIAR</Button>
+                                    <Button variant="ghost" size="sm" className="h-6 text-[8px] text-white/40 hover:text-white" onClick={() => { navigator.clipboard.writeText(expandedResults[index].blog!); toast({ title: "Copiado", description: "Artigo de Blog copiado." }); }}>COPIAR</Button>
                                   </div>
                                   <div className="text-[12px] text-white/70 whitespace-pre-wrap italic font-light leading-relaxed">{expandedResults[index].blog}</div>
                                 </div>
@@ -1066,8 +1066,8 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           )}
                         </div>
 
-                        <div className="flex justify-end gap-2 pt-2 border-t border-white/[0.06]">
-                          <Button variant="ghost" size="sm" className="text-white/[0.4] hover:text-white text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => saveToHistory('legenda', option, captionDescription, postType)}><Star className="w-3 h-3 text-bronze" /> Salvar</Button>
+                        <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+                          <Button variant="ghost" size="sm" className="text-white/40 hover:text-white text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => saveToHistory('legenda', option, captionDescription, postType)}><Star className="w-3 h-3 text-bronze" /> Salvar</Button>
                           <Button variant="ghost" size="sm" className="text-bronze hover:text-bronze/80 text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 h-8" onClick={() => { navigator.clipboard.writeText(`${option.legenda}\n\n${option.hashtags}`); toast({ title: "Copiado", description: `Opção ${index + 1} copiada.` }); }}><Copy className="w-3 h-3" /> Copiar Legenda</Button>
                         </div>
                       </CardContent>
@@ -1075,14 +1075,14 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                   ))
                 ) : generatedContent ? (
                   <Card className="bg-white/[0.02] border-bronze/30 rounded-none">
-                    <CardHeader className="p-6 border-b border-white/[0.06] flex flex-row items-center justify-between"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Resultado Sugerido</CardTitle></CardHeader>
+                    <CardHeader className="p-6 border-b border-white/5 flex flex-row items-center justify-between"><CardTitle className="text-sm font-bold text-white uppercase tracking-widest">Resultado Sugerido</CardTitle></CardHeader>
                     <CardContent className="p-6"><div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed">{generatedContent}</div></CardContent>
                   </Card>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/[0.06] p-12 text-center">
-                    <div className="w-16 h-16 bg-white/[0.06] flex items-center justify-center rounded-full mb-4 text-white/[0.18]"><Sparkles size={32} /></div>
-                    <h3 className="text-white/[0.4] text-lg font-cormorant mb-2">Pronto para gerar</h3>
-                    <p className="text-white/[0.18] text-xs max-w-[200px]">Preencha os campos ao lado e clique em gerar para ver as sugestões da IA.</p>
+                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Sparkles size={32} /></div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                    <p className="text-white/20 text-xs max-w-[200px]">Preencha os campos ao lado e clique em gerar para ver as sugestões da IA.</p>
                   </div>
                 )}
               </div>
@@ -1092,13 +1092,13 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           <TabsContent value="reels" className="space-y-6 outline-none">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <Card className="bg-white/[0.02] border-white/[0.06] rounded-none">
-                  <CardHeader className="p-6 border-b border-white/[0.06]">
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-6 border-b border-white/5">
                     <CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Roteiro de Reel</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">REFERÊNCIA VISUAL (opcional)</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">REFERÊNCIA VISUAL (opcional)</label>
                       <input 
                         type="file" 
                         ref={reelsImageRef} 
@@ -1118,7 +1118,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       />
                       <div 
                         onClick={() => reelsImageRef.current?.click()} 
-                        className="group relative h-40 border-2 border-dashed border-white/[0.12] hover:border-bronze/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
+                        className="group relative h-40 border-2 border-dashed border-white/10 hover:border-bronze/50 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer overflow-hidden"
                       >
                         {reelsImage ? (
                           <>
@@ -1129,34 +1129,34 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           </>
                         ) : (
                           <>
-                            <Upload className="w-8 h-8 text-white/[0.18] mb-2 group-hover:text-bronze/50 transition-colors" />
-                            <p className="text-white/[0.4] text-[10px] font-bold uppercase tracking-widest text-center px-4">
+                            <Upload className="w-8 h-8 text-white/20 mb-2 group-hover:text-bronze/50 transition-colors" />
+                            <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest text-center px-4">
                               Arraste uma foto do ambiente ou clique para selecionar
                             </p>
                           </>
                         )}
                       </div>
-                      <p className="text-[10px] text-white/[0.18] italic">A IA usa a imagem para contextualizar o roteiro com os detalhes reais do projeto.</p>
+                      <p className="text-[10px] text-white/20 italic">A IA usa a imagem para contextualizar o roteiro com os detalhes reais do projeto.</p>
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">ASSUNTO DO REEL</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">ASSUNTO DO REEL</label>
                       <Textarea 
                         value={reelsSubject} 
                         onChange={(e) => setReelsSubject(e.target.value)} 
                         placeholder="Ex: Mostrar o processo de compatibilização técnica antes da obra começar..." 
-                        className="min-h-[120px] bg-white/[0.03] border-white/[0.06] text-white focus:border-bronze/50 rounded-none text-sm" 
+                        className="min-h-[120px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" 
                       />
                     </div>
                     
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">DURAÇÃO</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">DURAÇÃO</label>
                       <div className="grid grid-cols-3 gap-2">
                         {(['30S', '60S', '90S'] as const).map((duration) => (
                           <Button 
                             key={duration} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsDuration === duration ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsDuration === duration ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setReelsDuration(duration)}
                           >
                             {duration}
@@ -1166,13 +1166,13 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">FORMATO</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FORMATO</label>
                       <div className="grid grid-cols-3 gap-2">
                         {(['EDUCATIVO', 'BASTIDOR', 'AUTORIDADE'] as const).map((format) => (
                           <Button 
                             key={format} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsFormat === format ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsFormat === format ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setReelsFormat(format)}
                           >
                             {format}
@@ -1225,7 +1225,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       <div className="p-6 pt-0 flex flex-col gap-2">
                         <Button 
                           variant="outline"
-                          className="w-full border-white/[0.12] text-white/60 hover:text-white hover:bg-white/[0.06] rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
+                          className="w-full border-white/10 text-white/60 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] font-bold tracking-widest h-10" 
                           onClick={() => saveToHistory('reel', reelsResult, reelsSubject)}
                         >
                           <Star className="w-3 h-3 mr-2 text-bronze" /> Salvar no Histórico
@@ -1244,10 +1244,10 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/[0.06] p-12 text-center">
-                    <div className="w-16 h-16 bg-white/[0.06] flex items-center justify-center rounded-full mb-4 text-white/[0.18]"><Video size={32} /></div>
-                    <h3 className="text-white/[0.4] text-lg font-cormorant mb-2">Pronto para gerar</h3>
-                    <p className="text-white/[0.18] text-xs max-w-[200px]">Preencha os campos ao lado e clique em gerar para ver o roteiro.</p>
+                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Video size={32} /></div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                    <p className="text-white/20 text-xs max-w-[200px]">Preencha os campos ao lado e clique em gerar para ver o roteiro.</p>
                   </div>
                 )}
               </div>
@@ -1257,18 +1257,18 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           <TabsContent value="calendar" className="space-y-6 outline-none">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-6">
-                <Card className="bg-white/[0.02] border-white/[0.06] rounded-none">
-                  <CardHeader className="p-6 border-b border-white/[0.06]">
+                <Card className="bg-white/[0.02] border-white/5 rounded-none">
+                  <CardHeader className="p-6 border-b border-white/5">
                     <CardTitle className="text-xl font-cormorant text-white uppercase tracking-tight">Geração de Calendário de Conteúdo</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6 space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">MÊS DE REFERÊNCIA</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">MÊS DE REFERÊNCIA</label>
                       <Select value={calendarMonth} onValueChange={setCalendarMonth}>
-                        <SelectTrigger className="w-full bg-white/[0.03] border-white/[0.06] text-white rounded-none h-10">
+                        <SelectTrigger className="w-full bg-white/[0.03] border-white/5 text-white rounded-none h-10">
                           <SelectValue placeholder="Selecione o mês" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white rounded-none">
+                        <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-none">
                           {[
                             "Janeiro 2026", "Fevereiro 2026", "Março 2026", "Abril 2026", 
                             "Maio 2026", "Junho 2026", "Julho 2026", "Agosto 2026", 
@@ -1281,23 +1281,23 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">PROJETOS PARA DESTACAR (opcional)</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">PROJETOS PARA DESTACAR (opcional)</label>
                       <Textarea 
                         value={calendarProjects} 
                         onChange={(e) => setCalendarProjects(e.target.value)} 
                         placeholder="Ex: Apartamento Moema 120m², Casa SJC estilo contemporâneo..." 
-                        className="min-h-[100px] bg-white/[0.03] border-white/[0.06] text-white focus:border-bronze/50 rounded-none text-sm" 
+                        className="min-h-[100px] bg-white/[0.03] border-white/5 text-white focus:border-bronze/50 rounded-none text-sm" 
                       />
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">FOCO DO MÊS</label>
+                      <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FOCO DO MÊS</label>
                       <div className="grid grid-cols-2 gap-2">
                         {(['CAPTAÇÃO', 'AUTORIDADE', 'EDUCAÇÃO', 'PORTFÓLIO'] as const).map((focus) => (
                           <Button 
                             key={focus} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${calendarFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${calendarFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setCalendarFocus(focus)}
                           >
                             {focus}
@@ -1323,15 +1323,15 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {calendarResult.map((semana) => (
                         <Card key={semana.numero} 
-                          className="bg-white/[0.02] border-white/[0.12] rounded-none overflow-hidden relative"
+                          className="bg-white/[0.02] border-white/10 rounded-none overflow-hidden relative"
                           style={{ borderLeft: `4px solid ${typeColors[semana.tipo] || '#8B7355'}` }}
                         >
                           <CardContent className="p-4 space-y-3">
                             <div className="flex justify-between items-start">
-                              <Badge className="bg-white/[0.06] text-white/60 text-[8px] font-bold tracking-widest rounded-none px-2 py-0.5 border border-white/[0.12] uppercase">
+                              <Badge className="bg-white/5 text-white/60 text-[8px] font-bold tracking-widest rounded-none px-2 py-0.5 border border-white/10 uppercase">
                                 {semana.tipo}
                               </Badge>
-                              <span className="text-[10px] text-white/[0.18] font-bold">SEMANA {semana.numero}</span>
+                              <span className="text-[10px] text-white/20 font-bold">SEMANA {semana.numero}</span>
                             </div>
                             
                             <div className="space-y-1">
@@ -1339,7 +1339,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <p className="text-bronze text-[10px] uppercase tracking-wider font-bold">{semana.formato}</p>
                             </div>
 
-                            <p className="text-white/[0.4] text-[10px] italic leading-relaxed line-clamp-2">"{semana.gancho}"</p>
+                            <p className="text-white/40 text-[10px] italic leading-relaxed line-clamp-2">"{semana.gancho}"</p>
 
                             <Button 
                               variant="ghost" 
@@ -1364,7 +1364,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       
                       <Button 
                         variant="outline" 
-                        className="w-full border-white/[0.12] text-white/[0.4] hover:bg-white/[0.06] rounded-none uppercase text-[9px] font-bold tracking-widest h-10"
+                        className="w-full border-white/10 text-white/40 hover:bg-white/5 rounded-none uppercase text-[9px] font-bold tracking-widest h-10"
                         onClick={() => {
                           const fullText = calendarResult.map(s => `SEMANA ${s.numero} — ${s.tipo}\nTema: ${s.tema}\nFormato: ${s.formato}\nDescrição: ${s.descricao}\nGancho: ${s.gancho}`).join('\n\n');
                           navigator.clipboard.writeText(fullText);
@@ -1376,27 +1376,27 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                     </div>
                   </div>
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/[0.06] p-12 text-center">
-                    <div className="w-16 h-16 bg-white/[0.06] flex items-center justify-center rounded-full mb-4 text-white/[0.18]"><Calendar size={32} /></div>
-                    <h3 className="text-white/[0.4] text-lg font-cormorant mb-2">Pronto para gerar</h3>
-                    <p className="text-white/[0.18] text-xs max-w-[200px]">Selecione o mês e o foco para gerar o seu planejamento estratégico.</p>
+                  <div className="h-full flex flex-col items-center justify-center border-2 border-dashed border-white/5 p-12 text-center">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20"><Calendar size={32} /></div>
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Pronto para gerar</h3>
+                    <p className="text-white/20 text-xs max-w-[200px]">Selecione o mês e o foco para gerar o seu planejamento estratégico.</p>
                   </div>
                 )}
               </div>
             </div>
           </TabsContent>
           <TabsContent value="history" className="space-y-6 outline-none">
-            <Card className="bg-white/[0.02] border-white/[0.06] rounded-none">
-              <CardHeader className="p-6 border-b border-white/[0.06]">
+            <Card className="bg-white/[0.02] border-white/5 rounded-none">
+              <CardHeader className="p-6 border-b border-white/5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4 flex-1">
                     <div className="relative flex-1 max-w-sm">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/[0.18]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                       <Input 
                         placeholder="Buscar no histórico..." 
                         value={historySearch}
                         onChange={(e) => setHistorySearch(e.target.value)}
-                        className="pl-10 bg-white/[0.06] border-white/[0.12] text-white rounded-none h-10 focus:border-bronze/50"
+                        className="pl-10 bg-white/5 border-white/10 text-white rounded-none h-10 focus:border-bronze/50"
                       />
                     </div>
                     <div className="flex items-center gap-2">
@@ -1404,9 +1404,9 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                         id="favorites" 
                         checked={showOnlyFavorites}
                         onCheckedChange={(checked) => setShowOnlyFavorites(checked as boolean)}
-                        className="border-white/[0.18] data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
+                        className="border-white/20 data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
                       />
-                      <label htmlFor="favorites" className="text-[10px] text-white/[0.4] uppercase font-bold tracking-widest cursor-pointer">Apenas favoritos</label>
+                      <label htmlFor="favorites" className="text-[10px] text-white/40 uppercase font-bold tracking-widest cursor-pointer">Apenas favoritos</label>
                     </div>
                   </div>
                   
@@ -1417,7 +1417,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                         variant="ghost"
                         size="sm"
                         onClick={() => setHistoryFilter(type)}
-                        className={`rounded-none text-[9px] font-bold tracking-widest px-4 h-8 ${historyFilter === type ? 'bg-bronze text-white' : 'text-white/[0.4] hover:text-white hover:bg-white/[0.06]'}`}
+                        className={`rounded-none text-[9px] font-bold tracking-widest px-4 h-8 ${historyFilter === type ? 'bg-bronze text-white' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
                       >
                         {type}
                       </Button>
@@ -1429,7 +1429,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                 {historyLoading ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <Loader2 className="w-8 h-8 text-bronze animate-spin mb-4" />
-                    <p className="text-white/[0.4] text-sm font-cormorant">Carregando sua biblioteca...</p>
+                    <p className="text-white/40 text-sm font-cormorant">Carregando sua biblioteca...</p>
                   </div>
                 ) : historyItems.filter(item => {
                   const matchesFilter = historyFilter === 'TODOS' || item.tipo.toUpperCase() === historyFilter;
@@ -1442,11 +1442,11 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                   return matchesFilter && matchesFavorite && matchesSearch;
                 }).length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <div className="w-16 h-16 bg-white/[0.06] flex items-center justify-center rounded-full mb-4 text-white/[0.18]">
+                    <div className="w-16 h-16 bg-white/5 flex items-center justify-center rounded-full mb-4 text-white/20">
                       <History size={32} />
                     </div>
-                    <h3 className="text-white/[0.4] text-lg font-cormorant mb-2">Nenhum conteúdo encontrado</h3>
-                    <p className="text-white/[0.18] text-xs max-w-[250px]">
+                    <h3 className="text-white/40 text-lg font-cormorant mb-2">Nenhum conteúdo encontrado</h3>
+                    <p className="text-white/20 text-xs max-w-[250px]">
                       {historySearch || showOnlyFavorites || historyFilter !== 'TODOS' 
                         ? "Tente ajustar seus filtros para encontrar o que procura."
                         : "Sua biblioteca ainda está vazia. Gere legendas, reels ou calendários para começar a construir seu histórico."}
@@ -1464,25 +1464,25 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                         (JSON.stringify(item.conteudo).toLowerCase().includes(searchLower));
                       return matchesFilter && matchesFavorite && matchesSearch;
                     }).map((item) => (
-                      <Card key={item.id} className="bg-white/[0.03] border-white/[0.06] hover:border-bronze/30 transition-all duration-300 rounded-none overflow-hidden group flex flex-col">
-                        <CardHeader className="p-4 flex flex-row items-center justify-between border-b border-white/[0.06]">
+                      <Card key={item.id} className="bg-white/[0.03] border-white/5 hover:border-bronze/30 transition-all duration-300 rounded-none overflow-hidden group flex flex-col">
+                        <CardHeader className="p-4 flex flex-row items-center justify-between border-b border-white/5">
                           <Badge variant="outline" className="bg-bronze/10 border-bronze/20 text-bronze text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-none">
                             {item.tipo}
                           </Badge>
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={() => toggleFavorite(item.id, item.favorito)}
-                              className={`transition-colors ${item.favorito ? 'text-bronze' : 'text-white/[0.18] hover:text-white/[0.4]'}`}
+                              className={`transition-colors ${item.favorito ? 'text-bronze' : 'text-white/20 hover:text-white/40'}`}
                             >
                               <Star size={16} fill={item.favorito ? "currentColor" : "none"} />
                             </button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <button className="text-white/[0.12] hover:text-red-400 transition-colors">
+                                <button className="text-white/10 hover:text-red-400 transition-colors">
                                   <Trash2 size={16} />
                                 </button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none">
+                              <AlertDialogContent className="bg-[#1A1A1A] border-white/10 rounded-none">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-white font-cormorant">Excluir do Histórico?</AlertDialogTitle>
                                   <AlertDialogDescription className="text-white/60">
@@ -1490,7 +1490,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel className="bg-transparent border-white/[0.12] text-white hover:bg-white/[0.06] rounded-none">Cancelar</AlertDialogCancel>
+                                  <AlertDialogCancel className="bg-transparent border-white/10 text-white hover:bg-white/5 rounded-none">Cancelar</AlertDialogCancel>
                                   <AlertDialogAction onClick={() => deleteHistoryItem(item.id)} className="bg-red-500/80 hover:bg-red-500 text-white rounded-none">Excluir</AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -1503,14 +1503,14 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           </p>
                           <h4 className="text-white text-sm font-bold line-clamp-1">{item.input_usado || "Sem descrição"}</h4>
                           
-                          <div className={`text-white/[0.06]0 text-[11px] leading-relaxed italic font-light ${expandedHistoryId === item.id ? '' : 'line-clamp-3'}`}>
+                          <div className={`text-white/50 text-[11px] leading-relaxed italic font-light ${expandedHistoryId === item.id ? '' : 'line-clamp-3'}`}>
                             {item.tipo === 'legenda' ? (item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda) : 
                              item.tipo === 'reel' ? item.conteudo.gancho : 
                              `Calendário para ${item.input_usado}`}
                           </div>
 
                           {expandedHistoryId === item.id && (
-                            <div className="pt-4 mt-4 border-t border-white/[0.06] space-y-4 animate-in slide-in-from-top-2 duration-300">
+                            <div className="pt-4 mt-4 border-t border-white/5 space-y-4 animate-in slide-in-from-top-2 duration-300">
                               {item.tipo === 'legenda' && (
                                 <div className="space-y-2">
                                   <p className="text-white/80 text-[12px] whitespace-pre-wrap">{item.conteudo.legenda || item.conteudo.opcoes?.[0]?.legenda}</p>
@@ -1532,7 +1532,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               {item.tipo === 'calendario' && (
                                 <div className="space-y-3">
                                   {item.conteudo.semanas?.map((s: any) => (
-                                    <div key={s.numero} className="p-2 bg-white/[0.06] border-l-2 border-bronze">
+                                    <div key={s.numero} className="p-2 bg-white/5 border-l-2 border-bronze">
                                       <p className="text-[9px] font-bold text-bronze uppercase">S{s.numero}: {s.tipo}</p>
                                       <p className="text-white/80 text-[11px] font-medium">{s.tema}</p>
                                     </div>
@@ -1547,7 +1547,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               variant="ghost" 
                               size="sm" 
                               onClick={() => setExpandedHistoryId(expandedHistoryId === item.id ? null : item.id)}
-                              className="w-full text-white/[0.4] hover:text-white hover:bg-white/[0.06] text-[9px] font-bold uppercase tracking-widest h-8 rounded-none"
+                              className="w-full text-white/40 hover:text-white hover:bg-white/5 text-[9px] font-bold uppercase tracking-widest h-8 rounded-none"
                             >
                               {expandedHistoryId === item.id ? <><ChevronUp size={12} className="mr-2" /> RECOLHER</> : <><ChevronDown size={12} className="mr-2" /> VER COMPLETO</>}
                             </Button>
@@ -1568,17 +1568,17 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           </TabsContent>
         </Tabs>
         <Dialog open={showExpansionModal} onOpenChange={setShowExpansionModal}>
-          <DialogContent className="bg-[#161616] border border-white/[0.12] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
-            <DialogHeader className="border-b border-white/[0.06] pb-4 mb-4">
+          <DialogContent className="bg-[#1A1A1A] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+            <DialogHeader className="border-b border-white/5 pb-4 mb-4">
               <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-tight flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-bronze" /> {modalContent.title}
               </DialogTitle>
-              <DialogDescription className="text-white/[0.4] text-xs">
+              <DialogDescription className="text-white/40 text-xs">
                 {modalContent.type === 'linkedin' ? 'Post otimizado para networking profissional.' : 'Artigo técnico otimizado para SEO local.'}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-6">
-              <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed bg-white/[0.02] p-6 border border-white/[0.06] italic">
+              <div className="text-white/80 text-sm whitespace-pre-wrap font-light leading-relaxed bg-white/[0.02] p-6 border border-white/5 italic">
                 {modalContent.content}
               </div>
               <Button 

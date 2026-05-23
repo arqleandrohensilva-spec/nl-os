@@ -272,17 +272,17 @@ const ModoApresentacao = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center text-white/[0.4] font-mono">PREPARANDO APRESENTAÇÃO...</div>;
+    return <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white/40 font-mono">PREPARANDO APRESENTAÇÃO...</div>;
   }
 
   if (!projeto) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D] flex flex-col items-center justify-center text-white/[0.4] font-mono p-8 text-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center text-white/40 font-mono p-8 text-center">
         <AlertCircle size={48} className="mb-6 opacity-20" />
         <h2 className="text-2xl font-cormorant italic text-white mb-2">ACESSO NÃO AUTORIZADO</h2>
         <p className="text-sm max-w-md">O link de apresentação expirou ou é inválido. Por favor, solicite um novo link ao seu arquiteto.</p>
         {!token && (
-          <Button onClick={() => navigate('/projetos/gestao')} variant="ghost" className="mt-8 text-xs uppercase tracking-widest text-white/[0.18] hover:text-white">
+          <Button onClick={() => navigate('/projetos/gestao')} variant="ghost" className="mt-8 text-xs uppercase tracking-widest text-white/20 hover:text-white">
             VOLTAR AO PAINEL
           </Button>
         )}
@@ -307,7 +307,7 @@ const ModoApresentacao = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white font-inter p-12 md:p-20 flex flex-col gap-20 select-none overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-inter p-12 md:p-20 flex flex-col gap-20 select-none overflow-x-hidden">
       {/* HEADER */}
       <header className="flex justify-between items-center w-full">
         <div className="text-2xl font-cormorant font-light tracking-widest italic text-white/80">
@@ -316,7 +316,7 @@ const ModoApresentacao = () => {
         {!token && (
           <button 
             onClick={() => navigate(-1)}
-            className="bg-white/[0.06] border border-white/[0.12] px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white/[0.4] hover:text-white hover:bg-white/[0.12] transition-all rounded-none"
+            className="bg-white/5 border border-white/10 px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/10 transition-all rounded-none"
           >
             SAIR
           </button>
@@ -327,7 +327,7 @@ const ModoApresentacao = () => {
       <section className="space-y-4">
         <p className="text-bronze text-sm uppercase tracking-[0.4em] font-bold">PROJETO</p>
         <h1 className="text-6xl md:text-8xl font-cormorant font-light italic leading-tight">{projeto.nome_cliente}</h1>
-        <div className="flex flex-wrap gap-4 text-white/[0.4] text-xl font-light">
+        <div className="flex flex-wrap gap-4 text-white/40 text-xl font-light">
           <span>{projeto.tipo}</span>
           <span>·</span>
           <span>{projeto.cidade}</span>
@@ -340,7 +340,7 @@ const ModoApresentacao = () => {
       <section className="space-y-12">
         <p className="text-bronze text-sm uppercase tracking-[0.4em] font-bold">JORNADA DO PROJETO</p>
         <div className="relative pt-8 overflow-x-auto">
-          <div className="absolute top-[45px] left-0 w-full h-[1px] bg-white/[0.06] min-w-[800px]" />
+          <div className="absolute top-[45px] left-0 w-full h-[1px] bg-white/5 min-w-[800px]" />
           <div className="relative flex justify-between min-w-[800px]">
             {ETAPAS_ORDER.map((etapaNome) => {
               const etapaData = etapas.find(e => e.etapa.toUpperCase() === etapaNome);
@@ -353,18 +353,18 @@ const ModoApresentacao = () => {
                     "w-5 h-5 rounded-full border-2 z-10 transition-all duration-1000",
                     isDone ? "bg-bronze border-bronze" : 
                     isCurrent ? "bg-bronze/20 border-bronze animate-pulse shadow-[0_0_15px_rgba(139,115,85,0.4)]" : 
-                    "bg-[#0D0D0D] border-white/[0.18]"
+                    "bg-[#0A0A0A] border-white/20"
                   )}>
                     {isCurrent && <div className="w-full h-full rounded-full bg-bronze scale-50" />}
                   </div>
                   <div className="space-y-2">
                     <p className={cn(
                       "text-sm font-bold tracking-widest uppercase",
-                      isCurrent ? "text-bronze" : isDone ? "text-white/80" : "text-white/[0.18]"
+                      isCurrent ? "text-bronze" : isDone ? "text-white/80" : "text-white/20"
                     )}>
                       {etapaNome}
                     </p>
-                    <p className="text-[10px] text-white/[0.4] font-medium">
+                    <p className="text-[10px] text-white/40 font-medium">
                       {isDone && etapaData?.data_aprovacao 
                         ? format(parseISO(etapaData.data_aprovacao), 'dd/MM/yyyy')
                         : etapaData?.data_entrega 
@@ -383,17 +383,17 @@ const ModoApresentacao = () => {
       {/* NOVO BLOCO - HISTÓRICO REAL */}
       <section className="space-y-12">
         <p className="text-bronze text-sm uppercase tracking-[0.4em] font-bold">HISTÓRICO DO PROJETO</p>
-        <div className="relative space-y-8 pl-8 border-l border-white/[0.06] max-w-2xl">
+        <div className="relative space-y-8 pl-8 border-l border-white/5 max-w-2xl">
           {timelineEvents.map((event, idx) => (
             <div key={event.id} className="relative group">
               <div className={cn(
                 "absolute -left-[37px] top-1.5 w-4 h-4 rounded-full border-2 transition-all duration-500",
-                event.concluido ? "bg-bronze border-bronze" : "bg-[#0D0D0D] border-white/[0.18]"
+                event.concluido ? "bg-bronze border-bronze" : "bg-[#0A0A0A] border-white/20"
               )} />
               <div className="space-y-1">
                 <p className={cn(
                   "text-[10px] font-bold tracking-widest uppercase",
-                  event.concluido ? "text-white/[0.4]" : "text-white/[0.18]"
+                  event.concluido ? "text-white/40" : "text-white/20"
                 )}>
                   {format(parseISO(event.data), 'dd/MM/yyyy')}
                   {event.tipo === 'previsto' && " · PREVISTO"}
@@ -408,7 +408,7 @@ const ModoApresentacao = () => {
             </div>
           ))}
           {timelineEvents.length === 0 && (
-            <p className="text-white/[0.18] italic">Aguardando os primeiros marcos do projeto.</p>
+            <p className="text-white/20 italic">Aguardando os primeiros marcos do projeto.</p>
           )}
         </div>
       </section>
@@ -429,13 +429,13 @@ const ModoApresentacao = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
               <div className="space-y-2">
-                <p className="text-white/[0.18] text-[10px] uppercase tracking-widest font-bold">Início</p>
+                <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Início</p>
                 <p className="text-xl font-light">
                   {etapaAtualData?.data_inicio ? format(parseISO(etapaAtualData.data_inicio), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-white/[0.18] text-[10px] uppercase tracking-widest font-bold">Próxima Entrega</p>
+                <p className="text-white/20 text-[10px] uppercase tracking-widest font-bold">Próxima Entrega</p>
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <p className="text-xl font-light">
                     {etapaAtualData?.data_entrega ? format(parseISO(etapaAtualData.data_entrega), 'dd/MM/yyyy') : <span className="text-white/30 italic">A definir</span>}
@@ -462,7 +462,7 @@ const ModoApresentacao = () => {
                   </li>
                 ))}
                 {entregues.length === 0 && (
-                  <li className="text-white/[0.18] italic">Iniciando jornada...</li>
+                  <li className="text-white/20 italic">Iniciando jornada...</li>
                 )}
               </ul>
             </div>
@@ -470,8 +470,8 @@ const ModoApresentacao = () => {
               <p className="text-bronze text-sm uppercase tracking-[0.4em] font-bold">PRÓXIMAS ENTREGAS</p>
               <ul className="space-y-6">
                 {proximas.slice(0, 3).map(e => (
-                  <li key={e.id} className="flex items-center gap-4 text-white/[0.4] text-lg">
-                    <div className="w-5 h-5 rounded-full border border-white/[0.12]" />
+                  <li key={e.id} className="flex items-center gap-4 text-white/40 text-lg">
+                    <div className="w-5 h-5 rounded-full border border-white/10" />
                     <div className="flex flex-col">
                       <span>{e.etapa}</span>
                       <span className="text-xs">{e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM') : <span className="text-white/30 italic">A definir</span>}</span>
@@ -492,7 +492,7 @@ const ModoApresentacao = () => {
               {etapas.filter(e => e.status === 'Aguardando aprovação' || e.status === 'Aprovado').map(e => (
                 <div key={e.id} className={cn(
                   "bg-white/[0.03] border p-12 space-y-10 transition-all duration-500",
-                  e.status === 'Aguardando aprovação' ? "border-bronze animate-pulse-subtle" : "border-white/[0.12] opacity-60"
+                  e.status === 'Aguardando aprovação' ? "border-bronze animate-pulse-subtle" : "border-white/10 opacity-60"
                 )}>
                   <div className={cn(
                     "flex items-center gap-4 uppercase tracking-[0.3em] font-bold text-sm",
@@ -504,7 +504,7 @@ const ModoApresentacao = () => {
                   
                   <div className="space-y-4">
                     <h3 className="text-4xl font-cormorant italic font-light uppercase tracking-tight">{e.etapa}</h3>
-                    <p className="text-white/[0.4] text-sm">
+                    <p className="text-white/40 text-sm">
                       {e.status === 'Aprovado' 
                         ? `Aprovado por ${e.aprovado_por} em ${e.data_aprovacao ? format(parseISO(e.data_aprovacao), 'dd/MM/yyyy') : ''}`
                         : `Enviado em ${e.data_entrega ? format(parseISO(e.data_entrega), 'dd/MM/yyyy') : 'A definir'}`}
@@ -538,7 +538,7 @@ const ModoApresentacao = () => {
                           }
                         }}
                         variant="ghost"
-                        className="flex-1 border border-white/[0.12] hover:bg-white/[0.06] text-white/60 hover:text-white rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all"
+                        className="flex-1 border border-white/10 hover:bg-white/5 text-white/60 hover:text-white rounded-none h-16 text-xs uppercase font-bold tracking-[0.3em] transition-all"
                       >
                         SOLICITAR AJUSTE
                       </Button>
@@ -548,22 +548,22 @@ const ModoApresentacao = () => {
               ))}
             </div>
           ) : (
-            <div className="h-full flex items-center justify-center border border-dashed border-white/[0.06] p-20 text-center">
-              <p className="text-white/[0.18] italic text-xl">Não há aprovações pendentes no momento.</p>
+            <div className="h-full flex items-center justify-center border border-dashed border-white/5 p-20 text-center">
+              <p className="text-white/20 italic text-xl">Não há aprovações pendentes no momento.</p>
             </div>
           )}
         </section>
       </div>
 
       {/* MENSAGEM DIRETA PARA A NL */}
-      <section className="mt-20 bg-white/[0.02] border border-white/[0.06] p-12 max-w-2xl mx-auto w-full">
+      <section className="mt-20 bg-white/[0.02] border border-white/5 p-12 max-w-2xl mx-auto w-full">
         <p className="text-bronze text-[10px] uppercase tracking-[0.4em] font-bold mb-6">ENVIAR MENSAGEM PARA A NL</p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Input 
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Dúvida, observação ou aprovação..."
-            className="bg-white/[0.06] border-white/[0.12] rounded-none h-14 text-white focus:border-bronze focus:ring-0 transition-all flex-1"
+            className="bg-white/5 border-white/10 rounded-none h-14 text-white focus:border-bronze focus:ring-0 transition-all flex-1"
           />
           <Button 
             onClick={handleSendMessage}
@@ -576,7 +576,7 @@ const ModoApresentacao = () => {
       </section>
 
       {/* FOOTER DISCRETO */}
-      <footer className="mt-auto pt-20 border-t border-white/[0.06] flex justify-center items-center gap-4 text-xs text-white/[0.18] uppercase tracking-widest font-bold">
+      <footer className="mt-auto pt-20 border-t border-white/5 flex justify-center items-center gap-4 text-xs text-white/20 uppercase tracking-widest font-bold">
         <span>PATRIMÔNIO EM EVOLUÇÃO</span>
         <span>·</span>
         <span>MODO APRESENTAÇÃO ATIVO</span>
@@ -584,7 +584,7 @@ const ModoApresentacao = () => {
 
       {/* APPROVAL MODAL */}
       <Dialog open={approvalModal.open} onOpenChange={(open) => !open && setApprovalModal({ open: false, etapa: null })}>
-        <DialogContent className="bg-[#0D0D0D] border border-bronze p-12 max-w-xl text-white rounded-none">
+        <DialogContent className="bg-[#0A0A0A] border border-bronze p-12 max-w-xl text-white rounded-none">
           <DialogHeader className="space-y-6">
             <DialogTitle className="text-3xl font-cormorant italic font-light uppercase tracking-tight text-center">
               Confirmação de Aprovação
@@ -599,17 +599,17 @@ const ModoApresentacao = () => {
 
           <div className="space-y-6 my-8">
             <div className="space-y-2">
-              <p className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">Nome Completo</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Nome Completo</p>
               <Input 
                 value={aprovadorNome}
                 onChange={(e) => setAprovadorNome(e.target.value)}
                 placeholder="Seu nome completo para assinatura digital..."
-                className="bg-white/[0.06] border-white/[0.12] rounded-none h-14 text-white focus:border-bronze focus:ring-0 transition-all"
+                className="bg-white/5 border-white/10 rounded-none h-14 text-white focus:border-bronze focus:ring-0 transition-all"
               />
             </div>
             <div className="space-y-2">
-              <p className="text-[10px] text-white/[0.4] uppercase tracking-widest font-bold">Data da Aprovação</p>
-              <div className="bg-white/[0.06] border border-white/[0.12] h-14 flex items-center px-4 text-white/60">
+              <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Data da Aprovação</p>
+              <div className="bg-white/5 border border-white/10 h-14 flex items-center px-4 text-white/60">
                 {format(new Date(), 'dd/MM/yyyy HH:mm')}
               </div>
             </div>
@@ -626,7 +626,7 @@ const ModoApresentacao = () => {
             <Button 
               onClick={() => setApprovalModal({ open: false, etapa: null })}
               variant="ghost"
-              className="w-full text-white/[0.18] hover:text-white hover:bg-white/[0.06] rounded-none text-[10px] uppercase tracking-widest font-bold h-12"
+              className="w-full text-white/20 hover:text-white hover:bg-white/5 rounded-none text-[10px] uppercase tracking-widest font-bold h-12"
             >
               CANCELAR
             </Button>

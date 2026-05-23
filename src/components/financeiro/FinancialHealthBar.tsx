@@ -48,7 +48,7 @@ const FinancialHealthBar: React.FC<FinancialHealthBarProps> = ({
       <TooltipProvider>
         <Tooltip delayDuration={300}>
           <TooltipTrigger asChild>
-            <div className="relative w-full h-[6px] bg-[#F0EDE8] rounded-full overflow-hidden cursor-help">
+            <div className="relative w-full h-[6px] bg-[#E8E4DF] rounded-full overflow-hidden cursor-help">
               <div 
                 className="h-full transition-all duration-[800ms] ease-out rounded-full"
                 style={{ 
@@ -65,7 +65,7 @@ const FinancialHealthBar: React.FC<FinancialHealthBarProps> = ({
       </TooltipProvider>
       
       <div className="mt-1">
-        <span className="text-[10px] font-dm-mono text-white/[0.4]">{percentage}% do mercado premium {marketName}</span>
+        <span className="text-[10px] font-dm-mono text-white/40">{percentage}% do mercado premium {marketName}</span>
       </div>
     </div>
   );

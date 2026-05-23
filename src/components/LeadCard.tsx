@@ -29,7 +29,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
   const tempConfig = {
     'Quente': { border: 'border-red-500', badge: 'bg-red-500/10 text-red-500', pulse: true },
     'Morno': { border: 'border-amber-500', badge: 'bg-amber-500/10 text-amber-500', pulse: false },
-    'Frio': { border: 'border-white/[0.18]', badge: 'bg-white/[0.06] text-white/[0.4]', pulse: false }
+    'Frio': { border: 'border-white/20', badge: 'bg-white/5 text-white/40', pulse: false }
   };
 
   const currentTemp = tempConfig[lead.temp] || tempConfig['Frio'];
@@ -67,7 +67,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
       {...listeners}
       onClick={onClick}
       className={cn(
-        "group relative bg-white/[0.03] border border-white/[0.12] p-4 cursor-pointer transition-all duration-300 hover:bg-white/[0.05] hover:border-white/[0.18]",
+        "group relative bg-white/[0.03] border border-white/10 p-4 cursor-pointer transition-all duration-300 hover:bg-white/[0.05] hover:border-white/20",
         "min-h-[100px] flex flex-col justify-between overflow-hidden",
         "border-l-4",
         currentTemp.border,
@@ -90,7 +90,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
             <span className={cn(
               "w-1 h-1 rounded-full",
               lead.temp === 'Quente' ? "bg-red-500 animate-pulse" : 
-              lead.temp === 'Morno' ? "bg-amber-500" : "bg-white/[0.4]"
+              lead.temp === 'Morno' ? "bg-amber-500" : "bg-white/40"
             )} />
             {lead.temp}
           </div>
@@ -127,7 +127,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
           </h3>
 
           {/* Project Type · City · Value */}
-          <p className="text-white/[0.06]0 text-[10px] mt-1 truncate uppercase tracking-wider">
+          <p className="text-white/50 text-[10px] mt-1 truncate uppercase tracking-wider">
             {lead.tipo} · {lead.cidade} · {formatCurrency(lead.orcamento)}
           </p>
 
@@ -140,7 +140,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
       </div>
 
       {/* Footer - Time in Stage & Action */}
-      <div className="mt-3 flex items-center justify-between border-t border-white/[0.06] pt-3">
+      <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
         <span className="text-white/30 text-[9px] uppercase tracking-wider">
           {lead.isBriefingVirtual 
             ? `${format(parseISO(lead.criado), 'dd/MM/yyyy')}`
@@ -199,7 +199,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                     toast.error("Erro ao aprovar lead");
                   }
                 }}
-                className="h-7 px-3 bg-[#8B7355] hover:bg-[#8B7355]/80 text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
+                className="h-7 px-3 bg-[#8B7355] hover:bg-[#7a654a] text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
               >
                 APROVAR
               </button>

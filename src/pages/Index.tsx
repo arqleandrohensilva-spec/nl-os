@@ -363,14 +363,14 @@ const Index = () => {
   const showMockToast = () => {
     const randomLead = leads[Math.floor(Math.random() * leads.length)];
     toast.custom((t) => (
-      <div className="bg-[#161616] border border-white/[0.12] text-white p-4 rounded-[2px] shadow-2xl border-l-4 border-bronze flex items-center justify-between gap-4 min-w-[320px] animate-in slide-in-from-right duration-300">
+      <div className="bg-[#1A1A1A] text-white p-4 rounded-[2px] shadow-2xl border-l-4 border-bronze flex items-center justify-between gap-4 min-w-[320px] animate-in slide-in-from-right duration-300">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-bronze/10 rounded-full">
             <Eye size={18} className="text-bronze" />
           </div>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest">{randomLead.nome} abriu a proposta agora</p>
-            <p className="text-[9px] text-white/[0.06]0">Módulo 04 · Tracking em tempo real</p>
+            <p className="text-[9px] text-white/50">Módulo 04 · Tracking em tempo real</p>
           </div>
         </div>
         <button 
@@ -537,7 +537,7 @@ const Index = () => {
     const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
     // Cores NL
-    const graphite = [26, 26, 26]; // #161616
+    const graphite = [26, 26, 26]; // #1A1A1A
     const bronze = [139, 115, 85]; // #8B7355
 
     // Capa
@@ -625,7 +625,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
@@ -633,33 +633,33 @@ const Index = () => {
 
 
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#0D0D0D] z-10">
-          <div className="px-10 py-6 border-b border-white/[0.12] flex items-center justify-between">
+        <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
+          <div className="px-10 py-6 border-b border-white/10 flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-white tracking-tight leading-none uppercase">Pipeline de Leads</h1>
-              <p className="text-[10px] text-white/[0.4] uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-medium">Captação e conversão de clientes</p>
             </div>
             
             <div className="flex items-center gap-6">
               <div className="relative group">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/[0.4] group-focus-within:text-bronze transition-colors" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-bronze transition-colors" />
                 <Input 
                   placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#0D0D0D] border-white/[0.12] focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
+                  className="w-72 h-10 pl-10 bg-[#0A0A0A] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
                 />
               </div>
-              <div className="h-8 w-[1px] bg-white/[0.12]" />
+              <div className="h-8 w-[1px] bg-white/10" />
               <div className="flex items-center gap-3">
                 <button 
                   onClick={exportToPDF}
-                  className="p-2 text-white/[0.4] hover:text-bronze transition-colors"
+                  className="p-2 text-white/40 hover:text-bronze transition-colors"
                   title="Exportar Pipeline"
                 >
                   <Download size={18} />
                 </button>
-                <div className="h-10 px-8 flex items-center gap-3 text-white/[0.18] text-[9px] font-bold uppercase tracking-[0.2em] border border-white/[0.06]">
+                <div className="h-10 px-8 flex items-center gap-3 text-white/20 text-[9px] font-bold uppercase tracking-[0.2em] border border-white/5">
                   CRIAÇÃO VIA MÓDULO CLIENTES
                 </div>
               </div>
@@ -668,37 +668,37 @@ const Index = () => {
 
           {/* MetricsBar and OriginBreakdown removed as per request - now in Command Center */}
 
-          <div className="px-10 py-4 border-b border-white/[0.12] flex items-center justify-between bg-[#0D0D0D] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
+          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
               <button 
                 onClick={showMockToast}
-                className="p-2 border border-white/[0.12] rounded-[2px] text-white/[0.4] hover:text-bronze transition-colors"
+                className="p-2 border border-white/10 rounded-[2px] text-white/40 hover:text-bronze transition-colors"
                 title="Simular proposta aberta"
               >
                 <Settings2 size={14} />
               </button>
-              <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-[2px]">
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
-                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/[0.4] hover:text-white")}>{type}</button>
+                  <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
               </div>
-              <div className="h-6 w-[1px] bg-white/[0.12] mx-2" />
-              <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-[2px]">
+              <div className="h-6 w-[1px] bg-white/10 mx-2" />
+              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                 <button 
                   onClick={() => setViewMode('kanban')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'kanban' ? "bg-bronze text-white" : "text-white/[0.4] hover:text-white")}
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'kanban' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
                 >
                   <LayoutGrid size={12} /> KANBAN
                 </button>
                 <button 
                   onClick={() => setViewMode('lista')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'lista' ? "bg-bronze text-white" : "text-white/[0.4] hover:text-white")}
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'lista' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
                 >
                   <List size={12} /> LISTA
                 </button>
                 <button 
                   onClick={() => setViewMode('foco')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'foco' ? "bg-bronze text-white" : "text-white/[0.4] hover:text-white")}
+                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'foco' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
                 >
                   <Zap size={12} /> FOCO
                 </button>
@@ -706,15 +706,15 @@ const Index = () => {
             </div>
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-white/[0.4] uppercase tracking-widest">Responsável:</span>
-                <div className="flex items-center gap-1 bg-white/[0.06] p-1 rounded-[2px]">
+                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Responsável:</span>
+                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                   {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
                     <button 
                       key={resp} 
                       onClick={() => setFilterResponsavel(resp)} 
                       className={cn(
                         "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
-                        filterResponsavel === resp ? "bg-bronze text-white shadow-sm" : "text-white/[0.4] hover:text-white"
+                        filterResponsavel === resp ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white"
                       )}
                     >
                       {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
@@ -724,20 +724,20 @@ const Index = () => {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-white/[0.4] uppercase tracking-widest">Prioridade:</span>
+                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Prioridade:</span>
                 <div className="flex items-center gap-2">
                   {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
-                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/[0.12] text-white/[0.4] hover:text-white hover:border-white/[0.18]")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/[0.4]")} />{temp}</button>
+                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/10 text-white/40 hover:text-white hover:border-white/20")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/40")} />{temp}</button>
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-white/[0.4] hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
+              <div className="flex items-center gap-2 text-white/40 hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
             </div>
           </div>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-[#0D0D0D] overflow-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#0A0A0A] overflow-auto p-6 pt-2 scrollbar-custom">
           {viewMode === 'kanban' && (
             <DndContext 
               sensors={sensors}
@@ -785,7 +785,7 @@ const Index = () => {
             <div className="w-full">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-white/[0.03] border-b border-white/[0.12]">
+                  <tr className="bg-white/[0.03] border-b border-white/10">
                     {['NOME', 'ETAPA', 'TIPO', 'VALOR', 'SCORE', 'DIAS NA ETAPA', 'TEMPERATURA', 'AÇÕES'].map((header) => {
                       const key = header === 'NOME' ? 'nome' : 
                                   header === 'ETAPA' ? 'stage' : 
@@ -802,7 +802,7 @@ const Index = () => {
                               direction: prev.key === key && prev.direction === 'desc' ? 'asc' : 'desc'
                             }));
                           }}
-                          className="px-4 py-3 text-left text-[9px] text-white/[0.4] uppercase tracking-widest font-bold cursor-pointer hover:text-white"
+                          className="px-4 py-3 text-left text-[9px] text-white/40 uppercase tracking-widest font-bold cursor-pointer hover:text-white"
                         >
                           <div className="flex items-center gap-2">
                             {header}
@@ -834,7 +834,7 @@ const Index = () => {
                       const daysInStage = Math.floor((new Date().getTime() - new Date(lead.etapa_desde).getTime()) / (1000 * 60 * 60 * 24));
                       const isAtiva = !['Fechado', 'Perdido'].includes(lead.stage);
                       return (
-                        <tr key={lead.id} className="border-b border-white/[0.06] hover:bg-white/[0.02] h-14 transition-colors">
+                        <tr key={lead.id} className="border-b border-white/5 hover:bg-white/[0.02] h-14 transition-colors">
                           <td onClick={() => setSelectedLeadId(lead.id)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
                           <td className="px-4">
                             <span className={cn(
@@ -853,7 +853,7 @@ const Index = () => {
                             <span className={cn(
                               "px-2 py-0.5 text-[10px] font-bold rounded-full",
                               lead.score >= 8 ? "bg-bronze text-white" : 
-                              lead.score >= 5 ? "bg-white/[0.12] text-white" : "text-white/[0.4]"
+                              lead.score >= 5 ? "bg-white/10 text-white" : "text-white/40"
                             )}>
                               {lead.score}
                             </span>
@@ -869,13 +869,13 @@ const Index = () => {
                               <div className={cn(
                                 "w-1.5 h-1.5 rounded-full",
                                 lead.temp === 'Quente' ? "bg-red animate-pulse" : 
-                                lead.temp === 'Morno' ? "bg-amber" : "bg-white/[0.4]"
+                                lead.temp === 'Morno' ? "bg-amber" : "bg-white/40"
                               )} />
                               <span className="text-[10px] text-white/60 uppercase font-medium">{lead.temp}</span>
                             </div>
                           </td>
                           <td className="px-4">
-                            <div className="flex items-center gap-3 text-white/[0.4]">
+                            <div className="flex items-center gap-3 text-white/40">
                               <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="hover:text-bronze transition-colors"><FileText size={14} /></button>
                               <button onClick={() => setSelectedLeadId(lead.id)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
                               <button onClick={() => handleQuickNote(lead.id, "Ação rápida registrada via lista")} className="hover:text-bronze transition-colors"><Zap size={14} /></button>
@@ -898,7 +898,7 @@ const Index = () => {
                   .map(l => {
                     let urgency = 0;
                     let badge = "";
-                    let color = "border-white/[0.12]";
+                    let color = "border-white/10";
                     
                     const isAtrasado = l.proxima_acao_data && isBefore(parseISO(l.proxima_acao_data), startOfDay(now));
                     const isQuenteSemContato = l.temp === 'Quente' && differenceInDays(now, parseISO(l.logs[0]?.data || l.criado)) > 7;
@@ -941,16 +941,16 @@ const Index = () => {
                                 {lead.focusBadge}
                               </span>
                               <h3 className="text-white font-medium text-lg">{lead.nome}</h3>
-                              <span className="text-white/[0.4] text-xs">· {lead.tipo} · R$ {(lead.orcamento / 1000).toLocaleString()}k · Score {lead.score}</span>
+                              <span className="text-white/40 text-xs">· {lead.tipo} · R$ {(lead.orcamento / 1000).toLocaleString()}k · Score {lead.score}</span>
                             </div>
-                            <p className="text-white/[0.4] text-xs italic">
+                            <p className="text-white/40 text-xs italic">
                               {lead.proxima_acao_nota || `Em ${lead.stage} há ${differenceInDays(now, parseISO(lead.etapa_desde))} dias`}
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="h-9 px-4 bg-white/[0.06] hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">ABRIR SCRIPT</button>
-                            <button onClick={() => handleQuickNote(lead.id, "Contato registrado via modo foco")} className="h-9 px-4 bg-white/[0.06] hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">REGISTRAR CONTATO</button>
-                            <button onClick={() => setSelectedLeadId(lead.id)} className="h-9 px-4 border border-white/[0.12] hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
+                            <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">ABRIR SCRIPT</button>
+                            <button onClick={() => handleQuickNote(lead.id, "Contato registrado via modo foco")} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">REGISTRAR CONTATO</button>
+                            <button onClick={() => setSelectedLeadId(lead.id)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
                           </div>
                         </div>
                       ))}
@@ -959,19 +959,19 @@ const Index = () => {
                     {regular.length > 0 && (
                       <div className="pt-8">
                         <div className="flex items-center gap-4 mb-4">
-                          <div className="h-[1px] flex-1 bg-white/[0.12]" />
-                          <h2 className="text-[10px] font-bold text-white/[0.18] uppercase tracking-[0.3em]">Demais Leads Ativos</h2>
-                          <div className="h-[1px] flex-1 bg-white/[0.12]" />
+                          <div className="h-[1px] flex-1 bg-white/10" />
+                          <h2 className="text-[10px] font-bold text-white/20 uppercase tracking-[0.3em]">Demais Leads Ativos</h2>
+                          <div className="h-[1px] flex-1 bg-white/10" />
                         </div>
                         <div className="space-y-3">
                           {regular.map(lead => (
-                            <div key={lead.id} className="bg-white/[0.01] border-l-4 border-white/[0.06] p-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
+                            <div key={lead.id} className="bg-white/[0.01] border-l-4 border-white/5 p-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
                               <div className="flex items-center gap-4">
                                 <span className="text-white font-medium">{lead.nome}</span>
                                 <span className="text-white/30 text-[10px] uppercase tracking-widest">{lead.stage}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <button onClick={() => setSelectedLeadId(lead.id)} className="text-[9px] font-bold text-white/[0.4] hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
+                                <button onClick={() => setSelectedLeadId(lead.id)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
                               </div>
                             </div>
                           ))}
@@ -998,13 +998,13 @@ const Index = () => {
 
       {/* Project Conversion Modal */}
       <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
-        <DialogContent className="bg-[#161616] border border-white/[0.12] border-white/[0.06] text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#1A1A1A] border-white/5 text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Converter em Projeto?</h2>
-            <p className="text-[11px] text-white/[0.4] mb-8 font-mono">{conversionLead?.nome} acabou de ser fechado. Deseja criar o projeto no Controle de Horas?</p>
+            <p className="text-[11px] text-white/40 mb-8 font-mono">{conversionLead?.nome} acabou de ser fechado. Deseja criar o projeto no Controle de Horas?</p>
             
             <div className="space-y-6">
-              <div className="p-4 bg-white/[0.06] border border-white/[0.12] rounded-none space-y-2">
+              <div className="p-4 bg-white/5 border border-white/10 rounded-none space-y-2">
                 <p className="text-[10px] uppercase font-bold tracking-widest text-bronze">Resumo do Lead</p>
                 <div className="grid grid-cols-2 gap-4 text-[11px]">
                   <div>
@@ -1027,7 +1027,7 @@ const Index = () => {
               </div>
 
               <div className="space-y-4">
-                <p className="text-[10px] uppercase font-bold tracking-widest text-white/[0.4]">Horas Estimadas</p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-white/40">Horas Estimadas</p>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                   {[
                     { id: 'briefing', label: 'Briefing' },
@@ -1044,7 +1044,7 @@ const Index = () => {
                           type="number"
                           value={(conversionHours as any)[h.id]}
                           onChange={(e) => setConversionHours({...conversionHours, [h.id]: Number(e.target.value)})}
-                          className="bg-white/[0.06] border-white/[0.12] text-white rounded-none h-9 text-xs"
+                          className="bg-white/5 border-white/10 text-white rounded-none h-9 text-xs"
                         />
                         <span className="text-[9px] text-white/30 uppercase">h</span>
                       </div>
@@ -1054,7 +1054,7 @@ const Index = () => {
               </div>
 
               <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setShowProjectConversion(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/[0.4] hover:text-white">Agora não</Button>
+                <Button variant="ghost" onClick={() => setShowProjectConversion(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Agora não</Button>
                 <Button 
                   onClick={async () => {
                     if (!conversionLead) return;

@@ -473,7 +473,7 @@ const FinanceiroProjetos = () => {
               title={isSent ? `Enviado ${step.label}` : isPast ? `Pulado ${step.label}` : `Agendado ${step.label}`}
               className={cn(
                 "w-2 h-2 rounded-full",
-                isSent ? "bg-green-500" : isPast ? "bg-white/[0.12]" : "bg-bronze/40 animate-pulse"
+                isSent ? "bg-green-500" : isPast ? "bg-white/10" : "bg-bronze/40 animate-pulse"
               )}
             />
           );
@@ -547,7 +547,7 @@ const FinanceiroProjetos = () => {
       return <Badge className="bg-bronze/10 text-bronze border-bronze/30">VENCE EM {diffDays} DIAS</Badge>;
     }
     
-    return <Badge className="bg-white/[0.12] text-white/60 border-none">EM ABERTO</Badge>;
+    return <Badge className="bg-white/10 text-white/60 border-none">EM ABERTO</Badge>;
   };
 
   const filteredParcelas = parcelas.filter(p => {
@@ -973,20 +973,20 @@ const FinanceiroProjetos = () => {
 
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-white font-inter">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-8">
         <header className="mb-10 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2 uppercase font-inter">07 · Financeiro de Projetos</h1>
-            <p className="text-white/[0.4] text-xs tracking-[0.3em] font-bold uppercase">
+            <p className="text-white/40 text-xs tracking-[0.3em] font-bold uppercase">
               PARCELAS · FLUXO DE CAIXA · LUCRATIVIDADE
             </p>
           </div>
           <Button 
             onClick={exportReport}
-            className="bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.12] rounded-none text-[10px] uppercase tracking-widest px-6 flex items-center gap-2"
+            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[10px] uppercase tracking-widest px-6 flex items-center gap-2"
           >
             <Download size={14} className="text-bronze" />
             Exportar Relatório
@@ -995,30 +995,30 @@ const FinanceiroProjetos = () => {
 
         {/* Metrics Cards */}
         <div className="grid grid-cols-5 gap-4 mb-8">
-          <div className="bg-white/[0.06] p-6 border border-white/[0.06] flex flex-col gap-1">
+          <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">RECEITA CONFIRMADA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
-            <span className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
-          <div className="bg-white/[0.06] p-6 border border-white/[0.06] flex flex-col gap-1">
+          <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PREVISTA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
-            <span className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
-          <div className="bg-white/[0.06] p-6 border border-white/[0.12] flex flex-col gap-1">
+          <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">ATRASADO</span>
-            <span className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
-          <div className="bg-white/[0.06] p-6 border border-white/[0.06] flex flex-col gap-1">
+          <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PRÓXIMOS 7 DIAS</span>
-            <span className="text-[22px] font-normal text-[#F0EDE8] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               {metrics.vencendo7Dias} {metrics.vencendo7Dias === 1 ? 'parcela' : 'parcelas'}
             </span>
           </div>
-          <div className="bg-white/[0.06] p-6 border border-bronze/20 flex flex-col gap-1 relative overflow-hidden group">
+          <div className="bg-white/5 p-6 border border-bronze/20 flex flex-col gap-1 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
               <TrendingUp size={12} className="text-bronze" />
             </div>
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LTV MÉDIO (HIST.)</span>
-            <span className="text-[22px] font-normal text-[#F0EDE8] font-inter">
+            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
               R$ {(projetosLucratividade.length > 0 
                 ? projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0) / projetosLucratividade.length 
                 : 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
@@ -1027,7 +1027,7 @@ const FinanceiroProjetos = () => {
         </div>
 
         <Tabs defaultValue="dashboard" onValueChange={setActiveTab} className="w-full">
-          <TabsList className="bg-white/[0.06] border border-white/[0.12] p-1 mb-6 rounded-none">
+          <TabsList className="bg-white/5 border border-white/10 p-1 mb-6 rounded-none">
             <TabsTrigger value="dashboard" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Dashboard</TabsTrigger>
             <TabsTrigger value="parcelas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Parcelas</TabsTrigger>
             <TabsTrigger value="fluxo" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4">Fluxo de Caixa</TabsTrigger>
@@ -1040,7 +1040,7 @@ const FinanceiroProjetos = () => {
             <TabsTrigger value="alertas" className="rounded-none data-[state=active]:bg-bronze data-[state=active]:text-white text-[10px] uppercase tracking-widest px-4 relative">
               Alertas
               {activeAlerts.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#161616]"></span>
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-[#1A1816]"></span>
               )}
             </TabsTrigger>
           </TabsList>
@@ -1048,7 +1048,7 @@ const FinanceiroProjetos = () => {
           <TabsContent value="dashboard">
             <div className="grid grid-cols-3 gap-6 mb-8">
               {/* Main Revenue Chart */}
-              <div className="col-span-2 bg-white/[0.06] border border-white/[0.06] p-6 h-[350px]">
+              <div className="col-span-2 bg-white/5 border border-white/5 p-6 h-[350px]">
                 <div className="flex justify-between items-center mb-6">
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
@@ -1074,7 +1074,7 @@ const FinanceiroProjetos = () => {
                         tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
                       />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#161616', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                        contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
                         itemStyle={{ color: '#fff' }}
                         formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR')}`, 'Receita']}
                       />
@@ -1085,7 +1085,7 @@ const FinanceiroProjetos = () => {
               </div>
 
               {/* Aging Analysis */}
-              <div className="bg-white/[0.06] border border-white/[0.06] p-6 h-[350px]">
+              <div className="bg-white/5 border border-white/5 p-6 h-[350px]">
                 <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                   <Clock size={14} className="text-red-500" />
                   Aging (Inadimplência)
@@ -1093,33 +1093,33 @@ const FinanceiroProjetos = () => {
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
-                      <span className="text-white/[0.4]">0 - 15 dias</span>
+                      <span className="text-white/40">0 - 15 dias</span>
                       <span className="font-bold">R$ {agingData['0-15'].toLocaleString('pt-BR')}</span>
                     </div>
-                    <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-bronze/40" style={{ width: `${Math.min((agingData['0-15'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
-                      <span className="text-white/[0.4]">15 - 30 dias</span>
+                      <span className="text-white/40">15 - 30 dias</span>
                       <span className="font-bold">R$ {agingData['15-30'].toLocaleString('pt-BR')}</span>
                     </div>
-                    <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-bronze/70" style={{ width: `${Math.min((agingData['15-30'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-[10px] uppercase tracking-widest mb-2">
-                      <span className="text-white/[0.4]">Acima de 30 dias</span>
+                      <span className="text-white/40">Acima de 30 dias</span>
                       <span className="font-bold text-red-500">R$ {agingData['30+'].toLocaleString('pt-BR')}</span>
                     </div>
-                    <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                       <div className="h-full bg-red-500" style={{ width: `${Math.min((agingData['30+'] / (metrics.totalAtrasado || 1)) * 100, 100)}%` }} />
                     </div>
                   </div>
-                  <div className="pt-6 border-t border-white/[0.06] mt-4">
-                    <p className="text-[10px] text-white/[0.18] uppercase text-center">Total Atrasado: R$ {metrics.totalAtrasado.toLocaleString('pt-BR')}</p>
+                  <div className="pt-6 border-t border-white/5 mt-4">
+                    <p className="text-[10px] text-white/20 uppercase text-center">Total Atrasado: R$ {metrics.totalAtrasado.toLocaleString('pt-BR')}</p>
                   </div>
                 </div>
               </div>
@@ -1127,7 +1127,7 @@ const FinanceiroProjetos = () => {
 
             <div className="grid grid-cols-2 gap-6">
               {/* Distribution by Type */}
-              <div className="bg-white/[0.06] border border-white/[0.06] p-6 h-[300px]">
+              <div className="bg-white/5 border border-white/5 p-6 h-[300px]">
                 <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                   <Activity size={14} className="text-bronze" />
                   Receita por Tipo de Projeto
@@ -1145,11 +1145,11 @@ const FinanceiroProjetos = () => {
                         dataKey="value"
                       >
                         {chartData.typeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={['#8B7355', '#1E1E1E', '#FFFFFF', '#777777'][index % 4]} />
+                          <Cell key={`cell-${index}`} fill={['#8B7355', '#3A3A3A', '#FFFFFF', '#777777'][index % 4]} />
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#161616', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                        contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
                         itemStyle={{ color: '#fff' }}
                       />
                       <Legend 
@@ -1164,7 +1164,7 @@ const FinanceiroProjetos = () => {
               </div>
 
               {/* Health Score / Next Actions */}
-              <div className="bg-white/[0.06] border border-white/[0.06] p-6 h-[300px]">
+              <div className="bg-white/5 border border-white/5 p-6 h-[300px]">
                 <h3 className="text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
                   <Target size={14} className="text-bronze" />
                   Ações Prioritárias
@@ -1176,10 +1176,10 @@ const FinanceiroProjetos = () => {
                         <AlertCircle size={16} className="text-red-500" />
                         <div>
                           <p className="text-xs font-bold">Cobrar Inadimplência</p>
-                          <p className="text-[10px] text-white/[0.4] uppercase">R$ {metrics.totalAtrasado.toLocaleString('pt-BR')} em atraso</p>
+                          <p className="text-[10px] text-white/40 uppercase">R$ {metrics.totalAtrasado.toLocaleString('pt-BR')} em atraso</p>
                         </div>
                       </div>
-                      <ChevronRight size={14} className="text-white/[0.18] group-hover:text-white transition-colors" />
+                      <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
                     </div>
                   )}
                   {metrics.vencendo7Dias > 0 && (
@@ -1188,21 +1188,21 @@ const FinanceiroProjetos = () => {
                         <Calendar size={16} className="text-bronze" />
                         <div>
                           <p className="text-xs font-bold">Régua de Cobrança</p>
-                          <p className="text-[10px] text-white/[0.4] uppercase">{metrics.vencendo7Dias} lembretes pendentes</p>
+                          <p className="text-[10px] text-white/40 uppercase">{metrics.vencendo7Dias} lembretes pendentes</p>
                         </div>
                       </div>
-                      <ChevronRight size={14} className="text-white/[0.18] group-hover:text-white transition-colors" />
+                      <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
                     </div>
                   )}
-                  <div className="p-4 bg-white/[0.06] border border-white/[0.12] flex justify-between items-center group cursor-pointer hover:bg-white/[0.12] transition-colors" onClick={() => { setActiveTab('parcelas'); setFilterStatus('NF_PENDENTE'); }}>
+                  <div className="p-4 bg-white/5 border border-white/10 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition-colors" onClick={() => { setActiveTab('parcelas'); setFilterStatus('NF_PENDENTE'); }}>
                     <div className="flex items-center gap-3">
                       <FileText size={16} className="text-white/60" />
                       <div>
                         <p className="text-xs font-bold">Emitir Notas Fiscais</p>
-                        <p className="text-[10px] text-white/[0.4] uppercase">Verificar parcelas pagas sem NF</p>
+                        <p className="text-[10px] text-white/40 uppercase">Verificar parcelas pagas sem NF</p>
                       </div>
                     </div>
-                    <ChevronRight size={14} className="text-white/[0.18] group-hover:text-white transition-colors" />
+                    <ChevronRight size={14} className="text-white/20 group-hover:text-white transition-colors" />
                   </div>
                 </div>
               </div>
@@ -1224,8 +1224,8 @@ const FinanceiroProjetos = () => {
                       size="sm"
                       onClick={() => setLucroFilter(filter.id as any)}
                       className={cn(
-                        "text-[10px] uppercase tracking-widest rounded-none border border-white/[0.06]",
-                        lucroFilter === filter.id ? "bg-white/[0.12] text-white" : "text-white/[0.4]"
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
                       )}
                     >
                       {filter.label}
@@ -1237,14 +1237,14 @@ const FinanceiroProjetos = () => {
                   <div className="flex gap-2 items-center">
                     <Input 
                       type="date" 
-                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-8 text-[10px] w-32"
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
                       value={lucroCustomDates.start}
                       onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
                     />
-                    <span className="text-white/[0.18] text-[10px] uppercase">até</span>
+                    <span className="text-white/20 text-[10px] uppercase">até</span>
                     <Input 
                       type="date" 
-                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-8 text-[10px] w-32"
+                      className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
                       value={lucroCustomDates.end}
                       onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
                     />
@@ -1270,8 +1270,8 @@ const FinanceiroProjetos = () => {
                       size="sm"
                       onClick={() => setFilterStatus(status.id)}
                       className={cn(
-                        "text-[10px] uppercase tracking-widest rounded-none border border-white/[0.06]",
-                        filterStatus === status.id ? "bg-white/[0.12] text-white" : "text-white/[0.4]"
+                        "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                        filterStatus === status.id ? "bg-white/10 text-white" : "text-white/40"
                       )}
                     >
                       {status.label}
@@ -1281,31 +1281,31 @@ const FinanceiroProjetos = () => {
               </div>
             </div>
 
-            <div className="bg-white/[0.06] border border-white/[0.06] overflow-hidden">
+            <div className="bg-white/5 border border-white/5 overflow-hidden">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-white/[0.12] bg-white/[0.06]">
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Cliente / Projeto</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Parcela</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Valor (Bruto)</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Líquido</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Vencimento</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4]">Status / NF / Régua</th>
-                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/[0.4] text-right">Ações</th>
+                  <tr className="border-b border-white/10 bg-white/5">
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Cliente / Projeto</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Parcela</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Valor (Bruto)</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Líquido</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Vencimento</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40">Status / NF / Régua</th>
+                    <th className="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-white/40 text-right">Ações</th>
 
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.06]">
+                <tbody className="divide-y divide-white/5">
                   {filteredParcelas.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-white/[0.18] text-xs italic">Nenhuma parcela encontrada</td>
+                      <td colSpan={7} className="px-6 py-12 text-center text-white/20 text-xs italic">Nenhuma parcela encontrada</td>
                     </tr>
                   ) : filteredParcelas.map(p => (
                     <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
                           <span className="text-sm font-medium">{p.cliente_nome}</span>
-                          <span className="text-[10px] text-white/[0.4] uppercase tracking-tighter">{p.projetos?.tipo || 'Projeto'}</span>
+                          <span className="text-[10px] text-white/40 uppercase tracking-tighter">{p.projetos?.tipo || 'Projeto'}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -1336,7 +1336,7 @@ const FinanceiroProjetos = () => {
                           </div>
                           {getReguaStatus(p)}
                           {(p as any).data_notificacao_cobranca && (
-                            <span className="text-[8px] text-white/[0.18] uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
+                            <span className="text-[8px] text-white/20 uppercase">Último aviso: {format(parseISO((p as any).data_notificacao_cobranca), 'dd/MM')}</span>
                           )}
                         </div>
                       </td>
@@ -1347,7 +1347,7 @@ const FinanceiroProjetos = () => {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 text-[9px] uppercase tracking-widest text-white/[0.4] hover:text-white rounded-none"
+                              className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-white rounded-none"
                               onClick={() => generateReceipt(p)}
                             >
                               <FileText size={14} className="mr-1" />
@@ -1359,7 +1359,7 @@ const FinanceiroProjetos = () => {
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-8 text-[9px] uppercase tracking-widest border-white/[0.12] hover:bg-bronze hover:text-white rounded-none"
+                                className="h-8 text-[9px] uppercase tracking-widest border-white/10 hover:bg-bronze hover:text-white rounded-none"
                                 onClick={() => {
                                   setSelectedParcela(p);
                                   setConfirmData({ 
@@ -1379,7 +1379,7 @@ const FinanceiroProjetos = () => {
                                 <Button 
                                   variant="ghost" 
                                   size="icon" 
-                                  className="h-8 w-8 text-white/[0.4] hover:text-green-500"
+                                  className="h-8 w-8 text-white/40 hover:text-green-500"
                                   onClick={() => sendWhatsApp(p)}
                                 >
                                   <MessageCircle size={14} />
@@ -1399,20 +1399,20 @@ const FinanceiroProjetos = () => {
           <TabsContent value="fluxo">
             <div className="grid grid-cols-3 gap-6">
               {fluxoCaixa.map((mes, idx) => (
-                <div key={idx} className="bg-white/[0.06] border border-white/[0.06] flex flex-col h-full">
-                  <div className="p-6 border-b border-white/[0.12] bg-white/[0.06]">
+                <div key={idx} className="bg-white/5 border border-white/5 flex flex-col h-full">
+                  <div className="p-6 border-b border-white/10 bg-white/5">
                     <h3 className="text-sm font-bold uppercase tracking-widest mb-4">{mes.label}</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado</p>
-                        <p className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Previsto</p>
                         <p className="text-[22px] font-normal text-[#777777] font-inter">R$ {mes.previsto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
-                    <div className="mt-4 h-1 bg-white/[0.06] w-full relative">
+                    <div className="mt-4 h-1 bg-white/5 w-full relative">
                       <div 
                         className="absolute h-full bg-green-500 transition-all" 
                         style={{ width: `${mes.previsto + mes.confirmado > 0 ? (mes.confirmado / (mes.previsto + mes.confirmado)) * 100 : 0}%` }} 
@@ -1422,16 +1422,16 @@ const FinanceiroProjetos = () => {
                   <div className="flex-1 overflow-y-auto max-h-[400px] p-2">
                     <div className="space-y-1">
                       {mes.parcelas.map(p => (
-                        <div key={p.id} className="p-3 bg-white/[0.02] border border-white/[0.06] flex justify-between items-center group">
+                        <div key={p.id} className="p-3 bg-white/[0.02] border border-white/5 flex justify-between items-center group">
                           <div>
                             <p className="text-xs font-medium">{p.cliente_nome}</p>
-                            <p className="text-[9px] text-white/[0.4]">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</p>
+                            <p className="text-[9px] text-white/40">{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</p>
                           </div>
                           <div className="text-right">
                             <p className="text-xs font-bold">R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                             <Badge className={cn(
                               "text-[7px] h-3 px-1 border-none",
-                              p.status === 'PAGO' ? "bg-green-500/20 text-green-500" : "bg-white/[0.12] text-white/[0.4]"
+                              p.status === 'PAGO' ? "bg-green-500/20 text-green-500" : "bg-white/10 text-white/40"
                             )}>
                               {p.status}
                             </Badge>
@@ -1444,10 +1444,10 @@ const FinanceiroProjetos = () => {
               ))}
             </div>
             
-            <div className="mt-8 p-6 bg-white/[0.06] border border-white/[0.06] flex justify-between items-center">
+            <div className="mt-8 p-6 bg-white/5 border border-white/5 flex justify-between items-center">
               <div>
                 <h4 className="text-[11px] uppercase tracking-widest font-normal text-[#777777] font-inter">Total Geral (Próximos 3 meses)</h4>
-                <p className="text-[10px] text-white/[0.18] uppercase font-inter mt-1">Consolidado de todas as parcelas previstas e confirmadas</p>
+                <p className="text-[10px] text-white/20 uppercase font-inter mt-1">Consolidado de todas as parcelas previstas e confirmadas</p>
               </div>
               <div className="flex gap-12 text-right">
                 <div>
@@ -1456,7 +1456,7 @@ const FinanceiroProjetos = () => {
                 </div>
                 <div>
                   <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado Geral</p>
-                  <p className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
             </div>
@@ -1465,51 +1465,51 @@ const FinanceiroProjetos = () => {
           <TabsContent value="score">
             <div className="grid grid-cols-2 gap-4">
               {clientScores.map(client => (
-                <div key={client.nome} className="bg-white/[0.06] border border-white/[0.06] p-6 hover:border-white/[0.12] transition-colors">
+                <div key={client.nome} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors">
                   <div className="flex justify-between items-start mb-6">
                     <div>
                       <h3 className="text-sm font-bold uppercase tracking-tight">{client.nome}</h3>
-                      <span className="text-[10px] text-white/[0.4] uppercase tracking-widest">{client.tipoProjeto}</span>
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest">{client.tipoProjeto}</span>
                     </div>
                     <div className="text-right">
                       <div className={cn("text-3xl font-bold font-inter", client.color)}>
                         {client.score.toFixed(0)}
                       </div>
-                      <Badge className={cn("border-none rounded-none text-[9px] px-2 mt-1 bg-white/[0.06]", client.color)}>
+                      <Badge className={cn("border-none rounded-none text-[9px] px-2 mt-1 bg-white/5", client.color)}>
                         {client.label}
                       </Badge>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-y-4 gap-x-8 py-4 border-y border-white/[0.06] mb-6">
+                  <div className="grid grid-cols-2 gap-y-4 gap-x-8 py-4 border-y border-white/5 mb-6">
                     <div>
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Parcelas em Dia</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Parcelas em Dia</p>
                       <p className="text-xs font-bold text-green-500">{client.parcelasPagas}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Atrasos</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Atrasos</p>
                       <p className="text-xs font-bold text-red-500">{client.parcelasAtrasadas}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Média Atraso</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Média Atraso</p>
                       <p className="text-xs font-bold">{client.diasMediaAtraso.toFixed(1)} dias</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Indicações</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Indicações</p>
                       <p className="text-xs font-bold text-bronze">{client.indicacoesFeitas}</p>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Resumo do Relacionamento</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Resumo do Relacionamento</p>
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="rounded-none border-white/[0.12] text-[9px] uppercase font-normal py-1">
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
                         {client.pagamentosAdiantados} Adiantamentos
                       </Badge>
-                      <Badge variant="outline" className="rounded-none border-white/[0.12] text-[9px] uppercase font-normal py-1">
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
                         {client.pedidosDesconto} Pedidos Desconto
                       </Badge>
-                      <Badge variant="outline" className="rounded-none border-white/[0.12] text-[9px] uppercase font-normal py-1">
+                      <Badge variant="outline" className="rounded-none border-white/10 text-[9px] uppercase font-normal py-1">
                         {client.retrabalhoGerado} Retrabalhos
                       </Badge>
                     </div>
@@ -1521,7 +1521,7 @@ const FinanceiroProjetos = () => {
 
           <TabsContent value="simulador">
             <div className="grid grid-cols-3 gap-6">
-              <div className="bg-white/[0.06] border border-white/[0.06] p-6 space-y-6">
+              <div className="bg-white/5 border border-white/5 p-6 space-y-6">
                 <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-4">
                   <Calculator size={14} className="text-bronze" />
                   Parâmetros de Simulação
@@ -1529,19 +1529,19 @@ const FinanceiroProjetos = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Número de Projetos (Mês)</label>
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Número de Projetos (Mês)</label>
                     <Input 
                       type="number" 
                       min="1" max="10"
-                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
                       value={simulator.numProjetos}
                       onChange={e => setSimulator({ ...simulator, numProjetos: parseInt(e.target.value) || 1 })}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Tipo de Projeto</label>
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Projeto</label>
                     <select 
-                      className="w-full bg-white/[0.06] border border-white/[0.12] rounded-none h-10 text-xs px-3 focus:outline-none focus:border-bronze"
+                      className="w-full bg-white/5 border border-white/10 rounded-none h-10 text-xs px-3 focus:outline-none focus:border-bronze"
                       value={simulator.tipo}
                       onChange={e => setSimulator({ ...simulator, tipo: e.target.value })}
                     >
@@ -1551,10 +1551,10 @@ const FinanceiroProjetos = () => {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Área Média (m²)</label>
+                    <label className="text-[10px] uppercase tracking-widest text-white/40">Área Média (m²)</label>
                     <Input 
                       type="number" 
-                      className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
+                      className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
                       value={simulator.areaM2}
                       onChange={e => setSimulator({ ...simulator, areaM2: parseInt(e.target.value) || 0 })}
                     />
@@ -1562,7 +1562,7 @@ const FinanceiroProjetos = () => {
                 </div>
               </div>
 
-              <div className="col-span-2 bg-white/[0.06] border border-white/[0.06] p-8">
+              <div className="col-span-2 bg-white/5 border border-white/5 p-8">
                 {(() => {
                   const tickets = { ArqInt: 150, Interiores: 120, Comercial: 180 };
                   const ticketMedio = (tickets as any)[simulator.tipo] || 150;
@@ -1589,22 +1589,22 @@ const FinanceiroProjetos = () => {
                   return (
                     <div className="grid grid-cols-2 gap-12">
                       <div className="space-y-6">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/[0.4] mb-4">Resultado Estimado</h3>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Resultado Estimado</h3>
                         <div className="space-y-3">
-                          <div className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] uppercase tracking-widest text-white/[0.4]">Receita Bruta</span>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">Receita Bruta</span>
                             <span className="text-sm font-bold">R$ {receitaBruta.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] uppercase tracking-widest text-white/[0.4]">(-) ISS (2%)</span>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) ISS (2%)</span>
                             <span className="text-sm text-red-400">R$ {iss.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] uppercase tracking-widest text-white/[0.4]">(-) Simples Nacional (6%)</span>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Simples Nacional (6%)</span>
                             <span className="text-sm text-red-400">R$ {simples.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
-                          <div className="flex justify-between items-center py-2 border-b border-white/[0.06]">
-                            <span className="text-[10px] uppercase tracking-widest text-white/[0.4]">(-) Custos Fixos</span>
+                          <div className="flex justify-between items-center py-2 border-b border-white/5">
+                            <span className="text-[10px] uppercase tracking-widest text-white/40">(-) Custos Fixos</span>
                             <span className="text-sm text-red-400">R$ {custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                           </div>
                           <div className="flex justify-between items-center pt-4">
@@ -1617,18 +1617,18 @@ const FinanceiroProjetos = () => {
                       </div>
 
                       <div className="space-y-6">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/[0.4] mb-4">Capacidade Operacional</h3>
-                        <div className="bg-white/[0.06] p-6 border border-white/[0.06] space-y-6 text-center">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-white/40 mb-4">Capacidade Operacional</h3>
+                        <div className="bg-white/5 p-6 border border-white/5 space-y-6 text-center">
                           <div>
-                            <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Horas Necessárias</p>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Necessárias</p>
                             <p className="text-2xl font-bold font-inter">{horasNecessarias.toFixed(0)}h</p>
                           </div>
                           <div>
-                            <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Capacidade Disponível</p>
-                            <p className="text-2xl font-bold font-inter text-white/[0.18]">{capacidadeDisponivel}h</p>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Capacidade Disponível</p>
+                            <p className="text-2xl font-bold font-inter text-white/20">{capacidadeDisponivel}h</p>
                           </div>
-                          <div className="pt-4 border-t border-white/[0.06]">
-                            <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Viabilidade</p>
+                          <div className="pt-4 border-t border-white/5">
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Viabilidade</p>
                             <p className={cn("text-xl font-bold tracking-widest", viabilidadeColor)}>{viabilidade}</p>
                           </div>
                         </div>
@@ -1642,7 +1642,7 @@ const FinanceiroProjetos = () => {
                             ]}>
                               <XAxis dataKey="name" hide />
                               <YAxis hide />
-                              <Tooltip contentStyle={{ backgroundColor: '#161616', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                              <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
                               <Bar dataKey="val">
                                 {[
                                   { fill: '#8B7355' },
@@ -1665,27 +1665,27 @@ const FinanceiroProjetos = () => {
 
           <TabsContent value="ponto_equilibrio">
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white/[0.06] border border-bronze/20 p-12 text-center space-y-8 relative overflow-hidden">
+              <div className="bg-white/5 border border-bronze/20 p-12 text-center space-y-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                   <Target size={120} className="text-bronze" />
                 </div>
                 
                 <div>
-                  <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white/[0.4] mb-2">Ponto de Equilíbrio do Mês</h2>
-                  <p className="text-[10px] text-white/[0.18] uppercase">Acompanhamento em tempo real dos custos vs faturamento</p>
+                  <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white/40 mb-2">Ponto de Equilíbrio do Mês</h2>
+                  <p className="text-[10px] text-white/20 uppercase">Acompanhamento em tempo real dos custos vs faturamento</p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-8 text-left border-y border-white/[0.06] py-8">
+                <div className="grid grid-cols-3 gap-8 text-left border-y border-white/5 py-8">
                   <div>
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Custos Fixos Totais</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Custos Fixos Totais</p>
                     <p className="text-xl font-bold font-inter">R$ {breakEven.custosFixos.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Impostos Estimados</p>
-                    <p className="text-xl font-bold font-inter text-white/[0.4]">R$ {breakEven.impostosEstimados.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Impostos Estimados</p>
+                    <p className="text-xl font-bold font-inter text-white/40">R$ {breakEven.impostosEstimados.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Total a Cobrir</p>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Total a Cobrir</p>
                     <p className="text-xl font-bold font-inter text-bronze">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                   </div>
                 </div>
@@ -1693,16 +1693,16 @@ const FinanceiroProjetos = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <div className="text-left">
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Faturado até agora</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Faturado até agora</p>
                       <p className="text-2xl font-bold font-inter">R$ {breakEven.faturado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-1">Meta de Cobertura</p>
-                      <p className="text-sm font-bold font-inter text-white/[0.18]">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Meta de Cobertura</p>
+                      <p className="text-sm font-bold font-inter text-white/20">R$ {breakEven.totalACobrir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                   </div>
                   
-                  <div className="h-4 bg-white/[0.06] w-full rounded-none overflow-hidden p-1 border border-white/[0.12]">
+                  <div className="h-4 bg-white/5 w-full rounded-none overflow-hidden p-1 border border-white/10">
                     <div 
                       className={cn(
                         "h-full transition-all duration-1000",
@@ -1723,7 +1723,7 @@ const FinanceiroProjetos = () => {
                       {breakEven.percentual.toFixed(1)}% Coberto
                     </span>
                     {breakEven.percentual < 100 ? (
-                      <span className="text-white/[0.18]">Faltam R$ {(breakEven.totalACobrir - breakEven.faturado).toLocaleString('pt-BR')}</span>
+                      <span className="text-white/20">Faltam R$ {(breakEven.totalACobrir - breakEven.faturado).toLocaleString('pt-BR')}</span>
                     ) : (
                       <span className="text-bronze">Margem de Segurança: R$ {(breakEven.faturado - breakEven.totalACobrir).toLocaleString('pt-BR')}</span>
                     )}
@@ -1731,18 +1731,18 @@ const FinanceiroProjetos = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div className="bg-white/[0.06] p-6 border border-white/[0.06]">
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Equivalência em Projetos</p>
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Equivalência em Projetos</p>
                     <p className="text-lg font-bold font-inter">
                       {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / 15000)} PROJETOS 
-                      <span className="text-[10px] text-white/[0.18] ml-2">DE TICKET MÉDIO R$ 15k</span>
+                      <span className="text-[10px] text-white/20 ml-2">DE TICKET MÉDIO R$ 15k</span>
                     </p>
                   </div>
-                  <div className="bg-white/[0.06] p-6 border border-white/[0.06]">
-                    <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-2">Horas Faturáveis Necessárias</p>
+                  <div className="bg-white/5 p-6 border border-white/5">
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest mb-2">Horas Faturáveis Necessárias</p>
                     <p className="text-lg font-bold font-inter">
                       {Math.ceil((breakEven.totalACobrir - breakEven.faturado) / (configEscritorio?.custo_hora || 150))} HORAS
-                      <span className="text-[10px] text-white/[0.18] ml-2">A R$ {(configEscritorio?.custo_hora || 150)}/h</span>
+                      <span className="text-[10px] text-white/20 ml-2">A R$ {(configEscritorio?.custo_hora || 150)}/h</span>
                     </p>
                   </div>
                 </div>
@@ -1752,7 +1752,7 @@ const FinanceiroProjetos = () => {
 
           <TabsContent value="sazonalidade">
             <div className="space-y-8">
-              <div className="bg-white/[0.06] border border-white/[0.06] p-8 h-[450px]">
+              <div className="bg-white/5 border border-white/5 p-8 h-[450px]">
                 <div className="flex justify-between items-center mb-8">
                   <div>
                     <h3 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
@@ -1763,19 +1763,19 @@ const FinanceiroProjetos = () => {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-bronze"></div>
-                      <span className="text-[10px] uppercase text-white/[0.4]">Receita</span>
+                      <span className="text-[10px] uppercase text-white/40">Receita</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-[1px] bg-bronze/40 border-t border-dashed"></div>
-                      <span className="text-[10px] uppercase text-white/[0.4]">Média Anual</span>
+                      <span className="text-[10px] uppercase text-white/40">Média Anual</span>
                     </div>
                   </div>
                 </div>
 
                 {sazonalidade.data.filter(d => d.receita > 0).length < 3 ? (
                   <div className="h-[300px] flex flex-col items-center justify-center text-center gap-4">
-                    <Activity size={32} className="text-white/[0.12]" />
-                    <p className="text-white/[0.4] text-sm italic">Dados insuficientes — continue registrando recebimentos para ver a sazonalidade.</p>
+                    <Activity size={32} className="text-white/10" />
+                    <p className="text-white/40 text-sm italic">Dados insuficientes — continue registrando recebimentos para ver a sazonalidade.</p>
                   </div>
                 ) : (
                   <div className="h-[320px] w-full">
@@ -1795,7 +1795,7 @@ const FinanceiroProjetos = () => {
                           tickFormatter={(value) => `R$ ${value >= 1000 ? (value / 1000) + 'k' : value}`}
                         />
                         <Tooltip 
-                          contentStyle={{ backgroundColor: '#161616', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
+                          contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }}
                           itemStyle={{ color: '#fff' }}
                         />
                         <Bar dataKey="receita" radius={[2, 2, 0, 0]}>
@@ -1813,39 +1813,39 @@ const FinanceiroProjetos = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-6">
-                <div className="bg-white/[0.06] border border-white/[0.06] p-6">
-                  <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-4">Melhor Período</p>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Melhor Período</p>
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-green-500/10 text-green-500">
                       <ArrowUpRight size={20} />
                     </div>
                     <div>
                       <p className="text-lg font-bold font-inter uppercase">{sazonalidade.top3[0] || '-'}</p>
-                      <p className="text-[10px] text-white/[0.18] uppercase">Maior volume histórico</p>
+                      <p className="text-[10px] text-white/20 uppercase">Maior volume histórico</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/[0.06] border border-white/[0.06] p-6">
-                  <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-4">Média de Faturamento</p>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Média de Faturamento</p>
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-bronze/10 text-bronze">
                       <Target size={20} />
                     </div>
                     <div>
                       <p className="text-lg font-bold font-inter">R$ {sazonalidade.mediaAnual.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}</p>
-                      <p className="text-[10px] text-white/[0.18] uppercase">Mensal consolidada</p>
+                      <p className="text-[10px] text-white/20 uppercase">Mensal consolidada</p>
                     </div>
                   </div>
                 </div>
-                <div className="bg-white/[0.06] border border-white/[0.06] p-6">
-                  <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-4">Tendência Próximo Mês</p>
+                <div className="bg-white/5 border border-white/5 p-6">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tendência Próximo Mês</p>
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-500/10 text-blue-500">
                       <Activity size={20} />
                     </div>
                     <div>
                       <p className="text-lg font-bold font-inter">ESTÁVEL</p>
-                      <p className="text-[10px] text-white/[0.18] uppercase">Baseado no histórico</p>
+                      <p className="text-[10px] text-white/20 uppercase">Baseado no histórico</p>
                     </div>
                   </div>
                 </div>
@@ -1855,7 +1855,7 @@ const FinanceiroProjetos = () => {
 
           <TabsContent value="rentabilidade_m2">
             <div className="space-y-8">
-              <div className="bg-white/[0.06] border border-white/[0.06] p-8">
+              <div className="bg-white/5 border border-white/5 p-8">
                 <h3 className="text-xs font-bold uppercase tracking-widest mb-8 flex items-center gap-2">
                   <Layers size={14} className="text-bronze" />
                   Performance por m² e Tipo de Projeto
@@ -1864,19 +1864,19 @@ const FinanceiroProjetos = () => {
                 <div className="overflow-hidden">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-white/[0.06]">
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold">Tipo de Projeto</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-center">Projetos</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-center">m² Total</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-right">Receita Total</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-right">Lucro Total</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-right">R$ / m²</th>
-                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/[0.4] font-bold text-right">Margem</th>
+                      <tr className="border-b border-white/5">
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold">Tipo de Projeto</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">Projetos</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-center">m² Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Receita Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Lucro Total</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">R$ / m²</th>
+                        <th className="py-4 text-[10px] uppercase tracking-widest text-white/40 font-bold text-right">Margem</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/[0.06]">
+                    <tbody className="divide-y divide-white/5">
                       {rentabilidadePorM2.map((item) => (
-                        <tr key={item.tipo} className="hover:bg-white/[0.06] transition-colors group">
+                        <tr key={item.tipo} className="hover:bg-white/5 transition-colors group">
                           <td className="py-4 text-xs font-bold uppercase tracking-widest text-bronze">{item.tipo}</td>
                           <td className="py-4 text-xs font-bold text-center font-inter">{item.projetos}</td>
                           <td className="py-4 text-xs text-center font-inter text-white/60">{item.m2Total.toFixed(0)} m²</td>
@@ -1892,28 +1892,28 @@ const FinanceiroProjetos = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white/[0.06] border border-white/[0.06] p-8">
-                  <h3 className="text-[10px] uppercase tracking-widest text-white/[0.4] mb-6">Comparativo R$ / m²</h3>
+                <div className="bg-white/5 border border-white/5 p-8">
+                  <h3 className="text-[10px] uppercase tracking-widest text-white/40 mb-6">Comparativo R$ / m²</h3>
                   <div className="h-[200px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={rentabilidadePorM2}>
                         <XAxis dataKey="tipo" axisLine={false} tickLine={false} tick={{ fill: '#777777', fontSize: 10 }} />
                         <YAxis hide />
-                        <Tooltip contentStyle={{ backgroundColor: '#161616', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: '#1A1816', border: '1px solid rgba(255,255,255,0.1)', fontSize: '10px' }} />
                         <Bar dataKey="rsPorM2" fill="#8B7355" radius={[2, 2, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="bg-white/[0.06] border border-bronze/20 p-8 flex flex-col justify-center text-center">
-                  <p className="text-[10px] text-white/[0.4] uppercase tracking-widest mb-4">Tipo mais rentável por m²</p>
+                <div className="bg-white/5 border border-bronze/20 p-8 flex flex-col justify-center text-center">
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest mb-4">Tipo mais rentável por m²</p>
                   {(() => {
                     const top = [...rentabilidadePorM2].sort((a, b) => b.rsPorM2 - a.rsPorM2)[0];
                     return top ? (
                       <>
                         <p className="text-3xl font-bold uppercase tracking-tighter text-bronze mb-2">{top.tipo}</p>
                         <p className="text-xl font-bold font-inter">R$ {top.rsPorM2.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}/m²</p>
-                        <p className="text-[10px] text-white/[0.18] uppercase mt-4">Margem média de {top.margem.toFixed(1)}%</p>
+                        <p className="text-[10px] text-white/20 uppercase mt-4">Margem média de {top.margem.toFixed(1)}%</p>
                       </>
                     ) : '-';
                   })()}
@@ -1925,11 +1925,11 @@ const FinanceiroProjetos = () => {
           <TabsContent value="alertas">
             <div className="max-w-4xl mx-auto space-y-4">
               {activeAlerts.length === 0 ? (
-                <div className="bg-white/[0.06] border border-green-500/20 p-12 text-center flex flex-col items-center gap-4">
+                <div className="bg-white/5 border border-green-500/20 p-12 text-center flex flex-col items-center gap-4">
                   <CheckCircle2 className="text-green-500 w-12 h-12" />
                   <div>
                     <h3 className="text-green-500 font-bold uppercase tracking-widest">Tudo sob controle</h3>
-                    <p className="text-white/[0.4] text-xs mt-2">Nenhum alerta crítico ou preditivo no momento.</p>
+                    <p className="text-white/40 text-xs mt-2">Nenhum alerta crítico ou preditivo no momento.</p>
                   </div>
                 </div>
               ) : (
@@ -1959,7 +1959,7 @@ const FinanceiroProjetos = () => {
                         </div>
                         <div>
                           <p className="text-sm font-bold text-white group-hover:translate-x-1 transition-transform">{alerta.mensagem}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-white/[0.18] mt-1">Alerta {alerta.tipo.replace('_', ' ')}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-white/20 mt-1">Alerta {alerta.tipo.replace('_', ' ')}</p>
                         </div>
                       </div>
                       
@@ -1968,7 +1968,7 @@ const FinanceiroProjetos = () => {
                           variant="outline" 
                           size="sm"
                           onClick={() => alerta.tab && setActiveTab(alerta.tab)}
-                          className="rounded-none border-white/[0.12] text-[9px] uppercase tracking-widest hover:bg-white/[0.12]"
+                          className="rounded-none border-white/10 text-[9px] uppercase tracking-widest hover:bg-white/10"
                         >
                           {alerta.acao}
                         </Button>
@@ -1993,8 +1993,8 @@ const FinanceiroProjetos = () => {
                     size="sm"
                     onClick={() => setLucroFilter(filter.id as any)}
                     className={cn(
-                      "text-[10px] uppercase tracking-widest rounded-none border border-white/[0.06]",
-                      lucroFilter === filter.id ? "bg-white/[0.12] text-white" : "text-white/[0.4]"
+                      "text-[10px] uppercase tracking-widest rounded-none border border-white/5",
+                      lucroFilter === filter.id ? "bg-white/10 text-white" : "text-white/40"
                     )}
                   >
                     {filter.label}
@@ -2006,14 +2006,14 @@ const FinanceiroProjetos = () => {
                 <div className="flex gap-2 items-center">
                   <Input 
                     type="date" 
-                    className="bg-white/[0.06] border-white/[0.12] rounded-none h-8 text-[10px] w-32"
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
                     value={lucroCustomDates.start}
                     onChange={e => setLucroCustomDates({ ...lucroCustomDates, start: e.target.value })}
                   />
-                  <span className="text-white/[0.18] text-[10px] uppercase">até</span>
+                  <span className="text-white/20 text-[10px] uppercase">até</span>
                   <Input 
                     type="date" 
-                    className="bg-white/[0.06] border-white/[0.12] rounded-none h-8 text-[10px] w-32"
+                    className="bg-white/5 border-white/10 rounded-none h-8 text-[10px] w-32"
                     value={lucroCustomDates.end}
                     onChange={e => setLucroCustomDates({ ...lucroCustomDates, end: e.target.value })}
                   />
@@ -2022,8 +2022,8 @@ const FinanceiroProjetos = () => {
             </div>
 
             {projetosLucratividade.length === 0 ? (
-              <div className="bg-white/[0.06] border border-white/[0.06] p-12 text-center flex flex-col items-center gap-6">
-                <AlertCircle className="text-white/[0.18] w-8 h-8" />
+              <div className="bg-white/5 border border-white/5 p-12 text-center flex flex-col items-center gap-6">
+                <AlertCircle className="text-white/20 w-8 h-8" />
                 <div className="max-w-md">
                   <p className="text-white/60 text-sm mb-2">
                     Nenhum projeto com movimentação {
@@ -2032,14 +2032,14 @@ const FinanceiroProjetos = () => {
                       'no período selecionado'
                     }.
                   </p>
-                  <p className="text-white/[0.18] text-xs italic mb-6">
+                  <p className="text-white/20 text-xs italic mb-6">
                     Para visualizar a lucratividade, é necessário registrar horas trabalhadas no Módulo 03 ou lançar o recebimento de parcelas (status PAGO) dentro deste intervalo.
                   </p>
                   
                   <div className="flex gap-4 justify-center">
                     <Button 
                       onClick={() => navigate('/projetos/horas')}
-                      className="bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.12] rounded-none text-[10px] uppercase tracking-widest px-6 h-10 flex items-center gap-2"
+                      className="bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[10px] uppercase tracking-widest px-6 h-10 flex items-center gap-2"
                     >
                       <Clock size={14} className="text-bronze" />
                       Registrar Horas (Mod 03)
@@ -2058,7 +2058,7 @@ const FinanceiroProjetos = () => {
               <div className="space-y-6">
                 {/* Summary Card */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white/[0.06] p-8 border border-white/[0.06]">
+                  <div className="bg-white/5 p-8 border border-white/5">
                     <span className="text-[11px] text-[#777777] uppercase font-normal font-inter block mb-2">Margem Média Geral</span>
                     <div className="flex items-center gap-4">
                       <span className={cn(
@@ -2067,7 +2067,7 @@ const FinanceiroProjetos = () => {
                       )}>
                         {(lucroResumo?.margemMedia || 0).toFixed(1)}%
                       </span>
-                      <div className="h-1 flex-1 bg-white/[0.12] rounded-full overflow-hidden">
+                      <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
                         <div 
                           className={cn(
                             "h-full transition-all",
@@ -2078,12 +2078,12 @@ const FinanceiroProjetos = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="bg-white/[0.06] p-8 border border-white/[0.06]">
+                  <div className="bg-white/5 p-8 border border-white/5">
                     <span className="text-[11px] text-[#777777] uppercase font-normal font-inter block mb-2">Total Recebido vs Custo Real</span>
                     <div className="grid grid-cols-2 gap-8">
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Recebido</p>
-                        <p className="text-[22px] font-normal text-[#F0EDE8] font-inter">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Custo Total</p>
@@ -2096,11 +2096,11 @@ const FinanceiroProjetos = () => {
                 {/* Projects Grid */}
                 <div className="grid grid-cols-3 gap-4">
                   {projetosLucratividade.map(proj => (
-                    <div key={proj.id} className="bg-white/[0.06] border border-white/[0.06] p-6 hover:border-white/[0.12] transition-colors flex flex-col">
+                    <div key={proj.id} className="bg-white/5 border border-white/5 p-6 hover:border-white/10 transition-colors flex flex-col">
                       <div className="flex justify-between items-start mb-6">
                         <div>
                           <h3 className="text-sm font-bold uppercase tracking-tight">{proj.nome_cliente}</h3>
-                          <span className="text-[10px] text-white/[0.4] uppercase tracking-widest">{proj.tipo}</span>
+                          <span className="text-[10px] text-white/40 uppercase tracking-widest">{proj.tipo}</span>
                         </div>
                         <Badge className={cn(
                           "border-none rounded-none text-[10px] px-2",
@@ -2114,14 +2114,14 @@ const FinanceiroProjetos = () => {
 
                       <div className="space-y-4 flex-1">
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-white/[0.4]">Receita Total</span>
+                          <span className="text-white/40">Receita Total</span>
                           <span className="font-bold">R$ {proj.receitaTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
                         
                         {/* Horas Orçadas vs Reais */}
-                        <div className="space-y-2 py-3 border-y border-white/[0.06]">
+                        <div className="space-y-2 py-3 border-y border-white/5">
                           <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                            <span className="text-white/[0.4]">Horas Reais</span>
+                            <span className="text-white/40">Horas Reais</span>
                             <span className={cn(
                               "font-bold",
                               proj.horasEstimadas > 0 && proj.horasReais > proj.horasEstimadas ? "text-red-500" : "text-white"
@@ -2131,7 +2131,7 @@ const FinanceiroProjetos = () => {
                             </span>
                           </div>
                           {proj.horasEstimadas > 0 && (
-                            <div className="h-1 bg-white/[0.12] w-full rounded-full overflow-hidden">
+                            <div className="h-1 bg-white/10 w-full rounded-full overflow-hidden">
                               <div 
                                 className={cn(
                                   "h-full transition-all",
@@ -2145,13 +2145,13 @@ const FinanceiroProjetos = () => {
                         </div>
 
                         <div className="flex justify-between text-[10px] uppercase tracking-widest">
-                          <span className="text-white/[0.4]">Custo Real</span>
+                          <span className="text-white/40">Custo Real</span>
                           <span className="font-bold">R$ {proj.custoReal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
                         
                         {/* Break-even Indicator (Simplified Logic) */}
                         {proj.dataInicio && (
-                          <div className="flex items-center gap-2 text-[9px] text-white/[0.18] uppercase tracking-tighter">
+                          <div className="flex items-center gap-2 text-[9px] text-white/20 uppercase tracking-tighter">
                             <Target size={10} />
                             Início: {format(parseISO(proj.dataInicio), 'MMM/yy', { locale: ptBR })}
                             {proj.margemRS > 0 && " • Ponto de Equilíbrio Atingido"}
@@ -2159,7 +2159,7 @@ const FinanceiroProjetos = () => {
                         )}
                       </div>
 
-                      <div className="pt-4 mt-4 border-t border-white/[0.06] flex justify-between items-center">
+                      <div className="pt-4 mt-4 border-t border-white/5 flex justify-between items-center">
                         <span className="text-[10px] uppercase tracking-widest font-bold">Margem Líquida</span>
                         <span className={cn(
                           "text-sm font-bold",
@@ -2178,36 +2178,36 @@ const FinanceiroProjetos = () => {
 
         {/* Modal Confirmação */}
         <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-          <DialogContent className="bg-[#0D0D0D] border-white/[0.12] text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm uppercase tracking-widest font-bold">Confirmar Recebimento</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Data do Recebimento</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40">Data do Recebimento</label>
                 <Input 
                   type="date" 
-                  className="bg-white/[0.06] border-white/[0.12] rounded-none h-12 text-sm"
+                  className="bg-white/5 border-white/10 rounded-none h-12 text-sm"
                   value={confirmData.data}
                   onChange={e => setConfirmData({ ...confirmData, data: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Valor Recebido (R$)</label>
+                <label className="text-[10px] uppercase tracking-widest text-white/40">Valor Recebido (R$)</label>
                 <Input 
                   type="number" 
-                  className="bg-white/[0.06] border-white/[0.12] rounded-none h-12 text-sm"
+                  className="bg-white/5 border-white/10 rounded-none h-12 text-sm"
                   value={confirmData.valor}
                   onChange={e => setConfirmData({ ...confirmData, valor: e.target.value })}
                 />
               </div>
 
-              <div className="pt-4 border-t border-white/[0.06] space-y-4">
+              <div className="pt-4 border-t border-white/5 space-y-4">
                 <div className="flex items-center space-x-2">
                   <input 
                     type="checkbox" 
                     id="nf_emitida"
-                    className="w-4 h-4 rounded-none border-white/[0.12] bg-white/[0.06] accent-bronze"
+                    className="w-4 h-4 rounded-none border-white/10 bg-white/5 accent-bronze"
                     checked={confirmData.nf_emitida}
                     onChange={e => setConfirmData({ ...confirmData, nf_emitida: e.target.checked })}
                   />
@@ -2217,19 +2217,19 @@ const FinanceiroProjetos = () => {
                 {confirmData.nf_emitida && (
                   <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-1">
                     <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Número da Nota</label>
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Número da Nota</label>
                       <Input 
                         placeholder="Ex: 2024001"
-                        className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
                         value={confirmData.nf_numero}
                         onChange={e => setConfirmData({ ...confirmData, nf_numero: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Data de Emissão</label>
+                      <label className="text-[10px] uppercase tracking-widest text-white/40">Data de Emissão</label>
                       <Input 
                         type="date" 
-                        className="bg-white/[0.06] border-white/[0.12] rounded-none h-10 text-xs"
+                        className="bg-white/5 border-white/10 rounded-none h-10 text-xs"
                         value={confirmData.nf_data_emissao}
                         onChange={e => setConfirmData({ ...confirmData, nf_data_emissao: e.target.value })}
                       />

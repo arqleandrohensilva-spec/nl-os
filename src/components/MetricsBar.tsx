@@ -13,20 +13,20 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }: MetricCardProps) => (
-  <div className="flex-1 px-8 py-7 border-r border-white/[0.12] last:border-r-0 relative group hover:bg-white/[0.03] transition-colors flex flex-col gap-1 bg-[#0D0D0D]">
+  <div className="flex-1 px-8 py-7 border-r border-white/10 last:border-r-0 relative group hover:bg-white/[0.03] transition-colors flex flex-col gap-1 bg-[#0A0A0A]">
     <div className="flex items-center gap-2 mb-2">
-      <span className="text-[11px] text-white/[0.4] uppercase font-normal font-inter">{label}</span>
+      <span className="text-[11px] text-white/40 uppercase font-normal font-inter">{label}</span>
       {pulse && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
     </div>
     
     <div className={cn(
       "text-[22px] font-normal font-inter",
-      isNegative ? "text-red-500" : "text-[#F0EDE8]"
+      isNegative ? "text-red-500" : "text-[#FFFFFF]"
     )}>
       {value}
     </div>
     
-    {subLabel && <div className="mt-2 text-[10px] text-white/[0.4] uppercase font-normal font-inter">{subLabel}</div>}
+    {subLabel && <div className="mt-2 text-[10px] text-white/40 uppercase font-normal font-inter">{subLabel}</div>}
     
     <div className={cn(
       "absolute bottom-0 left-0 right-0 h-[1px] transition-opacity",
@@ -100,16 +100,16 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
   };
 
   return (
-    <div className="flex flex-col bg-[#0D0D0D] border-b border-white/[0.12]">
-      <div className="flex border-b border-white/[0.12]">
+    <div className="flex flex-col bg-[#0A0A0A] border-b border-white/10">
+      <div className="flex border-b border-white/10">
         <div className="flex-1 px-10 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-[9px] font-bold text-white/[0.4] uppercase tracking-[0.2em]">Meta do Mês:</span>
+            <span className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em]">Meta do Mês:</span>
             <span className={cn("text-[10px] font-bold uppercase tracking-widest", corTextoMeta)}>
               {fechadosMes} de {metaFechamentos} projetos fechados
             </span>
           </div>
-          <div className="flex-1 max-w-md ml-8 h-1 bg-white/[0.06] rounded-full overflow-hidden">
+          <div className="flex-1 max-w-md ml-8 h-1 bg-white/5 rounded-full overflow-hidden">
             <div 
               className={cn("h-full transition-all duration-1000", corMeta)} 
               style={{ width: `${percentualMeta}%` }}

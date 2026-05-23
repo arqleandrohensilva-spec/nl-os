@@ -130,14 +130,14 @@ const ClientesLista = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#0D0D0D] text-[#F0EDE8]">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-10">
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-['Courier_New'] font-bold text-[#8B7355] tracking-tighter uppercase">CLIENTES</h1>
-            <p className="text-[10px] text-white/[0.4] uppercase tracking-[0.3em] mt-1 font-['Courier_New']">Gestão da carteira NL OS</p>
+            <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1 font-['Courier_New']">Gestão da carteira NL OS</p>
           </div>
           
           <Button 
@@ -155,26 +155,26 @@ const ClientesLista = () => {
               <div className="bg-[#555555] text-white px-2 py-0.5 text-[10px] font-bold font-['Courier_New'] uppercase tracking-widest">
                 {briefingsPendentes.length}
               </div>
-              <h2 className="text-sm font-['Courier_New'] font-bold text-[#F0EDE8] tracking-widest uppercase">AGUARDANDO TRIAGEM</h2>
+              <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF] tracking-widest uppercase">AGUARDANDO TRIAGEM</h2>
             </div>
 
             <div className="space-y-4">
               {briefingsPendentes.map((briefing) => (
                 <div 
                   key={briefing.id}
-                  className="bg-[#161616] border border-white/[0.12] border border-[#1E1E1E] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="bg-[#1A1816] border border-[#2A2A2A] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-[9px] font-['Courier_New'] font-bold text-[#555] uppercase tracking-[0.2em]">PRÉ-BRIEFING</span>
-                      <span className="text-[10px] text-white/[0.18] uppercase tracking-widest font-medium">
+                      <span className="text-[10px] text-white/20 uppercase tracking-widest font-medium">
                         {briefing.preenchido_em ? `Recebido há ${formatDistanceToNow(new Date(briefing.preenchido_em), { locale: ptBR })}` : 'Recentemente'}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-[#F0EDE8] mb-2 uppercase font-['Courier_New'] tracking-tight">
+                    <h3 className="text-lg font-bold text-[#E8E4DF] mb-2 uppercase font-['Courier_New'] tracking-tight">
                       {briefing.nome}
                     </h3>
-                    <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-white/[0.4]">
+                    <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-white/40">
                       <div className="flex items-center gap-2">
                         <User size={14} className="text-[#8B7355]/40" />
                         <span className="text-[10px] uppercase tracking-wider">
@@ -199,14 +199,14 @@ const ClientesLista = () => {
                         setSelectedBriefing(briefing);
                         setIsModalOpen(true);
                       }}
-                      className="border-[#1E1E1E] bg-transparent hover:bg-white/[0.06] text-[#8B7355] rounded-none px-4 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-all"
+                      className="border-[#2A2A2A] bg-transparent hover:bg-white/5 text-[#8B7355] rounded-none px-4 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-all"
                     >
                       <Eye size={14} className="mr-2" />
                       VER BRIEFING
                     </Button>
                     <Button 
                       onClick={() => handleAprovar(briefing)}
-                      className="bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0D0D0D] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                      className="bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0F0E0C] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
                     >
                       <Check size={14} className="mr-2" />
                       APROVAR
@@ -214,7 +214,7 @@ const ClientesLista = () => {
                     <Button 
                       variant="outline"
                       onClick={() => handleArquivar(briefing.id)}
-                      className="border-[#1E1E1E] bg-transparent hover:bg-white/[0.06] text-white/[0.4] rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                      className="border-[#3A3A3A] bg-transparent hover:bg-white/5 text-white/40 rounded-none px-6 h-10 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
                     >
                       <XIcon size={14} className="mr-2" />
                       ARQUIVAR
@@ -224,21 +224,21 @@ const ClientesLista = () => {
                 </div>
               ))}
             </div>
-            <div className="h-px bg-white/[0.06] my-12" />
+            <div className="h-px bg-white/5 my-12" />
           </div>
         )}
 
         <div className="flex items-center gap-3 mb-8">
-          <h2 className="text-sm font-['Courier_New'] font-bold text-[#F0EDE8]/40 tracking-widest uppercase">CARTEIRA DE CLIENTES</h2>
+          <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF]/40 tracking-widest uppercase">CARTEIRA DE CLIENTES</h2>
         </div>
 
         <div className="relative mb-8 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/[0.18] group-focus-within:text-[#8B7355] transition-colors" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-[#8B7355] transition-colors" size={18} />
           <Input 
             placeholder="BUSCAR POR NOME, CIDADE OU TIPO..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-white/[0.06] border-white/[0.12] focus:border-[#8B7355] rounded-none pl-12 h-14 font-['Courier_New'] text-xs tracking-widest uppercase text-white"
+            className="bg-white/5 border-white/10 focus:border-[#8B7355] rounded-none pl-12 h-14 font-['Courier_New'] text-xs tracking-widest uppercase text-white"
           />
         </div>
 
@@ -252,14 +252,14 @@ const ClientesLista = () => {
               <div 
                 key={cliente.id}
                 onClick={() => navigate(`/clientes/${cliente.id}`)}
-                className="bg-[#161616] border border-white/[0.12] border border-white/[0.06] p-6 hover:border-[#8B7355]/50 transition-all cursor-pointer group relative overflow-hidden"
+                className="bg-[#1A1816] border border-white/5 p-6 hover:border-[#8B7355]/50 transition-all cursor-pointer group relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-1 h-full bg-[#8B7355] opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="flex justify-between items-start mb-4">
                   <div className={cn(
                     "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-[1px]",
-                    STATUS_BADGES[cliente.status_comercial]?.color || 'bg-white/[0.12] text-white/[0.4]'
+                    STATUS_BADGES[cliente.status_comercial]?.color || 'bg-white/10 text-white/40'
                   )}>
                     {cliente.status_comercial || 'Novo Lead'}
                   </div>
@@ -270,15 +270,15 @@ const ClientesLista = () => {
                 </h3>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-white/[0.4]">
+                  <div className="flex items-center gap-3 text-white/40">
                     <MapPin size={14} className="text-[#8B7355]" />
                     <span className="text-[10px] uppercase tracking-wider">{cliente.cidade || '—'}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white/[0.4]">
+                  <div className="flex items-center gap-3 text-white/40">
                     <Phone size={14} className="text-[#8B7355]" />
                     <span className="text-[10px] uppercase tracking-wider">{cliente.whatsapp || '—'}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white/[0.4] border-t border-white/[0.06] pt-3 mt-3">
+                  <div className="flex items-center gap-3 text-white/40 border-t border-white/5 pt-3 mt-3">
                     <User size={14} className="text-[#8B7355]/40" />
                     <span className="text-[9px] uppercase tracking-[0.2em] font-bold">
                       {cliente.tipo_projeto || 'SEM PROJETO'}
@@ -291,8 +291,8 @@ const ClientesLista = () => {
         )}
 
         {filteredClientes?.length === 0 && !isLoading && (
-          <div className="text-center py-20 border border-dashed border-white/[0.12]">
-            <p className="text-white/[0.18] text-xs uppercase tracking-widest font-['Courier_New']">Nenhum cliente encontrado</p>
+          <div className="text-center py-20 border border-dashed border-white/10">
+            <p className="text-white/20 text-xs uppercase tracking-widest font-['Courier_New']">Nenhum cliente encontrado</p>
           </div>
         )}
       </main>

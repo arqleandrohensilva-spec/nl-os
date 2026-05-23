@@ -371,13 +371,13 @@ const PropostaCalculadora = () => {
     }
   };
 
-  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0D0D0D] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
+  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white font-sans">
-      <header className="border-b border-white/[0.06] bg-black/50 backdrop-blur-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
+      <header className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Button variant="ghost" className="text-white/[0.4] gap-2" onClick={() => navigate('/calculadora')}>
+          <Button variant="ghost" className="text-white/40 gap-2" onClick={() => navigate('/calculadora')}>
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
@@ -388,12 +388,12 @@ const PropostaCalculadora = () => {
                     placeholder="NOME DO CLIENTE"
                     value={proposal.cliente}
                     onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
-                    className="bg-white/[0.06] border-white/[0.12] h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
+                    className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
                   />
                 </div>
                 <div className="flex items-center gap-4">
                   <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
-                    <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/[0.06] border-white/[0.12] rounded-none text-white/[0.4]">
+                    <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -402,23 +402,23 @@ const PropostaCalculadora = () => {
                       <SelectItem value="Comercial">Comercial</SelectItem>
                     </SelectContent>
                   </Select>
-                  <span className="text-white/[0.18]">·</span>
+                  <span className="text-white/20">·</span>
                   <Input 
                     placeholder="CIDADE"
                     value={proposal.cidade}
                     onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
-                    className="bg-white/[0.06] border-white/[0.12] h-6 w-32 text-[10px] uppercase tracking-widest text-white/[0.4] placeholder:text-white/[0.18] rounded-none"
+                    className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
                   />
-                  <span className="text-white/[0.18]">·</span>
+                  <span className="text-white/20">·</span>
                   <div className="flex items-center gap-1">
                     <Input 
                       type="number"
                       placeholder="ÁREA"
                       value={proposal.area || ''}
                       onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
-                      className="bg-white/[0.06] border-white/[0.12] h-6 w-20 text-[10px] uppercase tracking-widest text-white/[0.4] placeholder:text-white/[0.18] rounded-none"
+                      className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
                     />
-                    <span className="text-[10px] uppercase tracking-widest text-white/[0.4]">m²</span>
+                    <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
                   </div>
                 </div>
               </div>
@@ -427,7 +427,7 @@ const PropostaCalculadora = () => {
                 <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
                   CALCULADORA DE PROPOSTA · {proposal.cliente}
                 </h1>
-                <p className="text-[10px] uppercase tracking-widest text-white/[0.4] mt-1">
+                <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
                   {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
                 </p>
               </>
@@ -440,9 +440,9 @@ const PropostaCalculadora = () => {
           <div className="lg:col-span-6 space-y-10">
             
             {/* Block 1 - Base Info */}
-            <section className="bg-white/[0.02] border border-white/[0.06] p-8 rounded-2xl">
+            <section className="bg-white/[0.02] border border-white/5 p-8 rounded-2xl">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/[0.4]">BASE DE CÁLCULO</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">BASE DE CÁLCULO</h2>
                 <Link to="/financeiro/base" className="text-[10px] uppercase tracking-widest text-bronze hover:underline flex items-center gap-1">
                   Alterar na Base Financeira <ExternalLink size={10} />
                 </Link>
@@ -465,7 +465,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 2 - Phases */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/[0.4]">FASES DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">FASES DO PROJETO</h2>
               <div className="space-y-2">
                 {phases.map((phase) => (
                   <div 
@@ -473,7 +473,7 @@ const PropostaCalculadora = () => {
                     className={cn(
                       "flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border",
                       phase.included 
-                        ? "bg-white/[0.04] border-white/[0.12]" 
+                        ? "bg-white/[0.04] border-white/10" 
                         : "bg-transparent border-transparent opacity-40 grayscale"
                     )}
                   >
@@ -481,7 +481,7 @@ const PropostaCalculadora = () => {
                       id={phase.id} 
                       checked={phase.included}
                       onCheckedChange={() => handlePhaseToggle(phase.id)}
-                      className="border-white/[0.18] data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
+                      className="border-white/20 data-[state=checked]:bg-bronze data-[state=checked]:border-bronze"
                     />
                     <div className="flex-1">
                       <label 
@@ -493,7 +493,7 @@ const PropostaCalculadora = () => {
                           <Badge className="bg-bronze/20 text-bronze border-bronze/20 text-[8px] uppercase tracking-widest py-0 h-4">COMPLETO</Badge>
                         )}
                         {phase.optional && (
-                          <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-white/[0.12] text-white/[0.4] py-0 h-4">OPCIONAL</Badge>
+                          <Badge variant="outline" className="text-[8px] uppercase tracking-widest border-white/10 text-white/40 py-0 h-4">OPCIONAL</Badge>
                         )}
                       </label>
                     </div>
@@ -503,7 +503,7 @@ const PropostaCalculadora = () => {
                           type="number"
                           value={phase.hours || ''}
                           onChange={(e) => handleHoursChange(phase.id, e.target.value)}
-                          className="w-16 h-8 bg-black/50 border-white/[0.12] rounded-lg text-center text-xs focus:border-bronze"
+                          className="w-16 h-8 bg-black/50 border-white/10 rounded-lg text-center text-xs focus:border-bronze"
                           placeholder="0"
                         />
                         <span className="text-[10px] text-white/30 uppercase">h</span>
@@ -519,7 +519,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 3 - Complexity */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/[0.4]">COMPLEXIDADE DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">COMPLEXIDADE DO PROJETO</h2>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { val: 1.0, label: 'Simples' },
@@ -534,7 +534,7 @@ const PropostaCalculadora = () => {
                       "h-16 rounded-xl uppercase tracking-widest text-[10px] transition-all duration-300",
                       complexity === item.val 
                         ? "bg-bronze text-white shadow-lg shadow-bronze/20" 
-                        : "border-white/[0.12] hover:border-white/[0.18] hover:bg-white/[0.06] text-white/60"
+                        : "border-white/10 hover:border-white/20 hover:bg-white/5 text-white/60"
                     )}
                   >
                     {item.label} (×{item.val.toFixed(1)})
@@ -552,29 +552,29 @@ const PropostaCalculadora = () => {
             {/* Block 4 - Notes & Extra Data */}
             <section className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/[0.4]">OBSERVAÇÕES E DADOS</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">OBSERVAÇÕES E DADOS</h2>
               </div>
               
               {proposal.tipo === 'Comercial' && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/[0.4]">TIPO DE NEGÓCIO</Label>
+                  <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">TIPO DE NEGÓCIO</Label>
                   <Input
                     id="tipoNegocio"
                     value={tipoNegocio}
                     onChange={(e) => setTipoNegocio(e.target.value)}
                     placeholder="Ex: Barbearia, Clínica, Restaurante..."
-                    className="bg-white/[0.02] border-white/[0.12] rounded-xl focus:border-bronze focus:ring-bronze/20"
+                    className="bg-white/[0.02] border-white/10 rounded-xl focus:border-bronze focus:ring-bronze/20"
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/[0.4]">OBSERVAÇÕES INTERNAS</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-white/40">OBSERVAÇÕES INTERNAS</Label>
                 <Textarea 
                   placeholder="Notas sobre o cálculo (uso interno)..."
                   value={observacoes}
                   onChange={(e) => setObservacoes(e.target.value)}
-                  className="min-h-[120px] bg-white/[0.02] border-white/[0.12] rounded-2xl focus:border-bronze focus:ring-bronze/20"
+                  className="min-h-[120px] bg-white/[0.02] border-white/10 rounded-2xl focus:border-bronze focus:ring-bronze/20"
                 />
               </div>
             </section>
@@ -583,20 +583,20 @@ const PropostaCalculadora = () => {
 
           {/* Right Column - 40% (Resume) */}
           <div className="lg:col-span-4 sticky top-32">
-            <div className="bg-white/[0.03] border border-white/[0.12] rounded-3xl p-8 backdrop-blur-sm overflow-hidden relative">
+            <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-8 backdrop-blur-sm overflow-hidden relative">
               <div className="absolute top-0 right-0 w-32 h-32 bg-bronze/10 blur-[60px] rounded-full -mr-16 -mt-16" />
               
               <h2 className="text-lg font-cormorant font-bold uppercase tracking-widest text-bronze mb-8">RESUMO DA PROPOSTA</h2>
               
               <div className="space-y-1 mb-8">
                 <p className="text-lg font-medium">{proposal.cliente}</p>
-                <p className="text-[10px] uppercase tracking-widest text-white/[0.4]">
+                <p className="text-[10px] uppercase tracking-widest text-white/40">
                   {proposal.tipo} · {proposal.cidade}
                 </p>
               </div>
 
               <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/[0.4]">FASES SELECIONADAS</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">FASES SELECIONADAS</p>
                 <div className="space-y-3">
                   {totals.includedPhases.map(phase => (
                     <div key={phase.id} className="flex justify-between items-center text-xs">
@@ -605,7 +605,7 @@ const PropostaCalculadora = () => {
                         {phase.label}
                       </span>
                       <div className="flex gap-4">
-                        <span className="text-white/[0.4]">{phase.hours}h</span>
+                        <span className="text-white/40">{phase.hours}h</span>
                         <span className="font-medium text-white/80">R$ {(phase.hours * config.preco_hora).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</span>
                       </div>
                     </div>
@@ -613,25 +613,25 @@ const PropostaCalculadora = () => {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-6 border-t border-white/[0.12]">
+              <div className="space-y-4 pt-6 border-t border-white/10">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-white/[0.4] uppercase tracking-widest text-[10px]">Subtotal</span>
+                  <span className="text-white/40 uppercase tracking-widest text-[10px]">Subtotal</span>
                   <div className="flex gap-4">
-                    <span className="text-white/[0.4]">{totals.totalHours}h</span>
+                    <span className="text-white/40">{totals.totalHours}h</span>
                     <span className="font-medium">R$ {totals.subtotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-white/[0.4] uppercase tracking-widest text-[10px]">Complexidade (×{complexity.toFixed(1)})</span>
+                  <span className="text-white/40 uppercase tracking-widest text-[10px]">Complexidade (×{complexity.toFixed(1)})</span>
                   <span className="font-medium text-bronze">+ R$ {totals.impactComplexity.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
 
               <div className="mt-8 space-y-4">
-                <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/[0.06] space-y-1">
-                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/[0.4] font-bold flex items-center gap-2">
+                <div className="p-6 bg-white/[0.04] rounded-2xl border border-white/5 space-y-1">
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-bold flex items-center gap-2">
                     PLANO EXECUTIVO 
-                    <Badge variant="outline" className="text-[7px] border-white/[0.12] text-white/[0.4] py-0 h-3">BASE</Badge>
+                    <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 py-0 h-3">BASE</Badge>
                   </p>
                   <p className="text-3xl font-light text-bronze">R$ {totals.valorExecutivo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
@@ -679,14 +679,14 @@ const PropostaCalculadora = () => {
                     <Button 
                       variant="outline" 
                       onClick={handleCopyLink}
-                      className="h-12 border-white/[0.12] text-[10px] uppercase tracking-widest gap-2 hover:bg-white/[0.06]"
+                      className="h-12 border-white/10 text-[10px] uppercase tracking-widest gap-2 hover:bg-white/5"
                     >
                       {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                       {copied ? "COPIADO" : "COPIAR LINK"}
                     </Button>
                     <Button 
                       onClick={() => window.open(generatedLink, '_blank')}
-                      className="h-12 bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.12] text-[10px] uppercase tracking-widest gap-2"
+                      className="h-12 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest gap-2"
                     >
                       <ExternalLink size={14} />
                       ABRIR
@@ -696,7 +696,7 @@ const PropostaCalculadora = () => {
                   <Button 
                     variant="ghost"
                     onClick={() => navigate('/propostas/tracking')}
-                    className="w-full h-12 text-[10px] uppercase tracking-widest text-white/[0.4] hover:text-white"
+                    className="w-full h-12 text-[10px] uppercase tracking-widest text-white/40 hover:text-white"
                   >
                     IR PARA TRACKING
                   </Button>
