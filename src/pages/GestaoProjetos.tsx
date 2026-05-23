@@ -244,7 +244,7 @@ const GestaoProjetos = () => {
       
       <main className="flex-1 ml-[230px] p-12">
         <header className="mb-12">
-          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">06 · Gestão de Projetos</h1>
+          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">Gestão de Projetos</h1>
           <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
         </header>
 

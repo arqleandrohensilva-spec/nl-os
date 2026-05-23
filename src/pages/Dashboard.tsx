@@ -98,7 +98,10 @@ const Dashboard = () => {
   // Fetch Auth User
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user?.email) setUserEmail(user.email);
+      if (user?.email) {
+        setUserEmail(user.email);
+        sessionStorage.setItem('nl_user', user.email.split('@')[0]);
+      }
     });
   }, []);
 

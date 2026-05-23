@@ -1371,7 +1371,7 @@ Máximo 3 linhas. Sem markdown. Em português.
           </DialogContent>
         </Dialog>
         <div className="flex-shrink-0 bg-[#0A0A0A] border-t border-white/10 px-10 py-4 flex justify-between items-center">
-          <p className="text-[9px] text-white/40 uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
+          <p className="text-[9px] text-white/40 uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo Administrativo</p>
           <p className="text-[9px] text-white/40 uppercase tracking-widest">São José dos Campos SP · 2026</p>
         </div>
       </main>

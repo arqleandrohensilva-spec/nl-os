@@ -370,7 +370,7 @@ const Index = () => {
           </div>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-widest">{randomLead.nome} abriu a proposta agora</p>
-            <p className="text-[9px] text-white/50">Módulo 04 · Tracking em tempo real</p>
+            <p className="text-[9px] text-white/50">Módulo Administrativo · Tracking em tempo real</p>
           </div>
         </div>
         <button 
