@@ -134,7 +134,7 @@ const CalculadoraList = () => {
               <Button 
                 onClick={handleStandalone}
                 variant="outline"
-                className="h-11 rounded-none border-white/10 hover:border-[#8B7355] bg-transparent text-[#E8E4DF]/60 hover:text-[#E8E4DF] text-[10px] uppercase font-bold tracking-widest px-6 transition-all"
+                className="h-11 rounded-none border-white/20 hover:border-[#8B7355] bg-transparent text-[#E8E4DF]/70 hover:text-[#E8E4DF] text-[10px] uppercase font-bold tracking-widest px-6 transition-all"
               >
                 <Plus size={16} className="mr-2" />
                 Nova proposta avulsa
@@ -163,11 +163,11 @@ const CalculadoraList = () => {
                           <h3 className="text-lg font-medium text-[#E8E4DF] group-hover:text-white transition-colors">{lead.nome}</h3>
                           <div className="flex items-center gap-4 mt-1">
                             <span className="text-[10px] uppercase tracking-widest text-[#8B7355] font-bold">{lead.tipo}</span>
-                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/40">
+                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/60">
                               <MapPin size={10} />
                               <span className="uppercase tracking-widest">{lead.cidade}</span>
                             </div>
-                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/40">
+                            <div className="flex items-center gap-1 text-[10px] text-[#E8E4DF]/60">
                               <Maximize2 size={10} />
                               <span className="uppercase tracking-widest">{lead.area}M²</span>
                             </div>
@@ -180,7 +180,7 @@ const CalculadoraList = () => {
                           "px-3 py-1 rounded-none text-[8px] font-bold uppercase tracking-[0.2em] border",
                           lead.temp === 'Quente' ? "bg-red-500/10 text-red-500 border-red-500/20" :
                           lead.temp === 'Morno' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
-                          "bg-white/5 text-[#E8E4DF]/40 border-white/10"
+                          "bg-white/5 text-[#E8E4DF]/60 border-white/20"
                         )}>
                           {lead.temp}
                         </Badge>
