@@ -198,18 +198,17 @@ const ClienteFicha = () => {
 
       // 3. Criar etapas padrão
       const etapasPadrao = [
-        { nome: 'Briefing', status: 'concluido' },
-        { nome: 'Estudo Preliminar', status: 'em_andamento' },
-        { nome: 'Anteprojeto', status: 'pendente' },
-        { nome: 'Executivo', status: 'pendente' }
+        { etapa: 'Briefing', status: 'concluido' },
+        { etapa: 'Estudo Preliminar', status: 'em_andamento' },
+        { etapa: 'Anteprojeto', status: 'pendente' },
+        { etapa: 'Executivo', status: 'pendente' }
       ];
 
-      for (const ep of etapasPadrao) {
+      for (let i = 0; i < etapasPadrao.length; i++) {
         await supabase.from('projeto_etapas').insert({
           projeto_id: novoProjeto.id,
-          nome: ep.nome,
-          status: ep.status,
-          ordem: etapasPadrao.indexOf(ep)
+          etapa: etapasPadrao[i].etapa,
+          status: etapasPadrao[i].status
         });
       }
 
