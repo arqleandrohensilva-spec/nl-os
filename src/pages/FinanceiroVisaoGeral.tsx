@@ -11,17 +11,18 @@ import {
   ArrowDownRight,
   Briefcase,
   FileText,
-  Calendar
+  Calendar,
+  Settings as SettingsIcon,
+  PenTool as PenIcon
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { format, startOfMonth, endOfMonth, subDays, isAfter } from 'date-fns';
+import { format, startOfMonth, endOfMonth, isAfter } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 const FinanceiroVisaoGeral = () => {
   const today = new Date();
   const startMonth = startOfMonth(today).toISOString();
   const endMonth = endOfMonth(today).toISOString();
-  const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   // Queries
   const { data: proposals = [] } = useQuery({
@@ -29,7 +30,7 @@ const FinanceiroVisaoGeral = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('proposals')
-        .select('id, status, created_at, proposal_views');
+        .select('id, status, created_at');
       return data || [];
     }
   });
@@ -39,7 +40,7 @@ const FinanceiroVisaoGeral = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('leads')
-        .select('id, stage, valor_estimado');
+        .select('id, stage, orcamento');
       return data || [];
     }
   });
@@ -49,8 +50,8 @@ const FinanceiroVisaoGeral = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('projetos')
-        .select('id, status')
-        .eq('status', 'ativo');
+        .select('id, status_geral')
+        .eq('status_geral', 'em_andamento');
       return data || [];
     }
   });
@@ -63,17 +64,6 @@ const FinanceiroVisaoGeral = () => {
         .select('*')
         .order('data_vencimento', { ascending: true });
       return data || [];
-    }
-  });
-
-  const { data: officeConfig } = useQuery({
-    queryKey: ['config-escritorio'],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from('config_escritorio')
-        .select('*')
-        .maybeSingle();
-      return data;
     }
   });
 
@@ -90,34 +80,32 @@ const FinanceiroVisaoGeral = () => {
   // Calculations
   const proposalsThisMonth = proposals.filter(p => p.created_at >= startMonth && p.created_at <= endMonth);
   const totalProposals = proposals.length;
-  const viewedProposals = proposals.filter(p => (p.proposal_views || 0) > 0).length;
-  const openRate = totalProposals > 0 ? (viewedProposals / totalProposals) * 100 : 0;
   
   const approvedProposals = proposals.filter(p => p.status === 'aprovada').length;
   const approvalRate = totalProposals > 0 ? (approvedProposals / totalProposals) * 100 : 0;
 
   const totalInNegotiation = leads
     .filter(l => !['FECHADO', 'PERDIDO', 'Fechado', 'Perdido'].includes(l.stage || ''))
-    .reduce((acc, curr) => acc + (Number(curr.valor_estimado) || 0), 0);
+    .reduce((acc, curr) => acc + (Number(curr.orcamento) || 0), 0);
 
   const activeProjectsCount = projects.length;
   
   const incomingThisMonth = installments
-    .filter(p => p.data_vencimento >= startMonth && p.data_vencimento <= endMonth && p.status === 'pendente')
+    .filter(p => p.data_vencimento >= startMonth.split('T')[0] && p.data_vencimento <= endMonth.split('T')[0] && p.status === 'pendente')
     .reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
 
   const confirmedThisMonth = installments
-    .filter(p => p.data_vencimento >= startMonth && p.data_vencimento <= endMonth && p.status === 'pago')
+    .filter(p => p.data_vencimento >= startMonth.split('T')[0] && p.data_vencimento <= endMonth.split('T')[0] && (p.status === 'pago' || p.status === 'recebido'))
     .reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
 
   const overdueInstallments = installments.filter(p => 
-    p.status === 'pendente' && isAfter(today, new Date(p.data_vencimento))
+    (p.status === 'pendente' || p.status === 'atrasado') && isAfter(today, new Date(p.data_vencimento))
   );
 
   const upcomingInstallments = installments.filter(p => 
     p.status === 'pendente' && 
     p.data_vencimento >= today.toISOString().split('T')[0] && 
-    p.data_vencimento <= next7Days.split('T')[0]
+    p.data_vencimento <= next7Days
   );
 
   const monthlyFixedCosts = costs.reduce((acc, curr) => acc + (Number(curr.valor) || 0), 0);
@@ -150,7 +138,7 @@ const FinanceiroVisaoGeral = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] p-8 pb-20">
+    <div className="min-h-screen bg-[#0D0D0D] p-8 pb-20 ml-[230px]">
       <div className="max-w-7xl mx-auto space-y-10">
         <header className="flex justify-between items-end border-b border-white/5 pb-6">
           <div>
@@ -177,12 +165,6 @@ const FinanceiroVisaoGeral = () => {
               icon={FileText}
             />
             <Card 
-              title="Taxa de Abertura" 
-              value={`${openRate.toFixed(1)}%`}
-              subtitle={`${viewedProposals} de ${totalProposals} visualizadas`}
-              icon={TrendingUp}
-            />
-            <Card 
               title="Taxa de Aprovação" 
               value={`${approvalRate.toFixed(1)}%`}
               subtitle={`${approvedProposals} propostas fechadas`}
@@ -194,13 +176,19 @@ const FinanceiroVisaoGeral = () => {
               subtitle="Leads ativos no pipeline"
               icon={DollarSign}
             />
+            <Card 
+              title="Total de Propostas" 
+              value={totalProposals}
+              subtitle="Histórico geral"
+              icon={Briefcase}
+            />
           </div>
         </section>
 
         {/* PROJETOS */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
-            <PenTool size={14} className="text-[#8B7355]" />
+            <PenIcon size={14} className="text-[#8B7355]" />
             <h2 className="text-[10px] text-white/80 font-bold tracking-[0.2em] uppercase">Bloco Projetos</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -228,7 +216,7 @@ const FinanceiroVisaoGeral = () => {
         {/* ESCRITÓRIO */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
-            <Settings size={14} className="text-[#8B7355]" />
+            <SettingsIcon size={14} className="text-[#8B7355]" />
             <h2 className="text-[10px] text-white/80 font-bold tracking-[0.2em] uppercase">Bloco Escritório</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -241,7 +229,7 @@ const FinanceiroVisaoGeral = () => {
             <Card 
               title="Custo Mensal" 
               value={monthlyFixedCosts.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              subtitle="Fixos + Variáveis cadastrados"
+              subtitle="Custos fixos cadastrados"
               icon={ArrowDownRight}
             />
             <Card 
@@ -300,14 +288,5 @@ const FinanceiroVisaoGeral = () => {
 };
 
 const cn = (...classes: any[]) => classes.filter(Boolean).join(' ');
-
-const PenTool = ({ size, className }: any) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="m12 19 7-7 3 3-7 7-3-3z"/>
-    <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-    <path d="m2 2 5 5"/>
-    <path d="m8.5 8.5 7 7"/>
-  </svg>
-);
 
 export default FinanceiroVisaoGeral;
