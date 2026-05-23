@@ -290,7 +290,7 @@ const ClienteFicha = () => {
         {/* DADOS PESSOAIS */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">DADOS PESSOAIS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0A0A0A]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0F0E0C]">
             {[
               { label: 'Nome', key: 'nome' },
               { label: 'WhatsApp', key: 'whatsapp' },
@@ -335,7 +335,7 @@ const ClienteFicha = () => {
         {/* QUALIFICAÇÃO */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">QUALIFICAÇÃO</h2>
-          <div className="bg-[#0A0A0A] border border-[#3A3A3A] p-8 space-y-8">
+          <div className="bg-[#0F0E0C] border border-[#3A3A3A] p-8 space-y-8">
             {/* SCORE CARD */}
             <div className="space-y-4">
               <div className="flex justify-between items-end">
@@ -427,7 +427,7 @@ const ClienteFicha = () => {
             onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
             onBlur={handleBlurSave}
             placeholder="Digite aqui anotações sobre este cliente..."
-            className="w-full h-40 bg-[#0A0A0A] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
+            className="w-full h-40 bg-[#0F0E0C] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
           />
         </section>
 

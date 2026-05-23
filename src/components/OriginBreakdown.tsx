@@ -29,7 +29,7 @@ const OriginBreakdown = ({ leads }: OriginBreakdownProps) => {
   const maxCount = sortedOrigins[0]?.count || 0;
 
   return (
-    <div className="border-b border-white/10 bg-[#0A0A0A]">
+    <div className="border-b border-white/10 bg-[#0F0E0C]">
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-full px-10 py-2.5 flex items-center justify-between hover:bg-white/[0.03] transition-colors"

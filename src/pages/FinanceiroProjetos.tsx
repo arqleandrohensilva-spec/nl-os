@@ -973,7 +973,7 @@ const FinanceiroProjetos = () => {
 
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
+    <div className="flex min-h-screen bg-[#0F0E0C] text-white font-inter">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-8">
@@ -997,19 +997,19 @@ const FinanceiroProjetos = () => {
         <div className="grid grid-cols-5 gap-4 mb-8">
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">RECEITA CONFIRMADA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {metrics.pagasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PREVISTA ({lucroFilter === 'MES_ATUAL' ? 'MÊS' : 'PERÍODO'})</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {metrics.previstasMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/10 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">ATRASADO</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            <span className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {metrics.totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           <div className="bg-white/5 p-6 border border-white/5 flex flex-col gap-1">
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">PRÓXIMOS 7 DIAS</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[22px] font-normal text-[#E8E4DF] font-inter">
               {metrics.vencendo7Dias} {metrics.vencendo7Dias === 1 ? 'parcela' : 'parcelas'}
             </span>
           </div>
@@ -1018,7 +1018,7 @@ const FinanceiroProjetos = () => {
               <TrendingUp size={12} className="text-bronze" />
             </div>
             <span className="text-[11px] text-[#777777] uppercase font-normal font-inter">LTV MÉDIO (HIST.)</span>
-            <span className="text-[22px] font-normal text-[#FFFFFF] font-inter">
+            <span className="text-[22px] font-normal text-[#E8E4DF] font-inter">
               R$ {(projetosLucratividade.length > 0 
                 ? projetosLucratividade.reduce((acc, p) => acc + p.receitaTotal, 0) / projetosLucratividade.length 
                 : 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
@@ -1405,7 +1405,7 @@ const FinanceiroProjetos = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado</p>
-                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {mes.confirmado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Previsto</p>
@@ -1456,7 +1456,7 @@ const FinanceiroProjetos = () => {
                 </div>
                 <div>
                   <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Confirmado Geral</p>
-                  <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                  <p className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {fluxoCaixa.reduce((acc, m) => acc + m.confirmado, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                 </div>
               </div>
             </div>
@@ -2083,7 +2083,7 @@ const FinanceiroProjetos = () => {
                     <div className="grid grid-cols-2 gap-8">
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Recebido</p>
-                        <p className="text-[22px] font-normal text-[#FFFFFF] font-inter">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[22px] font-normal text-[#E8E4DF] font-inter">R$ {(lucroResumo?.totalRecebido || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                       <div>
                         <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-1">Custo Total</p>
@@ -2178,7 +2178,7 @@ const FinanceiroProjetos = () => {
 
         {/* Modal Confirmação */}
         <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0F0E0C] border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm uppercase tracking-widest font-bold">Confirmar Recebimento</DialogTitle>
             </DialogHeader>

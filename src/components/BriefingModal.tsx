@@ -155,7 +155,7 @@ const BriefingModal = ({ isOpen, onClose, briefing, onAprovar, onArquivar }: Bri
           {renderAlignment()}
         </div>
 
-        <div className="p-6 border-t border-[#2A2A2A] bg-[#0A0A0A] flex justify-end gap-3">
+        <div className="p-6 border-t border-[#2A2A2A] bg-[#0F0E0C] flex justify-end gap-3">
           <Button 
             variant="outline"
             onClick={() => {

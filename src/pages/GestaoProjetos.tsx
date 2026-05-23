@@ -239,7 +239,7 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0F0E0C] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
@@ -408,7 +408,7 @@ const GestaoProjetos = () => {
                         <Trash2 size={12} className={cn(isDeleting === projeto.id && "animate-spin")} />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-[#0A0A0A] border border-white/10 text-white">
+                    <AlertDialogContent className="bg-[#0F0E0C] border border-white/10 text-white">
                       <AlertDialogHeader>
                         <AlertDialogTitle className="font-cormorant italic text-2xl">Excluir Projeto?</AlertDialogTitle>
                         <AlertDialogDescription className="text-white/60 font-inter text-sm">
@@ -459,7 +459,7 @@ const MetricCard = ({ label, value, icon, accent, warning }: { label: string, va
       <p className="text-[11px] uppercase text-[#777777] mb-2 font-normal font-inter">{label}</p>
       <p className={cn(
         "text-[22px] font-normal font-inter",
-        accent ? "text-[#FFFFFF]" : warning ? "text-[#FFFFFF]" : "text-[#FFFFFF]"
+        accent ? "text-[#E8E4DF]" : warning ? "text-[#E8E4DF]" : "text-[#E8E4DF]"
       )}>
         {value}
       </p>
