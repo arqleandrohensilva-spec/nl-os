@@ -1125,14 +1125,14 @@ Máximo 3 linhas. Sem markdown. Em português.
                 ))
               ) : aiSuggestions.length > 0 ? (
                 aiSuggestions.map((s, i) => (
-                  <div key={i} className="bg-white/[0.03] p-4 border border-bronze/30 border-dashed rounded-[4px] space-y-3 relative group">
+                  <div key={i} className="bg-white/[0.06] p-4 border border-bronze/40 border-dashed rounded-[4px] space-y-3 relative group transition-all hover:bg-white/[0.08]">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Lightbulb size={12} className="text-bronze" />
                           <span className="text-[11px] font-bold text-white uppercase font-dm-mono">{s.nome}</span>
                         </div>
-                        <p className="text-[10px] text-white/70 leading-relaxed">{s.motivo}</p>
+                        <p className="text-[10px] text-white/90 leading-relaxed font-medium">{s.motivo}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-white/10">
@@ -1162,7 +1162,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-[10px] font-dm-mono text-white/40 text-center py-4">
+                <div className="col-span-3 text-[10px] font-dm-mono text-white/60 text-center py-4">
                   Nenhuma sugestão adicional no momento.
                 </div>
               )}
@@ -1179,7 +1179,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             </button>
 
             {isSimulatorOpen && (
-              <div className="bg-white p-8 border border-white/10 rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-[#141414] p-8 border border-white/10 rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
                 <div className="flex items-center gap-4 text-xs font-dm-mono text-white">
                   <span>Se fechar</span>
                   <Input 
@@ -1201,19 +1201,19 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <div className="grid grid-cols-2 gap-12">
                   <div className="space-y-4">
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/40">Receita bruta estimada:</span>
+                      <span className="text-white/60">Receita bruta estimada:</span>
                       <span className="font-bold text-white">
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/40">(-) Custos totais mensais:</span>
+                      <span className="text-white/60">(-) Custos totais mensais:</span>
                       <span className="text-red-400">
                         R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/40">(-) Impostos estimados:</span>
+                      <span className="text-white/60">(-) Impostos estimados:</span>
                       <span className="text-red-400">
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice * (costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0) / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
@@ -1227,7 +1227,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <p className="text-[10px] text-white/40 font-dm-mono uppercase tracking-tighter">
+                    <p className="text-[10px] text-white/60 font-dm-mono uppercase tracking-tighter">
                       Isso representa {(( (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) / (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice || 1) ) * 100).toFixed(1)}% de margem líquida.
                     </p>
                   </div>
@@ -1262,7 +1262,7 @@ Máximo 3 linhas. Sem markdown. Em português.
 
         {/* Comparison Panel */}
         <Dialog open={isComparingCenários} onOpenChange={setIsComparingCenários}>
-          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-white/10 bg-white animate-in slide-in-from-right duration-500">
+          <DialogContent className="sm:max-w-[450px] absolute right-0 top-0 h-screen rounded-none border-l border-white/10 bg-[#0A0A0A] animate-in slide-in-from-right duration-500">
             <DialogHeader className="border-b border-white/10 pb-6">
               <DialogTitle className="font-cormorant text-2xl font-bold text-white uppercase tracking-tight">Comparador de Margem</DialogTitle>
             </DialogHeader>
@@ -1274,7 +1274,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="space-y-2">
                     <p className="text-[10px] font-dm-mono text-bronze uppercase font-bold tracking-widest">Cenário A</p>
                     <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/40">Margem:</span>
+                      <span className="text-white/60">Margem:</span>
                       <span className="font-bold">{cenarioAMargem}%</span>
                     </div>
                     <Slider 
@@ -1287,7 +1287,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                   
                   <div className="space-y-4 pt-4 border-t border-white/[0.08]">
                     <div className="space-y-1">
-                      <p className="text-[9px] text-white/40 uppercase">Preço/hora:</p>
+                      <p className="text-[9px] text-white/60 uppercase">Preço/hora:</p>
                       <p className="text-sm font-dm-mono font-bold text-white">R$ {(calculations.costPerHour * (1 + cenarioAMargem/100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                     </div>
                     <div className="space-y-1">
@@ -1370,7 +1370,7 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
           </DialogContent>
         </Dialog>
-        <div className="flex-shrink-0 bg-white border-t border-white/10 px-10 py-4 flex justify-between items-center">
+        <div className="flex-shrink-0 bg-[#0A0A0A] border-t border-white/10 px-10 py-4 flex justify-between items-center">
           <p className="text-[9px] text-white/40 uppercase tracking-widest">NL Arquitetos · Base Financeira · Módulo 02</p>
           <p className="text-[9px] text-white/40 uppercase tracking-widest">São José dos Campos SP · 2026</p>
         </div>
