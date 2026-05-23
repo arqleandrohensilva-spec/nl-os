@@ -14,7 +14,7 @@ export function usePropostaParams(): PropostaParams {
     tipo: searchParams.get('tipo') || '[Residencial · Comercial · Interiores]',
     cidade: searchParams.get('cidade') || '[Cidade]',
     estado: searchParams.get('estado') || '[Estado]',
-    area: searchParams.get('area') || '[XXX]',
+    area: searchParams.get('area') || '---',
     objetivo: searchParams.get('objetivo') || '[Descrição breve do objetivo do cliente]',
     data: searchParams.get('data') || '[DD Mês AAAA]',
     plano: searchParams.get('plano') || '',

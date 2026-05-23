@@ -101,7 +101,7 @@ const CalculadoraList = () => {
   };
 
   const handleStandalone = () => {
-    navigate('/calculadora/nova');
+    navigate('/calculadora/nova-proposta');
   };
 
   return (
