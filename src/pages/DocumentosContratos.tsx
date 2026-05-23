@@ -1518,7 +1518,7 @@ const DocumentosContratos = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Selecionar Lead</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Selecionar Lead</Label>
                     <Select onValueChange={(val) => {
                       setSelectedLeadId(val);
                       handleSelectLeadForContract(val);
@@ -1535,7 +1535,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nome Completo</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Nome Completo</Label>
                     <Input 
                       value={contractFormData.cliente.nome}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nome: e.target.value } }))}
@@ -1544,7 +1544,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">CPF</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">CPF</Label>
                     <Input 
                       value={contractFormData.cliente.cpf}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, cpf: e.target.value } }))}
@@ -1554,7 +1554,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5 md:col-span-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Endereço</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Endereço</Label>
                     <Input 
                       value={contractFormData.cliente.endereco}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, endereco: e.target.value } }))}
@@ -1563,7 +1563,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Nacionalidade</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Nacionalidade</Label>
                     <Input 
                       value={contractFormData.cliente.nacionalidade}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, nacionalidade: e.target.value } }))}
@@ -1572,7 +1572,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Estado Civil</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Estado Civil</Label>
                     <Input 
                       value={contractFormData.cliente.estadoCivil}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, estadoCivil: e.target.value } }))}
@@ -1581,7 +1581,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Profissão</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Profissão</Label>
                     <Input 
                       value={contractFormData.cliente.profissao}
                       onChange={(e) => setContractFormData(prev => ({ ...prev, cliente: { ...prev.cliente, profissao: e.target.value } }))}
@@ -1590,7 +1590,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Data de Assinatura</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Data de Assinatura</Label>
                     <Input 
                       type="text"
                       placeholder="Ex: 14 de maio de 2026"
@@ -1611,7 +1611,7 @@ const DocumentosContratos = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Tipo de Projeto</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Tipo de Projeto</Label>
                     <RadioGroup 
                       value={contractFormData.projeto.tipo} 
                       onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, tipo: val } }))}
@@ -1633,7 +1633,7 @@ const DocumentosContratos = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Plano</Label>
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Plano</Label>
                     <RadioGroup 
                       value={contractFormData.projeto.plano} 
                       onValueChange={(val) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, plano: val } }))}
@@ -2028,7 +2028,7 @@ const DocumentosContratos = () => {
               <Button 
                 variant="ghost"
                 onClick={() => setIsCancelModalOpen(false)} 
-                className="flex-1 bg-[#2A2825] border border-[#444] text-[#AAAAAA] hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
+                className="flex-1 bg-[#2A2825] border border-white/20 text-white/80 hover:bg-[#333] hover:text-white rounded-none text-[10px] tracking-widest uppercase h-10 transition-colors"
               >
                 MANTER CONTRATO
               </Button>
