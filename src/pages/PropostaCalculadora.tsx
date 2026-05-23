@@ -55,7 +55,7 @@ const PropostaCalculadora = () => {
   const [proposal, setProposal] = useState<ProposalData | null>(null);
 
   useEffect(() => {
-    if (clienteState?.clienteId && proposalId === 'nova') {
+    if (clienteState?.clienteId && (proposalId === 'nova' || proposalId === 'nova-proposta')) {
       setProposal(prev => {
         if (!prev) return prev;
         return {
