@@ -55,7 +55,7 @@ const PropostaCalculadora = () => {
   const [proposal, setProposal] = useState<ProposalData | null>(null);
 
   useEffect(() => {
-    if (clienteState?.clienteId && proposalId === 'nova') {
+    if (clienteState?.clienteId && (proposalId === 'nova' || proposalId === 'nova-proposta')) {
       setProposal(prev => {
         if (!prev) return prev;
         return {
@@ -91,9 +91,9 @@ const PropostaCalculadora = () => {
       setLoading(true);
       
       // Handle Standalone case
-      if (proposalId === 'nova') {
+      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         setProposal({
-          id: 'nova',
+          id: proposalId,
           cliente: '',
           tipo: 'ArqInt',
           cidade: '',
@@ -256,7 +256,7 @@ const PropostaCalculadora = () => {
       let currentProposalId = proposalId;
 
       // Handle standalone creation
-      if (proposalId === 'nova') {
+      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         if (!proposal?.cliente) {
           toast.error("Por favor, informe o nome do cliente.");
           setIsGeneratingLink(false);
@@ -398,7 +398,7 @@ const PropostaCalculadora = () => {
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
-            {proposalId === 'nova' ? (
+            {(proposalId === 'nova' || proposalId === 'nova-proposta') ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-4">
                   <Input 
