@@ -635,7 +635,7 @@ const ClienteFicha = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</span>
-                      <p className="text-xs uppercase mt-1">NL.C{contrato.id.toString().slice(-4).toUpperCase()}</p>
+                      <p className="text-xs uppercase mt-1">NL.C{String(contrato.id).slice(-4).toUpperCase()}</p>
                     </div>
                     <div className={cn(
                       "px-3 py-1 text-[9px] font-bold uppercase tracking-widest",
