@@ -360,7 +360,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           <NavItem 
             label="CLIENTES" 
             icon={<Users size={14} />}
-            active={location.pathname === '/clientes'} 
+            active={location.pathname === '/clientes' || location.pathname.startsWith('/clientes/')} 
             onClick={() => navigate('/clientes')} 
           />
           {pendingBriefingsCount > 0 && (
