@@ -242,12 +242,17 @@ export type Database = {
       clientes: {
         Row: {
           area_m2: number | null
+          briefing_enviado: boolean | null
           briefing_preenchido: boolean | null
           cidade: string | null
+          contrato_assinado: boolean | null
+          contrato_assinado_em: string | null
+          contrato_gerado: boolean | null
           cpf_cnpj: string | null
           created_at: string | null
           email: string | null
           endereco_imovel: string | null
+          etapa_fluxo: string | null
           id: string
           imovel_definido: string | null
           nome: string
@@ -255,7 +260,11 @@ export type Database = {
           orcamento: string | null
           origem: string | null
           prazo: string | null
+          proposta_enviada: boolean | null
           quem_decide: string | null
+          reuniao_agendada: boolean | null
+          reuniao_data: string | null
+          reuniao_notas: string | null
           status_comercial: string | null
           tipo_projeto: string | null
           updated_at: string | null
@@ -263,12 +272,17 @@ export type Database = {
         }
         Insert: {
           area_m2?: number | null
+          briefing_enviado?: boolean | null
           briefing_preenchido?: boolean | null
           cidade?: string | null
+          contrato_assinado?: boolean | null
+          contrato_assinado_em?: string | null
+          contrato_gerado?: boolean | null
           cpf_cnpj?: string | null
           created_at?: string | null
           email?: string | null
           endereco_imovel?: string | null
+          etapa_fluxo?: string | null
           id?: string
           imovel_definido?: string | null
           nome: string
@@ -276,7 +290,11 @@ export type Database = {
           orcamento?: string | null
           origem?: string | null
           prazo?: string | null
+          proposta_enviada?: boolean | null
           quem_decide?: string | null
+          reuniao_agendada?: boolean | null
+          reuniao_data?: string | null
+          reuniao_notas?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
           updated_at?: string | null
@@ -284,12 +302,17 @@ export type Database = {
         }
         Update: {
           area_m2?: number | null
+          briefing_enviado?: boolean | null
           briefing_preenchido?: boolean | null
           cidade?: string | null
+          contrato_assinado?: boolean | null
+          contrato_assinado_em?: string | null
+          contrato_gerado?: boolean | null
           cpf_cnpj?: string | null
           created_at?: string | null
           email?: string | null
           endereco_imovel?: string | null
+          etapa_fluxo?: string | null
           id?: string
           imovel_definido?: string | null
           nome?: string
@@ -297,7 +320,11 @@ export type Database = {
           orcamento?: string | null
           origem?: string | null
           prazo?: string | null
+          proposta_enviada?: boolean | null
           quem_decide?: string | null
+          reuniao_agendada?: boolean | null
+          reuniao_data?: string | null
+          reuniao_notas?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
           updated_at?: string | null
