@@ -560,7 +560,7 @@ const ClienteFicha = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">RESUMO DA PROPOSTA</span>
-                      <h3 className="text-xl font-bold mt-1">NL.P{proposta.id.toString().slice(-4).toUpperCase()}</h3>
+                      <h3 className="text-xl font-bold mt-1">NL.P{String(proposta.id).slice(-4).toUpperCase()}</h3>
                     </div>
                     <div className="bg-[#8B7355]/10 px-3 py-1 text-[9px] font-bold text-[#8B7355] uppercase tracking-widest">
                       {proposta.status || 'ENVIADA'}
