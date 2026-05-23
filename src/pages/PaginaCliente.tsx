@@ -66,11 +66,8 @@ export default function PaginaCliente() {
 
       setProjeto(proj);
 
-      const { data: etps } = await (supabase
-        .from('projeto_etapas') as any)
-        .select('*')
-        .eq('projeto_id', proj.id)
-        .order('criado_em', { ascending: true });
+      const { data: etps } = await supabase
+        .rpc('get_project_stages_by_token', { p_val: param });
       
       setEtapas(etps || []);
 
