@@ -192,7 +192,7 @@ const ConfiguracoesSistema = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0F0F]">
+    <div className="flex min-h-screen bg-[#0F0E0C]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
       
       <main className="flex-1 pl-[230px]">

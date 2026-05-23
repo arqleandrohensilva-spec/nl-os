@@ -157,7 +157,7 @@ const BibliotecaServicos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div className="min-h-screen bg-[#0F0E0C] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
@@ -217,7 +217,7 @@ const BibliotecaServicos = () => {
                       className={cn(
                         "text-[10px] font-bold uppercase tracking-wider px-4 py-2 rounded-[2px] transition-all",
                         filterType === type 
-                          ? "bg-[#1A1A1A] text-white" 
+                          ? "bg-[#1A1816] text-white" 
                           : "text-white/40 hover:bg-white/10 hover:text-white"
                       )}
                     >
@@ -231,7 +231,7 @@ const BibliotecaServicos = () => {
                     placeholder="BUSCAR SERVIÇO..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0A0A0A]"
+                    className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0F0E0C]"
                   />
                 </div>
               </div>
@@ -310,7 +310,7 @@ const BibliotecaServicos = () => {
             {/* Sidebar Content */}
             <div className="col-span-4">
               <div className="sticky top-8 space-y-6">
-                <div className="bg-[#1A1A1A] text-white p-8 rounded-[2px] shadow-xl relative overflow-hidden">
+                <div className="bg-[#1A1816] text-white p-8 rounded-[2px] shadow-xl relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-bronze/10 blur-[60px] rounded-full -mr-16 -mt-16" />
                   
                   <div className="flex items-center gap-3 mb-8 relative z-10">
@@ -388,7 +388,7 @@ const BibliotecaServicos = () => {
 
       {/* New/Edit Service Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px] p-0 max-w-lg overflow-hidden shadow-2xl">
+        <DialogContent className="bg-[#1A1816] border-white/10 text-white rounded-[2px] p-0 max-w-lg overflow-hidden shadow-2xl">
           <div className="p-10">
             <header className="mb-8">
               <h2 className="text-2xl font-bold mb-1">
@@ -430,7 +430,7 @@ const BibliotecaServicos = () => {
                     <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-[2px] h-11 text-xs">
                       <SelectValue placeholder="Selecione" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1A1A] border-white/10 text-white">
+                    <SelectContent className="bg-[#1A1816] border-white/10 text-white">
                       <SelectItem value="por_projeto">Por Projeto</SelectItem>
                       <SelectItem value="por_m2">Por m²</SelectItem>
                       <SelectItem value="por_hora">Por Hora</SelectItem>

@@ -826,7 +826,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A]">
+    <div className="flex min-h-screen bg-[#0F0E0C]">
       <Sidebar user="Sócio" />
       <main className="flex-1 ml-[230px] p-8">
         <header className="mb-8 flex justify-between items-center">
@@ -982,7 +982,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">TIPO DE POST</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['FEED', 'REEL', 'STORY', 'CARROSSEL'] as const).map((type) => (
-                          <Button key={type} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${postType === type ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setPostType(type)}>{type}</Button>
+                          <Button key={type} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${postType === type ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setPostType(type)}>{type}</Button>
                         ))}
                       </div>
                     </div>
@@ -990,7 +990,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                       <label className="text-[10px] text-white/40 uppercase tracking-widest font-bold">FOCO</label>
                       <div className="grid grid-cols-4 gap-2">
                         {(['TÉCNICO', 'PROCESSO', 'RESULTADO', 'EDUCATIVO'] as const).map((focus) => (
-                          <Button key={focus} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${captionFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
+                          <Button key={focus} variant="outline" className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${captionFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} onClick={() => setCaptionFocus(focus)}>{focus}</Button>
                         ))}
                       </div>
                     </div>
@@ -1016,7 +1016,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA]/50 rounded-none flex items-center gap-2 transition-all duration-200"
+                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#777777]/50 rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => {
                                   console.log("Clique no botão LinkedIn", { index, legenda: option.legenda });
                                   expandContent(index, option.legenda, 'linkedin');
@@ -1029,7 +1029,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                               <Button 
                                 variant="outline" 
                                 size="sm" 
-                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#AAAAAA]/50 rounded-none flex items-center gap-2 transition-all duration-200"
+                                className="h-9 text-[10px] uppercase tracking-widest bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white disabled:opacity-100 disabled:text-[#777777]/50 rounded-none flex items-center gap-2 transition-all duration-200"
                                 onClick={() => {
                                   console.log("Clique no botão Blog", { index, legenda: option.legenda });
                                   expandContent(index, option.legenda, 'blog');
@@ -1156,7 +1156,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           <Button 
                             key={duration} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsDuration === duration ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsDuration === duration ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setReelsDuration(duration)}
                           >
                             {duration}
@@ -1172,7 +1172,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           <Button 
                             key={format} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsFormat === format ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${reelsFormat === format ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setReelsFormat(format)}
                           >
                             {format}
@@ -1268,7 +1268,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                         <SelectTrigger className="w-full bg-white/[0.03] border-white/5 text-white rounded-none h-10">
                           <SelectValue placeholder="Selecione o mês" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-none">
+                        <SelectContent className="bg-[#1A1816] border-white/10 text-white rounded-none">
                           {[
                             "Janeiro 2026", "Fevereiro 2026", "Março 2026", "Abril 2026", 
                             "Maio 2026", "Junho 2026", "Julho 2026", "Agosto 2026", 
@@ -1297,7 +1297,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                           <Button 
                             key={focus} 
                             variant="outline" 
-                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${calendarFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#AAAAAA] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
+                            className={`rounded-none text-[10px] font-bold tracking-widest h-10 transition-all duration-200 ${calendarFocus === focus ? 'bg-[#8B7355] text-white border-[#8B7355]' : 'bg-[#2A2826] border-[#4A4846] text-[#777777] hover:bg-[#3A3836] hover:border-[#8B7355] hover:text-white'}`} 
                             onClick={() => setCalendarFocus(focus)}
                           >
                             {focus}
@@ -1482,7 +1482,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                                   <Trash2 size={16} />
                                 </button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-[#1A1A1A] border-white/10 rounded-none">
+                              <AlertDialogContent className="bg-[#1A1816] border-white/10 rounded-none">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-white font-cormorant">Excluir do Histórico?</AlertDialogTitle>
                                   <AlertDialogDescription className="text-white/60">
@@ -1568,7 +1568,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           </TabsContent>
         </Tabs>
         <Dialog open={showExpansionModal} onOpenChange={setShowExpansionModal}>
-          <DialogContent className="bg-[#1A1A1A] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+          <DialogContent className="bg-[#1A1816] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
             <DialogHeader className="border-b border-white/5 pb-4 mb-4">
               <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-tight flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-bronze" /> {modalContent.title}

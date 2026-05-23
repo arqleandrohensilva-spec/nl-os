@@ -215,7 +215,7 @@ export default function PaginaCliente() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-bronze animate-spin" />
       </div>
     );
@@ -223,7 +223,7 @@ export default function PaginaCliente() {
 
   if (error || !projeto) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center p-8 text-center">
         <div>
           <h1 className="font-cormorant text-4xl italic text-white mb-4">NL ARQUITETOS</h1>
           <p className="text-white/60 mb-2">Link inválido ou expirado.</p>
@@ -242,8 +242,8 @@ export default function PaginaCliente() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
+    <div className="min-h-screen bg-[#0F0E0C] text-white font-sans selection:bg-bronze/30">
+      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0F0E0C]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
         <h1 className="font-cormorant text-2xl italic">NL ARQUITETOS</h1>
         <span className="text-[10px] text-bronze uppercase tracking-[0.3em] font-medium hidden sm:block">
           A ARQUITETURA COMO DECISÃO
@@ -280,7 +280,7 @@ export default function PaginaCliente() {
                       <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/10" />
                     )}
                     
-                    <div className="z-10 bg-[#0A0A0A]">
+                    <div className="z-10 bg-[#0F0E0C]">
                       {isApproved ? (
                         <div className="w-3 h-3 rounded-full bg-bronze" />
                       ) : isCurrent ? (
@@ -410,7 +410,7 @@ export default function PaginaCliente() {
               <Input 
                 value={nomeMensagem}
                 onChange={e => setNomeMensagem(e.target.value)}
-                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
+                className="bg-[#1A1816] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
             <div className="space-y-2">
@@ -419,7 +419,7 @@ export default function PaginaCliente() {
                 value={textoMensagem}
                 onChange={e => setTextoMensagem(e.target.value)}
                 placeholder="Dúvida, observação ou pedido de ajuste..."
-                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
+                className="bg-[#1A1816] border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
               />
             </div>
             <Button 
@@ -444,7 +444,7 @@ export default function PaginaCliente() {
       </footer>
 
       <Dialog open={showAprovarModal} onOpenChange={setShowAprovarModal}>
-        <DialogContent className="bg-[#121212] border-white/10 rounded-none text-white max-w-md">
+        <DialogContent className="bg-[#0F0E0C] border-white/10 rounded-none text-white max-w-md">
           <DialogHeader className="space-y-4">
             <DialogTitle className="font-cormorant text-2xl italic">Confirmar aprovação de {selectedEtapa?.etapa}</DialogTitle>
           </DialogHeader>
@@ -455,7 +455,7 @@ export default function PaginaCliente() {
                 autoFocus
                 value={nomeAprovador}
                 onChange={e => setNomeAprovador(e.target.value)}
-                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
+                className="bg-[#1A1816] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
             <p className="text-[10px] text-white/20 leading-relaxed italic">
@@ -482,7 +482,7 @@ export default function PaginaCliente() {
       </Dialog>
 
       <Dialog open={showAjusteModal} onOpenChange={setShowAjusteModal}>
-        <DialogContent className="bg-[#121212] border-white/10 rounded-none text-white max-w-md">
+        <DialogContent className="bg-[#0F0E0C] border-white/10 rounded-none text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="font-cormorant text-2xl italic">O que precisa ser ajustado?</DialogTitle>
           </DialogHeader>
@@ -492,7 +492,7 @@ export default function PaginaCliente() {
               value={textoAjuste}
               onChange={e => setTextoAjuste(e.target.value)}
               placeholder="Descreva detalhadamente..."
-              className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none min-h-[150px] text-white text-sm resize-none"
+              className="bg-[#1A1816] border-white/10 focus:border-bronze/50 rounded-none min-h-[150px] text-white text-sm resize-none"
             />
           </div>
           <DialogFooter className="gap-4 sm:justify-start">

@@ -371,10 +371,10 @@ const PropostaCalculadora = () => {
     }
   };
 
-  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0A0A0A] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
+  if (loading || !proposal) return <div className="flex h-screen items-center justify-center bg-[#0F0E0C] text-white"><Loader2 className="animate-spin text-bronze mr-2" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans">
+    <div className="min-h-screen bg-[#0F0E0C] text-white font-sans">
       <header className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Button variant="ghost" className="text-white/40 gap-2" onClick={() => navigate('/calculadora')}>

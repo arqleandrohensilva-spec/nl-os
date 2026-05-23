@@ -716,7 +716,7 @@ Retorne APENAS JSON válido:
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white">
+    <div className="min-h-screen bg-[#0F0E0C] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12">
         <header className="mb-12">
@@ -742,13 +742,13 @@ Retorne APENAS JSON válido:
           </div>
 
           <div className="grid grid-cols-5 gap-4">
-            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+            <div className="bg-[#0F0E0C] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROPOSTAS ENVIADAS</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length}
               </span>
             </div>
-            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+            <div className="bg-[#0F0E0C] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-white/40 uppercase font-normal font-inter">TAXA DE ABERTURA</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
@@ -756,7 +756,7 @@ Retorne APENAS JSON válido:
                   : '0%'}
               </span>
             </div>
-            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+            <div className="bg-[#0F0E0C] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-white/40 uppercase font-normal font-inter">APROVAÇÃO</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {proposals.length > 0 
@@ -764,13 +764,13 @@ Retorne APENAS JSON válido:
                   : '0%'}
               </span>
             </div>
-            <div className="bg-[#0A0A0A] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
+            <div className="bg-[#0F0E0C] p-6 border border-white/10 rounded-[2px] flex flex-col gap-1">
               <span className="text-[11px] text-white/40 uppercase font-normal font-inter">LEADS NO FUNIL</span>
               <span className="text-[22px] font-normal text-white font-inter">
                 {leads.length}
               </span>
             </div>
-            <div className="bg-[#0A0A0A] p-6 border border-bronze/20 rounded-[2px] flex flex-col gap-1 relative overflow-hidden group">
+            <div className="bg-[#0F0E0C] p-6 border border-bronze/20 rounded-[2px] flex flex-col gap-1 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-1 opacity-20 group-hover:opacity-100 transition-opacity">
                 <TrendingUp size={12} className="text-bronze" />
               </div>
@@ -831,7 +831,7 @@ Retorne APENAS JSON válido:
                   placeholder="BUSCAR CLIENTE..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0A0A0A]"
+                  className="h-9 pl-9 w-64 border-white/10 rounded-[2px] text-[10px] uppercase tracking-widest bg-[#0F0E0C]"
                 />
               </div>
             </div>
@@ -973,7 +973,7 @@ Retorne APENAS JSON válido:
                     <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => handleOpenDashboard(p)}
-                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#777777] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
                         <LayoutDashboard size={14} className="mr-2" />
                         Ver Dashboard
@@ -981,7 +981,7 @@ Retorne APENAS JSON válido:
                       
                       <Button 
                         onClick={() => handleGenerateFollowup(p)}
-                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#AAAAAA] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
+                        className="bg-[#2A2826] hover:bg-[#3A3836] text-[#777777] hover:text-white border border-[#4A4846] hover:border-[#8B7355] rounded-[2px] h-[40px] px-4 text-[9px] font-bold uppercase tracking-widest transition-all duration-200"
                       >
                         <MessageSquare size={14} className="mr-2" />
                         Gerar Follow-up
@@ -1010,7 +1010,7 @@ Retorne APENAS JSON válido:
                       </Button>
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
-                        <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA]">
+                        <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#777777]">
                           <SelectValue placeholder="STATUS" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1042,7 +1042,7 @@ Retorne APENAS JSON válido:
       </main>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-2xl bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
+        <DialogContent className="max-w-2xl bg-[#1A1816] border-white/10 text-white rounded-[2px]">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold font-cormorant text-white uppercase tracking-wider">Nova Proposta</DialogTitle>
           </DialogHeader>
@@ -1064,7 +1064,7 @@ Retorne APENAS JSON válido:
                     className="rounded-[2px] border-white/10 h-10 bg-white/5 text-white"
                   />
                   {showLeads && leads.length > 0 && (
-                    <div className="absolute top-full left-0 w-full mt-1 bg-[#1A1A1A] border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
+                    <div className="absolute top-full left-0 w-full mt-1 bg-[#1A1816] border border-white/10 rounded-[2px] shadow-lg max-h-60 overflow-auto z-[100]">
                       {leads
                         .filter(lead => 
                           !newProposal.cliente || 
@@ -1207,7 +1207,7 @@ Retorne APENAS JSON válido:
             <Button 
               onClick={handleCreateProposal}
               disabled={isSaving}
-              className="bg-[#1A1A1A] hover:bg-[#2A2A2A] text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
+              className="bg-[#1A1816] hover:bg-[#2A2A2A] text-white rounded-[2px] uppercase tracking-widest text-[10px] font-bold h-11 px-8"
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : 'Criar Proposta'}
             </Button>
@@ -1215,7 +1215,7 @@ Retorne APENAS JSON válido:
         </DialogContent>
       </Dialog>
       <Dialog open={isFollowupModalOpen} onOpenChange={setIsFollowupModalOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-[#1A1A1A] border-white/10 text-white p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
+        <DialogContent className="sm:max-w-[500px] bg-[#1A1816] border-white/10 text-white p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
           <DialogHeader className="p-6 bg-graphite text-white">
             <DialogTitle className="text-xl font-bold font-cormorant flex items-center gap-2 uppercase tracking-tight">
               <MessageSquare size={20} className="text-bronze" />
@@ -1237,7 +1237,7 @@ Retorne APENAS JSON válido:
                   <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
+                  <SelectContent className="bg-[#1A1816] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="direto" className="text-xs font-bold uppercase tracking-wider">Direto / Amigável</SelectItem>
                     <SelectItem value="formal" className="text-xs font-bold uppercase tracking-wider">Formal / Polido</SelectItem>
                   </SelectContent>
@@ -1255,7 +1255,7 @@ Retorne APENAS JSON válido:
                   <SelectTrigger className="h-9 rounded-[2px] border-white/10 text-xs font-bold uppercase tracking-wider">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1A1A] border-white/10 text-white rounded-[2px]">
+                  <SelectContent className="bg-[#1A1816] border-white/10 text-white rounded-[2px]">
                     <SelectItem value="pt" className="text-xs font-bold uppercase tracking-wider">Português</SelectItem>
                     <SelectItem value="en" className="text-xs font-bold uppercase tracking-wider">English</SelectItem>
                     <SelectItem value="es" className="text-xs font-bold uppercase tracking-wider">Español</SelectItem>
@@ -1336,7 +1336,7 @@ Retorne APENAS JSON válido:
       </Dialog>
       
       <Dialog open={isReviewModalOpen} onOpenChange={setIsReviewModalOpen}>
-        <DialogContent className="max-w-3xl bg-[#0F0F0F] rounded-none p-0 overflow-hidden border-[#2A2826]">
+        <DialogContent className="max-w-3xl bg-[#0F0E0C] rounded-none p-0 overflow-hidden border-[#2A2826]">
           <DialogHeader className="p-8 bg-black text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
               <Shield size={160} />
@@ -1352,7 +1352,7 @@ Retorne APENAS JSON válido:
             </div>
           </DialogHeader>
 
-          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0F0F0F]">
+          <div className="p-8 max-h-[65vh] overflow-y-auto custom-scrollbar space-y-8 bg-[#0F0E0C]">
             {isReviewing ? (
               <div className="py-20 flex flex-col items-center justify-center space-y-4">
                 <Loader2 className="w-10 h-10 text-bronze animate-spin" />

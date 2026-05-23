@@ -130,7 +130,7 @@ const ClientesLista = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#0F0E0C] text-[#E8E4DF]">
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-10">

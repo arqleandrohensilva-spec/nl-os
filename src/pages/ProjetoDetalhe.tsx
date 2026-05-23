@@ -567,7 +567,7 @@ const ProjetoDetalhe = () => {
     }
   };
 
-  if (!projeto || loading) return <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white/40 font-mono">CARREGANDO DETALHES...</div>;
+  if (!projeto || loading) return <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center text-white/40 font-mono">CARREGANDO DETALHES...</div>;
 
   const getEtapaColor = (status: string) => {
     switch(status) {
@@ -578,7 +578,7 @@ const ProjetoDetalhe = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
+    <div className="flex min-h-screen bg-[#0F0E0C] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
       <main className="flex-1 ml-[230px] p-12">
@@ -633,7 +633,7 @@ const ProjetoDetalhe = () => {
                   <Trash2 size={14} className="mr-2" /> {isDeleting ? "EXCLUINDO..." : "EXCLUIR PROJETO"}
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent className="bg-[#0A0A0A] border border-white/10 text-white">
+              <AlertDialogContent className="bg-[#0F0E0C] border border-white/10 text-white">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="font-cormorant italic text-2xl">Confirmar exclusão?</AlertDialogTitle>
                   <AlertDialogDescription className="text-white/60 font-inter text-sm">
@@ -669,16 +669,16 @@ const ProjetoDetalhe = () => {
             </div>
             
             <div className="flex flex-wrap gap-8 text-[11px] text-[#777777] uppercase font-normal font-inter">
-              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
                 <MapPin size={14} className="text-[#8B7355]" /> {projeto.cidade || 'Localização não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
                 <Maximize2 size={14} className="text-[#8B7355]" /> {projeto.area_m2 ? `${projeto.area_m2} m²` : 'Área não definida'}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
                 <Calendar size={14} className="text-[#8B7355]" /> Início: {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
               </div>
-              <div className="flex items-center gap-2 hover:text-[#FFFFFF] transition-colors cursor-default">
+              <div className="flex items-center gap-2 hover:text-[#E8E4DF] transition-colors cursor-default">
                 <Clock size={14} className="text-[#8B7355]" /> Prazo: {projeto.prazo_final ? format(parseISO(projeto.prazo_final), 'dd/MM/yyyy') : 'Sob consulta'}
               </div>
             </div>
@@ -686,7 +686,7 @@ const ProjetoDetalhe = () => {
 
           <div className="text-right">
             <p className="text-[11px] text-[#777777] uppercase font-normal font-inter mb-3">Status do Ativo</p>
-            <span className="text-3xl font-cormorant italic text-[#FFFFFF] leading-none">
+            <span className="text-3xl font-cormorant italic text-[#E8E4DF] leading-none">
               {projeto.status_geral}
             </span>
           </div>
@@ -1074,7 +1074,7 @@ const ProjetoDetalhe = () => {
               </div>
 
               {/* Financeiro do Projeto - Internal Only */}
-              <div className="bg-[#0A0A0A] border border-white/5 p-10 relative overflow-hidden space-y-6">
+              <div className="bg-[#0F0E0C] border border-white/5 p-10 relative overflow-hidden space-y-6">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
                 <div className="flex justify-between items-start">
                   <div>
@@ -1217,7 +1217,7 @@ const ProjetoDetalhe = () => {
               </div>
 
               {/* Profitability Index - Internal Only */}
-              <div className="bg-[#0A0A0A] border border-[#8B7355]/30 p-10 relative overflow-hidden">
+              <div className="bg-[#0F0E0C] border border-[#8B7355]/30 p-10 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B7355]/5 blur-3xl rounded-full -mr-16 -mt-16" />
                 
                 <div className="flex justify-between items-start mb-8">
@@ -1308,7 +1308,7 @@ const VisualTimeline = ({ projeto, etapas }: { projeto: Projeto, etapas: Etapa[]
                   "w-4 h-4 rounded-full border-2 z-10 transition-all duration-700 flex items-center justify-center",
                   isDone ? "bg-[#3A3A3A] border-[#3A3A3A]" :
                   isCurrent ? (isOverdue ? "bg-[#8B2020] border-[#8B2020] animate-pulse" : "bg-[#8B7355] border-[#8B7355] animate-pulse") :
-                  "bg-[#0A0A0A] border-white/10"
+                  "bg-[#0F0E0C] border-white/10"
                 )}>
                   {isDone && <Check size={8} className="text-white" />}
                   {isCurrent && <div className="w-1.5 h-1.5 rounded-full bg-white" />}

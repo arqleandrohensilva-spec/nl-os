@@ -199,7 +199,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
                     toast.error("Erro ao aprovar lead");
                   }
                 }}
-                className="h-7 px-3 bg-[#8B7355] hover:bg-[#7a654a] text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
+                className="h-7 px-3 bg-[#8B7355] hover:bg-[#8B7355]/80 text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
               >
                 APROVAR
               </button>
