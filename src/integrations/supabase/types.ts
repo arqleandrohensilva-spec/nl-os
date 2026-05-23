@@ -1780,27 +1780,22 @@ export type Database = {
       get_briefing_by_token: {
         Args: { p_token: string }
         Returns: {
-          cidade: string | null
-          cliente_id: string | null
+          cidade: string
+          cliente_id: string
           criado_em: string
-          email: string | null
+          email: string
           id: string
-          lead_id: string | null
-          nome: string | null
-          origem: string | null
-          preenchido_em: string | null
-          respostas: Json | null
+          lead_id: string
+          leads: Json
+          nome: string
+          origem: string
+          preenchido_em: string
+          respostas: Json
           status: string
-          tipo_projeto: string | null
-          token: string | null
-          whatsapp: string | null
+          tipo_projeto: string
+          token: string
+          whatsapp: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "briefings"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_project_by_token: {
         Args: { p_token: string }
