@@ -931,7 +931,7 @@ const ControleHoras = () => {
               </div>
 
               <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/60 hover:text-white">Cancelar</Button>
                 <Button onClick={startTimer} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">▶ Iniciar Agora</Button>
               </div>
             </div>
@@ -1115,7 +1115,7 @@ const ControleHoras = () => {
                 <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold block mb-2">Data</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/5 border-white/10 text-white rounded-none h-11 px-3 hover:bg-white/10">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-white/5 border-white/20 text-white rounded-none h-11 px-3 hover:bg-white/10">
                       <Calendar className="mr-2 h-4 w-4" />
                       {manualSession.data ? format(manualSession.data, "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
                     </Button>
@@ -1167,7 +1167,7 @@ const ControleHoras = () => {
               </div>
 
               <div className="pt-4 flex gap-3">
-                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/40 hover:text-white">Cancelar</Button>
+                <Button variant="ghost" onClick={() => setIsManualModalOpen(false)} className="flex-1 rounded-none text-[10px] uppercase font-bold text-white/60 hover:text-white">Cancelar</Button>
                 <Button onClick={handleManualRegistration} className="flex-1 bg-bronze hover:bg-bronze/90 text-white rounded-none h-12 text-[10px] uppercase font-bold tracking-widest">
                   <CheckCircle2 size={14} className="mr-2" />
                   Registrar
@@ -1184,7 +1184,7 @@ const ControleHoras = () => {
           <div className="p-8 text-center">
             <AlertCircle size={32} className="mx-auto text-bronze mb-4" />
             <h2 className="text-xl font-cormorant font-bold mb-2">Ausência detectada</h2>
-            <p className="text-[11px] text-white/40 mb-8 leading-relaxed">
+            <p className="text-[11px] text-white/60 mb-8 leading-relaxed">
               Não detectamos atividade nos últimos 10 minutos. O que deseja fazer com o timer atual?
             </p>
             
@@ -1201,7 +1201,7 @@ const ControleHoras = () => {
               <Button 
                 variant="outline"
                 onClick={() => pauseInactivity(false)}
-                className="w-full border-white/10 hover:border-white/20 text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
+                className="w-full border-white/20 hover:border-white/30 text-white rounded-none h-11 text-[10px] uppercase font-bold tracking-widest"
               >
                 Pausar agora
               </Button>

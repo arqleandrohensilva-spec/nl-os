@@ -317,7 +317,7 @@ export default function PaginaCliente() {
                 <div key={etapa.id} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                   <div className="space-y-2">
                     <h3 className="font-cormorant text-3xl italic">{etapa.etapa}</h3>
-                    <p className="text-white/40 text-xs">
+                    <p className="text-white/60 text-xs">
                       Enviado em {format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR })}
                     </p>
                   </div>
@@ -334,7 +334,7 @@ export default function PaginaCliente() {
                     </Button>
                     <Button 
                       variant="ghost" 
-                      className="text-white/50 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest h-12"
+                      className="text-white/70 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest h-12"
                       onClick={() => {
                         setSelectedEtapa(etapa);
                         setShowAjusteModal(true);
@@ -406,7 +406,7 @@ export default function PaginaCliente() {
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">FALAR COM A NL</p>
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Seu nome (opcional)</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/60">Seu nome (opcional)</label>
               <Input 
                 value={nomeMensagem}
                 onChange={e => setNomeMensagem(e.target.value)}
@@ -414,7 +414,7 @@ export default function PaginaCliente() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Mensagem</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/60">Mensagem</label>
               <Textarea 
                 value={textoMensagem}
                 onChange={e => setTextoMensagem(e.target.value)}
@@ -450,7 +450,7 @@ export default function PaginaCliente() {
           </DialogHeader>
           <div className="py-6 space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Seu nome completo</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/60">Seu nome completo</label>
               <Input 
                 autoFocus
                 value={nomeAprovador}
@@ -472,7 +472,7 @@ export default function PaginaCliente() {
             </Button>
             <Button 
               variant="ghost" 
-              className="text-white/40 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              className="text-white/60 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
               onClick={() => setShowAprovarModal(false)}
             >
               CANCELAR
@@ -504,7 +504,7 @@ export default function PaginaCliente() {
             </Button>
             <Button 
               variant="ghost" 
-              className="text-white/40 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              className="text-white/60 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
               onClick={() => setShowAjusteModal(false)}
             >
               CANCELAR
