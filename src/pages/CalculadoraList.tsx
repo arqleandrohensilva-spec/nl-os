@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { 
@@ -29,9 +29,20 @@ interface Lead {
 
 const CalculadoraList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const clienteState = location.state;
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (clienteState?.clienteId) {
+      navigate('/calculadora/nova-proposta', { 
+        state: clienteState,
+        replace: true 
+      });
+    }
+  }, [clienteState, navigate]);
 
   useEffect(() => {
     fetchLeads();

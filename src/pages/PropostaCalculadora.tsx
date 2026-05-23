@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -48,9 +48,26 @@ interface ProposalData {
 const PropostaCalculadora = () => {
   const { proposalId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const clienteState = location.state;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [proposal, setProposal] = useState<ProposalData | null>(null);
+
+  useEffect(() => {
+    if (clienteState?.clienteId && proposalId === 'nova') {
+      setProposal(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          cliente: clienteState.clienteNome || prev.cliente,
+          cidade: clienteState.clienteCidade || prev.cidade,
+          tipo: clienteState.clienteTipo || prev.tipo,
+          area: clienteState.clienteArea || prev.area,
+        };
+      });
+    }
+  }, [clienteState, proposalId]);
   const [config, setConfig] = useState({
     custo_hora: 0,
     margem_lucro: 0,
