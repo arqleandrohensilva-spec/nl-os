@@ -410,7 +410,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   <Button 
                     variant="ghost" 
                     className="mt-4 text-[9px] font-bold uppercase tracking-widest text-bronze"
-                    onClick={() => navigate('/scripts')}
+                    onClick={() => navigate('/scripts-atendimento')}
                   >
                     Ver Todos os Scripts
                   </Button>
