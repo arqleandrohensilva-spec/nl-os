@@ -324,7 +324,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
                 <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
               </div>
               <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">
-                {location.pathname === '/financeiro/base' ? 'Módulo Financeiro' : 'Módulo Pipeline'}
+                Módulo Administrativo
               </p>
             </div>
           </div>
