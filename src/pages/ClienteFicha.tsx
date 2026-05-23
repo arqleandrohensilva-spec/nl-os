@@ -274,6 +274,20 @@ const ClienteFicha = () => {
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-12 max-w-6xl mx-auto space-y-12">
+        {/* CABEÇALHO EM DESTAQUE */}
+        <div className="space-y-4">
+          <h1 className="text-6xl font-['Cormorant_Garamond'] italic text-[#E8E4DF] leading-none uppercase tracking-tighter">
+            {cliente?.nome}
+          </h1>
+          <div className="flex items-center gap-4 text-white/30 text-[10px] font-['Courier_New'] uppercase tracking-[0.3em] font-bold">
+            <span>{cliente?.cidade}</span>
+            <span className="w-1 h-1 bg-white/20 rounded-full" />
+            <span>{cliente?.origem}</span>
+            <span className="w-1 h-1 bg-white/20 rounded-full" />
+            <span className="text-[#8B7355]">{cliente?.tipo_projeto || 'ARQ+INT'}</span>
+          </div>
+        </div>
+
         {/* BARRA DE PROGRESSO */}
         <div className="bg-[#161616] p-8 border border-white/5 relative">
           <div className="flex justify-between items-center relative z-10">
