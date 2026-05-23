@@ -91,7 +91,7 @@ const PropostaCalculadora = () => {
       setLoading(true);
       
       // Handle Standalone case
-      if (proposalId === 'nova') {
+      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         setProposal({
           id: 'nova',
           cliente: '',
