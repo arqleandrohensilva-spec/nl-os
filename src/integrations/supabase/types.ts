@@ -1797,6 +1797,22 @@ export type Database = {
           whatsapp: string
         }[]
       }
+      get_document_link_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          criado_em: string
+          documento_id: string | null
+          expira_em: string
+          id: string
+          token: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "documento_links"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_project_by_token_or_slug: {
         Args: { p_val: string }
         Returns: {
