@@ -525,12 +525,12 @@ Máximo 3 linhas. Sem markdown. Em português.
   if (isLoading) return <div className="flex h-screen items-center justify-center">Carregando...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user || ''} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#0F0E0C] z-10">
+        <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
           <div className="px-10 py-6 border-b border-white/10">
             <div className="flex items-center justify-between mb-6">
               <div className="space-y-1">

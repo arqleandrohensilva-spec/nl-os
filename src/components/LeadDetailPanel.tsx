@@ -197,7 +197,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
       <div className="absolute inset-0 bg-graphite/40 backdrop-blur-[8px]" onClick={onClose} />
-      <div className="relative w-[520px] h-full bg-[#0F0E0C] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
+      <div className="relative w-[520px] h-full bg-[#0A0A0A] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
         <div className="p-10 border-b border-white/10 relative">
           <button onClick={onClose} className="absolute right-8 top-8 text-white/40 hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
           <div className="flex items-center gap-3 mb-2">
@@ -444,7 +444,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
               <div className="relative">
                 <select 
-                  className="w-full p-2 bg-[#1A1816] border border-white/10 text-white/60 text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors appearance-none pr-8" 
+                  className="w-full p-2 bg-[#1A1A1A] border border-white/10 border border-white/10 text-white/60 text-[11px] rounded-none focus:outline-none focus:border-bronze transition-colors appearance-none pr-8" 
                   onChange={(e) => setNewLog({...newLog, tipo: e.target.value as LogTipo})}
                 >
                   <option value="N">Nota</option><option value="W">WhatsApp</option><option value="L">Ligação</option>
@@ -455,7 +455,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                 placeholder="Descrever o contato..." 
                 value={newLog.nota} 
                 onChange={(e) => setNewLog({...newLog, nota: e.target.value})} 
-                className="bg-[#1A1816] border-white/10 text-white rounded-none focus:border-bronze transition-colors" 
+                className="bg-[#1A1A1A] border border-white/10 border-white/10 text-white rounded-none focus:border-bronze transition-colors" 
               />
               <Button className="w-full bg-bronze text-white hover:bg-bronze/80 text-[10px] uppercase font-bold tracking-widest h-10 rounded-none transition-all" onClick={handleAddLog}>Registrar</Button>
             </div>

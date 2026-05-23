@@ -69,7 +69,7 @@ const NotificationsPanel = ({ isOpen, onClose, className }: NotificationsPanelPr
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           className={cn(
-            "absolute mt-4 w-[320px] bg-[#0F0E0C] border border-white/5 shadow-2xl z-[60] flex flex-col max-h-[480px]",
+            "absolute mt-4 w-[320px] bg-[#0A0A0A] border border-white/5 shadow-2xl z-[60] flex flex-col max-h-[480px]",
             className
           )}
         >

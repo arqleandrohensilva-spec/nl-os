@@ -173,7 +173,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0F0E0C] border-white/10 text-white sm:max-w-[425px]">
+      <DialogContent className="bg-[#0A0A0A] border-white/10 text-white sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-cormorant text-bronze uppercase tracking-widest">
             GERAR LINK DA PROPOSTA
@@ -185,10 +185,10 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
             <div className="space-y-2">
               <Label htmlFor="tipo" className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Proposta</Label>
               <Select value={tipo} onValueChange={setTipo}>
-                <SelectTrigger className="bg-[#1A1816] border-white/10 rounded-none focus:ring-bronze">
+                <SelectTrigger className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:ring-bronze">
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1A1816] border-white/10 text-white">
+                <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/10 text-white">
                   <SelectItem value="arqint">ARQ+INT</SelectItem>
                   <SelectItem value="int">Interiores</SelectItem>
                   <SelectItem value="comercial">Comercial</SelectItem>
@@ -204,7 +204,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   value={tipoNegocio}
                   onChange={(e) => setTipoNegocio(e.target.value)}
                   placeholder="Ex: Barbearia, Clínica, Restaurante..."
-                  className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
                 />
               </div>
             )}
@@ -215,7 +215,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                 id="nome"
                 value={nomeCliente}
                 onChange={(e) => setNomeCliente(e.target.value)}
-                className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
               />
             </div>
 
@@ -226,7 +226,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   id="cidade"
                   value={cidade}
                   onChange={(e) => setCidade(e.target.value)}
-                  className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
                 />
               </div>
               <div className="space-y-2">
@@ -236,7 +236,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   type="number"
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
-                  className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
                 />
               </div>
             </div>
@@ -249,7 +249,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   type="number"
                   value={valorExecutivo}
                   onChange={(e) => setValorExecutivo(e.target.value)}
-                  className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
                 />
               </div>
               <div className="space-y-2">
@@ -259,7 +259,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                   type="number"
                   value={valorCompleto}
                   onChange={(e) => setValorCompleto(e.target.value)}
-                  className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
                 />
               </div>
             </div>
@@ -270,7 +270,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
                 id="objetivo"
                 value={objetivo}
                 onChange={(e) => setObjetivo(e.target.value)}
-                className="bg-[#1A1816] border-white/10 rounded-none focus:border-bronze"
+                className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
               />
             </div>
 

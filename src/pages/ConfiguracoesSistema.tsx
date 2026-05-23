@@ -96,7 +96,7 @@ const UsefulLinks = () => {
           return (
             <div 
               key={link.id}
-              className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]"
+              className="bg-[#1A1A1A] border border-white/10 border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]"
             >
               <div className="p-3 bg-white/5 text-bronze rounded-[1px] group-hover:bg-bronze/10 transition-colors">
                 <IconComponent size={18} />
@@ -192,7 +192,7 @@ const ConfiguracoesSistema = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C]">
+    <div className="flex min-h-screen bg-[#0A0A0A]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
       
       <main className="flex-1 pl-[230px]">

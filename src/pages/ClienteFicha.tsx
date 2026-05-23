@@ -17,7 +17,7 @@ import { Progress } from '@/components/ui/progress';
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
 
 const ShortcutCard = ({ label, value, actionLabel, onClick }: { label: string, value: string, actionLabel: string, onClick: () => void }) => (
-  <div className="bg-[#1A1816] border border-[#3A3A3A] p-6 flex flex-col justify-between h-40">
+  <div className="bg-[#1A1A1A] border border-white/10 border border-[#3A3A3A] p-6 flex flex-col justify-between h-40">
     <div className="space-y-1">
       <span className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-widest">{label}</span>
       <p className="text-[#E8E4DF] text-lg font-medium">{value}</p>
@@ -252,12 +252,12 @@ const ClienteFicha = () => {
     saveMutation.mutate({ observacoes: formData.observacoes });
   };
 
-  if (isClienteLoading) return <div className="min-h-screen bg-[#1A1816] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
+  if (isClienteLoading) return <div className="min-h-screen bg-[#1A1A1A] border border-white/10 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
 
   const formatCurrency = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#1A1A1A] border border-white/10 text-[#E8E4DF]">
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-12 max-w-6xl mx-auto space-y-12">
@@ -290,7 +290,7 @@ const ClienteFicha = () => {
         {/* DADOS PESSOAIS */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">DADOS PESSOAIS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0F0E0C]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 border border-[#3A3A3A] bg-[#0A0A0A]">
             {[
               { label: 'Nome', key: 'nome' },
               { label: 'WhatsApp', key: 'whatsapp' },
@@ -308,7 +308,7 @@ const ClienteFicha = () => {
                       <SelectTrigger className="bg-white/5 border-white/10 rounded-none h-10 text-xs">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1A1816] border-white/10">
+                      <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/10">
                         {field.options?.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -335,7 +335,7 @@ const ClienteFicha = () => {
         {/* QUALIFICAÇÃO */}
         <section className="space-y-6">
           <h2 className="text-[#8B7355] font-['Courier_New'] text-xs uppercase tracking-[0.3em] font-bold">QUALIFICAÇÃO</h2>
-          <div className="bg-[#0F0E0C] border border-[#3A3A3A] p-8 space-y-8">
+          <div className="bg-[#0A0A0A] border border-[#3A3A3A] p-8 space-y-8">
             {/* SCORE CARD */}
             <div className="space-y-4">
               <div className="flex justify-between items-end">
@@ -427,7 +427,7 @@ const ClienteFicha = () => {
             onChange={(e) => setFormData({...formData, observacoes: e.target.value})}
             onBlur={handleBlurSave}
             placeholder="Digite aqui anotações sobre este cliente..."
-            className="w-full h-40 bg-[#0F0E0C] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
+            className="w-full h-40 bg-[#0A0A0A] border border-[#3A3A3A] p-6 text-[#E8E4DF] text-sm outline-none focus:border-[#8B7355] transition-colors resize-none"
           />
         </section>
 

@@ -166,14 +166,14 @@ const BriefingPublic = () => {
   );
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#8B7355] flex flex-col items-center justify-center font-cormorant italic text-2xl gap-4 selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#8B7355] flex flex-col items-center justify-center font-cormorant italic text-2xl gap-4 selection:bg-[#8B7355]/30">
       <div className="w-8 h-[1px] bg-[#8B7355] animate-pulse" />
       <p className="animate-pulse">Carregando...</p>
     </div>
   );
 
   if (submitted) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center font-['Courier_New'] relative overflow-hidden selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center font-['Courier_New'] relative overflow-hidden selection:bg-[#8B7355]/30">
       <GrainOverlay />
       <BackgroundGlow />
       
@@ -227,7 +227,7 @@ const BriefingPublic = () => {
   );
 
   if (step === 0) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden selection:bg-[#8B7355]/30">
+    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden selection:bg-[#8B7355]/30">
       <GrainOverlay />
       <BackgroundGlow />
 
@@ -332,11 +332,11 @@ const BriefingPublic = () => {
                           onChange={handleChange} 
                           className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] focus:bg-white/[0.04] transition-all duration-500 appearance-none cursor-pointer"
                         >
-                          <option value="" className="bg-[#0F0E0C]">Selecione uma opção...</option>
-                          <option value="Instagram" className="bg-[#0F0E0C]">Instagram</option>
-                          <option value="Indicação" className="bg-[#0F0E0C]">Indicação</option>
-                          <option value="Google" className="bg-[#0F0E0C]">Google</option>
-                          <option value="Outro" className="bg-[#0F0E0C]">Outros Canais</option>
+                          <option value="" className="bg-[#0A0A0A]">Selecione uma opção...</option>
+                          <option value="Instagram" className="bg-[#0A0A0A]">Instagram</option>
+                          <option value="Indicação" className="bg-[#0A0A0A]">Indicação</option>
+                          <option value="Google" className="bg-[#0A0A0A]">Google</option>
+                          <option value="Outro" className="bg-[#0A0A0A]">Outros Canais</option>
                         </select>
                       </div>
                     </div>
@@ -513,10 +513,10 @@ const BriefingPublic = () => {
                           onChange={handleChange} 
                           className="w-full bg-white/[0.02] border border-white/5 rounded-none h-14 px-6 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#8B7355] appearance-none cursor-pointer"
                         >
-                          <option value="" className="bg-[#0F0E0C]">Não definido...</option>
-                          <option value="Ate 500k" className="bg-[#0F0E0C]">Ate R$ 500.000</option>
-                          <option value="500k - 1M" className="bg-[#0F0E0C]">R$ 500.000 a R$ 1.000.000</option>
-                          <option value="Acima 1M" className="bg-[#0F0E0C]">Acima de R$ 1.000.000</option>
+                          <option value="" className="bg-[#0A0A0A]">Não definido...</option>
+                          <option value="Ate 500k" className="bg-[#0A0A0A]">Ate R$ 500.000</option>
+                          <option value="500k - 1M" className="bg-[#0A0A0A]">R$ 500.000 a R$ 1.000.000</option>
+                          <option value="Acima 1M" className="bg-[#0A0A0A]">Acima de R$ 1.000.000</option>
                         </select>
                       </div>
 
@@ -560,7 +560,7 @@ const BriefingPublic = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0E0C] text-[#E8E4DF] font-['Courier_New'] selection:bg-[#8B7355]/30 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0A0A0A] text-[#E8E4DF] font-['Courier_New'] selection:bg-[#8B7355]/30 relative overflow-hidden">
       <GrainOverlay />
       <BackgroundGlow />
       
@@ -570,7 +570,7 @@ const BriefingPublic = () => {
         <div className="absolute top-[100px] left-0 right-0 h-[1px] bg-white/[0.02]" />
       </div>
 
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0F0E0C]/90 backdrop-blur-xl border-b border-white/5 px-8 py-6">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-[#0A0A0A]/90 backdrop-blur-xl border-b border-white/5 px-8 py-6">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex flex-col">
             <span className="text-[11px] font-bold tracking-[0.6em] text-[#8B7355] ml-[0.6em]">NL ARQUITETOS</span>

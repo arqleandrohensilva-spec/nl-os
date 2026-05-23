@@ -826,7 +826,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C]">
+    <div className="flex min-h-screen bg-[#0A0A0A]">
       <Sidebar user="Sócio" />
       <main className="flex-1 ml-[230px] p-8">
         <header className="mb-8 flex justify-between items-center">
@@ -1268,7 +1268,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                         <SelectTrigger className="w-full bg-white/[0.03] border-white/5 text-white rounded-none h-10">
                           <SelectValue placeholder="Selecione o mês" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1A1816] border-white/10 text-white rounded-none">
+                        <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/10 text-white rounded-none">
                           {[
                             "Janeiro 2026", "Fevereiro 2026", "Março 2026", "Abril 2026", 
                             "Maio 2026", "Junho 2026", "Julho 2026", "Agosto 2026", 
@@ -1482,7 +1482,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
                                   <Trash2 size={16} />
                                 </button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="bg-[#1A1816] border-white/10 rounded-none">
+                              <AlertDialogContent className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle className="text-white font-cormorant">Excluir do Histórico?</AlertDialogTitle>
                                   <AlertDialogDescription className="text-white/60">
@@ -1568,7 +1568,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
           </TabsContent>
         </Tabs>
         <Dialog open={showExpansionModal} onOpenChange={setShowExpansionModal}>
-          <DialogContent className="bg-[#1A1816] border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
+          <DialogContent className="bg-[#1A1A1A] border border-white/10 border-bronze/30 text-white max-w-2xl max-h-[80vh] overflow-y-auto rounded-none">
             <DialogHeader className="border-b border-white/5 pb-4 mb-4">
               <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-tight flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-bronze" /> {modalContent.title}

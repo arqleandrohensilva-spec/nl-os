@@ -587,7 +587,7 @@ Retorne APENAS JSON:
   }, [leadLogs]);
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] font-sans text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
       <Sidebar user={getDisplayName()} />
       
       <main className="flex-1 ml-[230px] p-20 max-w-[1600px] mx-auto w-full">
@@ -612,7 +612,7 @@ Retorne APENAS JSON:
                         PREVISÃO DE FECHAMENTO
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-6xl bg-[#0F0E0C] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
+                    <DialogContent className="max-w-6xl bg-[#0A0A0A] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
                       <DialogHeader className="p-8 border-b border-white/5">
                         <DialogTitle className="text-bronze text-sm font-bold uppercase tracking-[0.3em]">
                           PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}

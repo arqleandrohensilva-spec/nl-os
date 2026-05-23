@@ -130,7 +130,7 @@ const ClientesLista = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
       <Sidebar user="User" />
       
       <main className="flex-1 ml-[230px] p-10">
@@ -162,7 +162,7 @@ const ClientesLista = () => {
               {briefingsPendentes.map((briefing) => (
                 <div 
                   key={briefing.id}
-                  className="bg-[#1A1816] border border-[#2A2A2A] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="bg-[#1A1A1A] border border-white/10 border border-[#2A2A2A] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -252,7 +252,7 @@ const ClientesLista = () => {
               <div 
                 key={cliente.id}
                 onClick={() => navigate(`/clientes/${cliente.id}`)}
-                className="bg-[#1A1816] border border-white/5 p-6 hover:border-[#8B7355]/50 transition-all cursor-pointer group relative overflow-hidden"
+                className="bg-[#1A1A1A] border border-white/10 border border-white/5 p-6 hover:border-[#8B7355]/50 transition-all cursor-pointer group relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-1 h-full bg-[#8B7355] opacity-0 group-hover:opacity-100 transition-opacity" />
                 

@@ -363,7 +363,7 @@ const Index = () => {
   const showMockToast = () => {
     const randomLead = leads[Math.floor(Math.random() * leads.length)];
     toast.custom((t) => (
-      <div className="bg-[#1A1816] text-white p-4 rounded-[2px] shadow-2xl border-l-4 border-bronze flex items-center justify-between gap-4 min-w-[320px] animate-in slide-in-from-right duration-300">
+      <div className="bg-[#1A1A1A] border border-white/10 text-white p-4 rounded-[2px] shadow-2xl border-l-4 border-bronze flex items-center justify-between gap-4 min-w-[320px] animate-in slide-in-from-right duration-300">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-bronze/10 rounded-full">
             <Eye size={18} className="text-bronze" />
@@ -625,7 +625,7 @@ const Index = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user} />
       
       <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden">
@@ -633,7 +633,7 @@ const Index = () => {
 
 
         {/* Header Section */}
-        <div className="flex-shrink-0 bg-[#0F0E0C] z-10">
+        <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
           <div className="px-10 py-6 border-b border-white/10 flex items-center justify-between">
             <div className="space-y-1">
               <h1 className="text-2xl font-cormorant text-white tracking-tight leading-none uppercase">Pipeline de Leads</h1>
@@ -647,7 +647,7 @@ const Index = () => {
                   placeholder="BUSCAR LEAD..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#0F0E0C] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
+                  className="w-72 h-10 pl-10 bg-[#0A0A0A] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
                 />
               </div>
               <div className="h-8 w-[1px] bg-white/10" />
@@ -668,7 +668,7 @@ const Index = () => {
 
           {/* MetricsBar and OriginBreakdown removed as per request - now in Command Center */}
 
-          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0F0E0C] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
+          <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
             <div className="flex items-center gap-3">
               <button 
                 onClick={showMockToast}
@@ -737,7 +737,7 @@ const Index = () => {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 bg-[#0F0E0C] overflow-auto p-6 pt-2 scrollbar-custom">
+        <div className="flex-1 bg-[#0A0A0A] overflow-auto p-6 pt-2 scrollbar-custom">
           {viewMode === 'kanban' && (
             <DndContext 
               sensors={sensors}
@@ -998,7 +998,7 @@ const Index = () => {
 
       {/* Project Conversion Modal */}
       <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
-        <DialogContent className="bg-[#1A1816] border-white/5 text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Converter em Projeto?</h2>
             <p className="text-[11px] text-white/40 mb-8 font-mono">{conversionLead?.nome} acabou de ser fechado. Deseja criar o projeto no Controle de Horas?</p>
