@@ -99,7 +99,7 @@ const ClienteFicha = () => {
       const { data } = await supabase
         .from('proposals')
         .select('*')
-        .eq('cliente_id', id)
+        .filter('cliente_id', 'eq', id)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
