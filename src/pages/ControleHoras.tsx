@@ -515,7 +515,7 @@ const ControleHoras = () => {
     doc.text('NL OS', 20, 25);
     doc.setFontSize(12);
     doc.setTextColor(bronze[0], bronze[1], bronze[2]);
-    doc.text(`Resumo Semanal — ${lastWeekSummary.period}`, 20, 32);
+    doc.text(`Módulo Administrativo — ${lastWeekSummary.period}`, 20, 32);
 
     // Summary Section
     doc.setTextColor(graphite[0], graphite[1], graphite[2]);
