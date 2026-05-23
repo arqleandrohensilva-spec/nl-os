@@ -431,6 +431,7 @@ export type Database = {
       contratos: {
         Row: {
           categoria_cancelamento: string | null
+          cliente_id: string | null
           cliente_nome: string | null
           conteudo: string | null
           criado_em: string
@@ -450,6 +451,7 @@ export type Database = {
         }
         Insert: {
           categoria_cancelamento?: string | null
+          cliente_id?: string | null
           cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
@@ -469,6 +471,7 @@ export type Database = {
         }
         Update: {
           categoria_cancelamento?: string | null
+          cliente_id?: string | null
           cliente_nome?: string | null
           conteudo?: string | null
           criado_em?: string
@@ -487,6 +490,13 @@ export type Database = {
           valores?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "contratos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contratos_lead_id_fkey"
             columns: ["lead_id"]
