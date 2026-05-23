@@ -254,14 +254,14 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             </div>
 
             <div className="bg-white/[0.03] border border-white/10 p-4 rounded-none space-y-2">
-              <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2">Breakdown do Score</p>
+              <p className="text-[9px] font-bold text-white/60 uppercase tracking-widest mb-2">Breakdown do Score</p>
               {calculateLeadScore(lead).breakdown.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-[10px]">
                   <div className="flex items-center gap-2">
                     {item.achieved ? <Check size={10} className="text-green-600" /> : <X size={10} className="text-red" />}
-                    <span className={cn(item.achieved ? "text-white" : "text-white/40")}>{item.label}</span>
+                    <span className={cn(item.achieved ? "text-white" : "text-white/60")}>{item.label}</span>
                   </div>
-                  <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-white/40")}>
+                  <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-white/60")}>
                     {item.achieved ? `+${item.value}` : '+0'}
                   </span>
                 </div>
@@ -295,7 +295,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="pt-3 border-t border-black/5 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Horas Est.</p>
+                  <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Horas Est.</p>
                   <input 
                     type="number" 
                     value={horasEstimadas} 
@@ -304,12 +304,12 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   />
                 </div>
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Custo Real</p>
+                  <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Custo Real</p>
                   <p className="text-xs font-bold text-white">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Margem Real</p>
+                <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Margem Real</p>
                 <p className={cn(
                   "text-sm font-bold",
                   viability.status === 'prejuizo' ? "text-red-600" : "text-white"
@@ -322,7 +322,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
 
           <section>
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Ações Rápidas</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 mb-6">Ações Rápidas</h4>
             <div className="flex flex-col gap-3">
               <Button 
                 onClick={async () => {
