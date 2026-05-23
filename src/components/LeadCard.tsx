@@ -29,7 +29,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
   const tempConfig = {
     'Quente': { border: 'border-red-500', badge: 'bg-red-500/10 text-red-500', pulse: true },
     'Morno': { border: 'border-amber-500', badge: 'bg-amber-500/10 text-amber-500', pulse: false },
-    'Frio': { border: 'border-white/20', badge: 'bg-white/5 text-white/40', pulse: false }
+    'Frio': { border: 'border-white/20', badge: 'bg-white/5 text-white/60', pulse: false }
   };
 
   const currentTemp = tempConfig[lead.temp] || tempConfig['Frio'];
@@ -90,7 +90,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
             <span className={cn(
               "w-1 h-1 rounded-full",
               lead.temp === 'Quente' ? "bg-red-500 animate-pulse" : 
-              lead.temp === 'Morno' ? "bg-amber-500" : "bg-white/40"
+              lead.temp === 'Morno' ? "bg-amber-500" : "bg-white/60"
             )} />
             {lead.temp}
           </div>
@@ -127,7 +127,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
           </h3>
 
           {/* Project Type · City · Value */}
-          <p className="text-white/50 text-[10px] mt-1 truncate uppercase tracking-wider">
+          <p className="text-white/70 text-[10px] mt-1 truncate uppercase tracking-wider">
             {lead.tipo} · {lead.cidade} · {formatCurrency(lead.orcamento)}
           </p>
 
@@ -141,7 +141,7 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
 
       {/* Footer - Time in Stage & Action */}
       <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
-        <span className="text-white/30 text-[9px] uppercase tracking-wider">
+        <span className="text-white/50 text-[9px] uppercase tracking-wider">
           {lead.isBriefingVirtual 
             ? `${format(parseISO(lead.criado), 'dd/MM/yyyy')}`
             : `há ${daysInStage} ${daysInStage === 1 ? 'dia' : 'dias'}`

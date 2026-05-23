@@ -506,7 +506,7 @@ const PropostaCalculadora = () => {
                           className="w-16 h-8 bg-black/50 border-white/10 rounded-lg text-center text-xs focus:border-bronze"
                           placeholder="0"
                         />
-                        <span className="text-[10px] text-white/30 uppercase">h</span>
+                        <span className="text-[10px] text-white/50 uppercase">h</span>
                       </div>
                       <div className="w-24 text-right">
                         <p className="text-xs font-medium">R$ {(phase.hours * config.preco_hora).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}</p>
@@ -519,7 +519,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 3 - Complexity */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">COMPLEXIDADE DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">COMPLEXIDADE DO PROJETO</h2>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { val: 1.0, label: 'Simples' },
@@ -552,12 +552,12 @@ const PropostaCalculadora = () => {
             {/* Block 4 - Notes & Extra Data */}
             <section className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">OBSERVAÇÕES E DADOS</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">OBSERVAÇÕES E DADOS</h2>
               </div>
               
               {proposal.tipo === 'Comercial' && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">TIPO DE NEGÓCIO</Label>
+                  <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/60">TIPO DE NEGÓCIO</Label>
                   <Input
                     id="tipoNegocio"
                     value={tipoNegocio}
@@ -569,7 +569,7 @@ const PropostaCalculadora = () => {
               )}
 
               <div className="space-y-2">
-                <Label className="text-[10px] uppercase tracking-widest text-white/40">OBSERVAÇÕES INTERNAS</Label>
+                <Label className="text-[10px] uppercase tracking-widest text-white/60">OBSERVAÇÕES INTERNAS</Label>
                 <Textarea 
                   placeholder="Notas sobre o cálculo (uso interno)..."
                   value={observacoes}
@@ -590,13 +590,13 @@ const PropostaCalculadora = () => {
               
               <div className="space-y-1 mb-8">
                 <p className="text-lg font-medium">{proposal.cliente}</p>
-                <p className="text-[10px] uppercase tracking-widest text-white/40">
+                <p className="text-[10px] uppercase tracking-widest text-white/60">
                   {proposal.tipo} · {proposal.cidade}
                 </p>
               </div>
 
               <div className="space-y-4 mb-8">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">FASES SELECIONADAS</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">FASES SELECIONADAS</p>
                 <div className="space-y-3">
                   {totals.includedPhases.map(phase => (
                     <div key={phase.id} className="flex justify-between items-center text-xs">

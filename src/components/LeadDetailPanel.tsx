@@ -199,11 +199,11 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
       <div className="absolute inset-0 bg-graphite/40 backdrop-blur-[8px]" onClick={onClose} />
       <div className="relative w-[520px] h-full bg-[#111111] shadow-[-30px_0_60px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 ease-out">
         <div className="p-10 border-b border-white/10 relative">
-          <button onClick={onClose} className="absolute right-8 top-8 text-white/40 hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
+          <button onClick={onClose} className="absolute right-8 top-8 text-white/60 hover:text-white transition-transform hover:scale-110"><X size={20} /></button>
           <div className="flex items-center gap-3 mb-2">
             <span className={cn(
               "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest border",
-              lead.temp === 'Quente' ? "bg-red/5 border-red/20 text-red" : "bg-white/5 border-white/10 text-white/40"
+              lead.temp === 'Quente' ? "bg-red/5 border-red/20 text-red" : "bg-white/10 border-white/20 text-white/60"
             )}>
               {lead.temp}
             </span>
@@ -223,7 +223,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                       ? "bg-bronze text-white border-bronze" 
                       : isPerdido
                         ? "bg-transparent border-red-500/30 text-red-400/60 hover:border-red-500 hover:text-red-400"
-                        : "bg-[#2A2826] border-[#4A4846] text-white/40 hover:border-bronze hover:text-white"
+                        : "bg-[#2A2826] border-[#4A4846] text-white/60 hover:border-bronze hover:text-white"
                   )}
                 >
                   {s}
@@ -236,7 +236,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
         <div className="flex-1 overflow-y-auto p-10 space-y-10">
           <section>
             <div className="flex justify-between items-center mb-6">
-              <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40">Dados do Lead</h4>
+              <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60">Dados do Lead</h4>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold text-white uppercase tracking-widest">Score Total:</span>
                 <span className="text-sm font-bold text-bronze">{calculateLeadScore(lead).score}/10</span>
@@ -244,24 +244,24 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             </div>
             
             <div className="grid grid-cols-2 gap-6 text-[11px] mb-8">
-              <div><p className="text-white/40">WhatsApp</p><a href={`https://wa.me/55${lead.whats.replace(/\D/g, '')}`} className="text-bronze underline">{lead.whats}</a></div>
-              <div><p className="text-white/40">Cidade</p><p className="text-white">{lead.cidade}</p></div>
-              <div><p className="text-white/40">Tipo</p><p className="text-white">{lead.tipo}</p></div>
-              <div><p className="text-white/40">Área</p><p className="text-white">{lead.area} m²</p></div>
-              <div><p className="text-white/40">Orçamento</p><p className="text-white">{formatCurrency(lead.orcamento)}</p></div>
-              <div><p className="text-white/40">Entrada</p><p className="text-white">{new Date(lead.criado).toLocaleDateString('pt-BR')}</p></div>
-              <div><p className="text-white/40">Origem</p><p className="text-white">{lead.origem}</p></div>
+              <div><p className="text-white/60">WhatsApp</p><a href={`https://wa.me/55${lead.whats.replace(/\D/g, '')}`} className="text-bronze underline">{lead.whats}</a></div>
+              <div><p className="text-white/60">Cidade</p><p className="text-white">{lead.cidade}</p></div>
+              <div><p className="text-white/60">Tipo</p><p className="text-white">{lead.tipo}</p></div>
+              <div><p className="text-white/60">Área</p><p className="text-white">{lead.area} m²</p></div>
+              <div><p className="text-white/60">Orçamento</p><p className="text-white">{formatCurrency(lead.orcamento)}</p></div>
+              <div><p className="text-white/60">Entrada</p><p className="text-white">{new Date(lead.criado).toLocaleDateString('pt-BR')}</p></div>
+              <div><p className="text-white/60">Origem</p><p className="text-white">{lead.origem}</p></div>
             </div>
 
             <div className="bg-white/[0.03] border border-white/10 p-4 rounded-none space-y-2">
-              <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-2">Breakdown do Score</p>
+              <p className="text-[9px] font-bold text-white/60 uppercase tracking-widest mb-2">Breakdown do Score</p>
               {calculateLeadScore(lead).breakdown.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-[10px]">
                   <div className="flex items-center gap-2">
                     {item.achieved ? <Check size={10} className="text-green-600" /> : <X size={10} className="text-red" />}
-                    <span className={cn(item.achieved ? "text-white" : "text-white/40")}>{item.label}</span>
+                    <span className={cn(item.achieved ? "text-white" : "text-white/60")}>{item.label}</span>
                   </div>
-                  <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-white/40")}>
+                  <span className={cn("font-mono", item.achieved ? "text-bronze font-bold" : "text-white/60")}>
                     {item.achieved ? `+${item.value}` : '+0'}
                   </span>
                 </div>
@@ -295,7 +295,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
             <div className="pt-3 border-t border-black/5 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Horas Est.</p>
+                  <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Horas Est.</p>
                   <input 
                     type="number" 
                     value={horasEstimadas} 
@@ -304,12 +304,12 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   />
                 </div>
                 <div>
-                  <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Custo Real</p>
+                  <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Custo Real</p>
                   <p className="text-xs font-bold text-white">R$ {((viability as any).custoReal || 0).toLocaleString('pt-BR')}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-[8px] text-white/40 uppercase font-bold tracking-tighter">Margem Real</p>
+                <p className="text-[8px] text-white/60 uppercase font-bold tracking-tighter">Margem Real</p>
                 <p className={cn(
                   "text-sm font-bold",
                   viability.status === 'prejuizo' ? "text-red-600" : "text-white"
@@ -322,7 +322,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
 
           <section>
-            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 mb-6">Ações Rápidas</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 mb-6">Ações Rápidas</h4>
             <div className="flex flex-col gap-3">
               <Button 
                 onClick={async () => {

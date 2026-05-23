@@ -23,12 +23,12 @@ const NavItem = ({ label, icon, active, disabled, onClick }: NavItemProps) => (
     onClick={!disabled ? onClick : undefined}
     className={cn(
       "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
-      active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/60",
+      active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
       disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
     )}>
     <div className="flex items-center justify-between gap-2">
       <div className="flex items-center gap-2">
-        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/40 group-hover:text-white/70")}>{icon}</div>}
+        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
         <span className={cn(
           "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
           active ? "text-white" : "group-hover:text-white/70"
@@ -60,11 +60,11 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge }: Se
       onClick={onToggle}
       className={cn(
         "w-full flex items-center justify-between px-6 py-3 transition-colors duration-200",
-        isOpen ? "bg-white/10 text-white" : "text-white/60 hover:text-white/80 hover:bg-white/[0.05]"
+        isOpen ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
       )}
     >
       <div className="flex items-center gap-3">
-        <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/40")}>
+        <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/60")}>
           {icon}
         </div>
         <div className="flex items-center gap-2">
@@ -336,7 +336,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
               onClick={() => setShowNotifications(!showNotifications)}
               className={cn(
                 "p-2 rounded-full transition-colors relative",
-                showNotifications ? "text-bronze" : "text-white/60 hover:text-bronze"
+                showNotifications ? "text-bronze" : "text-white/70 hover:text-bronze"
               )}
             >
               <Bell size={18} />
