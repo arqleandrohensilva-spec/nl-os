@@ -863,7 +863,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                           >
                             <div className="flex items-center gap-4">
                               <div 
-                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/10 text-bronze" : "bg-white/[0.08] text-white/40")}
+                                className={cn("p-2 rounded-full transition-colors", isOpen ? "bg-bronze/15 text-bronze" : "bg-white/[0.12] text-white/60")}
                                 style={isOpen ? {} : { backgroundColor: `${cat.color}15`, color: cat.color }}
                               >
                                 <cat.icon size={16} />
@@ -904,7 +904,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                                 <div className="flex items-center gap-2">
                                   <span className={cn(
                                     "text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-[2px]",
-                                    item.frequencia === 'mensal' ? "bg-white/[0.08] text-white/40" : "bg-bronze/10 text-bronze"
+                                    item.frequencia === 'mensal' ? "bg-white/[0.12] text-white/60" : "bg-bronze/15 text-bronze"
                                   )}>
                                     {item.frequencia}
                                   </span>
@@ -946,7 +946,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                         <DialogTrigger asChild>
                           <Button 
                             variant="ghost" 
-                            className="w-full mt-4 h-10 border border-dashed border-white/10 hover:border-bronze hover:bg-bronze/5 text-[10px] tracking-widest text-white/40 hover:text-bronze uppercase flex items-center gap-2"
+                            className="w-full mt-4 h-10 border border-dashed border-white/20 hover:border-bronze hover:bg-bronze/10 text-[10px] tracking-widest text-white/60 hover:text-bronze uppercase flex items-center gap-2"
                           >
                             <Plus size={12} />
                             Adicionar item
@@ -1048,7 +1048,7 @@ Máximo 3 linhas. Sem markdown. Em português.
               className="w-full flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors"
             >
               <div className="flex items-center gap-4">
-                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/10 text-bronze" : "bg-white/[0.08] text-white/40")}>
+                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/15 text-bronze" : "bg-white/[0.12] text-white/60")}>
                   <History size={16} />
                 </div>
                 <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">Evolução do Custo/Hora</span>

@@ -855,7 +855,7 @@ const ControleHoras = () => {
                         <td className="py-4 text-right">
                           <span className={cn(
                             "text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-sm font-bold",
-                            p.status_geral === 'ativo' ? "bg-bronze/10 text-bronze" : "bg-muted text-white/40"
+                            p.status_geral === 'ativo' ? "bg-bronze/15 text-bronze" : "bg-muted text-white/60"
                           )}>
                             {p.status_geral}
                           </span>

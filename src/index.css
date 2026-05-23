@@ -28,11 +28,11 @@
     
     --graphite: 0 0% 10%; /* #1A1A1A */
     --white: 0 0% 100%;
-    --bronze: 32 23% 44%; /* #8B7355 */
+    --bronze: 32 23% 38%; /* #7A6548 - Escurecido para melhor contraste */
     --beige: 33 13% 88%; /* #E8E4DF */
-    --muted: 0 0% 60%; /* #999999 */
+    --muted: 0 0% 45%; /* #737373 - Escurecido de #999999 para melhor contraste */
     --red: 0 57% 46%; /* #B83232 */
-    --amber: 44% 67% 47%; /* #C49A2A approx */
+    --amber: 44 67% 40%; /* #A68224 approx - Escurecido */
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 10%;

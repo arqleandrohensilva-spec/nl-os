@@ -792,7 +792,7 @@ Retorne APENAS JSON válido:
                     <div className="flex items-center justify-between mb-4">
                       <span className={cn(
                         "text-[8px] px-2 py-0.5 font-bold uppercase tracking-widest font-mono",
-                        script.especial ? "bg-white/5 text-white/40" : "bg-bronze/10 text-bronze"
+                        script.especial ? "bg-white/10 text-white/60" : "bg-bronze/15 text-bronze"
                       )}>
                         {script.situacao}
                       </span>
