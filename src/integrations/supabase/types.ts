@@ -1836,6 +1836,32 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      get_proposal_by_slug: {
+        Args: { p_slug: string; p_tipo: string }
+        Returns: {
+          acessos: number | null
+          area: string | null
+          cidade: string | null
+          criado_em: string | null
+          estado: string | null
+          id: string
+          nome_cliente: string | null
+          objetivo: string | null
+          slug: string
+          tipo: string
+          tipo_negocio: string | null
+          ultimo_acesso: string | null
+          validade: string | null
+          valor_completo: string | null
+          valor_executivo: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "propostas_clientes"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       get_survey_by_token: {
         Args: { p_token: string }
         Returns: {
