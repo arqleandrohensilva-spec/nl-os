@@ -1777,7 +1777,96 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_briefing_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          cidade: string | null
+          cliente_id: string | null
+          criado_em: string
+          email: string | null
+          id: string
+          lead_id: string | null
+          nome: string | null
+          origem: string | null
+          preenchido_em: string | null
+          respostas: Json | null
+          status: string
+          tipo_projeto: string | null
+          token: string | null
+          whatsapp: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "briefings"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_project_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          area_m2: number | null
+          cidade: string | null
+          cliente_id: string | null
+          criado_em: string | null
+          criado_por: string | null
+          data_inicio: string | null
+          dropbox_folder: string | null
+          etapa_atual: string | null
+          horas_acompanhamento: number | null
+          horas_anteprojeto: number | null
+          horas_briefing: number | null
+          horas_conceito: number | null
+          horas_detalhamento: number | null
+          horas_estimadas: number | null
+          horas_executivo: number | null
+          id: string
+          link_apresentacao: string | null
+          nome: string
+          nome_cliente: string | null
+          prazo_final: string | null
+          proposta_id: string | null
+          slug_cliente: string | null
+          status_geral: string | null
+          tipo: string | null
+          token_cliente: string | null
+          updated_at: string | null
+          valor_proposta: number | null
+          valor_total: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "projetos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_survey_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          avaliacao_processo: string | null
+          avaliacao_resultado: string | null
+          cliente_nome: string
+          comentario: string | null
+          criado_em: string
+          id: string
+          nota_geral: number | null
+          projeto_id: string | null
+          respondida_em: string | null
+          status: string
+          tipo: string | null
+          token: string
+          updated_at: string
+          video_dropbox_path: string | null
+          video_url: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "pesquisas_satisfacao"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       notification_type:
