@@ -195,14 +195,14 @@ const ConfiguracoesSistema = () => {
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
       
-      <main className="flex-1 pl-[230px]">
+      <main className="flex-1 ml-[230px]">
         <div className="p-12 max-w-5xl">
           <header className="mb-12">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-bronze/10 rounded-[1px]">
                 <Settings2 size={20} className="text-bronze" />
               </div>
-              <p className="text-[10px] text-bronze uppercase tracking-[0.4em] font-bold">Módulo 09 · Sistema</p>
+              <p className="text-[10px] text-bronze uppercase tracking-[0.4em] font-bold">Módulo Administrativo · Sistema</p>
             </div>
             <h1 className="text-4xl font-cormorant italic text-white">Configurações do Sistema</h1>
           </header>
