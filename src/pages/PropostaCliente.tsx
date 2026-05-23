@@ -68,7 +68,7 @@ const PropostaCliente = () => {
     tipo: proposta.tipo || '',
     cidade: proposta.cidade || '[Cidade]',
     estado: proposta.estado || 'SP',
-    area: proposta.area || '[XXX]',
+    area: proposta.area || '---',
     objetivo: proposta.objetivo || '',
     data: proposta.criado_em ? new Date(proposta.criado_em).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }) : new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
     plano: '',

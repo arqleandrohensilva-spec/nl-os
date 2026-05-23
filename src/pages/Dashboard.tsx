@@ -848,7 +848,16 @@ Retorne APENAS JSON:
                         → AÇÃO: <span className="text-white/80 normal-case font-normal">{aiInsight.acao}</span>
                       </p>
                       <Button 
-                        onClick={() => navigate(aiInsight.modulo === 'pipeline' ? '/pipeline' : aiInsight.modulo === 'financeiro' ? '/financeiro/base' : `/${aiInsight.modulo}`)}
+                        onClick={() => {
+                          const routeMap: Record<string, string> = {
+                            'pipeline': '/pipeline',
+                            'financeiro': '/financeiro/base',
+                            'marketing': '/marketing/ia',
+                            'sistemas': '/sistema/configuracoes',
+                            'projetos': '/projetos/gestao'
+                          };
+                          navigate(routeMap[aiInsight.modulo] || `/${aiInsight.modulo}`);
+                        }}
                         variant="outline" 
                         className="w-full h-9 bg-transparent border-bronze/30 hover:bg-bronze hover:text-white text-bronze text-[10px] font-bold uppercase tracking-[0.2em] rounded-none transition-all"
                       >

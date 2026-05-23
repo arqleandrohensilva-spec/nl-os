@@ -30,7 +30,7 @@ const NavItem = ({ label, icon, active, disabled, onClick }: NavItemProps) => (
       <div className="flex items-center gap-2">
         {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/20 group-hover:text-white/40")}>{icon}</div>}
         <span className={cn(
-          "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase",
+          "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
           active ? "text-white" : "group-hover:text-white/70"
         )}>
           {label}
