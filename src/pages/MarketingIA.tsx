@@ -832,7 +832,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
         <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-cormorant font-bold text-white mb-1">Marketing com IA</h1>
-            <p className="text-bronze/60 text-sm uppercase tracking-widest font-bold">Módulo 11 · Inteligência Estratégica</p>
+            <p className="text-bronze/60 text-sm uppercase tracking-widest font-bold">Módulo Administrativo · Inteligência Estratégica</p>
           </div>
           <Button variant="outline" className="border-bronze/30 text-bronze hover:bg-bronze/10" onClick={fetchKnowledgeBase} disabled={loading}>
             {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCcw className="w-4 h-4 mr-2" />}
