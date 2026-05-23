@@ -1888,6 +1888,7 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      increment_proposal_access: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
       notification_type:
