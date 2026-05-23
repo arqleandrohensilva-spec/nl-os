@@ -13,7 +13,7 @@ interface MetricCardProps {
 }
 
 const MetricCard = ({ label, value, subLabel, pulse, highlightBase, isNegative }: MetricCardProps) => (
-  <div className="flex-1 px-8 py-7 border-r border-white/10 last:border-r-0 relative group hover:bg-white/[0.03] transition-colors flex flex-col gap-1 bg-[#0F0E0C]">
+  <div className="flex-1 px-8 py-7 border-r border-white/10 last:border-r-0 relative group hover:bg-white/[0.03] transition-colors flex flex-col gap-1 bg-[#0A0A0A]">
     <div className="flex items-center gap-2 mb-2">
       <span className="text-[11px] text-white/40 uppercase font-normal font-inter">{label}</span>
       {pulse && <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
@@ -100,7 +100,7 @@ const MetricsBar = ({ leads }: { leads: any[] }) => {
   };
 
   return (
-    <div className="flex flex-col bg-[#0F0E0C] border-b border-white/10">
+    <div className="flex flex-col bg-[#0A0A0A] border-b border-white/10">
       <div className="flex border-b border-white/10">
         <div className="flex-1 px-10 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">

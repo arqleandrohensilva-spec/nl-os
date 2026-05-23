@@ -973,7 +973,7 @@ const FinanceiroProjetos = () => {
 
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-white font-inter">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-8">
@@ -2178,7 +2178,7 @@ const FinanceiroProjetos = () => {
 
         {/* Modal Confirmação */}
         <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm uppercase tracking-widest font-bold">Confirmar Recebimento</DialogTitle>
             </DialogHeader>

@@ -15,7 +15,7 @@ const PropostaInt = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
-      <div className="bg-[#0F0E0C] py-12 px-6 text-center">
+      <div className="bg-[#0A0A0A] py-12 px-6 text-center">
         <div className="inline-block w-16 h-16 bg-bronze flex items-center justify-center text-white font-cormorant text-3xl mb-6 mx-auto shadow-lg">
           NL
         </div>
@@ -100,7 +100,7 @@ const PropostaInt = () => {
                   <p className="text-[9px] text-black/40 mt-2 uppercase tracking-wider italic">*Projeto técnico e detalhamento para execução.</p>
                 </div>
 
-                <div className="bg-[#1A1816] p-6 border border-transparent relative overflow-hidden group">
+                <div className="bg-[#1A1A1A] border border-white/10 p-6 border border-transparent relative overflow-hidden group">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-bronze/60 mb-2 font-bold">Pacote Completo (Premium)</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-xs font-bold text-bronze">R$</span>

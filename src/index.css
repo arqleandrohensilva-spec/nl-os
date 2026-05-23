@@ -23,17 +23,17 @@
 
 @layer base {
   :root {
-    --background: 16 7% 6%; /* #0F0E0C */
+    --background: 0 0% 4%; /* #0A0A0A */
     --foreground: 33 20% 90%; /* #E8E4DF */
 
-    --card: 20 5% 10%; /* #1A1816 */
+    --card: 0 0% 10%; /* #1A1A1A */
     --card-foreground: 33 20% 90%; /* #E8E4DF */
 
-    --popover: 20 5% 10%;
+    --popover: 0 0% 10%;
     --popover-foreground: 33 20% 90%;
 
     --primary: 32 23% 44%; /* #8B7355 bronze */
-    --primary-foreground: 16 7% 6%; /* #0F0E0C */
+    --primary-foreground: 0 0% 4%; /* #0A0A0A */
 
     --secondary: 20 5% 14%; /* #2A2A2A */
     --secondary-foreground: 33 20% 90%;
@@ -58,7 +58,7 @@
   }
 
   body {
-    @apply bg-[#0F0E0C] text-[#E8E4DF];
+    @apply bg-[#0A0A0A] text-[#E8E4DF];
     font-family: 'DM Mono', monospace;
   }
 

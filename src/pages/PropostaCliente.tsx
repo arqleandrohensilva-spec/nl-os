@@ -44,13 +44,13 @@ const PropostaCliente = () => {
   }, [tipo, slug]);
 
   if (loading) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
       <div className="text-white/40 text-xs uppercase tracking-widest animate-pulse">Carregando proposta...</div>
     </div>
   );
 
   if (error || !proposta) return (
-    <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
       <div className="text-center space-y-4 p-6">
         <p className="font-display italic text-2xl text-white">NL Arquitetos</p>
         <div className="h-px w-8 bg-bronze/30 mx-auto" />

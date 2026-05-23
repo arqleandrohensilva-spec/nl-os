@@ -40,7 +40,7 @@ const KanbanColumn = ({ stage, leads, onLeadClick, onUpdateStatus, onQuickNote, 
 
   return (
     <div className={cn(
-      "w-full flex-shrink-1 flex flex-col h-full bg-[#0F0E0C] border transition-all duration-200 rounded-[2px]",
+      "w-full flex-shrink-1 flex flex-col h-full bg-[#0A0A0A] border transition-all duration-200 rounded-[2px]",
       isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-white/10",
       isLost && "opacity-45 bg-black/[0.02]"
     )}>

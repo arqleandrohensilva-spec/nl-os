@@ -141,7 +141,7 @@ const BriefingModal = ({ isOpen, onClose, briefing, onAprovar, onArquivar }: Bri
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-[#0F0E0C] border-[#2A2A2A] text-[#E8E4DF] p-0 gap-0 overflow-hidden rounded-none">
+      <DialogContent className="max-w-2xl bg-[#0A0A0A] border-[#2A2A2A] text-[#E8E4DF] p-0 gap-0 overflow-hidden rounded-none">
         <DialogHeader className="p-8 border-b border-[#2A2A2A]">
           <DialogTitle className="text-lg font-bold font-['Courier_New'] text-[#8B7355] uppercase tracking-widest">
             PRÉ-BRIEFING — {briefing.nome}
@@ -155,7 +155,7 @@ const BriefingModal = ({ isOpen, onClose, briefing, onAprovar, onArquivar }: Bri
           {renderAlignment()}
         </div>
 
-        <div className="p-6 border-t border-[#2A2A2A] bg-[#0F0E0C] flex justify-end gap-3">
+        <div className="p-6 border-t border-[#2A2A2A] bg-[#0A0A0A] flex justify-end gap-3">
           <Button 
             variant="outline"
             onClick={() => {

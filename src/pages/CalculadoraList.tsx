@@ -105,7 +105,7 @@ const CalculadoraList = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#1A1816] text-[#E8E4DF]">
+    <div className="flex min-h-screen bg-[#1A1A1A] border border-white/10 text-[#E8E4DF]">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 pl-[230px]">

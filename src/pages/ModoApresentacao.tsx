@@ -272,12 +272,12 @@ const ModoApresentacao = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#0F0E0C] flex items-center justify-center text-white/40 font-mono">PREPARANDO APRESENTAÇÃO...</div>;
+    return <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center text-white/40 font-mono">PREPARANDO APRESENTAÇÃO...</div>;
   }
 
   if (!projeto) {
     return (
-      <div className="min-h-screen bg-[#0F0E0C] flex flex-col items-center justify-center text-white/40 font-mono p-8 text-center">
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center text-white/40 font-mono p-8 text-center">
         <AlertCircle size={48} className="mb-6 opacity-20" />
         <h2 className="text-2xl font-cormorant italic text-white mb-2">ACESSO NÃO AUTORIZADO</h2>
         <p className="text-sm max-w-md">O link de apresentação expirou ou é inválido. Por favor, solicite um novo link ao seu arquiteto.</p>
@@ -307,7 +307,7 @@ const ModoApresentacao = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0E0C] text-white font-inter p-12 md:p-20 flex flex-col gap-20 select-none overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-inter p-12 md:p-20 flex flex-col gap-20 select-none overflow-x-hidden">
       {/* HEADER */}
       <header className="flex justify-between items-center w-full">
         <div className="text-2xl font-cormorant font-light tracking-widest italic text-white/80">
@@ -353,7 +353,7 @@ const ModoApresentacao = () => {
                     "w-5 h-5 rounded-full border-2 z-10 transition-all duration-1000",
                     isDone ? "bg-bronze border-bronze" : 
                     isCurrent ? "bg-bronze/20 border-bronze animate-pulse shadow-[0_0_15px_rgba(139,115,85,0.4)]" : 
-                    "bg-[#0F0E0C] border-white/20"
+                    "bg-[#0A0A0A] border-white/20"
                   )}>
                     {isCurrent && <div className="w-full h-full rounded-full bg-bronze scale-50" />}
                   </div>
@@ -388,7 +388,7 @@ const ModoApresentacao = () => {
             <div key={event.id} className="relative group">
               <div className={cn(
                 "absolute -left-[37px] top-1.5 w-4 h-4 rounded-full border-2 transition-all duration-500",
-                event.concluido ? "bg-bronze border-bronze" : "bg-[#0F0E0C] border-white/20"
+                event.concluido ? "bg-bronze border-bronze" : "bg-[#0A0A0A] border-white/20"
               )} />
               <div className="space-y-1">
                 <p className={cn(
@@ -584,7 +584,7 @@ const ModoApresentacao = () => {
 
       {/* APPROVAL MODAL */}
       <Dialog open={approvalModal.open} onOpenChange={(open) => !open && setApprovalModal({ open: false, etapa: null })}>
-        <DialogContent className="bg-[#0F0E0C] border border-bronze p-12 max-w-xl text-white rounded-none">
+        <DialogContent className="bg-[#0A0A0A] border border-bronze p-12 max-w-xl text-white rounded-none">
           <DialogHeader className="space-y-6">
             <DialogTitle className="text-3xl font-cormorant italic font-light uppercase tracking-tight text-center">
               Confirmação de Aprovação

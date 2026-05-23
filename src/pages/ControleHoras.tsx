@@ -577,7 +577,7 @@ const ControleHoras = () => {
   }, [sessoes, projetos, config]);
 
   return (
-    <div className="min-h-screen bg-[#0F0E0C] text-white">
+    <div className="min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       <main className="ml-[230px] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
@@ -685,25 +685,25 @@ const ControleHoras = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-12">
-          <div className="bg-[#0F0E0C] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">HORAS NO MÊS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {Math.round(metrics.totalMes)}h
             </span>
           </div>
-          <div className="bg-[#0F0E0C] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">PROJETOS ATIVOS</span>
             <span className="text-[22px] font-normal text-white font-inter">
               {metrics.ativos}
             </span>
           </div>
-          <div className="bg-[#0F0E0C] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">CUSTO INTERNO</span>
             <span className="text-[22px] font-normal text-white font-inter">
               R$ {metrics.custoInterno.toLocaleString()}
             </span>
           </div>
-          <div className="bg-[#0F0E0C] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
+          <div className="bg-[#0A0A0A] border border-white/10 p-6 rounded-[4px] relative overflow-hidden flex flex-col gap-1">
             <span className="text-[11px] text-white/40 uppercase font-normal font-inter">EFICIÊNCIA</span>
             <span className="text-[22px] font-normal text-white font-inter">
               92%
@@ -867,7 +867,7 @@ const ControleHoras = () => {
               </table>
               
               <div className="mt-8 flex justify-end">
-                <Button className="bg-[#1A1816] hover:bg-[#2A2A2A] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
+                <Button className="bg-[#1A1A1A] border border-white/10 hover:bg-[#2A2A2A] text-white rounded-none text-[10px] uppercase font-bold tracking-widest px-8">
                   <BarChart3 size={14} className="mr-2" />
                   Análise com IA
                 </Button>
@@ -879,7 +879,7 @@ const ControleHoras = () => {
 
       {/* Timer Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#1A1816] border-white/5 text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Iniciar Sessão</h2>
             <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8">{selectedProjeto?.nome}</p>
@@ -891,7 +891,7 @@ const ControleHoras = () => {
                   <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1816] border-white/5 text-white">
+                  <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
                     <SelectItem value="Briefing">01 · Briefing</SelectItem>
                     <SelectItem value="Conceito">02 · Conceito</SelectItem>
                     <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
@@ -941,7 +941,7 @@ const ControleHoras = () => {
 
       {/* Sessions Panel */}
       <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
-        <SheetContent className="w-[420px] bg-[#0F0E0C] border-l border-white/5 text-white p-0 overflow-y-auto">
+        <SheetContent className="w-[420px] bg-[#0A0A0A] border-l border-white/5 text-white p-0 overflow-y-auto">
           <div className="p-10">
             <div className="mb-10">
               <h2 className="text-3xl font-cormorant font-bold mb-1">{panelProjeto?.nome}</h2>
@@ -1060,7 +1060,7 @@ const ControleHoras = () => {
 
       {/* Manual Registration Modal */}
       <Dialog open={isManualModalOpen} onOpenChange={setIsManualModalOpen}>
-        <DialogContent className="bg-[#1A1816] border-white/5 text-white rounded-none p-0 max-w-md">
+        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-md">
           <div className="p-8">
             <h2 className="text-2xl font-cormorant font-bold mb-1">Registrar Horas</h2>
             <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-mono">Registro retroativo — Sem timer</p>
@@ -1072,7 +1072,7 @@ const ControleHoras = () => {
                   <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
                     <SelectValue placeholder="Selecione o projeto" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1A1816] border-white/5 text-white">
+                  <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
                     {projetos.filter(p => p.status_geral === 'ativo').map(p => (
                       <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
                     ))}
@@ -1087,7 +1087,7 @@ const ControleHoras = () => {
                     <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1816] border-white/5 text-white">
+                    <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
                       <SelectItem value="Briefing">01 · Briefing</SelectItem>
                       <SelectItem value="Conceito">02 · Conceito</SelectItem>
                       <SelectItem value="Estudo Preliminar">03 · Estudo Preliminar</SelectItem>
@@ -1103,7 +1103,7 @@ const ControleHoras = () => {
                     <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-none h-11">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1A1816] border-white/5 text-white">
+                    <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white">
                       <SelectItem value="Leandro">Leandro</SelectItem>
                       <SelectItem value="Neandro">Neandro</SelectItem>
                     </SelectContent>
@@ -1120,7 +1120,7 @@ const ControleHoras = () => {
                       {manualSession.data ? format(manualSession.data, "PPP", { locale: ptBR }) : <span>Selecione a data</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-[#1A1816] border-white/10">
+                  <PopoverContent className="w-auto p-0 bg-[#1A1A1A] border border-white/10 border-white/10">
                     <CalendarComponent
                       mode="single"
                       selected={manualSession.data}
@@ -1180,7 +1180,7 @@ const ControleHoras = () => {
 
       {/* Inactivity Modal */}
       <Dialog open={showInactivityModal} onOpenChange={setShowInactivityModal}>
-        <DialogContent className="bg-[#1A1816] border-white/5 text-white rounded-none p-0 max-w-sm">
+        <DialogContent className="bg-[#1A1A1A] border border-white/10 border-white/5 text-white rounded-none p-0 max-w-sm">
           <div className="p-8 text-center">
             <AlertCircle size={32} className="mx-auto text-bronze mb-4" />
             <h2 className="text-xl font-cormorant font-bold mb-2">Ausência detectada</h2>

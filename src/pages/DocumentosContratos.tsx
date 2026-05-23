@@ -911,7 +911,7 @@ const DocumentosContratos = () => {
   }, [activeTab, selectedProjetoArquivos]);
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-white">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       
       <main className="flex-1 ml-[230px] p-10">
@@ -923,9 +923,9 @@ const DocumentosContratos = () => {
         <Tabs defaultValue="briefing" className="space-y-6" onValueChange={setActiveTab}>
           <div className="flex justify-between items-center">
             <TabsList className="bg-white/[0.03] border border-white/10 p-1">
-              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#0F0E0C] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
-              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#0F0E0C] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
-              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#0F0E0C] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
+              <TabsTrigger value="briefing" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">BRIEFING</TabsTrigger>
+              <TabsTrigger value="contratos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">CONTRATOS</TabsTrigger>
+              <TabsTrigger value="arquivos" className="data-[state=active]:bg-[#0A0A0A] data-[state=active]:text-white uppercase text-[10px] tracking-widest px-6">ARQUIVOS</TabsTrigger>
             </TabsList>
 
             {activeTab === 'briefing' && (
@@ -1070,7 +1070,7 @@ const DocumentosContratos = () => {
                             <ExternalLink size={12} className="mr-1" /> ASSINATURA
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-[#0F0E0C] border-white/10 text-white text-[10px] uppercase tracking-widest">
+                        <TooltipContent className="bg-[#0A0A0A] border-white/10 text-white text-[10px] uppercase tracking-widest">
                           Integração com ClickSign em breve
                         </TooltipContent>
                       </Tooltip>
@@ -1432,7 +1432,7 @@ const DocumentosContratos = () => {
         </Tabs>
 
         <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">UPLOAD DE ARQUIVO</DialogTitle>
             </DialogHeader>
@@ -1473,7 +1473,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isBriefingModalOpen} onOpenChange={setIsBriefingModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">GERAR LINK DE BRIEFING</DialogTitle>
             </DialogHeader>
@@ -1501,7 +1501,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isContratoModalOpen} onOpenChange={setIsContratoModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <FileCheck size={18} className="text-bronze" /> GERAR NOVO CONTRATO - {contractFormData.numero}
@@ -1881,7 +1881,7 @@ const DocumentosContratos = () => {
 
 
         <Dialog open={isNewProjectModalOpen} onOpenChange={setIsNewProjectModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest">NOVO PROJETO NO DROPBOX</DialogTitle>
             </DialogHeader>
@@ -1928,7 +1928,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none max-w-md">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-md">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Trash2 size={16} className="text-red-500" /> CONFIRMAR EXCLUSÃO
@@ -1965,7 +1965,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none max-w-lg">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-lg">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <Ban size={16} className="text-red-500" /> CANCELAR CONTRATO
@@ -2043,7 +2043,7 @@ const DocumentosContratos = () => {
           </DialogContent>
         </Dialog>
         <Dialog open={isBriefingResponseModalOpen} onOpenChange={setIsBriefingResponseModalOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-sm font-bold uppercase tracking-widest flex items-center gap-2">
                 <ClipboardList size={18} className="text-bronze" /> RESPOSTAS DO BRIEFING - {selectedBriefing?.leads?.nome}
@@ -2069,7 +2069,7 @@ const DocumentosContratos = () => {
               )}
             </div>
             
-            <DialogFooter className="sticky bottom-0 bg-[#0F0E0C] pt-4 border-t border-white/10">
+            <DialogFooter className="sticky bottom-0 bg-[#0A0A0A] pt-4 border-t border-white/10">
               <Button onClick={() => setIsBriefingResponseModalOpen(false)} className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full uppercase text-[10px] tracking-widest h-10">
                 FECHAR
               </Button>
@@ -2078,7 +2078,7 @@ const DocumentosContratos = () => {
         </Dialog>
 
         <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
-          <DialogContent className="bg-[#0F0E0C] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
+          <DialogContent className="bg-[#0A0A0A] border border-white/10 text-white rounded-none max-w-5xl h-[90vh] p-0 flex flex-col">
             <DialogHeader className="p-4 border-b border-white/5 flex flex-row items-center justify-between">
               <DialogTitle className="text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-2">
                 <Eye size={14} className="text-bronze" /> {viewerFile?.name}

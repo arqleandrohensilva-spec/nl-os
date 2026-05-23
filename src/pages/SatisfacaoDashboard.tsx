@@ -304,7 +304,7 @@ const SatisfacaoDashboard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0E0C] text-white font-inter">
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Equipe NL" />
       <main className="flex-1 ml-[230px] p-12">
         <div className="mb-10">
