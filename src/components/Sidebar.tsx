@@ -122,17 +122,15 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
   useEffect(() => {
     const path = location.pathname;
-    if (path === '/financeiro/base' || path === '/projetos/horas' || path === '/financeiro/projetos') {
+    if (path === '/financeiro' || path === '/financeiro/base' || path === '/financeiro/projetos') {
       setOpenSections(prev => ({ ...prev, 'FINANCEIRO': true }));
-    } else if (path === '/projetos/gestao' || path.startsWith('/projetos/detalhe/')) {
+    } else if (path === '/projetos/gestao' || path === '/projetos/horas' || path.startsWith('/projetos/detalhe/')) {
       setOpenSections(prev => ({ ...prev, 'PROJETOS': true }));
-    } else if (path.startsWith('/propostas/') || path.startsWith('/calculadora')) {
-      setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
-    } else if (path.startsWith('/clientes')) {
-      setOpenSections(prev => ({ ...prev, 'CLIENTES': true }));
+    } else if (path === '/propostas/biblioteca' || path === '/propostas/documentos') {
+      setOpenSections(prev => ({ ...prev, 'CONFIGURAÇÕES': true }));
     } else if (path === '/sistema/configuracoes') {
-      setOpenSections(prev => ({ ...prev, 'SISTEMA': true }));
-    } else if (path === '/marketing/ia' || path === '/marketing/satisfacao') {
+      setOpenSections(prev => ({ ...prev, 'CONFIGURAÇÕES': true }));
+    } else if (path === '/marketing/ia' || path === '/marketing/satisfacao' || path === '/scripts-atendimento') {
       setOpenSections(prev => ({ ...prev, 'MARKETING': true }));
     }
   }, [location.pathname]);
