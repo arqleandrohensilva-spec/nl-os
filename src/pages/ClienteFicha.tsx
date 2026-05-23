@@ -111,11 +111,14 @@ const ClienteFicha = () => {
   const { data: contrato } = useQuery({
     queryKey: ['contrato_cliente', id],
     queryFn: async () => {
-      const { data } = await supabase
+      if (!id) return null;
+      // Using raw query to avoid complex type instantiation depth issue in this specific view
+      const { data, error } = await supabase
         .from('contratos')
         .select('*')
-        .eq('cliente_id' as any, id)
+        .filter('cliente_id', 'eq', id)
         .maybeSingle();
+      if (error) console.error("Error fetching contract:", error);
       return data;
     },
     enabled: !!id
