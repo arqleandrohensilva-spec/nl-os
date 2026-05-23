@@ -1115,7 +1115,7 @@ Máximo 3 linhas. Sem markdown. Em português.
 
           {/* AI Suggestions Section */}
           <div className="space-y-4">
-            <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+            <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em] flex items-center gap-2">
               <Sparkles size={12} className="text-bronze" /> Sugestões da IA · Custos Possivelmente Esquecidos
             </h3>
             <div className="grid grid-cols-3 gap-6">
@@ -1125,23 +1125,23 @@ Máximo 3 linhas. Sem markdown. Em português.
                 ))
               ) : aiSuggestions.length > 0 ? (
                 aiSuggestions.map((s, i) => (
-                  <div key={i} className="bg-white p-4 border border-bronze/30 border-dashed rounded-[4px] space-y-3 relative group">
+                  <div key={i} className="bg-white/[0.03] p-4 border border-bronze/30 border-dashed rounded-[4px] space-y-3 relative group">
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Lightbulb size={12} className="text-bronze" />
-                          <span className="text-[10px] font-bold text-white uppercase font-dm-mono">{s.nome}</span>
+                          <span className="text-[11px] font-bold text-white uppercase font-dm-mono">{s.nome}</span>
                         </div>
-                        <p className="text-[9px] text-white/40 leading-relaxed">{s.motivo}</p>
+                        <p className="text-[10px] text-white/70 leading-relaxed">{s.motivo}</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-white/10/30">
+                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
                       <span className="text-[10px] font-dm-mono font-bold text-bronze">Est. R$ {s.valor_estimado.toLocaleString('pt-BR')}</span>
                       <div className="flex gap-2">
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="h-6 text-[8px] uppercase font-bold text-white/40 hover:text-red-500"
+                          className="h-6 text-[8px] uppercase font-bold text-white/60 hover:text-red-500"
                           onClick={() => setAiSuggestions(prev => prev.filter((_, idx) => idx !== i))}
                         >
                           Ignorar
