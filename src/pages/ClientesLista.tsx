@@ -13,14 +13,13 @@ import { ptBR } from 'date-fns/locale';
 import BriefingModal from '@/components/BriefingModal';
 
 
-const STATUS_BADGES: Record<string, { label: string; color: string }> = {
-  'Novo Lead': { label: 'Novo Lead', color: 'bg-zinc-500/10 text-zinc-500' },
-  'Reunião Agendada': { label: 'Reunião Agendada', color: 'bg-blue-500/10 text-blue-500' },
-  'Briefing Preenchido': { label: 'Briefing Preenchido', color: 'bg-yellow-500/10 text-yellow-500' },
-  'Proposta Enviada': { label: 'Proposta Enviada', color: 'bg-orange-500/10 text-orange-500' },
-  'Negociação': { label: 'Negociação', color: 'bg-[#8B7355]/10 text-[#8B7355]' },
-  'Fechado': { label: 'Fechado', color: 'bg-green-500/10 text-green-500' },
-  'Perdido': { label: 'Perdido', color: 'bg-red-500/10 text-red-500' }
+const STAGE_MAP: Record<string, { label: string; color: string }> = {
+  'ficha': { label: 'FICHA', color: 'bg-zinc-500/10 text-zinc-500' },
+  'pre_briefing': { label: 'PRÉ-BRIEFING', color: 'bg-zinc-400/10 text-zinc-400' },
+  'reuniao': { label: 'REUNIÃO', color: 'bg-[#8B7355]/20 text-[#8B7355]' },
+  'proposta': { label: 'PROPOSTA', color: 'bg-[#8B7355]/40 text-[#8B7355]' },
+  'contrato': { label: 'CONTRATO', color: 'bg-orange-500/20 text-orange-500' },
+  'projeto': { label: 'PROJETO ATIVO', color: 'bg-green-500/20 text-green-500' }
 };
 
 const ClientesLista = () => {
@@ -259,9 +258,9 @@ const ClientesLista = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className={cn(
                     "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest rounded-[1px]",
-                    STATUS_BADGES[cliente.status_comercial]?.color || 'bg-white/10 text-white/40'
+                    STAGE_MAP[cliente.etapa_fluxo]?.color || 'bg-white/10 text-white/40'
                   )}>
-                    {cliente.status_comercial || 'Novo Lead'}
+                    {STAGE_MAP[cliente.etapa_fluxo]?.label || 'FICHA'}
                   </div>
                 </div>
 
