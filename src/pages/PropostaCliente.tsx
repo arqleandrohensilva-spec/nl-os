@@ -15,10 +15,7 @@ const PropostaCliente = () => {
   useEffect(() => {
     const buscarProposta = async () => {
       const { data, error } = await supabase
-        .from('propostas_clientes')
-        .select('*')
-        .eq('tipo', tipo)
-        .eq('slug', slug)
+        .rpc('get_proposal_by_slug', { p_tipo: tipo, p_slug: slug })
         .maybeSingle();
 
       if (error || !data) {
