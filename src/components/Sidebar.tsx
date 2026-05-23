@@ -358,37 +358,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       </div>
 
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
-        <SectionAccordion 
+        <NavItem 
           label="CLIENTES" 
           icon={<Users size={14} />}
-          isOpen={!!openSections['CLIENTES']}
-          onToggle={() => toggleSection('CLIENTES')}
-          badge={pendingBriefingsCount}
-        >
-          <NavItem 
-            label="01 · Carteira de Clientes" 
-            active={location.pathname === '/clientes'} 
-            onClick={() => navigate('/clientes')} 
-          />
-        </SectionAccordion>
+          active={location.pathname === '/clientes'} 
+          onClick={() => navigate('/clientes')} 
+        />
 
-        <SectionAccordion 
-          label="LEADS" 
+        <NavItem 
+          label="PIPELINE" 
           icon={<LayoutGrid size={14} />}
-          isOpen={!!openSections['LEADS']}
-          onToggle={() => toggleSection('LEADS')}
-        >
-          <NavItem 
-            label="02 · Pipeline de Leads" 
-            active={location.pathname === '/pipeline'} 
-            onClick={() => navigate('/pipeline')} 
-          />
-          <NavItem 
-            label="03 · Scripts de Atendimento" 
-            active={location.pathname === '/scripts-atendimento'} 
-            onClick={() => navigate('/scripts-atendimento')} 
-          />
-        </SectionAccordion>
+          active={location.pathname === '/pipeline'} 
+          onClick={() => navigate('/pipeline')} 
+        />
 
         <SectionAccordion 
           label="PROJETOS" 
@@ -397,12 +379,12 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('PROJETOS')}
         >
           <NavItem 
-            label="04 · Gestão de Projetos" 
+            label="Gestão de Projetos" 
             active={location.pathname === '/projetos/gestao' || location.pathname.startsWith('/projetos/detalhe/')} 
             onClick={() => navigate('/projetos/gestao')} 
           />
           <NavItem 
-            label="05 · Controle de Horas" 
+            label="Controle de Horas" 
             active={location.pathname === '/projetos/horas'} 
             onClick={() => navigate('/projetos/horas')} 
           />
@@ -415,44 +397,14 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('FINANCEIRO')}
         >
           <NavItem 
-            label="06 · Base Financeira" 
-            active={location.pathname === '/financeiro/base'} 
-            onClick={() => navigate('/financeiro/base')} 
+            label="Visão Geral" 
+            active={location.pathname === '/financeiro'} 
+            onClick={() => navigate('/financeiro')} 
           />
           <NavItem 
-            label="07 · Financeiro de Projetos" 
+            label="Por Projeto" 
             active={location.pathname === '/financeiro/projetos'} 
             onClick={() => navigate('/financeiro/projetos')} 
-          />
-        </SectionAccordion>
-
-        <NavItem 
-          label="08 · CALCULADORA" 
-          icon={<Calculator size={12} />}
-          active={location.pathname.startsWith('/calculadora')} 
-          onClick={() => navigate('/calculadora')} 
-        />
-
-        <SectionAccordion 
-          label="PROPOSTAS" 
-          icon={<FileText size={14} />}
-          isOpen={!!openSections['PROPOSTAS']}
-          onToggle={() => toggleSection('PROPOSTAS')}
-        >
-          <NavItem 
-            label="09 · Tracking" 
-            active={location.pathname === '/propostas/tracking'} 
-            onClick={() => navigate('/propostas/tracking')} 
-          />
-          <NavItem 
-            label="10 · Biblioteca" 
-            active={location.pathname === '/propostas/biblioteca'} 
-            onClick={() => navigate('/propostas/biblioteca')} 
-          />
-          <NavItem 
-            label="11 · Documentos" 
-            active={location.pathname === '/propostas/documentos'} 
-            onClick={() => navigate('/propostas/documentos')} 
           />
         </SectionAccordion>
 
@@ -463,29 +415,50 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('MARKETING')}
         >
           <NavItem 
-            label="12 · Pesquisa de Satisfação" 
+            label="Marketing com IA" 
+            active={location.pathname === '/marketing/ia'} 
+            onClick={() => navigate('/marketing/ia')} 
+          />
+          <NavItem 
+            label="Pesquisa de Satisfação" 
             active={location.pathname === '/marketing/satisfacao'} 
             onClick={() => navigate('/marketing/satisfacao')} 
           />
           <NavItem 
-            label="13 · Marketing com IA" 
-            active={location.pathname === '/marketing/ia'} 
-            onClick={() => navigate('/marketing/ia')} 
+            label="Scripts" 
+            active={location.pathname === '/scripts-atendimento'} 
+            onClick={() => navigate('/scripts-atendimento')} 
           />
         </SectionAccordion>
 
         <SectionAccordion 
-          label="SISTEMA" 
+          label="CONFIGURAÇÕES" 
           icon={<Settings size={14} />}
-          isOpen={!!openSections['SISTEMA']}
-          onToggle={() => toggleSection('SISTEMA')}
+          isOpen={!!openSections['CONFIGURAÇÕES']}
+          onToggle={() => toggleSection('CONFIGURAÇÕES')}
         >
           <NavItem 
-            label="14 · Configurações" 
+            label="Configurações" 
             active={location.pathname === '/sistema/configuracoes'} 
             onClick={() => navigate('/sistema/configuracoes')} 
           />
+          <NavItem 
+            label="Base Financeira" 
+            active={location.pathname === '/financeiro/base'} 
+            onClick={() => navigate('/financeiro/base')} 
+          />
+          <NavItem 
+            label="Biblioteca" 
+            active={location.pathname === '/propostas/biblioteca'} 
+            onClick={() => navigate('/propostas/biblioteca')} 
+          />
+          <NavItem 
+            label="Documentos" 
+            active={location.pathname === '/propostas/documentos'} 
+            onClick={() => navigate('/propostas/documentos')} 
+          />
         </SectionAccordion>
+      </div>
       </div>
 
       <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
