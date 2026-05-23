@@ -587,7 +587,7 @@ Retorne APENAS JSON:
   }, [leadLogs]);
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
+    <div className="flex min-h-screen bg-[#0D0D0D] font-sans text-white">
       <Sidebar user={getDisplayName()} />
       
       <main className="flex-1 ml-[230px] p-20 max-w-[1600px] mx-auto w-full">
@@ -599,7 +599,7 @@ Retorne APENAS JSON:
                 {getGreeting()}, <span className="text-bronze uppercase">{getDisplayName()}</span>.
               </h1>
               <div className="flex items-center gap-4">
-                <p className="text-white/40 text-sm uppercase tracking-widest font-medium">
+                <p className="text-white/[0.4] text-sm uppercase tracking-widest font-medium">
                   {format(new Date(), "EEEE, d 'DE' MMMM", { locale: ptBR })}
                 </p>
                 
@@ -607,13 +607,13 @@ Retorne APENAS JSON:
                 <div className="flex items-center gap-3 ml-4">
                   <Dialog open={isForecastOpen} onOpenChange={setIsForecastOpen}>
                     <DialogTrigger asChild>
-                      <button className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors">
+                      <button className="flex items-center gap-2 px-4 py-2 bg-white/[0.06] border border-white/[0.12] text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.12] transition-colors">
                         <BarChart3 size={14} />
                         PREVISÃO DE FECHAMENTO
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-6xl bg-[#0A0A0A] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
-                      <DialogHeader className="p-8 border-b border-white/5">
+                    <DialogContent className="max-w-6xl bg-[#0D0D0D] border-[#2A2826] p-0 overflow-hidden rounded-none shadow-2xl">
+                      <DialogHeader className="p-8 border-b border-white/[0.06]">
                         <DialogTitle className="text-bronze text-sm font-bold uppercase tracking-[0.3em]">
                           PREVISÃO DE FECHAMENTO · {format(new Date(), 'MMMM', { locale: ptBR }).toUpperCase()}
                         </DialogTitle>
@@ -625,7 +625,7 @@ Retorne APENAS JSON:
                   <div className="relative">
                     <button 
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors relative"
+                      className="flex items-center gap-2 px-4 py-2 bg-white/[0.06] border border-white/[0.12] text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/[0.12] transition-colors relative"
                     >
                       <Bell size={14} />
                       {unreadCount} {unreadCount === 1 ? 'notificação' : 'notificações'}
@@ -666,27 +666,27 @@ Retorne APENAS JSON:
             <section>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">AÇÕES DO DIA</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
+                <div className="h-[1px] flex-1 bg-white/[0.06]" />
               </div>
 
               <div className="space-y-4">
                 {actions.length === 0 ? (
-                  <p className="text-white/20 text-sm italic">Nenhuma ação pendente. Bom trabalho.</p>
+                  <p className="text-white/[0.18] text-sm italic">Nenhuma ação pendente. Bom trabalho.</p>
                 ) : (
                   <>
                     {/* Urgent */}
                     {actions.filter(a => a.type === 'urgent').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-red-500/70 group hover:bg-white/[0.04] transition-all">
+                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] border-l-4 border-l-red-500/70 group hover:bg-white/[0.04] transition-all">
                         <div className="flex items-center gap-4">
                           <div className="px-2 py-0.5 bg-red-500/10 text-red-500 text-[9px] font-bold uppercase tracking-wider">⚡ URGENTE</div>
                           <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
+                            <p className="text-sm font-medium">{action.title} · <span className="text-white/[0.4]">{action.reason}</span></p>
                             <p className="text-[10px] text-red-400/60 uppercase font-bold tracking-tighter">Atrasado há {action.days} dias</p>
                           </div>
                         </div>
                         <button 
                           onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
+                          className="flex items-center gap-2 text-[10px] font-bold text-white/[0.4] hover:text-white transition-colors group-hover:translate-x-1"
                         >
                           AGIR <ArrowRight size={12} />
                         </button>
@@ -695,16 +695,16 @@ Retorne APENAS JSON:
 
                     {/* Today */}
                     {actions.filter(a => a.type === 'today').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-bronze group hover:bg-white/[0.04] transition-all">
+                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] border-l-4 border-l-bronze group hover:bg-white/[0.04] transition-all">
                         <div className="flex items-center gap-4">
                           <div className="px-2 py-0.5 bg-bronze/10 text-bronze text-[9px] font-bold uppercase tracking-wider">📋 HOJE</div>
                           <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
+                            <p className="text-sm font-medium">{action.title} · <span className="text-white/[0.4]">{action.reason}</span></p>
                           </div>
                         </div>
                         <button 
                           onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
+                          className="flex items-center gap-2 text-[10px] font-bold text-white/[0.4] hover:text-white transition-colors group-hover:translate-x-1"
                         >
                           VER <ArrowRight size={12} />
                         </button>
@@ -720,7 +720,7 @@ Retorne APENAS JSON:
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PULSO DA EMPRESA</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
+                <div className="h-[1px] flex-1 bg-white/[0.06]" />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
@@ -748,11 +748,11 @@ Retorne APENAS JSON:
                       
                       {isEmpty ? (
                         <div className="h-2 flex items-center">
-                          <p className="text-[10px] text-white/20 italic">— Sem dados este mês</p>
+                          <p className="text-[10px] text-white/[0.18] italic">— Sem dados este mês</p>
                         </div>
                       ) : (
                         <>
-                          <div className="h-2 w-full bg-white/5 overflow-hidden">
+                          <div className="h-2 w-full bg-white/[0.06] overflow-hidden">
                             <motion.div 
                               initial={{ width: 0 }}
                               animate={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
@@ -773,7 +773,7 @@ Retorne APENAS JSON:
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">ESTA SEMANA</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
+                <div className="h-[1px] flex-1 bg-white/[0.06]" />
               </div>
 
               <div className="grid grid-cols-7 gap-4">
@@ -783,7 +783,7 @@ Retorne APENAS JSON:
                     <div key={day.toString()} className="space-y-4">
                       <div className={cn(
                         "text-center py-2 border-b transition-colors",
-                        isCurrent ? "border-bronze text-bronze" : "border-white/5 text-white/20"
+                        isCurrent ? "border-bronze text-bronze" : "border-white/[0.06] text-white/[0.18]"
                       )}>
                         <p className="text-[10px] font-bold uppercase mb-1">{format(day, 'EEE', { locale: ptBR })}</p>
                         <p className="text-xs font-mono">{format(day, 'dd')}</p>
@@ -791,7 +791,7 @@ Retorne APENAS JSON:
                       
                       <div className="space-y-2 min-h-[80px] flex flex-col items-center justify-center">
                         {events.length === 0 ? (
-                          <span className="text-white/10 text-lg flex items-center justify-center h-full">—</span>
+                          <span className="text-white/[0.12] text-lg flex items-center justify-center h-full">—</span>
                         ) : (
                           events.map(event => (
                             <button 
@@ -805,7 +805,7 @@ Retorne APENAS JSON:
                                   event.type === 'lead' ? "bg-blue-400" : 
                                   event.type === 'projeto' ? "bg-bronze" : "bg-green-400"
                                 )} />
-                                <p className="text-[9px] text-white/40 leading-tight group-hover:text-white transition-colors truncate">
+                                <p className="text-[9px] text-white/[0.4] leading-tight group-hover:text-white transition-colors truncate">
                                   {event.title}
                                 </p>
                               </div>
@@ -831,12 +831,12 @@ Retorne APENAS JSON:
                 </span>
               </div>
 
-              <div className="p-6 bg-white/[0.02] border border-white/5 border-l-4 border-l-bronze relative overflow-hidden group">
+              <div className="p-6 bg-white/[0.02] border border-white/[0.06] border-l-4 border-l-bronze relative overflow-hidden group">
                 {loadingAI ? (
                   <div className="flex flex-col gap-3">
-                    <div className="h-4 bg-white/5 animate-pulse w-full" />
-                    <div className="h-4 bg-white/5 animate-pulse w-[80%]" />
-                    <div className="h-10 mt-4 bg-white/5 animate-pulse w-full" />
+                    <div className="h-4 bg-white/[0.06] animate-pulse w-full" />
+                    <div className="h-4 bg-white/[0.06] animate-pulse w-[80%]" />
+                    <div className="h-10 mt-4 bg-white/[0.06] animate-pulse w-full" />
                   </div>
                 ) : aiInsight ? (
                   <div className="space-y-0">
@@ -857,13 +857,13 @@ Retorne APENAS JSON:
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-white/20 italic">Aguardando dados para gerar insight...</p>
+                  <p className="text-xs text-white/[0.18] italic">Aguardando dados para gerar insight...</p>
                 )}
               </div>
             </section>
 
             {/* Separator */}
-            <div className="border-t border-white/5" />
+            <div className="border-t border-white/[0.06]" />
 
             {/* Bloco: Saúde do Negócio */}
             <section className="space-y-6">
@@ -871,12 +871,12 @@ Retorne APENAS JSON:
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">SAÚDE DO NEGÓCIO</span>
               </div>
 
-              <div className="p-6 bg-white/[0.02] border border-white/5 space-y-6">
+              <div className="p-6 bg-white/[0.02] border border-white/[0.06] space-y-6">
                 {loadingHealth ? (
                   <div className="space-y-4">
-                    <div className="h-8 bg-white/5 animate-pulse w-24" />
-                    <div className="h-2 bg-white/5 animate-pulse w-full" />
-                    <div className="h-12 bg-white/5 animate-pulse w-full" />
+                    <div className="h-8 bg-white/[0.06] animate-pulse w-24" />
+                    <div className="h-2 bg-white/[0.06] animate-pulse w-full" />
+                    <div className="h-12 bg-white/[0.06] animate-pulse w-full" />
                   </div>
                 ) : businessHealth ? (
                   <>
@@ -889,7 +889,7 @@ Retorne APENAS JSON:
                         )}>
                           {businessHealth.score}
                         </span>
-                        <span className="text-white/20 text-sm font-mono">/ 100</span>
+                        <span className="text-white/[0.18] text-sm font-mono">/ 100</span>
                       </div>
                       <div className="flex gap-1">
                         {[...Array(10)].map((_, i) => (
@@ -899,7 +899,7 @@ Retorne APENAS JSON:
                               "text-sm leading-none transition-colors duration-500",
                               i < Math.round(businessHealth.score / 10) 
                                 ? (businessHealth.score >= 80 ? "text-bronze" : businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]")
-                                : "text-white/10"
+                                : "text-white/[0.12]"
                             )}
                           >
                             ●
@@ -912,7 +912,7 @@ Retorne APENAS JSON:
                       "{businessHealth.diagnostico}"
                     </p>
 
-                    <div className="grid grid-cols-4 gap-2 pt-4 border-t border-white/5">
+                    <div className="grid grid-cols-4 gap-2 pt-4 border-t border-white/[0.06]">
                       {[
                         { label: 'PIPELINE', status: businessHealth.pipeline },
                         { label: 'PROJETOS', status: businessHealth.projetos },
@@ -929,13 +929,13 @@ Retorne APENAS JSON:
                               <span className="text-red-500/70 text-sm font-bold">●</span>
                             )}
                           </div>
-                          <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">{item.label}</p>
+                          <p className="text-[9px] font-bold tracking-widest text-white/[0.4] uppercase">{item.label}</p>
                         </div>
                       ))}
                     </div>
                   </>
                 ) : (
-                  <p className="text-xs text-white/20 italic">Analisando indicadores...</p>
+                  <p className="text-xs text-white/[0.18] italic">Analisando indicadores...</p>
                 )}
               </div>
             </section>
@@ -946,9 +946,9 @@ Retorne APENAS JSON:
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">VELOCIDADE DO PIPELINE</span>
               </div>
 
-              <div className="p-6 bg-white/[0.02] border border-white/5">
+              <div className="p-6 bg-white/[0.02] border border-white/[0.06]">
                 {!velocity.some(v => v.hasData) && leadLogs.length > 0 ? (
-                  <p className="text-xs text-white/20 italic">Dados insuficientes — disponível após 30 dias de uso.</p>
+                  <p className="text-xs text-white/[0.18] italic">Dados insuficientes — disponível após 30 dias de uso.</p>
                 ) : (
                   <div className="space-y-5">
                     {velocity.map((item, idx) => (
@@ -975,7 +975,7 @@ Retorne APENAS JSON:
             <section>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">RESUMO</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
+                <div className="h-[1px] flex-1 bg-white/[0.06]" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1001,7 +1001,7 @@ Retorne APENAS JSON:
                   <button 
                     key={card.label}
                     onClick={() => navigate(card.link)}
-                    className="p-5 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-bronze/30 transition-all text-left"
+                    className="p-5 bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-bronze/30 transition-all text-left"
                   >
                     <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-2">{card.label}</p>
                     <p className="text-base font-bold text-white">{card.val}</p>

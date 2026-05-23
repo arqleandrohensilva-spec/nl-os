@@ -69,15 +69,15 @@ const NotificationsPanel = ({ isOpen, onClose, className }: NotificationsPanelPr
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           className={cn(
-            "absolute mt-4 w-[320px] bg-[#0A0A0A] border border-white/5 shadow-2xl z-[60] flex flex-col max-h-[480px]",
+            "absolute mt-4 w-[320px] bg-[#0D0D0D] border border-white/[0.06] shadow-2xl z-[60] flex flex-col max-h-[480px]",
             className
           )}
         >
-          <div className="p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
             <span className="text-[10px] font-bold text-bronze uppercase tracking-widest">NOTIFICAÇÕES</span>
             <button 
               onClick={() => markAllAsRead.mutate()}
-              className="text-[9px] text-white/40 hover:text-white uppercase font-bold"
+              className="text-[9px] text-white/[0.4] hover:text-white uppercase font-bold"
             >
               Marcar todas como lidas
             </button>
@@ -86,7 +86,7 @@ const NotificationsPanel = ({ isOpen, onClose, className }: NotificationsPanelPr
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             {notifications.length === 0 ? (
               <div className="p-10 text-center">
-                <p className="text-white/20 text-xs italic">Nenhuma notificação.</p>
+                <p className="text-white/[0.18] text-xs italic">Nenhuma notificação.</p>
               </div>
             ) : (
               notifications.map(notification => (
@@ -98,7 +98,7 @@ const NotificationsPanel = ({ isOpen, onClose, className }: NotificationsPanelPr
                     onClose();
                   }}
                   className={cn(
-                    "p-4 border-b border-white/5 cursor-pointer transition-colors flex gap-4 items-start",
+                    "p-4 border-b border-white/[0.06] cursor-pointer transition-colors flex gap-4 items-start",
                     !notification.lida ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
                   )}
                 >

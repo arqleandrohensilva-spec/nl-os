@@ -306,13 +306,13 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
   return (
     <div className="space-y-6">
       {/* Resumo Card */}
-      <div className="bg-[#2A2825] border border-white/5 p-6 rounded-none shadow-xl">
+      <div className="bg-[#2A2825] border border-white/[0.06] p-6 rounded-none shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
           <div>
-            <h4 className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Status da Documentação</h4>
+            <h4 className="text-[10px] uppercase tracking-widest text-white/[0.4] font-bold mb-1">Status da Documentação</h4>
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold text-white">{recebidos} de {total}</span>
-              <span className="text-white/20">|</span>
+              <span className="text-white/[0.18]">|</span>
               <Badge className={cn(
                 "rounded-none text-[9px] uppercase tracking-widest",
                 isCompleto ? "bg-green-500/10 text-green-500 border-green-500/20" : "bg-bronze/10 text-bronze border-bronze/20"
@@ -322,11 +322,11 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
             </div>
           </div>
           <div className="flex-1 max-w-md">
-            <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/40 mb-2">
+            <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/[0.4] mb-2">
               <span>Progresso</span>
               <span>{Math.round(porcentagem)}%</span>
             </div>
-            <Progress value={porcentagem} className="h-1 bg-white/5" indicatorClassName="bg-bronze" />
+            <Progress value={porcentagem} className="h-1 bg-white/[0.06]" indicatorClassName="bg-bronze" />
           </div>
           <div className="flex shrink-0">
             <Button 
@@ -342,8 +342,8 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
         </div>
       </div>
 
-      <div className="bg-white/[0.03] border border-white/10 p-8 shadow-2xl">
-        <div className="flex items-center gap-3 mb-8 border-b border-white/5 pb-4">
+      <div className="bg-white/[0.03] border border-white/[0.12] p-8 shadow-2xl">
+        <div className="flex items-center gap-3 mb-8 border-b border-white/[0.06] pb-4">
           <FileText className="text-bronze" size={20} />
           <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-white">DOCUMENTOS NECESSÁRIOS — {projeto.nome}</h2>
         </div>
@@ -357,14 +357,14 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
               
               <div className="grid grid-cols-1 gap-1">
                 {items.filter(i => i.categoria === cat).map(item => (
-                  <div key={item.id} className="group bg-black/10 border border-white/5 p-4 transition-all hover:bg-black/20 hover:border-white/10">
+                  <div key={item.id} className="group bg-black/10 border border-white/[0.06] p-4 transition-all hover:bg-black/20 hover:border-white/[0.12]">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex items-start gap-4 flex-1">
                         <button 
                           onClick={() => handleToggleStatus(item)}
                           className={cn(
                             "mt-0.5 transition-colors",
-                            item.status === 'RECEBIDO' ? "text-green-500" : "text-white/20 hover:text-white/40"
+                            item.status === 'RECEBIDO' ? "text-green-500" : "text-white/[0.18] hover:text-white/[0.4]"
                           )}
                         >
                           {item.status === 'RECEBIDO' ? <CheckCircle2 size={18} /> : <Circle size={18} />}
@@ -374,7 +374,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
                           <div className="flex items-center gap-3 mb-1">
                             <span className={cn(
                               "text-[11px] font-medium transition-colors",
-                              item.status === 'RECEBIDO' ? "text-white/90" : "text-white/50"
+                              item.status === 'RECEBIDO' ? "text-white/90" : "text-white/[0.06]0"
                             )}>
                               {item.item}
                             </span>
@@ -397,7 +397,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
                               placeholder="Observação (ex: Aguardando cartório)"
                               defaultValue={item.observacao || ''}
                               onBlur={(e) => handleUpdateObservacao(item.id, e.target.value)}
-                              className="bg-black/40 border-white/5 rounded-none text-[10px] min-h-[40px] focus:ring-bronze/30 transition-all focus:border-white/20"
+                              className="bg-black/40 border-white/[0.06] rounded-none text-[10px] min-h-[40px] focus:ring-bronze/30 transition-all focus:border-white/[0.18]"
                             />
                             {savingObs === item.id && (
                               <div className="absolute right-2 bottom-2">
@@ -434,7 +434,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
                               size="sm"
                               disabled={uploadingItem === item.id}
                               onClick={() => document.getElementById(`upload-${item.id}`)?.click()}
-                              className="bg-transparent border-white/10 text-white/60 hover:text-white hover:border-bronze hover:bg-bronze h-8 text-[9px] uppercase tracking-widest rounded-none transition-all"
+                              className="bg-transparent border-white/[0.12] text-white/60 hover:text-white hover:border-bronze hover:bg-bronze h-8 text-[9px] uppercase tracking-widest rounded-none transition-all"
                             >
                               {uploadingItem === item.id ? (
                                 <Loader2 size={12} className="animate-spin mr-2" />

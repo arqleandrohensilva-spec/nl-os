@@ -215,7 +215,7 @@ export default function PaginaCliente() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-bronze animate-spin" />
       </div>
     );
@@ -223,11 +223,11 @@ export default function PaginaCliente() {
 
   if (error || !projeto) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-8 text-center">
         <div>
           <h1 className="font-cormorant text-4xl italic text-white mb-4">NL ARQUITETOS</h1>
           <p className="text-white/60 mb-2">Link inválido ou expirado.</p>
-          <p className="text-white/40 text-sm">Entre em contato com a NL Arquitetos.</p>
+          <p className="text-white/[0.4] text-sm">Entre em contato com a NL Arquitetos.</p>
         </div>
       </div>
     );
@@ -242,8 +242,8 @@ export default function PaginaCliente() {
   }, {});
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
+    <div className="min-h-screen bg-[#0D0D0D] text-white font-sans selection:bg-bronze/30">
+      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0D0D0D]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
         <h1 className="font-cormorant text-2xl italic">NL ARQUITETOS</h1>
         <span className="text-[10px] text-bronze uppercase tracking-[0.3em] font-medium hidden sm:block">
           A ARQUITETURA COMO DECISÃO
@@ -256,7 +256,7 @@ export default function PaginaCliente() {
           <h2 className="font-cormorant text-4xl italic">Olá, {projeto.nome_cliente}.</h2>
           <div className="space-y-1">
             <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">SEU PROJETO</p>
-            <p className="text-white/50 text-sm uppercase tracking-wider">
+            <p className="text-white/[0.06]0 text-sm uppercase tracking-wider">
               {projeto.tipo || 'Projeto'} · {projeto.cidade || 'São José dos Campos'} · {projeto.area_m2 || '--'}m²
             </p>
             <p className="text-white/30 text-xs">
@@ -277,21 +277,21 @@ export default function PaginaCliente() {
                 return (
                   <div key={step} className="flex flex-col items-center text-center space-y-4 flex-1 relative">
                     {idx < ETAPAS_JORNADA.length - 1 && (
-                      <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/10" />
+                      <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/[0.12]" />
                     )}
                     
-                    <div className="z-10 bg-[#0A0A0A]">
+                    <div className="z-10 bg-[#0D0D0D]">
                       {isApproved ? (
                         <div className="w-3 h-3 rounded-full bg-bronze" />
                       ) : isCurrent ? (
                         <div className="w-3 h-3 rounded-full bg-bronze animate-pulse ring-4 ring-bronze/20" />
                       ) : (
-                        <div className="w-3 h-3 rounded-full border border-white/20" />
+                        <div className="w-3 h-3 rounded-full border border-white/[0.18]" />
                       )}
                     </div>
 
                     <div className="space-y-1 px-2">
-                      <p className={`text-[10px] tracking-widest font-bold ${isCurrent || isApproved ? 'text-white' : 'text-white/20'}`}>
+                      <p className={`text-[10px] tracking-widest font-bold ${isCurrent || isApproved ? 'text-white' : 'text-white/[0.18]'}`}>
                         {step}
                       </p>
                       <p className="text-[10px] text-white/30">
@@ -317,7 +317,7 @@ export default function PaginaCliente() {
                 <div key={etapa.id} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                   <div className="space-y-2">
                     <h3 className="font-cormorant text-3xl italic">{etapa.etapa}</h3>
-                    <p className="text-white/40 text-xs">
+                    <p className="text-white/[0.4] text-xs">
                       Enviado em {format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR })}
                     </p>
                   </div>
@@ -334,7 +334,7 @@ export default function PaginaCliente() {
                     </Button>
                     <Button 
                       variant="ghost" 
-                      className="text-white/50 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest h-12"
+                      className="text-white/[0.06]0 hover:text-white hover:bg-white/[0.06] rounded-none uppercase text-[10px] tracking-widest h-12"
                       onClick={() => {
                         setSelectedEtapa(etapa);
                         setShowAjusteModal(true);
@@ -363,7 +363,7 @@ export default function PaginaCliente() {
                     <span className="uppercase text-[10px] tracking-[0.2em] font-bold">{etapa}</span>
                   </div>
                   
-                  <div className="space-y-6 pl-8 border-l border-white/5">
+                  <div className="space-y-6 pl-8 border-l border-white/[0.06]">
                     {arqs.map((arquivo: any) => (
                       <div key={arquivo.id} className="group">
                         <div className="flex items-start justify-between gap-4">
@@ -371,14 +371,14 @@ export default function PaginaCliente() {
                             {arquivo.liberado ? (
                               <FileText className="w-5 h-5 text-bronze mt-0.5" />
                             ) : (
-                              <Lock className="w-5 h-5 text-white/20 mt-0.5" />
+                              <Lock className="w-5 h-5 text-white/[0.18] mt-0.5" />
                             )}
                             <div className="space-y-1">
                               <p className={`text-sm ${arquivo.liberado ? 'text-white' : 'text-white/30'}`}>
                                 {arquivo.nome_arquivo}
                               </p>
                               {!arquivo.liberado && (
-                                <p className="text-white/20 italic text-[10px]">Disponível em breve</p>
+                                <p className="text-white/[0.18] italic text-[10px]">Disponível em breve</p>
                               )}
                             </div>
                           </div>
@@ -406,20 +406,20 @@ export default function PaginaCliente() {
           <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">FALAR COM A NL</p>
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Seu nome (opcional)</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Seu nome (opcional)</label>
               <Input 
                 value={nomeMensagem}
                 onChange={e => setNomeMensagem(e.target.value)}
-                className="bg-[#1A1A1A] border border-white/10 border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
+                className="bg-[#161616] border border-white/[0.12] border-white/[0.12] focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Mensagem</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Mensagem</label>
               <Textarea 
                 value={textoMensagem}
                 onChange={e => setTextoMensagem(e.target.value)}
                 placeholder="Dúvida, observação ou pedido de ajuste..."
-                className="bg-[#1A1A1A] border border-white/10 border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
+                className="bg-[#161616] border border-white/[0.12] border-white/[0.12] focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
               />
             </div>
             <Button 
@@ -434,31 +434,31 @@ export default function PaginaCliente() {
 
       </main>
 
-      <footer className="py-20 border-t border-white/5 px-8 flex flex-col items-center gap-4">
-        <p className="text-white/20 text-[10px] uppercase tracking-[0.4em] text-center">
+      <footer className="py-20 border-t border-white/[0.06] px-8 flex flex-col items-center gap-4">
+        <p className="text-white/[0.18] text-[10px] uppercase tracking-[0.4em] text-center">
           NL ARQUITETOS · São José dos Campos, SP
         </p>
-        <p className="text-white/10 text-[8px] uppercase tracking-[0.6em] text-center">
+        <p className="text-white/[0.12] text-[8px] uppercase tracking-[0.6em] text-center">
           A ARQUITETURA COMO DECISÃO
         </p>
       </footer>
 
       <Dialog open={showAprovarModal} onOpenChange={setShowAprovarModal}>
-        <DialogContent className="bg-[#0A0A0A] border-white/10 rounded-none text-white max-w-md">
+        <DialogContent className="bg-[#0D0D0D] border-white/[0.12] rounded-none text-white max-w-md">
           <DialogHeader className="space-y-4">
             <DialogTitle className="font-cormorant text-2xl italic">Confirmar aprovação de {selectedEtapa?.etapa}</DialogTitle>
           </DialogHeader>
           <div className="py-6 space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/40">Seu nome completo</label>
+              <label className="text-[10px] uppercase tracking-widest text-white/[0.4]">Seu nome completo</label>
               <Input 
                 autoFocus
                 value={nomeAprovador}
                 onChange={e => setNomeAprovador(e.target.value)}
-                className="bg-[#1A1A1A] border border-white/10 border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
+                className="bg-[#161616] border border-white/[0.12] border-white/[0.12] focus:border-bronze/50 rounded-none h-12 text-white text-sm"
               />
             </div>
-            <p className="text-[10px] text-white/20 leading-relaxed italic">
+            <p className="text-[10px] text-white/[0.18] leading-relaxed italic">
               Ao confirmar, você declara estar de acordo com os arquivos apresentados nesta etapa. 
               Seu IP e horário serão registrados para fins contratuais.
             </p>
@@ -472,7 +472,7 @@ export default function PaginaCliente() {
             </Button>
             <Button 
               variant="ghost" 
-              className="text-white/40 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              className="text-white/[0.4] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
               onClick={() => setShowAprovarModal(false)}
             >
               CANCELAR
@@ -482,7 +482,7 @@ export default function PaginaCliente() {
       </Dialog>
 
       <Dialog open={showAjusteModal} onOpenChange={setShowAjusteModal}>
-        <DialogContent className="bg-[#0A0A0A] border-white/10 rounded-none text-white max-w-md">
+        <DialogContent className="bg-[#0D0D0D] border-white/[0.12] rounded-none text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="font-cormorant text-2xl italic">O que precisa ser ajustado?</DialogTitle>
           </DialogHeader>
@@ -492,7 +492,7 @@ export default function PaginaCliente() {
               value={textoAjuste}
               onChange={e => setTextoAjuste(e.target.value)}
               placeholder="Descreva detalhadamente..."
-              className="bg-[#1A1A1A] border border-white/10 border-white/10 focus:border-bronze/50 rounded-none min-h-[150px] text-white text-sm resize-none"
+              className="bg-[#161616] border border-white/[0.12] border-white/[0.12] focus:border-bronze/50 rounded-none min-h-[150px] text-white text-sm resize-none"
             />
           </div>
           <DialogFooter className="gap-4 sm:justify-start">
@@ -504,7 +504,7 @@ export default function PaginaCliente() {
             </Button>
             <Button 
               variant="ghost" 
-              className="text-white/40 hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
+              className="text-white/[0.4] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12"
               onClick={() => setShowAjusteModal(false)}
             >
               CANCELAR

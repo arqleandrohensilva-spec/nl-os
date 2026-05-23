@@ -173,7 +173,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#0A0A0A] border-white/10 text-white sm:max-w-[425px]">
+      <DialogContent className="bg-[#0D0D0D] border-white/[0.12] text-white sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-xl font-cormorant text-bronze uppercase tracking-widest">
             GERAR LINK DA PROPOSTA
@@ -183,12 +183,12 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
         {!generatedLink ? (
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="tipo" className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Proposta</Label>
+              <Label htmlFor="tipo" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Tipo de Proposta</Label>
               <Select value={tipo} onValueChange={setTipo}>
-                <SelectTrigger className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:ring-bronze">
+                <SelectTrigger className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:ring-bronze">
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1A1A1A] border border-white/10 border-white/10 text-white">
+                <SelectContent className="bg-[#161616] border border-white/[0.12] border-white/[0.12] text-white">
                   <SelectItem value="arqint">ARQ+INT</SelectItem>
                   <SelectItem value="int">Interiores</SelectItem>
                   <SelectItem value="comercial">Comercial</SelectItem>
@@ -198,79 +198,79 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
             
             {tipo === 'comercial' && (
               <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/40">Tipo de Negócio</Label>
+                <Label htmlFor="tipoNegocio" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Tipo de Negócio</Label>
                 <Input
                   id="tipoNegocio"
                   value={tipoNegocio}
                   onChange={(e) => setTipoNegocio(e.target.value)}
                   placeholder="Ex: Barbearia, Clínica, Restaurante..."
-                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="nome" className="text-[10px] uppercase tracking-widest text-white/40">Nome do Cliente</Label>
+              <Label htmlFor="nome" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Nome do Cliente</Label>
               <Input
                 id="nome"
                 value={nomeCliente}
                 onChange={(e) => setNomeCliente(e.target.value)}
-                className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="cidade" className="text-[10px] uppercase tracking-widest text-white/40">Cidade (Opcional)</Label>
+                <Label htmlFor="cidade" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Cidade (Opcional)</Label>
                 <Input
                   id="cidade"
                   value={cidade}
                   onChange={(e) => setCidade(e.target.value)}
-                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="area" className="text-[10px] uppercase tracking-widest text-white/40">Área m² (Opcional)</Label>
+                <Label htmlFor="area" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Área m² (Opcional)</Label>
                 <Input
                   id="area"
                   type="number"
                   value={area}
                   onChange={(e) => setArea(e.target.value)}
-                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="v_exec" className="text-[10px] uppercase tracking-widest text-white/40">Valor Executivo</Label>
+                <Label htmlFor="v_exec" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Valor Executivo</Label>
                 <Input
                   id="v_exec"
                   type="number"
                   value={valorExecutivo}
                   onChange={(e) => setValorExecutivo(e.target.value)}
-                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="v_comp" className="text-[10px] uppercase tracking-widest text-white/40">Valor Completo</Label>
+                <Label htmlFor="v_comp" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Valor Completo</Label>
                 <Input
                   id="v_comp"
                   type="number"
                   value={valorCompleto}
                   onChange={(e) => setValorCompleto(e.target.value)}
-                  className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                  className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="objetivo" className="text-[10px] uppercase tracking-widest text-white/40">Objetivo (Opcional)</Label>
+              <Label htmlFor="objetivo" className="text-[10px] uppercase tracking-widest text-white/[0.4]">Objetivo (Opcional)</Label>
               <Input
                 id="objetivo"
                 value={objetivo}
                 onChange={(e) => setObjetivo(e.target.value)}
-                className="bg-[#1A1A1A] border border-white/10 border-white/10 rounded-none focus:border-bronze"
+                className="bg-[#161616] border border-white/[0.12] border-white/[0.12] rounded-none focus:border-bronze"
               />
             </div>
 
@@ -291,7 +291,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                className="flex-1 border-white/10 hover:border-bronze hover:text-bronze text-white rounded-none uppercase text-[10px] tracking-widest"
+                className="flex-1 border-white/[0.12] hover:border-bronze hover:text-bronze text-white rounded-none uppercase text-[10px] tracking-widest"
                 onClick={handleCopy}
               >
                 <Copy size={14} className="mr-2" />
@@ -308,7 +308,7 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
 
             <Button
               variant="ghost"
-              className="text-white/40 hover:text-white uppercase text-[9px] tracking-widest"
+              className="text-white/[0.4] hover:text-white uppercase text-[9px] tracking-widest"
               onClick={() => setGeneratedLink(null)}
             >
               GERAR OUTRO LINK
