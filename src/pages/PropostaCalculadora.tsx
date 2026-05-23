@@ -123,9 +123,14 @@ const PropostaCalculadora = () => {
         .from('proposals')
         .select('*')
         .eq('id', proposalId)
-        .single();
+        .maybeSingle();
         
       if (proposalError) throw proposalError;
+      if (!proposalData) {
+        toast.error("Proposta não encontrada.");
+        navigate('/calculadora');
+        return;
+      }
       setProposal(proposalData);
 
       // Fetch Config
