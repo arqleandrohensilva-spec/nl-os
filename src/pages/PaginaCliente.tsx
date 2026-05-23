@@ -71,11 +71,8 @@ export default function PaginaCliente() {
       
       setEtapas(etps || []);
 
-      const { data: arqs } = await (supabase
-        .from('arquivos_projeto') as any)
-        .select('*')
-        .eq('projeto_id', proj.id)
-        .order('created_at', { ascending: true });
+      const { data: arqs } = await supabase
+        .rpc('get_project_files_by_token', { p_val: param });
 
       setArquivos(arqs || []);
     } catch (err) {
