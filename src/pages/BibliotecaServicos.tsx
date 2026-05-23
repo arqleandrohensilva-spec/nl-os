@@ -164,7 +164,7 @@ const BibliotecaServicos = () => {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-white">Biblioteca de Serviços</h1>
-              <p className="text-white/40 mt-1 text-xs uppercase tracking-widest font-bold">Módulo 05 · Catálogo de Serviços e Precificação</p>
+              <p className="text-white/40 mt-1 text-xs uppercase tracking-widest font-bold">Módulo Administrativo · Catálogo de Serviços e Precificação</p>
             </div>
             <Button 
               onClick={() => {
