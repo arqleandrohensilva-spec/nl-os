@@ -29,9 +29,20 @@ interface Lead {
 
 const CalculadoraList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const clienteState = location.state;
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (clienteState?.clienteId) {
+      navigate('/calculadora/nova-proposta', { 
+        state: clienteState,
+        replace: true 
+      });
+    }
+  }, [clienteState, navigate]);
 
   useEffect(() => {
     fetchLeads();
