@@ -409,13 +409,13 @@ const ClienteFicha = () => {
             label="PROJETO" 
             value={projeto?.status_geral ? `${projeto.status_geral} · VER PROJETO` : '—'} 
             actionLabel="VER PROJETO" 
-            onClick={() => projeto?.id ? navigate(`/projetos/${projeto.id}`) : navigate('/projetos')} 
+            onClick={() => projeto?.id ? navigate(`/projetos/detalhe/${projeto.id}`) : navigate('/projetos/gestao')} 
           />
           <ShortcutCard 
             label="FINANCEIRO" 
             value={financeiro ? `${formatCurrency(financeiro)} recebido` : '—'} 
             actionLabel="VER PARCELAS" 
-            onClick={() => navigate('/financeiro')} 
+            onClick={() => navigate('/financeiro/projetos')} 
           />
         </section>
 
