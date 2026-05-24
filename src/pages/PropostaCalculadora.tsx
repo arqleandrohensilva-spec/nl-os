@@ -73,17 +73,18 @@ const PropostaCalculadora = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, [proposalId]);
+  }, [proposalId, location.state]);
 
   const fetchInitialData = async () => {
     try {
       setLoading(true);
+      const state = location.state as any;
       
       // Handle Standalone case
       const isNew = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
       
       if (isNew) {
-        const clienteTipo = clienteState?.clienteTipo;
+        const clienteTipo = state?.clienteTipo;
         let mappedTipo = 'ArqInt';
         if (clienteTipo) {
           if (['ARQ+INT', 'arq'].includes(clienteTipo)) mappedTipo = 'ArqInt';
@@ -94,14 +95,14 @@ const PropostaCalculadora = () => {
 
         setProposal({
           id: (proposalId || 'nova') as string,
-          cliente: clienteState?.clienteNome || '',
-          cliente_id: clienteState?.clienteId || '',
+          cliente: state?.clienteNome || '',
+          cliente_id: state?.clienteId || '',
           tipo: mappedTipo,
-          cidade: clienteState?.clienteCidade || '',
+          cidade: state?.clienteCidade || '',
           estado: 'SP',
-          area: parseFloat(clienteState?.clienteArea as any) || 0,
+          area: parseFloat(state?.clienteArea as any) || 0,
           objetivo: '',
-          versao: clienteState?.versao || 1
+          versao: state?.versao || 1
         });
         setPhases([]);
         
