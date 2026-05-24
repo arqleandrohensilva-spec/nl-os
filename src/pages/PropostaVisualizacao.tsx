@@ -231,7 +231,7 @@ const PropostaVisualizacao = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a 
-                href="https://wa.me/5500000000000" 
+                href={`https://wa.me/5512981504958?text=${encodeURIComponent(`Olá! Gostaria de falar sobre a proposta de projeto para ${proposalData.nome}.`)}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="bg-bronze hover:bg-bronze/90 text-white px-8 py-3 rounded-[2px] font-bold uppercase tracking-widest text-[11px] transition-all w-full sm:w-auto text-center"
