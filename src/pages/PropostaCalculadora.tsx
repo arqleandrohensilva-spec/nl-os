@@ -73,7 +73,12 @@ const PropostaCalculadora = () => {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    fetchInitialData();
+    // Only run if it's not a new proposal being created/edited in the current session
+    // This prevents re-fetching when we just set the ID locally after insertion
+    const isNewState = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
+    if (!proposal || (proposal.id !== proposalId && !isNewState)) {
+      fetchInitialData();
+    }
   }, [proposalId]);
 
   const fetchInitialData = async () => {
