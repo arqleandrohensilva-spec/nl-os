@@ -351,30 +351,20 @@ const PropostasTracking = () => {
   };
 
   const generateLink = (proposal: Proposal) => {
-    let baseUrl = "https://nlarquitetosapresentacao.lovable.app/proposta/";
-    const typeSlug = proposal.tipo === 'ArqInt' ? 'arqint' : proposal.tipo === 'Interiores' ? 'int' : 'comercial';
-    
-    const params = new URLSearchParams({
-      id: proposal.id,
-      nome: proposal.cliente,
-      tipo: proposal.tipo,
-      cidade: proposal.cidade || '',
-      estado: proposal.estado || '',
-      area: proposal.area?.toString() || '',
-      objetivo: proposal.objetivo || '',
-      data: proposal.data,
-      valor_executivo: proposal.valor_executivo?.toString() || '',
-      valor_completo: proposal.valor_completo?.toString() || '',
-      validade: proposal.validade?.toString() || '30'
-    });
-
-    return `${baseUrl}${typeSlug}?${params.toString()}`;
+    if (proposal.link_proposta) {
+      return proposal.link_proposta;
+    }
+    return null;
   };
 
   const copyLink = (proposal: Proposal) => {
     const link = generateLink(proposal);
-    navigator.clipboard.writeText(link);
-    toast.success('Link copiado para a área de transferência');
+    if (link) {
+      navigator.clipboard.writeText(link);
+      toast.success('Link copiado para a área de transferência');
+    } else {
+      toast.error('Proposta sem link gerado. Calcule a proposta primeiro.');
+    }
   };
 
   const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string, toneOverride?: 'formal' | 'direto', langOverride?: 'pt' | 'en' | 'es') => {
