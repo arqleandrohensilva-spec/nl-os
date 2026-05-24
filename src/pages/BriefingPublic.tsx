@@ -121,9 +121,10 @@ const BriefingPublic = () => {
             tipo_projeto: projetoType,
             area_m2: formData.area_estimada || formData.area_terreno,
             orcamento: formData.orcamento,
-            briefing_preenchido: true
+            briefing_preenchido: true,
+            etapa_fluxo: 'pre_briefing'
           };
-          await (supabase.from('clientes') as any).update(clienteUpdate).eq('id', briefing.cliente_id);
+          await supabase.from('clientes').update(clienteUpdate).eq('id', briefing.cliente_id);
         }
       } else {
         // Modo público - Criar novo
