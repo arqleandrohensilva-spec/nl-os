@@ -893,7 +893,7 @@ const ClienteFicha = () => {
                             // Cálculo dinâmico para visualização baseada na proposta selecionada
                             let val = 0;
                             if (selectedProposals.length > 0) {
-                              const props = propostas.filter(p => selectedProposals.includes(p.id));
+                              const props = (propostas as any[]).filter(p => selectedProposals.includes(p.id));
                               props.forEach(p => {
                                 const c = p.calculos_proposta?.[0];
                                 if (contractFormData.plano === 'Executivo') {
