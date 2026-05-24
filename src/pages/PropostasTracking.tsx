@@ -990,15 +990,27 @@ Retorne APENAS JSON válido:
                     
                     {/* Outras ações */}
                     <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/5">
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/calculadora/${p.id}`)}
-                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
-                      >
-                        <Calculator size={11} />
-                        CALCULAR
-                      </Button>
+                      {p.link_proposta ? (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyLink(p)}
+                          className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
+                        >
+                          <Copy size={11} />
+                          COPIAR LINK
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/calculadora/${p.id}`)}
+                          className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
+                        >
+                          <Calculator size={11} />
+                          CALCULAR
+                        </Button>
+                      )}
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
                         <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA]">
