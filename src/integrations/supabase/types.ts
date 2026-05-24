@@ -914,25 +914,31 @@ export type Database = {
           autor_id: string | null
           cliente_id: string | null
           data_hora: string | null
+          descricao: string | null
           id: string
           status_anterior: string | null
           status_novo: string | null
+          tipo: string | null
         }
         Insert: {
           autor_id?: string | null
           cliente_id?: string | null
           data_hora?: string | null
+          descricao?: string | null
           id?: string
           status_anterior?: string | null
           status_novo?: string | null
+          tipo?: string | null
         }
         Update: {
           autor_id?: string | null
           cliente_id?: string | null
           data_hora?: string | null
+          descricao?: string | null
           id?: string
           status_anterior?: string | null
           status_novo?: string | null
+          tipo?: string | null
         }
         Relationships: [
           {
