@@ -363,21 +363,90 @@ const ClienteFicha = () => {
           
           {openSections.includes('ficha') && (
             <div className="p-8 space-y-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[
-                  { label: 'Nome', key: 'nome' },
-                  { label: 'WhatsApp', key: 'whatsapp' },
-                  { label: 'E-mail', key: 'email' },
-                  { label: 'CPF/CNPJ', key: 'cpf_cnpj' },
-                  { label: 'Cidade', key: 'cidade' },
-                  { label: 'Endereço', key: 'endereco_imovel', fullWidth: true },
-                  { label: 'Origem', key: 'origem' },
-                ].map((field) => (
-                  <div key={field.key} className={cn("space-y-1", field.fullWidth && "md:col-span-2 lg:col-span-3")}>
-                    <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">{field.label}</Label>
-                    <p className="text-[#E8E4DF] text-sm uppercase font-medium">{formData[field.key as keyof typeof formData] || '—'}</p>
-                  </div>
-                ))}
+              <div className="flex justify-between items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 flex-1">
+                  {[
+                    { label: 'Nome', key: 'nome' },
+                    { label: 'WhatsApp', key: 'whatsapp' },
+                    { label: 'E-mail', key: 'email' },
+                    { label: 'CPF/CNPJ', key: 'cpf_cnpj' },
+                    { label: 'Cidade', key: 'cidade' },
+                    { label: 'Endereço', key: 'endereco_imovel', fullWidth: true },
+                    { label: 'Origem', key: 'origem' },
+                  ].map((field) => (
+                    <div key={field.key} className={cn("space-y-1", field.fullWidth && "md:col-span-2 lg:col-span-3")}>
+                      <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">{field.label}</Label>
+                      {isEditing ? (
+                        <Input 
+                          value={formData[field.key as keyof typeof formData]} 
+                          onChange={(e) => setFormData({...formData, [field.key]: e.target.value})}
+                          className="bg-white/5 border-white/10 rounded-none h-8 text-xs uppercase"
+                        />
+                      ) : (
+                        <p className="text-[#E8E4DF] text-sm uppercase font-medium">{formData[field.key as keyof typeof formData] || '—'}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {!id && (
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const { data, error } = await supabase.from('clientes').insert({
+                          nome: formData.nome,
+                          whatsapp: formData.whatsapp,
+                          email: formData.email,
+                          cpf_cnpj: formData.cpf_cnpj,
+                          cidade: formData.cidade,
+                          endereco_imovel: formData.endereco_imovel,
+                          origem: formData.origem,
+                          etapa_fluxo: 'ficha'
+                        }).select().single();
+                        
+                        if (error) throw error;
+                        
+                        toast.success("Cliente criado com sucesso!");
+                        navigate(`/clientes/${data.id}`);
+                      } catch (err) {
+                        toast.error("Erro ao criar cliente");
+                      }
+                    }}
+                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 ml-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest h-12"
+                  >
+                    SALVAR CLIENTE
+                  </Button>
+                )}
+                {id && (
+                  <Button 
+                    onClick={async () => {
+                      if (isEditing) {
+                        try {
+                          const { error } = await supabase.from('clientes').update({
+                            nome: formData.nome,
+                            whatsapp: formData.whatsapp,
+                            email: formData.email,
+                            cpf_cnpj: formData.cpf_cnpj,
+                            cidade: formData.cidade,
+                            endereco_imovel: formData.endereco_imovel,
+                            origem: formData.origem
+                          }).eq('id', id);
+                          if (error) throw error;
+                          toast.success("Dados atualizados!");
+                          setIsEditing(false);
+                          queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+                        } catch (err) {
+                          toast.error("Erro ao atualizar");
+                        }
+                      } else {
+                        setIsEditing(true);
+                      }
+                    }}
+                    variant="outline"
+                    className="border-white/10 text-white/40 hover:text-[#8B7355] hover:border-[#8B7355] rounded-none px-6 ml-8 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                  >
+                    {isEditing ? 'SALVAR' : 'EDITAR'}
+                  </Button>
+                )}
               </div>
 
               {/* QUALIFICAÇÃO BLOCO */}
