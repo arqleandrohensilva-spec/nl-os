@@ -77,6 +77,7 @@ export interface Proposal {
   last_view_at?: string;
   proposta_engajamento?: Engagement[];
   link_proposta?: string;
+  versao?: number;
 }
 
 interface Lead {
@@ -853,7 +854,9 @@ Retorne APENAS JSON válido:
                       </span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-white mb-1 font-cormorant">{p.cliente}</h3>
+                    <h3 className="text-lg font-bold text-white mb-1 font-cormorant">
+                      {p.cliente} {p.versao && p.versao > 1 && <span className="text-bronze/60 text-xs ml-1 font-sans">v{p.versao}</span>}
+                    </h3>
                     <p className="text-[10px] text-bronze uppercase tracking-widest font-bold mb-4">{p.tipo}</p>
 
                     <div className="grid grid-cols-2 gap-4 mb-6">
