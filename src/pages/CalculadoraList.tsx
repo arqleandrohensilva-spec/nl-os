@@ -70,45 +70,16 @@ const CalculadoraList = () => {
     lead.nome.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleLeadSelect = async (lead: Lead) => {
-    try {
-      // First, check if there's already a proposal for this lead to avoid duplicates
-      // Or just create a new one every time? Usually, tracking is per proposal.
-      // But the user said: "Ao clicar no lead -> abre a calculadora já preenchida com os dados dele"
-      
-      // We need a proposal_id. Let's look for an existing proposal for this client name or create one.
-      const { data: existingProposal } = await supabase
-        .from('proposals')
-        .select('id')
-        .eq('cliente', lead.nome)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (existingProposal) {
-        navigate(`/calculadora/${existingProposal.id}`);
-      } else {
-        // Create a basic proposal to start with
-        const { data: newProposal, error: createError } = await supabase
-          .from('proposals')
-          .insert({
-            cliente: lead.nome,
-            tipo: (['ArqInt', 'Interiores', 'Comercial'].includes(lead.tipo) ? lead.tipo : 'ArqInt') as any,
-            cidade: lead.cidade,
-            area: lead.area,
-            status: 'Enviada',
-            data: new Date().toISOString().split('T')[0]
-          })
-          .select()
-          .single();
-
-        if (createError) throw createError;
-        navigate(`/calculadora/${newProposal.id}`);
-      }
-    } catch (error) {
-      console.error('Error selecting lead:', error);
-      toast.error('Erro ao iniciar calculadora');
-    }
+  const handleLeadSelect = (lead: Lead) => {
+    navigate('/calculadora/nova-proposta', { 
+      state: { 
+        clienteId: lead.id,
+        clienteNome: lead.nome,
+        clienteCidade: lead.cidade,
+        clienteTipo: lead.tipo,
+        clienteArea: lead.area
+      } 
+    });
   };
 
   const handleStandalone = () => {
