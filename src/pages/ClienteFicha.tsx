@@ -603,13 +603,28 @@ const ClienteFicha = () => {
                     </div>
                   </div>
 
-                  <div className="pt-4 flex gap-4">
+                  <div className="pt-4 flex flex-wrap gap-4">
                     <Button 
                       variant="outline" 
                       className="border-[#8B7355]/30 bg-transparent text-[#E8E4DF] hover:bg-[#8B7355]/10 hover:border-[#8B7355] rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-6"
                       onClick={() => navigate(`/proposta/${(proposta.tipo === 'ArqInt' ? 'arqint' : proposta.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${proposta.id}`)}
                     >
                       VER CARTA PROPOSTA
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="text-[#8B7355] hover:bg-[#8B7355]/5 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-4"
+                      onClick={() => navigate('/calculadora/nova-proposta', { 
+                        state: { 
+                          clienteId: id,
+                          clienteNome: cliente?.nome,
+                          clienteCidade: cliente?.cidade,
+                          clienteTipo: cliente?.tipo_projeto,
+                          clienteArea: cliente?.area_m2
+                        } 
+                      })}
+                    >
+                      + CRIAR NOVA VERSÃO
                     </Button>
                   </div>
                 </div>
