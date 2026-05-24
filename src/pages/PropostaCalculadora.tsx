@@ -419,7 +419,8 @@ const PropostaCalculadora = () => {
       }
 
       if (!finalLink) {
-        throw new Error("Não foi possível gerar o link oficial da proposta. O link já pode existir ou houve um erro de conexão.");
+        finalLink = `${window.location.origin}/proposta/${typeSlug}?id=${currentProposalId}`;
+        toast.warning("Não foi possível gerar o link personalizado. Usando link alternativo.");
       }
 
       // 4. Update local proposal with the link and version
