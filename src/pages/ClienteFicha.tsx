@@ -112,7 +112,10 @@ const ClienteFicha = () => {
     enabled: !!id && !!cliente?.nome
   });
 
-  const proposta = propostas[0] || null;
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
+
+  const proposta = propostas[propostas.length - 1] || null;
 
   const { data: contrato } = useQuery({
     queryKey: ['contrato_cliente', id],
