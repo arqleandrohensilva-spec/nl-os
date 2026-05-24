@@ -416,7 +416,8 @@ const PropostaCalculadora = () => {
       }
 
       if (!finalLink) {
-        throw new Error("Não foi possível gerar o link da proposta. Verifique sua conexão e tente novamente.");
+        finalLink = `${window.location.origin}/proposta/${typeSlug}?id=${currentProposalId}`;
+        console.warn("Usando link de fallback devido a falha na API externa");
       }
 
       // 4. Update local proposal with the link and version
