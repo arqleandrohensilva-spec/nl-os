@@ -328,7 +328,8 @@ const PropostaCalculadora = () => {
       
       const slugAttempts = [
         `${baseSlug}${versaoSuffix}`,
-        `${baseSlug}${versaoSuffix}-${Math.floor(Math.random() * 1000)}`
+        `${baseSlug}${versaoSuffix}-${Math.floor(Math.random() * 1000)}`,
+        `${baseSlug}${versaoSuffix}-${Date.now()}`
       ];
 
       let finalLink = "";
@@ -370,9 +371,12 @@ const PropostaCalculadora = () => {
 
           if (updateResponse.ok) {
             finalLink = `https://proposta.nl.arq.br/${existingSlug}`;
+          } else {
+            const errorText = await updateResponse.text();
+            console.error("PATCH error response:", errorText);
           }
         } catch (err) {
-          console.error("PATCH error:", err);
+          console.error("PATCH connection error:", err);
         }
       }
 
@@ -404,15 +408,18 @@ const PropostaCalculadora = () => {
             if (createResponse.ok) {
               finalLink = `https://proposta.nl.arq.br/${attemptSlug}`;
               break;
+            } else {
+              const errorText = await createResponse.text();
+              console.error(`POST error for slug ${attemptSlug}:`, errorText);
             }
           } catch (err) {
-            console.error("POST error:", err);
+            console.error(`POST connection error for slug ${attemptSlug}:`, err);
           }
         }
       }
 
       if (!finalLink) {
-        throw new Error("Não foi possível gerar o link oficial da proposta. Verifique sua conexão e tente novamente.");
+        throw new Error("Não foi possível gerar o link oficial da proposta. O link já pode existir ou houve um erro de conexão.");
       }
 
       // 4. Update local proposal with the link and version
