@@ -29,7 +29,7 @@ const PropostaCliente = () => {
         const { data: localProp } = await supabase
           .from('proposals')
           .select('id')
-          .ilike('link_proposta', `%${slug}%`)
+          .like('link_proposta', `%/${slug}`)
           .maybeSingle();
 
         if (localProp) {
