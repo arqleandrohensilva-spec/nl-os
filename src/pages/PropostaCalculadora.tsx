@@ -324,7 +324,7 @@ const PropostaCalculadora = () => {
       else if (typeSlug === 'comercial') finalTipoNegocio = tipoNegocio;
 
       const baseSlug = gerarSlug(proposal?.cliente || '');
-      const versaoSuffix = clienteState?.versao ? `-v${clienteState.versao}` : '';
+      const versaoSuffix = proposal.versao && proposal.versao > 1 ? `-v${proposal.versao}` : '';
       const now = new Date();
       const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
@@ -335,13 +335,22 @@ const PropostaCalculadora = () => {
       ];
 
       let finalLink = "";
-      let finalSlug = "";
 
-      // If updating an existing proposal that already has a link_proposta, we update the external server
+      // 1. Determine existing slug
+      let existingSlug = "";
       if (proposal.link_proposta) {
         const urlParts = proposal.link_proposta.split('/');
-        const existingSlug = urlParts[urlParts.length - 1];
-        
+        existingSlug = urlParts[urlParts.length - 1];
+      }
+
+      // 2. Decide if we can PATCH the existing slug
+      // We PATCH if the existing slug already contains the desired version suffix (or both have no version suffix)
+      const shouldPatch = proposal.link_proposta && (
+        (versaoSuffix && existingSlug.includes(versaoSuffix)) || 
+        (!versaoSuffix && !existingSlug.includes('-v'))
+      );
+
+      if (shouldPatch) {
         try {
           const updateResponse = await fetch(`https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes?slug=eq.${existingSlug}`, {
             method: 'PATCH',
@@ -365,10 +374,44 @@ const PropostaCalculadora = () => {
 
           if (updateResponse.ok) {
             finalLink = proposal.link_proposta;
-            console.log("Servidor externo atualizado com sucesso");
           }
         } catch (err) {
-          console.error("Falha ao atualizar servidor externo:", err);
+          console.error("PATCH error:", err);
+        }
+      }
+
+      // 3. If no finalLink (either update failed, or we need a new versioned slug)
+      if (!finalLink) {
+        for (const attemptSlug of slugAttempts) {
+          try {
+            const createResponse = await fetch(`https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
+                'Prefer': 'return=representation'
+              },
+              body: JSON.stringify({
+                slug: attemptSlug,
+                nome_cliente: proposal.cliente,
+                cidade: proposal.cidade,
+                estado: proposal.estado,
+                area: proposal.area || null,
+                valor_executivo: Math.round(totals.valorExecutivo).toString(),
+                valor_completo: Math.round(totals.valorCompleto).toString(),
+                objetivo: proposal.objetivo || "",
+                tipo_negocio: finalTipoNegocio
+              })
+            });
+
+            if (createResponse.ok) {
+              finalLink = `https://proposta.nl.arq.br/${attemptSlug}`;
+              break;
+            }
+          } catch (err) {
+            console.error("POST error:", err);
+          }
         }
       }
 
@@ -376,10 +419,13 @@ const PropostaCalculadora = () => {
         throw new Error("Não foi possível gerar o link da proposta. Verifique sua conexão e tente novamente.");
       }
 
-      // 4. Update local proposal with the link
+      // 4. Update local proposal with the link and version
       const { error: linkError } = await supabase
         .from('proposals')
-        .update({ link_proposta: finalLink })
+        .update({ 
+          link_proposta: finalLink,
+          versao: proposal.versao || 1
+        })
         .eq('id', currentProposalId);
 
       if (linkError) throw linkError;
