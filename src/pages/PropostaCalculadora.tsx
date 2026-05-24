@@ -576,7 +576,7 @@ const PropostaCalculadora = () => {
             {/* Block 4 - Notes & Extra Data */}
             <section className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">OBSERVAÇÕES E DADOS</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">OBSERVAÇÕES E DADOS</h2>
               </div>
               
               {proposal.tipo === 'Comercial' && (
