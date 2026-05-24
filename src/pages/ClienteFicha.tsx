@@ -637,10 +637,24 @@ const ClienteFicha = () => {
                         >
                           {/* HEADER (FECHADO) */}
                           <div 
-                            onClick={() => setOpenProposalId(isOpen ? null : p.id)}
-                            className="p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04]"
+                            className="p-4 flex justify-between items-center hover:bg-white/[0.04]"
                           >
-                            <div className="flex flex-col">
+                            <div className="flex items-center gap-4 flex-1 cursor-pointer" onClick={() => setOpenProposalId(isOpen ? null : p.id)}>
+                              <div 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProposals(prev => 
+                                    prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                                  );
+                                }}
+                                className={cn(
+                                  "w-4 h-4 border flex items-center justify-center transition-colors",
+                                  selectedProposals.includes(p.id) ? "bg-[#8B7355] border-[#8B7355]" : "border-white/20"
+                                )}
+                              >
+                                {selectedProposals.includes(p.id) && <Check size={10} className="text-white" />}
+                              </div>
+                              <div className="flex flex-col">
                               <div className="flex items-center gap-2">
                                 <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
                                   {p.cliente} — {p.tipo}
