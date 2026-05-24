@@ -555,10 +555,10 @@ const PropostaCalculadora = () => {
                     variant={complexity === item.val ? 'default' : 'outline'}
                     onClick={() => setComplexity(item.val as any)}
                     className={cn(
-                      "h-16 rounded-xl uppercase tracking-widest text-[10px] transition-all duration-300",
+                      "h-20 rounded-xl uppercase tracking-widest text-xs font-bold transition-all duration-300",
                       complexity === item.val 
                         ? "bg-bronze text-white shadow-lg shadow-bronze/20" 
-                        : "border-white/10 hover:border-white/20 hover:bg-white/5 text-white/60"
+                        : "border-white/10 hover:border-bronze/50 hover:bg-white/5 text-white/80"
                     )}
                   >
                     {item.label} (×{item.val.toFixed(1)})
