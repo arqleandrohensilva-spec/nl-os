@@ -684,16 +684,18 @@ const PropostaCalculadora = () => {
                 </div>
               </div>
 
-              {!generatedLink ? (
+              <div className="mt-10 space-y-4">
                 <Button 
                   onClick={handleSaveAndGenerate}
                   disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !!proposalId)}
-                  className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
+                  className="w-full h-16 bg-bronze hover:bg-bronze/80 text-[#0A0A0A] font-bold uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
                 >
-                  {isGeneratingLink ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
+                  {isGeneratingLink ? <Loader2 className="animate-spin" /> : generatedLink ? "ATUALIZAR PROPOSTA" : "GERAR LINK DA PROPOSTA"}
                 </Button>
-              ) : (
-                <div className="mt-10 p-6 bg-bronze/10 border border-bronze/20 rounded-2xl space-y-6 animate-in zoom-in-95 duration-500">
+              </div>
+
+              {generatedLink && (
+                <div className="mt-6 p-6 bg-bronze/10 border border-bronze/20 rounded-2xl space-y-6 animate-in zoom-in-95 duration-500">
                   <div className="text-center space-y-2">
                     <p className="text-xs font-bold text-bronze uppercase tracking-[0.2em] flex items-center justify-center gap-2">
                       <Check size={16} /> PROPOSTA GERADA
