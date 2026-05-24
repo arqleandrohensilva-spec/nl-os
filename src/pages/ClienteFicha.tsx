@@ -854,6 +854,49 @@ const ClienteFicha = () => {
             </div>
           </section>
         </div>
+        {/* MODAL PARA CRIAR PROJETO QUANDO APROVADO */}
+        <Dialog open={isProjectModalOpen} onOpenChange={setIsProjectModalOpen}>
+          <DialogContent className="bg-[#161616] border-white/10 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-cormorant font-bold uppercase tracking-widest text-[#8B7355]">
+                PROPOSTA APROVADA!
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <p className="text-sm text-white/60 leading-relaxed uppercase tracking-wide">
+                Deseja criar o projeto automaticamente para <span className="text-[#8B7355] font-bold">{cliente?.nome}</span>?
+              </p>
+              <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+                <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1">PROPOSTA SELECIONADA</p>
+                <p className="text-xs font-bold uppercase">{selectedProposalForProject?.cliente} — {selectedProposalForProject?.tipo}</p>
+              </div>
+            </div>
+            <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <Button 
+                variant="ghost" 
+                onClick={() => setIsProjectModalOpen(false)}
+                className="text-white/40 hover:text-white uppercase tracking-widest text-[10px] font-bold"
+              >
+                APENAS APROVAR
+              </Button>
+              <Button 
+                onClick={async () => {
+                  try {
+                    // Reutiliza a lógica existente de handleCreateProject
+                    await handleCreateProject();
+                    setIsProjectModalOpen(false);
+                    // O handleCreateProject já faz o invalidate e navega ou mostra mensagem
+                  } catch (err) {
+                    toast.error("Erro ao criar projeto");
+                  }
+                }}
+                className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white uppercase tracking-widest text-[10px] font-bold"
+              >
+                CRIAR PROJETO AGORA
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
