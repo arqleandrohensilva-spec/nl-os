@@ -329,7 +329,7 @@ const PropostaCalculadora = () => {
       const slugAttempts = [
         `${baseSlug}${versaoSuffix}`,
         `${baseSlug}${versaoSuffix}-${Math.floor(Math.random() * 1000)}`,
-        `${baseSlug}${versaoSuffix}-${Date.now()}`
+        `${baseSlug}${versaoSuffix}-${Date.now().toString().slice(-6)}`
       ];
 
       let finalLink = "";
