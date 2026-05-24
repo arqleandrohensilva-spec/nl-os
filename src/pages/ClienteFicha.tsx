@@ -626,13 +626,44 @@ const ClienteFicha = () => {
                           clienteNome: cliente?.nome,
                           clienteCidade: cliente?.cidade,
                           clienteTipo: cliente?.tipo_projeto,
-                          clienteArea: cliente?.area_m2
+                          clienteArea: cliente?.area_m2,
+                          versao: propostas.length + 1
                         } 
                       })}
                     >
                       + CRIAR NOVA VERSÃO
                     </Button>
                   </div>
+
+                  {propostas.length > 1 && (
+                    <div className="pt-6 border-t border-white/5 space-y-4">
+                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">HISTÓRICO DE VERSÕES</span>
+                      <div className="space-y-2">
+                        {propostas.slice(1).map((p, idx) => (
+                          <div key={p.id} className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 hover:border-[#8B7355]/30 transition-colors">
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-bold text-white/60">VERSÃO {propostas.length - 1 - idx}</span>
+                              <span className="text-[8px] text-white/20">{format(new Date(p.created_at), 'dd/MM/yyyy HH:mm')}</span>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="h-7 text-[8px] text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10"
+                              onClick={() => {
+                                if (p.link_proposta) {
+                                  window.open(p.link_proposta, '_blank');
+                                } else {
+                                  navigate(`/proposta/${(p.tipo === 'ArqInt' ? 'arqint' : p.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${p.id}`);
+                                }
+                              }}
+                            >
+                              ACESSAR
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
