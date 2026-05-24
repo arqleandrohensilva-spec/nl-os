@@ -1112,9 +1112,9 @@ const ClienteFicha = () => {
                               cliente_nome: contractData.cliente.nome,
                               tipo: contractData.projeto.tipo,
                               plano: contractData.projeto.plano,
-                              dados_gerais: contractData.cliente,
-                              prazos: contractData.prazos,
-                              valores: contractData.honorarios,
+                              dados_gerais: contractData.cliente as any,
+                              prazos: contractData.prazos as any,
+                              valores: contractData.honorarios as any,
                               status: 'Gerado'
                             });
 
