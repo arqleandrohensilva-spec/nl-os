@@ -42,6 +42,7 @@ export interface ContractData {
     marco3: string;
     valorExecutivo?: string;
     valorCompleto?: string;
+    totalExtenso?: string;
   };
   nl: {
     cauLeandro: string;
