@@ -695,57 +695,212 @@ const ClienteFicha = () => {
 
           {openSections.includes('reuniao') && (
             <div className="p-8 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Data e Hora</Label>
-                  <div className="flex gap-2">
-                    <Input type="datetime-local" className="bg-[#0D0D0D] border-white/5 rounded-none" />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Checklist de Reunião</Label>
-                  <div className="space-y-3">
-                    {[
-                      'Apresentou o método R.E.S.O.L.V.E',
-                      'Entendeu o problema do cliente',
-                      'Definiu escopo preliminar',
-                      'Cliente confirmou interesse em proposta'
-                    ].map(item => (
-                      <div key={item} className="flex items-center gap-3">
-                        <div className="w-4 h-4 border border-[#8B7355] flex items-center justify-center cursor-pointer">
-                          <Check size={10} className="text-[#8B7355]" />
-                        </div>
-                        <span className="text-[10px] uppercase text-white/60">{item}</span>
+              {!cliente?.reuniao_data || isRescheduling ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Data e Horário</Label>
+                      <Input 
+                        type="datetime-local" 
+                        value={formData.reuniao_data ? formData.reuniao_data.slice(0, 16) : ''}
+                        onChange={(e) => setFormData({...formData, reuniao_data: e.target.value})}
+                        className="bg-[#0D0D0D] border-white/5 rounded-none" 
+                      />
+                    </div>
+                    <div className="space-y-4">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Local</Label>
+                      <div className="flex gap-6 mt-2">
+                        {['Presencial', 'Online'].map(loc => (
+                          <label key={loc} className="flex items-center gap-2 cursor-pointer group">
+                            <div 
+                              onClick={() => setFormData({...formData, reuniao_local: loc})}
+                              className={cn(
+                                "w-4 h-4 rounded-full border flex items-center justify-center transition-all",
+                                formData.reuniao_local === loc ? "border-[#8B7355] bg-[#8B7355]" : "border-white/20 group-hover:border-[#8B7355]/50"
+                              )}
+                            >
+                              {formData.reuniao_local === loc && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                            </div>
+                            <span className="text-[10px] uppercase text-white/60 font-bold tracking-widest font-['Courier_New']">
+                              {loc === 'Online' ? 'Online (Google Meet / Zoom)' : loc}
+                            </span>
+                          </label>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                  </div>
+
+                  {formData.reuniao_local === 'Online' && (
+                    <div className="space-y-4">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Link da Reunião</Label>
+                      <Input 
+                        value={formData.reuniao_link}
+                        onChange={(e) => setFormData({...formData, reuniao_link: e.target.value})}
+                        placeholder="HTTPS://MEET.GOOGLE.COM/..."
+                        className="bg-[#0D0D0D] border-white/5 rounded-none text-xs uppercase" 
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Observações Internas</Label>
+                    <textarea 
+                      value={formData.reuniao_notas}
+                      onChange={(e) => setFormData({...formData, reuniao_notas: e.target.value})}
+                      className="w-full h-32 bg-[#0D0D0D] border border-white/5 p-4 text-xs uppercase text-white/60 outline-none focus:border-[#8B7355]" 
+                      placeholder="PONTOS IMPORTANTES DA REUNIÃO..." 
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-4">
+                    {isRescheduling && (
+                      <Button 
+                        variant="outline"
+                        onClick={() => setIsRescheduling(false)}
+                        className="border-white/10 text-white/40 rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                      >
+                        CANCELAR
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={async () => {
+                        if (!id) return;
+                        try {
+                          // Se for reagendamento, salvar no histórico
+                          if (cliente?.reuniao_data && isRescheduling) {
+                            const dataAnterior = format(new Date(cliente.reuniao_data), "dd/MM/yy 'às' HH:mm", { locale: ptBR });
+                            const novaData = format(new Date(formData.reuniao_data), "dd/MM/yy 'às' HH:mm", { locale: ptBR });
+                            
+                            await supabase.from('historico_clientes').insert({
+                              cliente_id: id,
+                              tipo: 'reagendamento',
+                              descricao: `Apresentação reagendada de ${dataAnterior} para ${novaData}`,
+                              data_hora: new Date().toISOString()
+                            });
+                          }
+
+                          const { error } = await supabase
+                            .from('clientes')
+                            .update({
+                              reuniao_data: formData.reuniao_data,
+                              reuniao_local: formData.reuniao_local,
+                              reuniao_link: formData.reuniao_link,
+                              reuniao_notas: formData.reuniao_notas
+                            } as any)
+                            .eq('id', id);
+                          
+                          if (error) throw error;
+                          
+                          toast.success("Agendamento salvo com sucesso!");
+                          setIsRescheduling(false);
+                          queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+                          queryClient.invalidateQueries({ queryKey: ['historico_cliente', id] });
+                        } catch (err) {
+                          toast.error("Erro ao salvar agendamento");
+                        }
+                      }}
+                      className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                    >
+                      SALVAR AGENDAMENTO
+                    </Button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-8">
+                  {/* CARD DE CONFIRMAÇÃO */}
+                  <div className="p-8 bg-[#0D0D0D] border border-[#8B7355]/30 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Calendar size={80} className="text-[#8B7355]" />
+                    </div>
+                    
+                    <div className="space-y-6 relative z-10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                          <Check size={12} className="text-green-500" />
+                        </div>
+                        <span className="text-xs font-bold text-green-500 uppercase tracking-[0.2em] font-['Courier_New']">APRESENTAÇÃO AGENDADA</span>
+                      </div>
 
-              <div className="space-y-4">
-                <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Anotações Livres</Label>
-                <textarea className="w-full h-32 bg-[#0D0D0D] border border-white/5 p-4 text-xs uppercase text-white/60 outline-none focus:border-[#8B7355]" placeholder="PONTOS IMPORTANTES DA REUNIÃO..." />
-              </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/30 font-['Courier_New']">Data e Horário</span>
+                          <p className="text-lg font-medium text-[#E8E4DF] uppercase">
+                            {format(new Date(cliente.reuniao_data), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/30 font-['Courier_New']">Local</span>
+                          <p className="text-lg font-medium text-[#E8E4DF] uppercase">
+                            {cliente.reuniao_local}
+                            {cliente.reuniao_link && (
+                              <a 
+                                href={cliente.reuniao_link.startsWith('http') ? cliente.reuniao_link : `https://${cliente.reuniao_link}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block text-[10px] text-[#8B7355] underline mt-1 font-['Courier_New']"
+                              >
+                                ACESSAR LINK DA REUNIÃO
+                              </a>
+                            )}
+                          </p>
+                        </div>
+                      </div>
 
-              {currentStepIndex === 2 && (
-                <div className="flex justify-end">
-                  <Button 
-                    onClick={() => {
-                      updateEtapa('proposta');
-                    navigate('/calculadora/nova-proposta', { 
-                      state: { 
-                        clienteId: id,
-                        clienteNome: formData.nome || cliente?.nome,
-                        clienteCidade: formData.cidade || cliente?.cidade,
-                        clienteTipo: formData.tipo_projeto || cliente?.tipo_projeto,
-                        clienteArea: formData.area_m2 || cliente?.area_m2
-                      } 
-                    });
-                    }}
-                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
-                  >
-                    GERAR PROPOSTA →
-                  </Button>
+                      <div className="pt-4">
+                        <Button 
+                          variant="outline"
+                          onClick={() => setIsRescheduling(true)}
+                          className="border-[#8B7355]/30 text-[#8B7355] hover:bg-[#8B7355]/10 rounded-none px-8 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                        >
+                          REAGENDAR
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* HISTÓRICO DE REAGENDAMENTOS */}
+                  {historico?.filter((h: any) => h.tipo === 'reagendamento').length > 0 && (
+                    <div className="space-y-4 pt-4">
+                      <div className="flex items-center gap-4">
+                        <span className="text-[9px] uppercase text-white/30 font-bold tracking-[0.2em] font-['Courier_New'] whitespace-nowrap">HISTÓRICO DE AGENDAMENTOS</span>
+                        <div className="h-px bg-white/5 flex-1" />
+                      </div>
+                      <div className="space-y-3">
+                        {historico
+                          .filter((h: any) => h.tipo === 'reagendamento')
+                          .map((h: any) => (
+                            <div key={h.id} className="flex items-start gap-3 text-[10px] font-['Courier_New'] text-white/40 uppercase tracking-tight">
+                              <History size={12} className="mt-0.5 text-[#8B7355]/50" />
+                              <p>
+                                Reagendado em {format(new Date(h.data_hora), "dd/MM")} — {h.descricao}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStepIndex === 2 && (
+                    <div className="flex justify-end pt-4">
+                      <Button 
+                        onClick={() => {
+                          updateEtapa('proposta');
+                          navigate('/calculadora/nova-proposta', { 
+                            state: { 
+                              clienteId: id,
+                              clienteNome: formData.nome || cliente?.nome,
+                              clienteCidade: formData.cidade || cliente?.cidade,
+                              clienteTipo: formData.tipo_projeto || cliente?.tipo_projeto,
+                              clienteArea: formData.area_m2 || cliente?.area_m2
+                            } 
+                          });
+                        }}
+                        className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                      >
+                        GERAR PROPOSTA →
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
