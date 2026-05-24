@@ -859,7 +859,7 @@ const ClienteFicha = () => {
                   </div>
 
                   {/* HISTÓRICO DE REAGENDAMENTOS */}
-                  {historico?.filter((h: any) => h.tipo === 'reagendamento').length >= 1 && (
+                  {historico?.some((h: any) => h.tipo === 'reagendamento') && (
                     <div className="space-y-4 pt-4">
                       <div className="flex items-center gap-4">
                         <span className="text-[9px] uppercase text-white/30 font-bold tracking-[0.2em] font-['Courier_New'] whitespace-nowrap">HISTÓRICO DE AGENDAMENTOS</span>
