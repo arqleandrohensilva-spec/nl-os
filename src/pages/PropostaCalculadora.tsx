@@ -54,20 +54,6 @@ const PropostaCalculadora = () => {
   const [saving, setSaving] = useState(false);
   const [proposal, setProposal] = useState<ProposalData | null>(null);
 
-  useEffect(() => {
-    if (clienteState?.clienteId && (proposalId === 'nova' || proposalId === 'nova-proposta')) {
-      setProposal(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          cliente: clienteState.clienteNome || prev.cliente,
-          cidade: clienteState.clienteCidade || prev.cidade,
-          tipo: clienteState.clienteTipo || prev.tipo,
-          area: clienteState.clienteArea || prev.area,
-        };
-      });
-    }
-  }, [clienteState, proposalId]);
   const [config, setConfig] = useState({
     custo_hora: 0,
     margem_lucro: 0,
@@ -93,12 +79,12 @@ const PropostaCalculadora = () => {
       // Handle Standalone case
       if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         setProposal({
-          id: proposalId,
-          cliente: '',
-          tipo: 'ArqInt',
-          cidade: '',
+          id: proposalId as string,
+          cliente: clienteState?.clienteNome || '',
+          tipo: (clienteState?.clienteTipo === 'arq' ? 'ArqInt' : clienteState?.clienteTipo === 'int' ? 'Interiores' : clienteState?.clienteTipo === 'com' ? 'Comercial' : clienteState?.clienteTipo) || 'ArqInt',
+          cidade: clienteState?.clienteCidade || '',
           estado: 'SP',
-          area: 0,
+          area: parseFloat(clienteState?.clienteArea as any) || 0,
           objetivo: ''
         });
         setPhases([]);
