@@ -93,20 +93,20 @@ const ClienteFicha = () => {
     enabled: !!id
   });
 
-  const { data: proposta } = useQuery({
-    queryKey: ['proposta_cliente', id],
+  const { data: propostas = [] } = useQuery({
+    queryKey: ['propostas_cliente', id],
     queryFn: async () => {
       const { data } = await supabase
         .from('proposals')
         .select('*')
         .filter('cliente_id', 'eq', id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      return data;
+        .order('created_at', { ascending: false });
+      return data || [];
     },
     enabled: !!id
   });
+
+  const proposta = propostas[0] || null;
 
   const { data: contrato } = useQuery({
     queryKey: ['contrato_cliente', id],
