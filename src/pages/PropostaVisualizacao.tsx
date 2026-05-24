@@ -20,19 +20,7 @@ const PropostaVisualizacao = () => {
   const { tipo } = useParams();
   const [searchParams] = useSearchParams();
   const [recorded, setRecorded] = useState(false);
-  const [proposalData, setProposalData] = useState<any>({
-    id: searchParams.get('id'),
-    nome: searchParams.get('nome'),
-    tipo: searchParams.get('tipo'),
-    cidade: searchParams.get('cidade'),
-    estado: searchParams.get('estado') || 'SP',
-    area: searchParams.get('area'),
-    objetivo: searchParams.get('objetivo'),
-    data: searchParams.get('data'),
-    valor_executivo: searchParams.get('valor_executivo'),
-    valor_completo: searchParams.get('valor_completo'),
-    validade: searchParams.get('validade') || '30'
-  });
+  const [proposalData, setProposalData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
