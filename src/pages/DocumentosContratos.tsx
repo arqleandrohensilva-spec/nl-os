@@ -161,6 +161,26 @@ const DocumentosContratos = () => {
   const [outroMotivo, setOutroMotivo] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
 
+  const generateContractNumber = async () => {
+    const year = new Date().getFullYear();
+    const { data: lastContract } = await supabase
+      .from('contratos')
+      .select('numero')
+      .order('criado_em', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastContract && lastContract[0]?.numero) {
+      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+  };
+
   useEffect(() => {
     fetchData();
     if (location.state?.selectedProposals && location.state.selectedProposals.length > 0) {
