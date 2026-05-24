@@ -206,7 +206,6 @@ const DocumentosContratos = () => {
 
       // Pegar o último selecionado para dados de cliente (ou o primeiro)
       const lastProp = props[props.length - 1];
-      const calculo = lastProp.calculos_proposta?.[0];
 
       // Tentar encontrar o lead se houver cliente_id
       let leadData: any = null;
@@ -220,6 +219,16 @@ const DocumentosContratos = () => {
       }
 
       await generateContractNumber();
+
+      // Calcular totais se houver múltiplas propostas
+      let totalExec = 0;
+      let totalComp = 0;
+
+      props.forEach(p => {
+        const c = p.calculos_proposta?.[0];
+        totalExec += Number(c?.valor_executivo || p.valor_executivo || 0);
+        totalComp += Number(c?.valor_completo || p.valor_completo || 0);
+      });
 
       setContractFormData(prev => ({
         ...prev,
@@ -238,8 +247,8 @@ const DocumentosContratos = () => {
         },
         honorarios: {
           ...prev.honorarios,
-          totalExecutivo: calculo?.valor_executivo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || lastProp.valor_executivo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '',
-          totalCompleto: calculo?.valor_completo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || lastProp.valor_completo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '',
+          totalExecutivo: totalExec.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalCompleto: totalComp.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
         }
       }));
 
