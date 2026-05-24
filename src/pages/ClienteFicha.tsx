@@ -127,6 +127,15 @@ const ClienteFicha = () => {
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
   const [isGeneratingContract, setIsGeneratingContract] = useState(false);
+  const [contractFormData, setContractFormData] = useState({
+    nacionalidade: 'brasileiro(a)',
+    estadoCivil: 'Solteiro(a)',
+    profissao: '',
+    prazoTotal: '12',
+    matricula: '',
+    cartorio: '',
+    plano: 'Executivo' as 'Executivo' | 'Completo'
+  });
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -833,143 +842,304 @@ const ClienteFicha = () => {
           {openSections.includes('contrato') && (
             <div className="p-8 space-y-8">
               {!contrato ? (
-                <div className="text-center py-10 border border-dashed border-white/5 bg-[#0D0D0D]">
-                  <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">
-                    {selectedProposals.length > 0 
-                      ? `${selectedProposals.length} PROPOSTA(S) SELECIONADA(S)` 
-                      : 'Contrato ainda não gerado para este cliente'}
-                  </p>
-                  <Button 
-                    disabled={isGeneratingContract}
-                    onClick={async () => {
-                      try {
-                        setIsGeneratingContract(true);
-                        
-                        // 1. Obter dados das propostas selecionadas
-                        const { data: props, error } = await supabase
-                          .from('proposals')
-                          .select('*, calculos_proposta (*)')
-                          .in('id', selectedProposals);
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* BLOCO 1 - Dados Automáticos (Read-only) */}
+                    <div className="space-y-6 bg-[#0D0D0D] p-6 border border-white/5">
+                      <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold border-b border-white/5 pb-2">BLOCO 1 — DADOS AUTOMÁTICOS</h3>
+                      
+                      <div className="grid gap-4">
+                        <div className="space-y-1">
+                          <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">NOME</Label>
+                          <p className="text-xs uppercase text-white/80">{formData.nome || cliente?.nome || '-'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">CPF</Label>
+                          <p className="text-xs uppercase text-white/80">{cliente?.cpf_cnpj || '-'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">ENDEREÇO</Label>
+                          <p className="text-xs uppercase text-white/80">{cliente?.endereco_imovel || cliente?.cidade || '-'}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">TIPO PROJETO</Label>
+                            <p className="text-xs uppercase text-white/80">{cliente?.tipo_projeto || '-'}</p>
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">ÁREA</Label>
+                            <p className="text-xs uppercase text-white/80">{cliente?.area_m2 || '-'} M²</p>
+                          </div>
+                        </div>
 
-                        if (error) throw error;
-                        if (!props || props.length === 0) {
-                          toast.error("Selecione pelo menos uma proposta");
-                          return;
+                        <div className="space-y-3 pt-4 border-t border-white/5">
+                          <div className="flex justify-between items-center">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">PLANO SELECIONADO</Label>
+                            <Select 
+                              value={contractFormData.plano} 
+                              onValueChange={(v: any) => setContractFormData({...contractFormData, plano: v})}
+                            >
+                              <SelectTrigger className="w-32 bg-transparent border-white/10 text-xs h-8 rounded-none">
+                                <SelectValue placeholder="PLANO" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-[#161616] border-white/10">
+                                <SelectItem value="Executivo">EXECUTIVO</SelectItem>
+                                <SelectItem value="Completo">COMPLETO</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          {(() => {
+                            // Cálculo dinâmico para visualização baseada na proposta selecionada
+                            let val = 0;
+                            if (selectedProposals.length > 0) {
+                              const props = (propostas as any[]).filter(p => selectedProposals.includes(p.id));
+                              props.forEach(p => {
+                                const c = p.calculos_proposta?.[0];
+                                if (contractFormData.plano === 'Executivo') {
+                                  val += Number(c?.valor_executivo || p.valor_executivo || 0);
+                                } else {
+                                  val += Number(c?.valor_completo || p.valor_completo || 0);
+                                }
+                              });
+                            }
+                            
+                            return (
+                              <div className="space-y-2 bg-white/5 p-3 mt-2">
+                                <div className="flex justify-between text-[10px]">
+                                  <span className="text-white/40 uppercase font-bold tracking-widest">VALOR TOTAL</span>
+                                  <span className="text-[#8B7355] font-bold">R$ {val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px] border-t border-white/5 pt-2">
+                                  <span className="text-white/40 uppercase tracking-widest">MARCO 1 (30%)</span>
+                                  <span className="text-white/60">R$ {(val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px]">
+                                  <span className="text-white/40 uppercase tracking-widest">MARCO 2 (40%)</span>
+                                  <span className="text-white/60">R$ {(val * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                </div>
+                                <div className="flex justify-between text-[10px]">
+                                  <span className="text-white/40 uppercase tracking-widest">MARCO 3 (30%)</span>
+                                  <span className="text-white/60">R$ {(val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* BLOCO 2 - Campos que faltam (Editáveis) */}
+                    <div className="space-y-6 bg-[#0D0D0D] p-6 border border-white/5">
+                      <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold border-b border-white/5 pb-2">BLOCO 2 — CAMPOS QUE FALTAM</h3>
+                      
+                      <div className="grid gap-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">NACIONALIDADE</Label>
+                            <Input 
+                              value={contractFormData.nacionalidade}
+                              onChange={(e) => setContractFormData({...contractFormData, nacionalidade: e.target.value})}
+                              className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355] uppercase"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">ESTADO CIVIL</Label>
+                            <Select 
+                              value={contractFormData.estadoCivil}
+                              onValueChange={(v) => setContractFormData({...contractFormData, estadoCivil: v})}
+                            >
+                              <SelectTrigger className="bg-transparent border-white/10 text-xs h-9 rounded-none">
+                                <SelectValue placeholder="SELECIONE" />
+                              </SelectTrigger>
+                              <SelectContent className="bg-[#161616] border-white/10">
+                                <SelectItem value="Solteiro(a)">SOLTEIRO(A)</SelectItem>
+                                <SelectItem value="Casado(a)">CASADO(A)</SelectItem>
+                                <SelectItem value="Divorciado(a)">DIVORCIADO(A)</SelectItem>
+                                <SelectItem value="Viúvo(a)">VIÚVO(A)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">PROFISSÃO</Label>
+                          <Input 
+                            value={contractFormData.profissao}
+                            onChange={(e) => setContractFormData({...contractFormData, profissao: e.target.value})}
+                            className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355] uppercase"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">PRAZO TOTAL (SEMANAS)</Label>
+                            <Input 
+                              type="number"
+                              value={contractFormData.prazoTotal}
+                              onChange={(e) => setContractFormData({...contractFormData, prazoTotal: e.target.value})}
+                              className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355]"
+                            />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">MATRÍCULA</Label>
+                            <Input 
+                              value={contractFormData.matricula}
+                              onChange={(e) => setContractFormData({...contractFormData, matricula: e.target.value})}
+                              placeholder="OPCIONAL"
+                              className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355] uppercase"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">CARTÓRIO</Label>
+                          <Input 
+                            value={contractFormData.cartorio}
+                            onChange={(e) => setContractFormData({...contractFormData, cartorio: e.target.value})}
+                            placeholder="OPCIONAL"
+                            className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355] uppercase"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center pt-4">
+                    <Button 
+                      disabled={isGeneratingContract || selectedProposals.length === 0}
+                      onClick={async () => {
+                        try {
+                          setIsGeneratingContract(true);
+                          
+                          // 1. Obter dados das propostas selecionadas
+                          const { data: props, error } = await supabase
+                            .from('proposals')
+                            .select('*, calculos_proposta (*)')
+                            .in('id', selectedProposals);
+
+                          if (error) throw error;
+                          if (!props || props.length === 0) {
+                            toast.error("Selecione pelo menos uma proposta");
+                            return;
+                          }
+
+                          // 2. Gerar número do contrato
+                          const year = new Date().getFullYear();
+                          const { data: lastContract } = await supabase
+                            .from('contratos')
+                            .select('numero')
+                            .order('criado_em', { ascending: false })
+                            .limit(1);
+
+                          let nextNumber = 1;
+                          if (lastContract?.[0]?.numero) {
+                            const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+                            if (match) nextNumber = parseInt(match[1]) + 1;
+                          }
+                          const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
+                          // 3. Somar valores conforme o plano
+                          let totalValue = 0;
+                          props.forEach(p => {
+                            const c = p.calculos_proposta?.[0];
+                            if (contractFormData.plano === 'Executivo') {
+                              totalValue += Number(c?.valor_executivo || p.valor_executivo || 0);
+                            } else {
+                              totalValue += Number(c?.valor_completo || p.valor_completo || 0);
+                            }
+                          });
+
+                          const lastProp = props[props.length - 1];
+
+                          // 4. Montar dados para o contrato
+                          const contractData: ContractData = {
+                            numero: numeroContrato,
+                            cliente: {
+                              nome: formData.nome || cliente?.nome || '',
+                              cpf: cliente?.cpf_cnpj || '',
+                              endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+                              nacionalidade: contractFormData.nacionalidade,
+                              estadoCivil: contractFormData.estadoCivil,
+                              profissao: contractFormData.profissao
+                            },
+                            projeto: {
+                              tipo: lastProp.tipo === 'ArqInt' ? 'Arquitetura + Interiores' : 
+                                    lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+                              plano: contractFormData.plano,
+                              endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+                              tipoImovel: 'Residência',
+                              areaTerreno: '',
+                              areaConstruida: lastProp.area?.toString() || '',
+                              matricula: contractFormData.matricula,
+                              cartorio: contractFormData.cartorio
+                            },
+                            prazos: {
+                              briefing: '5',
+                              estudo: '15',
+                              legal: '30',
+                              executivo: '20',
+                              total: contractFormData.prazoTotal
+                            },
+                            honorarios: {
+                              totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                              totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                              totalExtenso: valorPorExtenso(totalValue),
+                              marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                              marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                              marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            },
+                            nl: {
+                              cauLeandro: 'A203598-7',
+                              cauNeandro: 'A203599-5',
+                              cpfNeandro: '000.000.000-00'
+                            },
+                            dataAssinatura: new Date().toLocaleDateString('pt-BR')
+                          };
+
+                          // 5. Gerar DOCX
+                          const docxBlob = await generateContractDocx(contractData);
+                          if (!docxBlob) return;
+
+                          // 6. Salvar no Banco
+                          const { data: newContract, error: dbError } = await supabase.from('contratos').insert({
+                            numero: numeroContrato,
+                            cliente_id: cliente?.id,
+                            lead_id: null,
+                            cliente_nome: contractData.cliente.nome,
+                            tipo: contractData.projeto.tipo,
+                            plano: contractData.projeto.plano,
+                            dados_gerais: contractData.cliente,
+                            prazos: contractData.prazos,
+                            valores: contractData.honorarios,
+                            status: 'Gerado'
+                          }).select().single();
+
+                          if (dbError) throw dbError;
+
+                          // 7. Download
+                          const url = URL.createObjectURL(docxBlob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${numeroContrato} - ${contractData.cliente.nome}.docx`;
+                          a.click();
+                          URL.revokeObjectURL(url);
+
+                          toast.success("Contrato gerado com sucesso!");
+                          queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+                        } catch (err: any) {
+                          console.error('Erro detalhado:', err);
+                          toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
+                        } finally {
+                          setIsGeneratingContract(false);
                         }
-
-                        // 2. Gerar número do contrato
-                        const year = new Date().getFullYear();
-                        const { data: lastContract } = await supabase
-                          .from('contratos')
-                          .select('numero')
-                          .order('criado_em', { ascending: false })
-                          .limit(1);
-
-                        let nextNumber = 1;
-                        if (lastContract?.[0]?.numero) {
-                          const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-                          if (match) nextNumber = parseInt(match[1]) + 1;
-                        }
-                        const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
-
-                        // 3. Somar valores
-                        let totalExec = 0;
-                        let totalComp = 0;
-                        props.forEach(p => {
-                          const c = p.calculos_proposta?.[0];
-                          totalExec += Number(c?.valor_executivo || p.valor_executivo || 0);
-                          totalComp += Number(c?.valor_completo || p.valor_completo || 0);
-                        });
-
-                        const lastProp = props[props.length - 1];
-
-                        // 4. Montar dados para o contrato
-                        const contractData: ContractData = {
-                          numero: numeroContrato,
-                          cliente: {
-                            nome: formData.nome || cliente?.nome || '',
-                            cpf: cliente?.cpf_cnpj || '',
-                            endereco: formData.cidade || cliente?.cidade || '',
-                            nacionalidade: 'Brasileiro(a)',
-                            estadoCivil: 'Solteiro(a)',
-                            profissao: ''
-                          },
-                          projeto: {
-                            tipo: lastProp.tipo === 'ArqInt' ? 'Arquitetura + Interiores' : 
-                                  lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
-                            plano: 'Executivo',
-                            endereco: formData.cidade || cliente?.cidade || '',
-                            tipoImovel: 'Residência',
-                            areaTerreno: '',
-                            areaConstruida: lastProp.area?.toString() || '',
-                            matricula: '',
-                            cartorio: ''
-                          },
-                          prazos: {
-                            briefing: '5',
-                            estudo: '15',
-                            legal: '30',
-                            executivo: '20',
-                            total: '12'
-                          },
-                          honorarios: {
-                            totalExecutivo: totalExec.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                            totalCompleto: totalComp.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                            totalExtenso: valorPorExtenso(totalExec),
-                            marco1: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                            marco2: (totalExec * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                            marco3: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                          },
-                          nl: {
-                            cauLeandro: 'A203598-7',
-                            cauNeandro: 'A203599-5',
-                            cpfNeandro: '000.000.000-00'
-                          },
-                          dataAssinatura: new Date().toLocaleDateString('pt-BR')
-                        };
-
-                        // 5. Gerar DOCX
-                        const docxBlob = await generateContractDocx(contractData);
-                        if (!docxBlob) return;
-
-                        // 6. Salvar no Banco
-                        const { data: newContract, error: dbError } = await supabase.from('contratos').insert({
-                          numero: numeroContrato,
-                          cliente_id: cliente?.id,
-                          lead_id: null,
-                          cliente_nome: contractData.cliente.nome,
-                          tipo: contractData.projeto.tipo,
-                          plano: contractData.projeto.plano,
-                          dados_gerais: contractData.cliente,
-                          prazos: contractData.prazos,
-                          valores: contractData.honorarios,
-                          status: 'Gerado'
-                        }).select().single();
-
-                        if (dbError) throw dbError;
-
-                        // 7. Download
-                        const url = URL.createObjectURL(docxBlob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `${numeroContrato} - ${contractData.cliente.nome}.docx`;
-                        a.click();
-                        URL.revokeObjectURL(url);
-
-                        toast.success("Contrato gerado com sucesso!");
-                        queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
-                      } catch (err: any) {
-                        console.error('Erro detalhado:', err);
-                        toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
-                      } finally {
-                        setIsGeneratingContract(false);
-                      }
-                    }}
-                    className="bg-[#8B7355] text-white rounded-none px-8 text-[10px] font-bold uppercase"
-                  >
-                    {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
-                    {selectedProposals.length > 0 ? 'GERAR CONTRATO AGORA' : 'GERAR CONTRATO'}
-                  </Button>
+                      }}
+                      className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 text-[10px] font-bold uppercase h-12 tracking-widest"
+                    >
+                      {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
+                      GERAR CONTRATO DOCX
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="p-6 bg-[#0D0D0D] border border-white/5 space-y-6">
