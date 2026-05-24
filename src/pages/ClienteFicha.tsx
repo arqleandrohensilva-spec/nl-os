@@ -98,7 +98,12 @@ const ClienteFicha = () => {
     queryFn: async () => {
       const query = supabase
         .from('proposals')
-        .select('*')
+        .select(`
+          *,
+          proposal_views (
+            viewed_at
+          )
+        `)
         .order('created_at', { ascending: true });
 
       if (id) {
