@@ -76,6 +76,7 @@ export interface Proposal {
   views_count?: number;
   last_view_at?: string;
   proposta_engajamento?: Engagement[];
+  link_proposta?: string;
 }
 
 interface Lead {
@@ -350,30 +351,20 @@ const PropostasTracking = () => {
   };
 
   const generateLink = (proposal: Proposal) => {
-    let baseUrl = "https://nlarquitetosapresentacao.lovable.app/proposta/";
-    const typeSlug = proposal.tipo === 'ArqInt' ? 'arqint' : proposal.tipo === 'Interiores' ? 'int' : 'comercial';
-    
-    const params = new URLSearchParams({
-      id: proposal.id,
-      nome: proposal.cliente,
-      tipo: proposal.tipo,
-      cidade: proposal.cidade || '',
-      estado: proposal.estado || '',
-      area: proposal.area?.toString() || '',
-      objetivo: proposal.objetivo || '',
-      data: proposal.data,
-      valor_executivo: proposal.valor_executivo?.toString() || '',
-      valor_completo: proposal.valor_completo?.toString() || '',
-      validade: proposal.validade?.toString() || '30'
-    });
-
-    return `${baseUrl}${typeSlug}?${params.toString()}`;
+    if (proposal.link_proposta) {
+      return proposal.link_proposta;
+    }
+    return null;
   };
 
   const copyLink = (proposal: Proposal) => {
     const link = generateLink(proposal);
-    navigator.clipboard.writeText(link);
-    toast.success('Link copiado para a área de transferência');
+    if (link) {
+      navigator.clipboard.writeText(link);
+      toast.success('Link copiado para a área de transferência');
+    } else {
+      toast.error('Proposta sem link gerado. Calcule a proposta primeiro.');
+    }
   };
 
   const handleGenerateFollowup = async (proposal: Proposal, analysisContext?: string, toneOverride?: 'formal' | 'direto', langOverride?: 'pt' | 'en' | 'es') => {
@@ -999,15 +990,27 @@ Retorne APENAS JSON válido:
                     
                     {/* Outras ações */}
                     <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-white/5">
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/calculadora/${p.id}`)}
-                        className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
-                      >
-                        <Calculator size={11} />
-                        CALCULAR
-                      </Button>
+                      {p.link_proposta ? (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyLink(p)}
+                          className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
+                        >
+                          <Copy size={11} />
+                          COPIAR LINK
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/calculadora/${p.id}`)}
+                          className="rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-bronze/50 bg-bronze/5 text-bronze hover:bg-bronze hover:text-white hover:border-bronze transition-all gap-2"
+                        >
+                          <Calculator size={11} />
+                          CALCULAR
+                        </Button>
+                      )}
                       
                       <Select onValueChange={(val) => handleStatusUpdate(p.id, val)}>
                         <SelectTrigger className="w-full rounded-[2px] text-[8px] font-bold uppercase tracking-widest h-8 border-white/10 bg-transparent text-[#AAAAAA]">
