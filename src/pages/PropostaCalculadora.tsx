@@ -83,11 +83,20 @@ const PropostaCalculadora = () => {
       const isNew = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
       
       if (isNew) {
+        const clienteTipo = clienteState?.clienteTipo;
+        let mappedTipo = 'ArqInt';
+        if (clienteTipo) {
+          if (['ARQ+INT', 'arq'].includes(clienteTipo)) mappedTipo = 'ArqInt';
+          else if (['Interiores', 'int'].includes(clienteTipo)) mappedTipo = 'Interiores';
+          else if (['Comercial', 'com'].includes(clienteTipo)) mappedTipo = 'Comercial';
+          else mappedTipo = clienteTipo;
+        }
+
         setProposal({
           id: (proposalId || 'nova') as string,
           cliente: clienteState?.clienteNome || '',
           cliente_id: clienteState?.clienteId || '',
-          tipo: (clienteState?.clienteTipo === 'arq' ? 'ArqInt' : clienteState?.clienteTipo === 'int' ? 'Interiores' : clienteState?.clienteTipo === 'com' ? 'Comercial' : clienteState?.clienteTipo) || 'ArqInt',
+          tipo: mappedTipo,
           cidade: clienteState?.clienteCidade || '',
           estado: 'SP',
           area: parseFloat(clienteState?.clienteArea as any) || 0,
