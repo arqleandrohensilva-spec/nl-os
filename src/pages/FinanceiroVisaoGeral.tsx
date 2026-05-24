@@ -139,8 +139,10 @@ const FinanceiroVisaoGeral = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] p-8 pb-20 ml-[230px]">
-      <div className="max-w-7xl mx-auto space-y-10">
+    <div className="flex min-h-screen bg-[#0D0D0D]">
+      <Sidebar user="Sócio" />
+      <div className="flex-1 ml-[230px] p-8 pb-20">
+        <div className="max-w-7xl mx-auto space-y-10">
         <header className="flex justify-between items-end border-b border-white/5 pb-6">
           <div>
             <span className="text-[10px] text-[#8B7355] font-mono tracking-[0.3em] uppercase mb-2 block">Módulo Administrativo</span>
