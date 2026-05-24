@@ -99,7 +99,7 @@ const ClienteFicha = () => {
       const query = supabase
         .from('proposals')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (id) {
         // First try by cliente_id, then fallback to name if no results found via OR or separate logic
