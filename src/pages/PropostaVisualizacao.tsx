@@ -81,7 +81,6 @@ const PropostaVisualizacao = () => {
     const recordView = async () => {
       if (proposalData.id && !recorded) {
         try {
-          // Only record the view
           await supabase
             .from('proposal_views')
             .insert([{ proposal_id: proposalData.id }]);
@@ -92,8 +91,10 @@ const PropostaVisualizacao = () => {
       }
     };
 
-    recordView();
-  }, [proposalData.id, recorded]);
+    if (!loading) {
+      recordView();
+    }
+  }, [proposalData.id, recorded, loading]);
 
   const getIcon = () => {
     switch (tipo) {
