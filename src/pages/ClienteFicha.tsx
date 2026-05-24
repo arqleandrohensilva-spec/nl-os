@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { generateContractDocx } from '@/lib/generateContract';
+import { ContractData } from '@/utils/contractTemplates';
 import { Progress } from '@/components/ui/progress';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
