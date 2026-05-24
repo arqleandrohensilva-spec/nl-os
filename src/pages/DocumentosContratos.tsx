@@ -68,6 +68,7 @@ import {
 } from "@/components/ui/select";
 
 const DocumentosContratos = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('briefing');
   const [leads, setLeads] = useState<any[]>([]);
   const [projetos, setProjetos] = useState<any[]>([]);
