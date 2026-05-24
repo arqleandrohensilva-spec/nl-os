@@ -687,7 +687,7 @@ const PropostaCalculadora = () => {
               <div className="mt-10 space-y-4">
                 <Button 
                   onClick={handleSaveAndGenerate}
-                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !!proposalId)}
+                  disabled={saving || totals.totalHours === 0}
                   className="w-full h-16 bg-bronze hover:bg-bronze/80 text-[#0A0A0A] font-bold uppercase tracking-[0.2em] rounded-xl shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
                 >
                   {isGeneratingLink ? <Loader2 className="animate-spin" /> : generatedLink ? "ATUALIZAR PROPOSTA" : "GERAR LINK DA PROPOSTA"}
