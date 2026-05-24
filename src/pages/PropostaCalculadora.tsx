@@ -365,12 +365,13 @@ const PropostaCalculadora = () => {
               valor_completo: Math.round(totals.valorCompleto).toString(),
               objetivo: proposal.objetivo || "",
               tipo_negocio: finalTipoNegocio,
+              tipo: typeSlug,
               updated_at: new Date().toISOString()
             })
           });
 
           if (updateResponse.ok) {
-            finalLink = `https://proposta.nl.arq.br/${existingSlug}`;
+            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${existingSlug}`;
           } else {
             const errorText = await updateResponse.text();
             console.error("PATCH error response:", errorText);
@@ -401,12 +402,13 @@ const PropostaCalculadora = () => {
                 valor_executivo: Math.round(totals.valorExecutivo).toString(),
                 valor_completo: Math.round(totals.valorCompleto).toString(),
                 objetivo: proposal.objetivo || "",
-                tipo_negocio: finalTipoNegocio
+                tipo_negocio: finalTipoNegocio,
+                tipo: typeSlug
               })
             });
 
             if (createResponse.ok) {
-              finalLink = `https://proposta.nl.arq.br/${attemptSlug}`;
+              finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${attemptSlug}`;
               break;
             } else {
               const errorText = await createResponse.text();
@@ -419,8 +421,7 @@ const PropostaCalculadora = () => {
       }
 
       if (!finalLink) {
-        finalLink = `${window.location.origin}/proposta/${typeSlug}?id=${currentProposalId}`;
-        toast.warning("Não foi possível gerar o link personalizado. Usando link alternativo.");
+        throw new Error("Não foi possível gerar o link da proposta. Verifique sua conexão e tente novamente.");
       }
 
       // 4. Update local proposal with the link and version
