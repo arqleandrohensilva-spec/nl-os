@@ -268,6 +268,8 @@ const PropostaCalculadora = () => {
           setSaving(false);
           return;
         }
+
+        console.log("Iniciando criação de proposta para:", proposal.cliente);
         
         const { data: newProp, error: propCreateError } = await supabase
           .from('proposals')
