@@ -12,6 +12,31 @@ const PropostaCliente = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const registrarView = async (pTipo: string, pSlug: string) => {
+    try {
+      // Buscar todas as propostas com link para encontrar o match ideal
+      const { data: propostas } = await supabase
+        .from('proposals')
+        .select('id, link_proposta')
+        .not('link_proposta', 'is', null);
+
+      const propostaMatch = propostas?.find(p => {
+        const link = (p.link_proposta || '').toLowerCase();
+        return link.endsWith(`/${pSlug}`) || 
+               link.includes(`/${pTipo}/${pSlug}`);
+      });
+
+      if (propostaMatch?.id) {
+        await supabase.from('proposal_views').insert({
+          proposal_id: propostaMatch.id,
+          viewed_at: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.error('Erro ao registrar view:', err);
+    }
+  };
+
   useEffect(() => {
     const buscarProposta = async () => {
       const { data, error } = await supabase
@@ -24,24 +49,9 @@ const PropostaCliente = () => {
         // Incrementar acessos na tabela de clientes externos
         await supabase.rpc('increment_proposal_access', { p_id: data.id });
 
-        // Registrar visualização no tracking local
-        // Registrar visualização no tracking local
-        // Buscamos o ID da proposta na tabela 'proposals' para o tracking interno
-        const { data: localProp } = await supabase
-          .from('proposals')
-          .select('id')
-          // Busca robusta: tenta encontrar o slug em qualquer parte do link, 
-          // ignorando domínio ou protocolo (http/https)
-          .ilike('link_proposta', `%/${slug}%`)
-          .maybeSingle();
-        
-        const localPropId = localProp?.id;
-
-        if (localPropId) {
-          await supabase.from('proposal_views').insert([{ 
-            proposal_id: localPropId,
-            viewed_at: new Date().toISOString()
-          }]);
+        // Registrar visualização de forma robusta
+        if (tipo && slug) {
+          registrarView(tipo, slug);
         }
 
         setProposta(data);
