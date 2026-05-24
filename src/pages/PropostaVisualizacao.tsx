@@ -20,20 +20,62 @@ const PropostaVisualizacao = () => {
   const { tipo } = useParams();
   const [searchParams] = useSearchParams();
   const [recorded, setRecorded] = useState(false);
-
-  const proposalData = {
+  const [proposalData, setProposalData] = useState<any>({
     id: searchParams.get('id'),
     nome: searchParams.get('nome'),
     tipo: searchParams.get('tipo'),
     cidade: searchParams.get('cidade'),
-    estado: searchParams.get('estado'),
+    estado: searchParams.get('estado') || 'SP',
     area: searchParams.get('area'),
     objetivo: searchParams.get('objetivo'),
     data: searchParams.get('data'),
     valor_executivo: searchParams.get('valor_executivo'),
     valor_completo: searchParams.get('valor_completo'),
     validade: searchParams.get('validade') || '30'
-  };
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProposal = async () => {
+      const id = searchParams.get('id');
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('proposals')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setProposalData({
+            id: data.id,
+            nome: data.cliente,
+            tipo: data.tipo,
+            cidade: data.cidade,
+            estado: data.estado || 'SP',
+            area: data.area,
+            objetivo: data.objetivo,
+            data: data.data || data.created_at,
+            valor_executivo: data.valor_executivo,
+            valor_completo: data.valor_completo,
+            validade: data.validade || '30'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching proposal:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProposal();
+  }, [searchParams]);
 
   useEffect(() => {
     const recordView = async () => {
