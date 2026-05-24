@@ -114,6 +114,14 @@ const PropostaVisualizacao = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bronze"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
       {/* Header / Brand */}
