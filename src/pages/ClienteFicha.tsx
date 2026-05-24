@@ -121,6 +121,7 @@ const ClienteFicha = () => {
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
+  const [openProposalId, setOpenProposalId] = useState<string | null>(null);
 
   const proposta = propostas[propostas.length - 1] || null;
 
