@@ -91,7 +91,8 @@ const PropostaCalculadora = () => {
           cidade: clienteState?.clienteCidade || '',
           estado: 'SP',
           area: parseFloat(clienteState?.clienteArea as any) || 0,
-          objetivo: ''
+          objetivo: '',
+          versao: clienteState?.versao || 1
         });
         setPhases([]);
         
