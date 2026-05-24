@@ -465,25 +465,46 @@ const PropostaCalculadora = () => {
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
-            {(!proposalId || proposalId === 'nova' || proposalId === 'nova-proposta') ? (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
-                    CALCULADORA DE PROPOSTA · {proposal.cliente}
-                  </h1>
-                  <div className="flex items-center gap-2 bg-white/5 px-2 py-0.5 border border-white/10 rounded">
-                    <span className="text-[8px] uppercase tracking-widest text-white/40">Versão</span>
-                    <input 
-                      type="number" 
-                      value={proposal.versao || 1} 
-                      onChange={(e) => setProposal({...proposal, versao: parseInt(e.target.value) || 1})}
-                      className="bg-transparent border-none text-bronze text-xs font-bold w-8 focus:ring-0 p-0 text-center"
+            {(!proposalId || proposalId === 'nova' || proposalId === 'nova-proposta') && (!proposal.cliente || !proposal.cidade || !proposal.area) ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <Input 
+                    placeholder="NOME DO CLIENTE"
+                    value={proposal.cliente}
+                    onChange={(e) => setProposal({...proposal, cliente: e.target.value})}
+                    className="bg-white/5 border-white/10 h-8 text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze placeholder:text-bronze/30 w-96 rounded-none"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <Select value={proposal.tipo} onValueChange={(val) => setProposal({...proposal, tipo: val})}>
+                    <SelectTrigger className="w-32 h-6 text-[10px] uppercase tracking-widest bg-white/5 border-white/10 rounded-none text-white/40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ArqInt">ArqInt</SelectItem>
+                      <SelectItem value="Interiores">Interiores</SelectItem>
+                      <SelectItem value="Comercial">Comercial</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-white/20">·</span>
+                  <Input 
+                    placeholder="CIDADE"
+                    value={proposal.cidade}
+                    onChange={(e) => setProposal({...proposal, cidade: e.target.value})}
+                    className="bg-white/5 border-white/10 h-6 w-32 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
+                  />
+                  <span className="text-white/20">·</span>
+                  <div className="flex items-center gap-1">
+                    <Input 
+                      type="number"
+                      placeholder="ÁREA"
+                      value={proposal.area || ''}
+                      onChange={(e) => setProposal({...proposal, area: parseFloat(e.target.value) || 0})}
+                      className="bg-white/5 border-white/10 h-6 w-20 text-[10px] uppercase tracking-widest text-white/40 placeholder:text-white/20 rounded-none"
                     />
+                    <span className="text-[10px] uppercase tracking-widest text-white/40">m²</span>
                   </div>
                 </div>
-                <p className="text-[10px] uppercase tracking-widest text-white/40">
-                  {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
-                </p>
               </div>
             ) : (
               <div className="flex flex-col gap-1">
