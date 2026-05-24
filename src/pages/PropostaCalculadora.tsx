@@ -36,6 +36,7 @@ interface Phase {
 interface ProposalData {
   id: string;
   cliente: string;
+  cliente_id?: string;
   tipo: string;
   cidade: string;
   estado: string;
