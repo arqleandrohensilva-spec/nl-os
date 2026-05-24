@@ -57,46 +57,72 @@ const ClientesLista = () => {
 
   const handleAprovar = async (briefing: any) => {
     try {
-      // 1. Criar cliente
-      const { data: novoCliente, error: clienteError } = await supabase.from('clientes').insert({
-        nome: briefing.nome,
-        whatsapp: briefing.whatsapp,
-        email: briefing.email,
-        cidade: briefing.cidade,
-        origem: briefing.origem,
-        tipo_projeto: briefing.tipo_projeto,
-        briefing_preenchido: true,
-        etapa_fluxo: 'pre_briefing'
-      }).select().single();
+      const normalizarWhats = (whats: string) => (whats || '').replace(/\D/g, '');
+      const whatsappBriefing = normalizarWhats(briefing.whatsapp);
 
-      if (clienteError) throw clienteError;
+      // Buscar todos os clientes para comparar pelo número normalizado
+      const { data: todosClientes } = await supabase
+        .from('clientes')
+        .select('id, nome, whatsapp, tipo_projeto, cidade, briefing_preenchido');
 
-      // 2. Criar lead no Pipeline
-      const { error: leadError } = await supabase.from('leads').insert({
-        nome: briefing.nome,
-        whats: briefing.whatsapp,
-        cidade: briefing.cidade,
-        tipo: briefing.tipo_projeto === 'com' ? 'Comercial' : briefing.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int',
-        stage: 'Novo Lead',
-        origem: briefing.origem || 'Instagram',
-        temp: 'Frio',
-        score: 2,
-        criado: new Date().toISOString(),
-        area: 0,
-        cliente_id: novoCliente.id
-      });
+      const clienteExistente = todosClientes?.find(c => 
+        normalizarWhats(c.whatsapp) === whatsappBriefing
+      );
 
-      if (leadError) throw leadError;
+      let clienteId = clienteExistente?.id;
 
-      // 3. Atualizar briefing
+      if (clienteExistente) {
+        // Atualizar dados do cliente existente se estiverem vazios
+        await supabase.from('clientes').update({
+          tipo_projeto: clienteExistente.tipo_projeto || briefing.tipo_projeto,
+          cidade: clienteExistente.cidade || briefing.cidade,
+          briefing_preenchido: true
+        }).eq('id', clienteExistente.id);
+
+        toast.success(`Briefing vinculado a ${clienteExistente.nome}`);
+      } else {
+        // 1. Criar novo cliente
+        const { data: novoCliente, error: clienteError } = await supabase.from('clientes').insert({
+          nome: briefing.nome,
+          whatsapp: briefing.whatsapp,
+          email: briefing.email,
+          cidade: briefing.cidade,
+          origem: briefing.origem,
+          tipo_projeto: briefing.tipo_projeto,
+          briefing_preenchido: true,
+          etapa_fluxo: 'pre_briefing'
+        }).select().single();
+
+        if (clienteError) throw clienteError;
+        clienteId = novoCliente.id;
+
+        // 2. Criar lead no Pipeline apenas para novos clientes
+        const { error: leadError } = await supabase.from('leads').insert({
+          nome: briefing.nome,
+          whats: briefing.whatsapp,
+          cidade: briefing.cidade,
+          tipo: briefing.tipo_projeto === 'com' ? 'Comercial' : briefing.tipo_projeto === 'int' ? 'Interiores' : 'Arq+Int',
+          stage: 'Novo Lead',
+          origem: briefing.origem || 'Instagram',
+          temp: 'Frio',
+          score: 2,
+          criado: new Date().toISOString(),
+          area: 0,
+          cliente_id: clienteId
+        });
+
+        if (leadError) throw leadError;
+        toast.success(`${briefing.nome} aprovado — ficha criada`);
+      }
+
+      // 3. Atualizar briefing vinculando ao cliente (existente ou novo)
       const { error: briefingUpdateError } = await supabase.from('briefings').update({
         status: 'aprovado',
-        cliente_id: novoCliente.id
+        cliente_id: clienteId
       }).eq('id', briefing.id);
 
       if (briefingUpdateError) throw briefingUpdateError;
 
-      toast.success(`${briefing.nome} aprovado — ficha criada`);
       queryClient.invalidateQueries({ queryKey: ['briefings-pendentes'] });
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       queryClient.invalidateQueries({ queryKey: ['leads'] });
