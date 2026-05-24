@@ -80,8 +80,13 @@ const ClienteFicha = () => {
     quem_decide: '',
     anotacoes_reuniao: '',
     data_reuniao: '',
-    checklist_reuniao: [] as string[]
+    checklist_reuniao: [] as string[],
+    reuniao_data: '',
+    reuniao_local: 'Presencial',
+    reuniao_link: '',
+    reuniao_notas: ''
   });
+  const [isRescheduling, setIsRescheduling] = useState(false);
 
   const { data: cliente, isLoading: isClienteLoading } = useQuery({
     queryKey: ['cliente', id],
