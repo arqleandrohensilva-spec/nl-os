@@ -58,7 +58,11 @@ const ClienteFicha = () => {
         quem_decide: '',
         anotacoes_reuniao: '',
         data_reuniao: '',
-        checklist_reuniao: []
+        checklist_reuniao: [],
+        reuniao_data: '',
+        reuniao_local: 'Presencial',
+        reuniao_link: '',
+        reuniao_notas: ''
       });
     }
   }, [id]);
