@@ -94,16 +94,22 @@ const ClienteFicha = () => {
   });
 
   const { data: propostas = [] } = useQuery({
-    queryKey: ['propostas_cliente', id],
+    queryKey: ['propostas_cliente', id, cliente?.nome],
     queryFn: async () => {
-      const { data } = await supabase
+      const query = supabase
         .from('proposals')
         .select('*')
-        .filter('cliente_id', 'eq', id)
         .order('created_at', { ascending: false });
-      return data || [];
+
+      if (id) {
+        // First try by cliente_id, then fallback to name if no results found via OR or separate logic
+        const { data, error } = await query.or(`cliente_id.eq.${id},cliente.eq."${cliente?.nome}"`);
+        if (error) throw error;
+        return data || [];
+      }
+      return [];
     },
-    enabled: !!id
+    enabled: !!id && !!cliente?.nome
   });
 
   const proposta = propostas[0] || null;
