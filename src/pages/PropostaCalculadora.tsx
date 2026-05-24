@@ -356,14 +356,20 @@ const PropostaCalculadora = () => {
           } else if (response.status === 409) {
             continue;
           } else {
-            throw new Error(`Erro no servidor externo (${response.status})`);
+            console.error(`Erro no servidor externo: ${response.status}`);
+            // If it's the last attempt and it failed, we don't throw yet, 
+            // we let the loop finish or handle it after
           }
         } catch (err) {
-          console.warn("Attempt failed", err);
+          console.warn(`Tentativa com slug "${attemptSlug}" falhou:`, err);
         }
       }
 
-      if (!finalLink) throw new Error("Não foi possível gerar um link único.");
+      if (!finalLink) {
+        // Fallback: use local preview link if external fails
+        finalLink = `${window.location.origin}/proposta/executivo?id=${currentProposalId}`;
+        toast.warning("Link externo não gerado. Usando link interno temporário.");
+      }
 
       // 4. Update local proposal with the link
       const { error: linkError } = await supabase
