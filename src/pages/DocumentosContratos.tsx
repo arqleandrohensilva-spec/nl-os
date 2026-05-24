@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -67,6 +68,7 @@ import {
 } from "@/components/ui/select";
 
 const DocumentosContratos = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('briefing');
   const [leads, setLeads] = useState<any[]>([]);
   const [projetos, setProjetos] = useState<any[]>([]);
@@ -159,9 +161,110 @@ const DocumentosContratos = () => {
   const [outroMotivo, setOutroMotivo] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
 
+  const generateContractNumber = async () => {
+    const year = new Date().getFullYear();
+    const { data: lastContract } = await supabase
+      .from('contratos')
+      .select('numero')
+      .order('criado_em', { ascending: false })
+      .limit(1);
+
+    let nextNumber = 1;
+    if (lastContract && lastContract[0]?.numero) {
+      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+      if (match) {
+        nextNumber = parseInt(match[1]) + 1;
+      }
+    }
+
+    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+  };
+
   useEffect(() => {
     fetchData();
-  }, []);
+    if (location.state?.selectedProposals && location.state.selectedProposals.length > 0) {
+      handleSelectedProposalsFromState(location.state.selectedProposals);
+    }
+  }, [location.state]);
+
+  const handleSelectedProposalsFromState = async (proposalIds: string[]) => {
+    try {
+      setLoading(true);
+      
+      // Buscar as propostas selecionadas e seus cálculos
+      const { data: props, error } = await supabase
+        .from('proposals')
+        .select(`
+          *,
+          calculos_proposta (*)
+        `)
+        .in('id', proposalIds);
+
+      if (error) throw error;
+      if (!props || props.length === 0) return;
+
+      // Pegar o último selecionado para dados de cliente (ou o primeiro)
+      const lastProp = props[props.length - 1];
+
+      // Tentar encontrar o lead se houver cliente_id
+      let leadData: any = null;
+      if (lastProp.cliente_id) {
+        const { data: lead } = await supabase
+          .from('leads')
+          .select('*')
+          .eq('id', lastProp.cliente_id)
+          .maybeSingle();
+        leadData = lead;
+      }
+
+      await generateContractNumber();
+
+      // Calcular totais se houver múltiplas propostas
+      let totalExec = 0;
+      let totalComp = 0;
+
+      props.forEach(p => {
+        const c = p.calculos_proposta?.[0];
+        totalExec += Number(c?.valor_executivo || p.valor_executivo || 0);
+        totalComp += Number(c?.valor_completo || p.valor_completo || 0);
+      });
+
+      setContractFormData(prev => ({
+        ...prev,
+        cliente: {
+          ...prev.cliente,
+          nome: lastProp.cliente || leadData?.nome || '',
+          cpf: leadData?.cpf || '',
+          endereco: lastProp.cidade || leadData?.cidade || '',
+        },
+        projeto: {
+          ...prev.projeto,
+          tipo: lastProp.tipo === 'ArqInt' ? 'Arquitetura + Interiores' : 
+                lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+          areaConstruida: lastProp.area?.toString() || '',
+          endereco: lastProp.cidade || '',
+        },
+        honorarios: {
+          ...prev.honorarios,
+          totalExecutivo: totalExec.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalCompleto: totalComp.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+        }
+      }));
+
+      if (lastProp.cliente_id) {
+        setSelectedLeadId(lastProp.cliente_id);
+      }
+      
+      setActiveTab('contratos');
+      setIsContratoModalOpen(true);
+    } catch (err) {
+      console.error('Error loading selected proposals:', err);
+      toast.error('Erro ao carregar dados das propostas selecionadas');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -232,25 +335,6 @@ const DocumentosContratos = () => {
     }
   };
 
-  const generateContractNumber = async () => {
-    const year = new Date().getFullYear();
-    const { data: lastContract } = await supabase
-      .from('contratos')
-      .select('numero')
-      .order('criado_em', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (lastContract && lastContract[0]?.numero) {
-      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
-      }
-    }
-
-    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
-    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
-  };
 
   const handleSelectLeadForContract = (leadId: string) => {
     const lead = leads.find(l => l.id === leadId);

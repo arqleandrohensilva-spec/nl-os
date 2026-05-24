@@ -122,6 +122,7 @@ const ClienteFicha = () => {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
+  const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -636,19 +637,34 @@ const ClienteFicha = () => {
                         >
                           {/* HEADER (FECHADO) */}
                           <div 
-                            onClick={() => setOpenProposalId(isOpen ? null : p.id)}
-                            className="p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04]"
+                            className="p-4 flex justify-between items-center hover:bg-white/[0.04]"
                           >
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
-                                  {p.cliente} — {p.tipo}
-                                </span>
-                                <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
+                            <div className="flex items-center gap-4 flex-1 cursor-pointer" onClick={() => setOpenProposalId(isOpen ? null : p.id)}>
+                              <div 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProposals(prev => 
+                                    prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                                  );
+                                }}
+                                className={cn(
+                                  "w-4 h-4 border flex items-center justify-center transition-colors",
+                                  selectedProposals.includes(p.id) ? "bg-[#8B7355] border-[#8B7355]" : "border-white/20"
+                                )}
+                              >
+                                {selectedProposals.includes(p.id) && <Check size={10} className="text-white" />}
                               </div>
-                              <p className="text-[9px] text-white/30 font-mono tracking-tighter mt-0.5">
-                                {p.link_proposta || 'Sem link gerado'}
-                              </p>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
+                                    {p.cliente} — {p.tipo}
+                                  </span>
+                                  <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
+                                </div>
+                                <p className="text-[9px] text-white/30 font-mono tracking-tighter mt-0.5">
+                                  {p.link_proposta || 'Sem link gerado'}
+                                </p>
+                              </div>
                             </div>
                             <div className="flex items-center gap-4">
                               <div className={cn(
@@ -814,12 +830,22 @@ const ClienteFicha = () => {
             <div className="p-8 space-y-8">
               {!contrato ? (
                 <div className="text-center py-10 border border-dashed border-white/5 bg-[#0D0D0D]">
-                  <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">Contrato ainda não gerado para este cliente</p>
+                  <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">
+                    {selectedProposals.length > 0 
+                      ? `${selectedProposals.length} PROPOSTA(S) SELECIONADA(S)` 
+                      : 'Contrato ainda não gerado para este cliente'}
+                  </p>
                   <Button 
-                    onClick={() => navigate('/propostas/documentos')}
+                    onClick={() => navigate('/propostas/documentos', { 
+                      state: { 
+                        selectedProposals, 
+                        clienteId: id,
+                        clienteNome: formData.nome || cliente?.nome 
+                      } 
+                    })}
                     className="bg-[#8B7355] text-white rounded-none px-8 text-[10px] font-bold uppercase"
                   >
-                    GERAR CONTRATO
+                    {selectedProposals.length > 0 ? 'GERAR CONTRATO COM SELECIONADAS' : 'GERAR CONTRATO'}
                   </Button>
                 </div>
               ) : (
