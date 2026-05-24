@@ -757,7 +757,7 @@ const ClienteFicha = () => {
                       <Button 
                         variant="outline"
                         onClick={() => setIsRescheduling(false)}
-                        className="border-white/10 text-white/40 rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                        className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#0D0D0D] rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
                       >
                         CANCELAR
                       </Button>
@@ -859,7 +859,7 @@ const ClienteFicha = () => {
                   </div>
 
                   {/* HISTÓRICO DE REAGENDAMENTOS */}
-                  {historico?.filter((h: any) => h.tipo === 'reagendamento').length >= 1 && (
+                  {historico?.some((h: any) => h.tipo === 'reagendamento') && (
                     <div className="space-y-4 pt-4">
                       <div className="flex items-center gap-4">
                         <span className="text-[9px] uppercase text-white/30 font-bold tracking-[0.2em] font-['Courier_New'] whitespace-nowrap">HISTÓRICO DE AGENDAMENTOS</span>
