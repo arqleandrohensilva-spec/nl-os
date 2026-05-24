@@ -618,6 +618,13 @@ const ClienteFicha = () => {
                       VER CARTA PROPOSTA
                     </Button>
                     <Button 
+                      variant="outline" 
+                      className="border-[#8B7355]/60 bg-[#8B7355]/5 text-[#E8E4DF] hover:bg-[#8B7355]/20 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-6"
+                      onClick={() => navigate(`/calculadora/${proposta.id}`)}
+                    >
+                      EDITAR ATUAL
+                    </Button>
+                    <Button 
                       variant="ghost" 
                       className="text-[#8B7355] hover:bg-[#8B7355]/5 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-4"
                       onClick={() => navigate('/calculadora/nova-proposta', { 
