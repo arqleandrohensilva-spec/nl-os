@@ -655,15 +655,16 @@ const ClienteFicha = () => {
                                 {selectedProposals.includes(p.id) && <Check size={10} className="text-white" />}
                               </div>
                               <div className="flex flex-col">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
-                                  {p.cliente} — {p.tipo}
-                                </span>
-                                <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
+                                    {p.cliente} — {p.tipo}
+                                  </span>
+                                  <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
+                                </div>
+                                <p className="text-[9px] text-white/30 font-mono tracking-tighter mt-0.5">
+                                  {p.link_proposta || 'Sem link gerado'}
+                                </p>
                               </div>
-                              <p className="text-[9px] text-white/30 font-mono tracking-tighter mt-0.5">
-                                {p.link_proposta || 'Sem link gerado'}
-                              </p>
                             </div>
                             <div className="flex items-center gap-4">
                               <div className={cn(
