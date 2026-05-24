@@ -955,9 +955,9 @@ const ClienteFicha = () => {
 
                         toast.success("Contrato gerado com sucesso!");
                         queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
-                      } catch (err) {
-                        console.error(err);
-                        toast.error("Erro ao gerar contrato");
+                      } catch (err: any) {
+                        console.error('Erro detalhado:', err);
+                        toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
                       } finally {
                         setIsGeneratingContract(false);
                       }
