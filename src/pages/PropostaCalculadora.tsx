@@ -54,20 +54,6 @@ const PropostaCalculadora = () => {
   const [saving, setSaving] = useState(false);
   const [proposal, setProposal] = useState<ProposalData | null>(null);
 
-  useEffect(() => {
-    if (clienteState?.clienteId && (proposalId === 'nova' || proposalId === 'nova-proposta')) {
-      setProposal(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          cliente: clienteState.clienteNome || prev.cliente,
-          cidade: clienteState.clienteCidade || prev.cidade,
-          tipo: clienteState.clienteTipo || prev.tipo,
-          area: clienteState.clienteArea || prev.area,
-        };
-      });
-    }
-  }, [clienteState, proposalId]);
   const [config, setConfig] = useState({
     custo_hora: 0,
     margem_lucro: 0,
