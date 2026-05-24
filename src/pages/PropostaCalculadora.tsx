@@ -251,7 +251,7 @@ const PropostaCalculadora = () => {
       let currentProposalId = proposalId;
 
       // Handle standalone creation
-      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
+      if (!proposalId || proposalId === 'nova' || proposalId === 'nova-proposta') {
         if (!proposal?.cliente) {
           toast.error("Por favor, informe o nome do cliente.");
           setIsGeneratingLink(false);
@@ -277,6 +277,9 @@ const PropostaCalculadora = () => {
           
         if (propCreateError) throw propCreateError;
         currentProposalId = newProp.id;
+        
+        // Update URL without reloading to reflect the new proposal ID
+        navigate(`/calculadora/${currentProposalId}`, { replace: true, state: clienteState });
       }
 
       // Save Calculation
