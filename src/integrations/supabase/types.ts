@@ -1488,6 +1488,7 @@ export type Database = {
           validade: number | null
           valor_completo: number | null
           valor_executivo: number | null
+          versao: number | null
         }
         Insert: {
           area?: number | null
@@ -1506,6 +1507,7 @@ export type Database = {
           validade?: number | null
           valor_completo?: number | null
           valor_executivo?: number | null
+          versao?: number | null
         }
         Update: {
           area?: number | null
@@ -1524,6 +1526,7 @@ export type Database = {
           validade?: number | null
           valor_completo?: number | null
           valor_executivo?: number | null
+          versao?: number | null
         }
         Relationships: [
           {
