@@ -880,12 +880,12 @@ const ClienteFicha = () => {
                               value={contractFormData.plano} 
                               onValueChange={(v: any) => setContractFormData({...contractFormData, plano: v})}
                             >
-                              <SelectTrigger className="w-32 bg-transparent border-white/10 text-xs h-8 rounded-none">
+                              <SelectTrigger className="w-32 bg-[#1E1E1E] text-[#F0EDE8] border-[#3A3A3A] text-xs h-8 rounded-none">
                                 <SelectValue placeholder="PLANO" />
                               </SelectTrigger>
-                              <SelectContent className="bg-[#161616] border-white/10">
-                                <SelectItem value="Executivo">EXECUTIVO</SelectItem>
-                                <SelectItem value="Completo">COMPLETO</SelectItem>
+                              <SelectContent className="bg-[#1E1E1E] border-[#3A3A3A] text-[#F0EDE8]">
+                                <SelectItem value="Executivo" className="focus:bg-[#8B7355] focus:text-white">EXECUTIVO</SelectItem>
+                                <SelectItem value="Completo" className="focus:bg-[#8B7355] focus:text-white">COMPLETO</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>
