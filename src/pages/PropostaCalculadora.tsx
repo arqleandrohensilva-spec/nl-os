@@ -295,8 +295,8 @@ const PropostaCalculadora = () => {
         if (propCreateError) throw propCreateError;
         currentProposalId = newProp.id;
         
-        // Update URL without reloading to reflect the new proposal ID
-        navigate(`/calculadora/${currentProposalId}`, { replace: true, state: clienteState });
+        // Atualizar o proposal com o ID real sem navegar
+        setProposal(prev => prev ? { ...prev, id: newProp.id } : prev);
       }
 
       // Save Calculation
