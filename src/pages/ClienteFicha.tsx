@@ -180,6 +180,7 @@ const ClienteFicha = () => {
     cartorio: '',
     plano: 'Executivo' as 'Executivo' | 'Completo'
   });
+  const [isBriefingOpen, setIsBriefingOpen] = useState(false);
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -573,10 +574,16 @@ const ClienteFicha = () => {
                 <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Link para envio</Label>
                 <div className="flex gap-2">
                   <Input readOnly value="app.nl.arq.br/pre-briefing" className="bg-[#0D0D0D] border-white/5 text-white/60 text-xs rounded-none" />
-                  <Button variant="outline" className="border-[#2A2A2A] text-white/60 rounded-none text-[10px] uppercase" onClick={() => {
-                    navigator.clipboard.writeText("https://app.nl.arq.br/pre-briefing");
-                    toast.success("Link copiado!");
-                  }}><Copy size={14} className="mr-2" /> COPIAR</Button>
+                  <Button 
+                    variant="outline" 
+                    className="border-[#8B7355] text-[#8B7355] bg-transparent hover:bg-[#8B7355] hover:text-[#0D0D0D] rounded-none text-[10px] uppercase transition-colors" 
+                    onClick={() => {
+                      navigator.clipboard.writeText("https://app.nl.arq.br/pre-briefing");
+                      toast.success("Link copiado!");
+                    }}
+                  >
+                    <Copy size={14} className="mr-2" /> COPIAR
+                  </Button>
                   <Button 
                     className="bg-green-600/10 text-green-500 border border-green-600/20 hover:bg-green-600/20 rounded-none text-[10px] uppercase"
                     onClick={() => {
@@ -590,30 +597,60 @@ const ClienteFicha = () => {
               </div>
 
               <div className="p-6 bg-[#0D0D0D] border border-white/5">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : "bg-yellow-500")} />
-                  <span className="text-[10px] uppercase font-bold tracking-widest font-['Courier_New'] text-white/60">
-                    {briefing ? 'BRIEFING PREENCHIDO ✓' : 'AGUARDANDO PREENCHIMENTO'}
-                  </span>
+                <div 
+                  onClick={() => briefing && setIsBriefingOpen(!isBriefingOpen)}
+                  className={cn(
+                    "flex items-center justify-between",
+                    briefing ? "cursor-pointer group" : ""
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : "bg-yellow-500")} />
+                    <span className="text-[10px] uppercase font-bold tracking-widest font-['Courier_New'] text-white/60">
+                      {briefing ? 'BRIEFING PREENCHIDO ✓' : 'AGUARDANDO PREENCHIMENTO'}
+                    </span>
+                  </div>
+                  {briefing && (
+                    <ChevronDown size={14} className={cn("text-white/20 transition-transform duration-200", isBriefingOpen ? "rotate-0" : "-rotate-90")} />
+                  )}
                 </div>
                 
                 {briefing && (
-                  <div className="grid grid-cols-2 gap-8 mt-6 border-t border-white/5 pt-6">
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Tipo de Projeto</span>
-                      <p className="text-xs font-medium uppercase">{briefing.tipo_projeto || '—'}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Área estimada</span>
-                      <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.area_estimada || '—'} m²</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Orçamento</span>
-                      <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.orcamento || '—'}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Prazo</span>
-                      <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.prazo || '—'}</p>
+                  <div className={cn(
+                    "grid transition-all duration-200 ease-in-out",
+                    isBriefingOpen ? "grid-rows-[1fr] opacity-100 mt-6" : "grid-rows-[0fr] opacity-0"
+                  )}>
+                    <div className="overflow-hidden">
+                      <div className="grid grid-cols-2 gap-8 border-t border-white/5 pt-6">
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Tipo de Projeto</span>
+                          <p className="text-xs font-medium uppercase">{briefing.tipo_projeto || '—'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Área estimada</span>
+                          <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.area_estimada || '—'} m²</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Orçamento</span>
+                          <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.orcamento || '—'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Prazo</span>
+                          <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.prazo || '—'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Estilo</span>
+                          <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.estilo || '—'}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Imóvel</span>
+                          <p className="text-xs font-medium uppercase">{(briefing.respostas as any)?.imovel || '—'}</p>
+                        </div>
+                        <div className="space-y-1 col-span-2">
+                          <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Observações</span>
+                          <p className="text-xs font-medium uppercase whitespace-pre-wrap">{(briefing.respostas as any)?.observacoes || '—'}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
