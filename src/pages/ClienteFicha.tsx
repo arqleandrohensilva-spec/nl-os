@@ -562,7 +562,7 @@ const ClienteFicha = () => {
                 <div className="text-center py-10 border border-dashed border-white/5 bg-[#0D0D0D]">
                   <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">Nenhuma proposta vinculada a este cliente</p>
                   <Button 
-                    onClick={() => navigate('/calculadora', { 
+                    onClick={() => navigate('/calculadora/nova-proposta', { 
                       state: { 
                         clienteId: id,
                         clienteNome: cliente?.nome,
