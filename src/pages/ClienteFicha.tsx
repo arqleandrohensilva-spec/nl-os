@@ -830,12 +830,22 @@ const ClienteFicha = () => {
             <div className="p-8 space-y-8">
               {!contrato ? (
                 <div className="text-center py-10 border border-dashed border-white/5 bg-[#0D0D0D]">
-                  <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">Contrato ainda não gerado para este cliente</p>
+                  <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">
+                    {selectedProposals.length > 0 
+                      ? `${selectedProposals.length} PROPOSTA(S) SELECIONADA(S)` 
+                      : 'Contrato ainda não gerado para este cliente'}
+                  </p>
                   <Button 
-                    onClick={() => navigate('/propostas/documentos')}
+                    onClick={() => navigate('/propostas/documentos', { 
+                      state: { 
+                        selectedProposals, 
+                        clienteId: id,
+                        clienteNome: formData.nome || cliente?.nome 
+                      } 
+                    })}
                     className="bg-[#8B7355] text-white rounded-none px-8 text-[10px] font-bold uppercase"
                   >
-                    GERAR CONTRATO
+                    {selectedProposals.length > 0 ? 'GERAR CONTRATO COM SELECIONADAS' : 'GERAR CONTRATO'}
                   </Button>
                 </div>
               ) : (
