@@ -447,14 +447,25 @@ const PropostaCalculadora = () => {
                 </div>
               </div>
             ) : (
-              <>
-                <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
-                  CALCULADORA DE PROPOSTA · {proposal.cliente}
-                </h1>
-                <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl font-cormorant font-bold uppercase tracking-[0.2em] text-bronze leading-tight">
+                    CALCULADORA DE PROPOSTA · {proposal.cliente}
+                  </h1>
+                  <div className="flex items-center gap-2 bg-white/5 px-2 py-0.5 border border-white/10 rounded">
+                    <span className="text-[8px] uppercase tracking-widest text-white/40">Versão</span>
+                    <input 
+                      type="number" 
+                      value={proposal.versao || 1} 
+                      onChange={(e) => setProposal({...proposal, versao: parseInt(e.target.value) || 1})}
+                      className="bg-transparent border-none text-bronze text-xs font-bold w-8 focus:ring-0 p-0 text-center"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] uppercase tracking-widest text-white/40">
                   {proposal.tipo} · {proposal.cidade} · {proposal.area}m²
                 </p>
-              </>
+              </div>
             )}
           </div>
         </div>
