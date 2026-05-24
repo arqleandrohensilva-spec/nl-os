@@ -77,6 +77,7 @@ export interface Proposal {
   last_view_at?: string;
   proposta_engajamento?: Engagement[];
   link_proposta?: string;
+  versao?: number;
 }
 
 interface Lead {
