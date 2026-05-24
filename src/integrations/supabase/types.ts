@@ -264,6 +264,8 @@ export type Database = {
           quem_decide: string | null
           reuniao_agendada: boolean | null
           reuniao_data: string | null
+          reuniao_link: string | null
+          reuniao_local: string | null
           reuniao_notas: string | null
           status_comercial: string | null
           tipo_projeto: string | null
@@ -294,6 +296,8 @@ export type Database = {
           quem_decide?: string | null
           reuniao_agendada?: boolean | null
           reuniao_data?: string | null
+          reuniao_link?: string | null
+          reuniao_local?: string | null
           reuniao_notas?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
@@ -324,6 +328,8 @@ export type Database = {
           quem_decide?: string | null
           reuniao_agendada?: boolean | null
           reuniao_data?: string | null
+          reuniao_link?: string | null
+          reuniao_local?: string | null
           reuniao_notas?: string | null
           status_comercial?: string | null
           tipo_projeto?: string | null
