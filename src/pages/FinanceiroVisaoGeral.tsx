@@ -285,6 +285,7 @@ const FinanceiroVisaoGeral = () => {
             </table>
           </div>
         </section>
+        </div>
       </div>
     </div>
   );
