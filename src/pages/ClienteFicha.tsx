@@ -147,7 +147,8 @@ const ClienteFicha = () => {
       const { data, error } = await supabase
         .from('contratos')
         .select('*')
-        .filter('cliente_id', 'eq', id)
+        .eq('cliente_id', id)
+        .eq('status', 'Gerado')
         .maybeSingle();
       if (error) console.error("Error fetching contract:", error);
       return data;
@@ -1154,6 +1155,38 @@ const ClienteFicha = () => {
                     )}>
                       {cliente?.contrato_assinado ? 'ASSINADO ✓' : 'AGUARDANDO ASSINATURA'}
                     </div>
+                    <Button 
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        if (confirm('Deseja realmente inativar este contrato para gerar um novo?')) {
+                          try {
+                            const { error } = await supabase
+                              .from('contratos')
+                              .update({ status: 'Inativo' } as any)
+                              .eq('id', contrato.id);
+                            
+                            if (error) throw error;
+                            
+                            // Também resetar status de assinado no cliente se necessário
+                            await supabase
+                              .from('clientes')
+                              .update({ contrato_assinado: false } as any)
+                              .eq('id', id);
+
+                            toast.success("Contrato inativado");
+                            queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+                            queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+                          } catch (error) {
+                            console.error(error);
+                            toast.error("Erro ao inativar contrato");
+                          }
+                        }
+                      }}
+                      className="text-[9px] text-white/20 hover:text-red-500 uppercase tracking-widest font-bold h-auto p-0"
+                    >
+                      Inativar
+                    </Button>
                   </div>
                   
                   {!cliente?.contrato_assinado ? (
