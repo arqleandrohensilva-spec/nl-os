@@ -28,6 +28,7 @@ export interface ContractData {
     legal: string;
     executivo: string;
     total: string;
+    totalDias?: string;
     prazoLevantamento?: string;
     prazoEstudo?: string;
     prazoLegal?: string;
