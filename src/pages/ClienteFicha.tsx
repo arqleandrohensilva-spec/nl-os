@@ -612,7 +612,7 @@ const ClienteFicha = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-6">
+                  <div className="space-y-3">
                     {propostas.map((p, idx) => {
                       const views = p.proposal_views || [];
                       const viewsCount = views.length;
@@ -624,98 +624,143 @@ const ClienteFicha = () => {
                         ? format(new Date(lastView), "HH:mm 'de' dd/MM", { locale: ptBR })
                         : null;
 
+                      const isOpen = openProposalId === p.id;
+
                       return (
-                        <div key={p.id} className="p-6 bg-white/[0.02] border border-white/5 space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div className="space-y-1">
+                        <div 
+                          key={p.id} 
+                          className={cn(
+                            "bg-white/[0.02] border transition-all duration-200 overflow-hidden",
+                            isOpen ? "border-[#8B7355]" : "border-[#2A2A2A]"
+                          )}
+                        >
+                          {/* HEADER (FECHADO) */}
+                          <div 
+                            onClick={() => setOpenProposalId(isOpen ? null : p.id)}
+                            className="p-4 flex justify-between items-center cursor-pointer hover:bg-white/[0.04]"
+                          >
+                            <div className="flex flex-col">
                               <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-white/80 uppercase">{p.cliente} — {p.tipo}</span>
+                                <span className="text-[11px] font-bold text-white/80 uppercase tracking-tight">
+                                  {p.cliente} — {p.tipo}
+                                </span>
                                 <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
                               </div>
-                              <p className="text-[10px] text-white/30 font-mono break-all">{p.link_proposta || 'Sem link gerado'}</p>
+                              <p className="text-[9px] text-white/30 font-mono tracking-tighter mt-0.5">
+                                {p.link_proposta || 'Sem link gerado'}
+                              </p>
                             </div>
-                            <Select 
-                              value={p.status || 'Enviada'} 
-                              onValueChange={async (newStatus) => {
-                                try {
-                                  const { error } = await supabase
-                                    .from('proposals')
-                                    .update({ status: newStatus })
-                                    .eq('id', p.id);
-                                  if (error) throw error;
-                                  toast.success(`Status da V${idx + 1} atualizado para ${newStatus}`);
-                                  queryClient.invalidateQueries({ queryKey: ['propostas_cliente'] });
-                                  
-                                  if (newStatus === 'Aprovada') {
-                                    setSelectedProposalForProject(p);
-                                    setIsProjectModalOpen(true);
-                                  }
-                                } catch (err) {
-                                  toast.error("Erro ao atualizar status");
-                                }
-                              }}
-                            >
-                              <SelectTrigger className="w-32 h-7 text-[9px] uppercase tracking-widest bg-[#8B7355]/10 border-none text-[#8B7355] font-bold rounded-none">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Enviada">Enviada</SelectItem>
-                                <SelectItem value="Vista">Vista</SelectItem>
-                                <SelectItem value="Aprovada">Aprovada</SelectItem>
-                                <SelectItem value="Recusada">Recusada</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="flex items-center gap-6 py-2 border-y border-white/5">
-                            <div className="flex items-center gap-2">
-                              <Eye size={12} className="text-[#8B7355]" />
-                              <span className="text-[10px] text-white/60 uppercase tracking-widest">
-                                {viewsCount > 0 ? `Aberta ${viewsCount} vezes` : 'Ainda não aberta'}
-                              </span>
-                            </div>
-                            {timeSinceLastView && (
-                              <div className="flex items-center gap-2">
-                                <Clock size={12} className="text-[#8B7355]" />
-                                <span className="text-[10px] text-white/60 uppercase tracking-widest">
-                                  Última abertura: {timeSinceLastView}
-                                </span>
+                            <div className="flex items-center gap-4">
+                              <div className={cn(
+                                "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest",
+                                p.status === 'Aprovada' ? "bg-green-500/10 text-green-500" : "bg-[#8B7355]/10 text-[#8B7355]"
+                              )}>
+                                {p.status || 'Enviada'}
                               </div>
-                            )}
+                              <ChevronDown size={14} className={cn("text-white/20 transition-transform duration-200", isOpen && "rotate-180")} />
+                            </div>
                           </div>
 
-                          <div className="flex gap-3">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="h-8 border-white/10 bg-transparent text-white/40 hover:text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
-                              onClick={() => {
-                                if (p.link_proposta) {
-                                  navigator.clipboard.writeText(p.link_proposta);
-                                  toast.success("Link copiado!");
-                                }
-                              }}
-                            >
-                              <Copy size={12} className="mr-2" /> COPIAR LINK
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="h-8 border-[#8B7355]/30 bg-transparent text-[#8B7355] hover:bg-[#8B7355]/10 rounded-none text-[9px] uppercase tracking-widest font-bold"
-                              onClick={() => navigate(`/calculadora/${p.id}`)}
-                            >
-                              <Calculator size={12} className="mr-2" /> CALCULAR
-                            </Button>
-                            {p.link_proposta && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                className="h-8 text-white/20 hover:text-white rounded-none text-[9px] uppercase tracking-widest"
-                                onClick={() => window.open(p.link_proposta, '_blank')}
-                              >
-                                <ExternalLink size={12} />
-                              </Button>
-                            )}
+                          {/* BODY (ABERTO) */}
+                          <div className={cn(
+                            "grid transition-all duration-200 ease-in-out",
+                            isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                          )}>
+                            <div className="overflow-hidden">
+                              <div className="px-4 pb-6 pt-2 space-y-4">
+                                <div className="flex items-center gap-6 py-3 border-y border-white/5">
+                                  <div className="flex items-center gap-2">
+                                    <Eye size={12} className="text-[#8B7355]" />
+                                    <span className="text-[10px] text-white/60 uppercase tracking-widest">
+                                      {viewsCount > 0 ? `Aberta ${viewsCount} vezes` : 'Ainda não aberta'}
+                                    </span>
+                                  </div>
+                                  {timeSinceLastView && (
+                                    <div className="flex items-center gap-2">
+                                      <Clock size={12} className="text-[#8B7355]" />
+                                      <span className="text-[10px] text-white/60 uppercase tracking-widest">
+                                        Última abertura: {timeSinceLastView}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="h-8 border-white/10 bg-transparent text-white/40 hover:text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (p.link_proposta) {
+                                          navigator.clipboard.writeText(p.link_proposta);
+                                          toast.success("Link copiado!");
+                                        }
+                                      }}
+                                    >
+                                      <Copy size={12} className="mr-2" /> COPIAR LINK
+                                    </Button>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="h-8 border-[#8B7355]/30 bg-transparent text-[#8B7355] hover:bg-[#8B7355]/10 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/calculadora/${p.id}`);
+                                      }}
+                                    >
+                                      <Calculator size={12} className="mr-2" /> CALCULAR
+                                    </Button>
+                                    {p.link_proposta && (
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm"
+                                        className="h-8 text-[#8B7355] hover:text-[#F0EDE8] rounded-none text-[9px] uppercase tracking-widest flex items-center gap-2"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          window.open(p.link_proposta, '_blank');
+                                        }}
+                                      >
+                                        <ExternalLink size={12} /> ABRIR
+                                      </Button>
+                                    )}
+                                  </div>
+
+                                  <Select 
+                                    value={p.status || 'Enviada'} 
+                                    onValueChange={async (newStatus) => {
+                                      try {
+                                        const { error } = await supabase
+                                          .from('proposals')
+                                          .update({ status: newStatus })
+                                          .eq('id', p.id);
+                                        if (error) throw error;
+                                        toast.success(`Status da V${idx + 1} atualizado para ${newStatus}`);
+                                        queryClient.invalidateQueries({ queryKey: ['propostas_cliente'] });
+                                        
+                                        if (newStatus === 'Aprovada') {
+                                          setSelectedProposalForProject(p);
+                                          setIsProjectModalOpen(true);
+                                        }
+                                      } catch (err) {
+                                        toast.error("Erro ao atualizar status");
+                                      }
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-32 h-8 text-[9px] uppercase tracking-widest bg-[#1E1E1E] border border-white/10 text-[#F0EDE8] font-bold rounded-none focus:ring-0">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-[#1E1E1E] border-white/10">
+                                      <SelectItem value="Enviada" className="text-[#F0EDE8] text-[9px] uppercase focus:bg-[#2A2A2A] focus:text-[#F0EDE8] cursor-pointer">Enviada</SelectItem>
+                                      <SelectItem value="Vista" className="text-[#F0EDE8] text-[9px] uppercase focus:bg-[#2A2A2A] focus:text-[#F0EDE8] cursor-pointer">Vista</SelectItem>
+                                      <SelectItem value="Aprovada" className="text-[#F0EDE8] text-[9px] uppercase focus:bg-[#2A2A2A] focus:text-[#F0EDE8] cursor-pointer">Aprovada</SelectItem>
+                                      <SelectItem value="Recusada" className="text-[#F0EDE8] text-[9px] uppercase focus:bg-[#2A2A2A] focus:text-[#F0EDE8] cursor-pointer">Recusada</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       );
