@@ -652,20 +652,30 @@ const ClienteFicha = () => {
                               <span className="text-[10px] font-bold text-white/60">VERSÃO {propostas.length - 1 - idx}</span>
                               <span className="text-[8px] text-white/20">{format(new Date(p.created_at), 'dd/MM/yyyy HH:mm')}</span>
                             </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className="h-7 text-[8px] text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10"
-                              onClick={() => {
-                                if (p.link_proposta) {
-                                  window.open(p.link_proposta, '_blank');
-                                } else {
-                                  navigate(`/proposta/${(p.tipo === 'ArqInt' ? 'arqint' : p.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${p.id}`);
-                                }
-                              }}
-                            >
-                              ACESSAR
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-7 text-[8px] text-white/40 hover:text-[#8B7355] hover:bg-[#8B7355]/10"
+                                onClick={() => navigate(`/calculadora/${p.id}`)}
+                              >
+                                MODIFICAR
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-7 text-[8px] text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10"
+                                onClick={() => {
+                                  if (p.link_proposta) {
+                                    window.open(p.link_proposta, '_blank');
+                                  } else {
+                                    navigate(`/proposta/${(p.tipo === 'ArqInt' ? 'arqint' : p.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${p.id}`);
+                                  }
+                                }}
+                              >
+                                ACESSAR
+                              </Button>
+                            </div>
                           </div>
                         ))}
                       </div>
