@@ -21,8 +21,20 @@ const PropostaCliente = () => {
       if (error || !data) {
         setError(true);
       } else {
-        // Incrementar acessos
+        // Incrementar acessos na tabela de clientes externos
         await supabase.rpc('increment_proposal_access', { p_id: data.id });
+
+        // Registrar visualização no tracking local
+        const currentUrl = window.location.href;
+        const { data: localProp } = await supabase
+          .from('proposals')
+          .select('id')
+          .like('link_proposta', `%/${slug}`)
+          .maybeSingle();
+
+        if (localProp) {
+          await supabase.from('proposal_views').insert([{ proposal_id: localProp.id }]);
+        }
 
         setProposta(data);
       }
