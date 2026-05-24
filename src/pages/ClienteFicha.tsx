@@ -7,13 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, History, User, Phone, Pencil, Save, Clock, Copy, ExternalLink, Check, Calendar, Plus, Eye, Calculator, ChevronDown } from 'lucide-react';
+import { ArrowLeft, History, User, Phone, Pencil, Save, Clock, Copy, ExternalLink, Check, Calendar, Plus, Eye, Calculator, ChevronDown, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { generateContractDocx } from '@/lib/generateContract';
+import { ContractData } from '@/utils/contractTemplates';
 import { Progress } from '@/components/ui/progress';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
@@ -123,6 +125,7 @@ const ClienteFicha = () => {
   const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
+  const [isGeneratingContract, setIsGeneratingContract] = useState(false);
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -836,16 +839,133 @@ const ClienteFicha = () => {
                       : 'Contrato ainda não gerado para este cliente'}
                   </p>
                   <Button 
-                    onClick={() => navigate('/propostas/documentos', { 
-                      state: { 
-                        selectedProposals, 
-                        clienteId: id,
-                        clienteNome: formData.nome || cliente?.nome 
-                      } 
-                    })}
+                    disabled={isGeneratingContract}
+                    onClick={async () => {
+                      try {
+                        setIsGeneratingContract(true);
+                        
+                        // 1. Obter dados das propostas selecionadas
+                        const { data: props, error } = await supabase
+                          .from('proposals')
+                          .select('*, calculos_proposta (*)')
+                          .in('id', selectedProposals);
+
+                        if (error) throw error;
+                        if (!props || props.length === 0) {
+                          toast.error("Selecione pelo menos uma proposta");
+                          return;
+                        }
+
+                        // 2. Gerar número do contrato
+                        const year = new Date().getFullYear();
+                        const { data: lastContract } = await supabase
+                          .from('contratos')
+                          .select('numero')
+                          .order('criado_em', { ascending: false })
+                          .limit(1);
+
+                        let nextNumber = 1;
+                        if (lastContract?.[0]?.numero) {
+                          const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+                          if (match) nextNumber = parseInt(match[1]) + 1;
+                        }
+                        const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
+                        // 3. Somar valores
+                        let totalExec = 0;
+                        let totalComp = 0;
+                        props.forEach(p => {
+                          const c = p.calculos_proposta?.[0];
+                          totalExec += Number(c?.valor_executivo || p.valor_executivo || 0);
+                          totalComp += Number(c?.valor_completo || p.valor_completo || 0);
+                        });
+
+                        const lastProp = props[props.length - 1];
+
+                        // 4. Montar dados para o contrato
+                        const contractData: ContractData = {
+                          numero: numeroContrato,
+                          cliente: {
+                            nome: formData.nome || cliente?.nome || '',
+                            cpf: cliente?.cpf_cnpj || '',
+                            endereco: formData.cidade || cliente?.cidade || '',
+                            nacionalidade: 'Brasileiro(a)',
+                            estadoCivil: 'Solteiro(a)',
+                            profissao: ''
+                          },
+                          projeto: {
+                            tipo: lastProp.tipo === 'ArqInt' ? 'Arquitetura + Interiores' : 
+                                  lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+                            plano: 'Executivo',
+                            endereco: formData.cidade || cliente?.cidade || '',
+                            tipoImovel: 'Residência',
+                            areaTerreno: '',
+                            areaConstruida: lastProp.area?.toString() || '',
+                            matricula: '',
+                            cartorio: ''
+                          },
+                          prazos: {
+                            briefing: '5',
+                            estudo: '15',
+                            legal: '30',
+                            executivo: '20',
+                            total: '12'
+                          },
+                          honorarios: {
+                            totalExecutivo: totalExec.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            totalCompleto: totalComp.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            marco1: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            marco2: (totalExec * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            marco3: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                          },
+                          nl: {
+                            cauLeandro: 'A203598-7',
+                            cauNeandro: 'A203599-5',
+                            cpfNeandro: '000.000.000-00'
+                          },
+                          dataAssinatura: new Date().toLocaleDateString('pt-BR')
+                        };
+
+                        // 5. Gerar DOCX
+                        const docxBlob = await generateContractDocx(contractData);
+                        if (!docxBlob) return;
+
+                        // 6. Salvar no Banco
+                        const { data: newContract, error: dbError } = await supabase.from('contratos').insert({
+                          numero: numeroContrato,
+                          lead_id: cliente?.id,
+                          cliente_nome: contractData.cliente.nome,
+                          tipo: contractData.projeto.tipo,
+                          plano: contractData.projeto.plano,
+                          dados_gerais: contractData.cliente,
+                          prazos: contractData.prazos,
+                          valores: contractData.honorarios,
+                          status: 'Gerado'
+                        }).select().single();
+
+                        if (dbError) throw dbError;
+
+                        // 7. Download
+                        const url = URL.createObjectURL(docxBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${numeroContrato} - ${contractData.cliente.nome}.docx`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                        toast.success("Contrato gerado com sucesso!");
+                        queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+                      } catch (err) {
+                        console.error(err);
+                        toast.error("Erro ao gerar contrato");
+                      } finally {
+                        setIsGeneratingContract(false);
+                      }
+                    }}
                     className="bg-[#8B7355] text-white rounded-none px-8 text-[10px] font-bold uppercase"
                   >
-                    {selectedProposals.length > 0 ? 'GERAR CONTRATO COM SELECIONADAS' : 'GERAR CONTRATO'}
+                    {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
+                    {selectedProposals.length > 0 ? 'GERAR CONTRATO AGORA' : 'GERAR CONTRATO'}
                   </Button>
                 </div>
               ) : (
