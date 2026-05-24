@@ -541,7 +541,18 @@ const ClienteFicha = () => {
               {currentStepIndex === 2 && (
                 <div className="flex justify-end">
                   <Button 
-                    onClick={() => updateEtapa('proposta')}
+                    onClick={() => {
+                      updateEtapa('proposta');
+                      navigate('/calculadora/nova-proposta', { 
+                        state: { 
+                          clienteId: id,
+                          clienteNome: cliente?.nome,
+                          clienteCidade: cliente?.cidade,
+                          clienteTipo: cliente?.tipo_projeto,
+                          clienteArea: cliente?.area_m2
+                        } 
+                      });
+                    }}
                     className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
                   >
                     GERAR PROPOSTA →
