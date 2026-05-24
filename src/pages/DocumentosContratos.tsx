@@ -163,7 +163,79 @@ const DocumentosContratos = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    if (location.state?.selectedProposals && location.state.selectedProposals.length > 0) {
+      handleSelectedProposalsFromState(location.state.selectedProposals);
+    }
+  }, [location.state]);
+
+  const handleSelectedProposalsFromState = async (proposalIds: string[]) => {
+    try {
+      setLoading(true);
+      
+      // Buscar as propostas selecionadas e seus cálculos
+      const { data: props, error } = await supabase
+        .from('proposals')
+        .select(`
+          *,
+          calculos_proposta (*)
+        `)
+        .in('id', proposalIds);
+
+      if (error) throw error;
+      if (!props || props.length === 0) return;
+
+      // Pegar o último selecionado para dados de cliente (ou o primeiro)
+      const lastProp = props[props.length - 1];
+      const calculo = lastProp.calculos_proposta?.[0];
+
+      // Tentar encontrar o lead se houver cliente_id
+      let leadData: any = null;
+      if (lastProp.cliente_id) {
+        const { data: lead } = await supabase
+          .from('leads')
+          .select('*')
+          .eq('id', lastProp.cliente_id)
+          .maybeSingle();
+        leadData = lead;
+      }
+
+      await generateContractNumber();
+
+      setContractFormData(prev => ({
+        ...prev,
+        cliente: {
+          ...prev.cliente,
+          nome: lastProp.cliente || leadData?.nome || '',
+          cpf: leadData?.cpf || '',
+          endereco: lastProp.cidade || leadData?.cidade || '',
+        },
+        projeto: {
+          ...prev.projeto,
+          tipo: lastProp.tipo === 'ArqInt' ? 'Arquitetura + Interiores' : 
+                lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+          areaConstruida: lastProp.area?.toString() || '',
+          endereco: lastProp.cidade || '',
+        },
+        honorarios: {
+          ...prev.honorarios,
+          totalExecutivo: calculo?.valor_executivo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || lastProp.valor_executivo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '',
+          totalCompleto: calculo?.valor_completo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || lastProp.valor_completo?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '',
+        }
+      }));
+
+      if (lastProp.cliente_id) {
+        setSelectedLeadId(lastProp.cliente_id);
+      }
+      
+      setActiveTab('contratos');
+      setIsContratoModalOpen(true);
+    } catch (err) {
+      console.error('Error loading selected proposals:', err);
+      toast.error('Erro ao carregar dados das propostas selecionadas');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
