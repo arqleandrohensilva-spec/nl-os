@@ -25,15 +25,28 @@ const PropostaCliente = () => {
         await supabase.rpc('increment_proposal_access', { p_id: data.id });
 
         // Registrar visualização no tracking local
-        const currentUrl = window.location.href;
-        const { data: localProp } = await supabase
+        const { data: exact } = await supabase
           .from('proposals')
           .select('id')
-          .like('link_proposta', `%/${slug}`)
+          .eq('link_proposta', `https://proposta.nl.arq.br/p/${tipo}/${slug}`)
           .maybeSingle();
+        
+        let localPropId = exact?.id;
+        
+        if (!localPropId) {
+          const { data: fallback } = await supabase
+            .from('proposals')
+            .select('id')
+            .ilike('link_proposta', `%${slug}`)
+            .maybeSingle();
+          localPropId = fallback?.id;
+        }
 
-        if (localProp) {
-          await supabase.from('proposal_views').insert([{ proposal_id: localProp.id }]);
+        if (localPropId) {
+          await supabase.from('proposal_views').insert([{ 
+            proposal_id: localPropId,
+            viewed_at: new Date().toISOString()
+          }]);
         }
 
         setProposta(data);
