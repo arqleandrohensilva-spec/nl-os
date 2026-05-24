@@ -82,7 +82,7 @@ const PropostaCalculadora = () => {
       
       if (isNew) {
         setProposal({
-          id: proposalId as string,
+          id: (proposalId || 'nova') as string,
           cliente: clienteState?.clienteNome || '',
           cliente_id: clienteState?.clienteId || '',
           tipo: (clienteState?.clienteTipo === 'arq' ? 'ArqInt' : clienteState?.clienteTipo === 'int' ? 'Interiores' : clienteState?.clienteTipo === 'com' ? 'Comercial' : clienteState?.clienteTipo) || 'ArqInt',
