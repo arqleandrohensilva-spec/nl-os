@@ -13,7 +13,7 @@ export const generateContractDocx = async (data: ContractData) => {
     const response = await supabase.functions.invoke('dropbox-proxy', {
       body: {
         action: 'download',
-        path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/Contrato_NL_Final.docx'
+        path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx'
       }
     });
 
