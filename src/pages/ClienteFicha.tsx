@@ -543,15 +543,15 @@ const ClienteFicha = () => {
                   <Button 
                     onClick={() => {
                       updateEtapa('proposta');
-                      navigate('/calculadora/nova-proposta', { 
-                        state: { 
-                          clienteId: id,
-                          clienteNome: cliente?.nome,
-                          clienteCidade: cliente?.cidade,
-                          clienteTipo: cliente?.tipo_projeto,
-                          clienteArea: cliente?.area_m2
-                        } 
-                      });
+                    navigate('/calculadora/nova-proposta', { 
+                      state: { 
+                        clienteId: id,
+                        clienteNome: formData.nome || cliente?.nome,
+                        clienteCidade: formData.cidade || cliente?.cidade,
+                        clienteTipo: formData.tipo_projeto || cliente?.tipo_projeto,
+                        clienteArea: formData.area_m2 || cliente?.area_m2
+                      } 
+                    });
                     }}
                     className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
                   >
@@ -582,10 +582,10 @@ const ClienteFicha = () => {
                     onClick={() => navigate('/calculadora/nova-proposta', { 
                       state: { 
                         clienteId: id,
-                        clienteNome: cliente?.nome,
-                        clienteCidade: cliente?.cidade,
-                        clienteTipo: cliente?.tipo_projeto,
-                        clienteArea: cliente?.area_m2
+                        clienteNome: formData.nome || cliente?.nome,
+                        clienteCidade: formData.cidade || cliente?.cidade,
+                        clienteTipo: formData.tipo_projeto || cliente?.tipo_projeto,
+                        clienteArea: formData.area_m2 || cliente?.area_m2
                       } 
                     })}
                     className="bg-[#8B7355] text-white rounded-none px-8 text-[10px] font-bold uppercase"
@@ -647,10 +647,10 @@ const ClienteFicha = () => {
                       onClick={() => navigate('/calculadora/nova-proposta', { 
                         state: { 
                           clienteId: id,
-                          clienteNome: cliente?.nome,
-                          clienteCidade: cliente?.cidade,
-                          clienteTipo: cliente?.tipo_projeto,
-                          clienteArea: cliente?.area_m2,
+                          clienteNome: formData.nome || cliente?.nome,
+                          clienteCidade: formData.cidade || cliente?.cidade,
+                          clienteTipo: formData.tipo_projeto || cliente?.tipo_projeto,
+                          clienteArea: formData.area_m2 || cliente?.area_m2,
                           versao: propostas.length + 1
                         } 
                       })}
