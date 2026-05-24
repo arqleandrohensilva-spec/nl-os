@@ -318,12 +318,13 @@ const PropostaCalculadora = () => {
       else if (typeSlug === 'comercial') finalTipoNegocio = tipoNegocio;
 
       const baseSlug = gerarSlug(proposal?.cliente || '');
+      const versaoSuffix = clienteState?.versao ? `-v${clienteState.versao}` : '';
       const now = new Date();
       const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
       const slugAttempts = [
-        baseSlug,
-        `${baseSlug}-${timestamp}`,
+        `${baseSlug}${versaoSuffix}`,
+        `${baseSlug}${versaoSuffix}-${timestamp}`,
         `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
       ];
 
