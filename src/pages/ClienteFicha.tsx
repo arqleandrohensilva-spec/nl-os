@@ -35,6 +35,33 @@ const ClienteFicha = () => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(['ficha']);
+  const [isNewClient, setIsNewClient] = useState(!id);
+  
+  useEffect(() => {
+    setIsNewClient(!id);
+    if (!id) {
+      setIsEditing(true);
+      setFormData({
+        nome: '',
+        whatsapp: '',
+        email: '',
+        cpf_cnpj: '',
+        cidade: '',
+        endereco_imovel: '',
+        origem: 'Instagram',
+        observacoes: '',
+        imovel_definido: '',
+        tipo_projeto: '',
+        area_m2: '',
+        orcamento: '',
+        prazo: '',
+        quem_decide: '',
+        anotacoes_reuniao: '',
+        data_reuniao: '',
+        checklist_reuniao: []
+      });
+    }
+  }, [id]);
   
   const [formData, setFormData] = useState({
     nome: '',
