@@ -79,10 +79,10 @@ const PropostaVisualizacao = () => {
       }
     };
 
-    if (!loading) {
+    if (!loading && proposalData?.id) {
       recordView();
     }
-  }, [proposalData.id, recorded, loading]);
+  }, [proposalData?.id, recorded, loading]);
 
   const getIcon = () => {
     switch (tipo) {
