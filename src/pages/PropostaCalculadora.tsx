@@ -45,6 +45,7 @@ interface ProposalData {
   valor_executivo?: number;
   valor_completo?: number;
   link_proposta?: string;
+  versao?: number;
 }
 
 const PropostaCalculadora = () => {
