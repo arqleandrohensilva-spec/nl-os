@@ -683,7 +683,7 @@ const PropostaCalculadora = () => {
               {!generatedLink ? (
                 <Button 
                   onClick={handleSaveAndGenerate}
-                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && proposalId)}
+                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !!proposalId)}
                   className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
                 >
                   {isGeneratingLink ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
