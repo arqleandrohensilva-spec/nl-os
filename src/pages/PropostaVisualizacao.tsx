@@ -20,19 +20,7 @@ const PropostaVisualizacao = () => {
   const { tipo } = useParams();
   const [searchParams] = useSearchParams();
   const [recorded, setRecorded] = useState(false);
-  const [proposalData, setProposalData] = useState<any>({
-    id: searchParams.get('id'),
-    nome: searchParams.get('nome'),
-    tipo: searchParams.get('tipo'),
-    cidade: searchParams.get('cidade'),
-    estado: searchParams.get('estado') || 'SP',
-    area: searchParams.get('area'),
-    objetivo: searchParams.get('objetivo'),
-    data: searchParams.get('data'),
-    valor_executivo: searchParams.get('valor_executivo'),
-    valor_completo: searchParams.get('valor_completo'),
-    validade: searchParams.get('validade') || '30'
-  });
+  const [proposalData, setProposalData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -118,6 +106,15 @@ const PropostaVisualizacao = () => {
     return (
       <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bronze"></div>
+      </div>
+    );
+  }
+
+  if (!proposalData) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex flex-col items-center justify-center text-white p-6 text-center">
+        <h2 className="text-2xl font-cormorant font-bold mb-4">Proposta não encontrada</h2>
+        <p className="text-white/40 mb-8">O link pode estar expirado ou a proposta ainda não foi finalizada.</p>
       </div>
     );
   }
@@ -234,7 +231,7 @@ const PropostaVisualizacao = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a 
-                href="https://wa.me/5500000000000" 
+                href={`https://wa.me/5512981504958?text=${encodeURIComponent(`Olá! Gostaria de falar sobre a proposta de projeto para ${proposalData.nome}.`)}`} 
                 target="_blank" 
                 rel="noreferrer"
                 className="bg-bronze hover:bg-bronze/90 text-white px-8 py-3 rounded-[2px] font-bold uppercase tracking-widest text-[11px] transition-all w-full sm:w-auto text-center"
