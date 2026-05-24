@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
@@ -53,6 +53,7 @@ const PropostaCalculadora = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const clienteState = location.state;
+  const initialStateRef = useRef(location.state as any);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [proposal, setProposal] = useState<ProposalData | null>(null);
@@ -73,12 +74,12 @@ const PropostaCalculadora = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, [proposalId, location.state]);
+  }, [proposalId]);
 
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      const state = location.state as any;
+      const state = initialStateRef.current;
       
       // Handle Standalone case
       const isNew = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
