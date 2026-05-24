@@ -156,6 +156,7 @@ const PropostasTracking = () => {
           ),
           proposta_engajamento (*)
         `)
+        .is('cliente_id', null)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
