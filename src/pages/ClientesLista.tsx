@@ -65,7 +65,8 @@ const ClientesLista = () => {
         cidade: briefing.cidade,
         origem: briefing.origem,
         tipo_projeto: briefing.tipo_projeto,
-        briefing_preenchido: true
+        briefing_preenchido: true,
+        etapa_fluxo: 'pre_briefing'
       }).select().single();
 
       if (clienteError) throw clienteError;
