@@ -757,7 +757,7 @@ const ClienteFicha = () => {
                       <Button 
                         variant="outline"
                         onClick={() => setIsRescheduling(false)}
-                        className="border-white/10 text-white/40 rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                        className="border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#0D0D0D] rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
                       >
                         CANCELAR
                       </Button>
