@@ -309,7 +309,7 @@ const ClienteFicha = () => {
         {/* CABEÇALHO EM DESTAQUE */}
         <div className="space-y-4">
           <h1 className="text-6xl font-['Cormorant_Garamond'] italic text-[#E8E4DF] leading-none uppercase tracking-tighter">
-            {cliente?.nome}
+            {id ? cliente?.nome : 'Novo Cliente'}
           </h1>
           <div className="flex items-center gap-4 text-white/30 text-[10px] font-['Courier_New'] uppercase tracking-[0.3em] font-bold">
             <span>{cliente?.cidade}</span>
