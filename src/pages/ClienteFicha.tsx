@@ -127,6 +127,15 @@ const ClienteFicha = () => {
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
   const [isGeneratingContract, setIsGeneratingContract] = useState(false);
+  const [contractFormData, setContractFormData] = useState({
+    nacionalidade: 'brasileiro(a)',
+    estadoCivil: 'Solteiro(a)',
+    profissao: '',
+    prazoTotal: '12',
+    matricula: '',
+    cartorio: '',
+    plano: 'Executivo' as 'Executivo' | 'Completo'
+  });
 
   const proposta = propostas[propostas.length - 1] || null;
 
