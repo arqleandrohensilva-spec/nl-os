@@ -263,7 +263,7 @@ const PropostaCalculadora = () => {
           .from('proposals')
           .insert({
             cliente: proposal.cliente,
-            cliente_id: clienteState?.clienteId || null,
+            cliente_id: proposal.cliente_id || clienteState?.clienteId || null,
             tipo: proposal.tipo as any,
             cidade: proposal.cidade,
             area: proposal.area,
