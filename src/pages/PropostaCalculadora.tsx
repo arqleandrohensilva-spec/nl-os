@@ -79,12 +79,12 @@ const PropostaCalculadora = () => {
       // Handle Standalone case
       if (proposalId === 'nova' || proposalId === 'nova-proposta') {
         setProposal({
-          id: proposalId,
-          cliente: '',
-          tipo: 'ArqInt',
-          cidade: '',
+          id: proposalId as string,
+          cliente: clienteState?.clienteNome || '',
+          tipo: (clienteState?.clienteTipo === 'arq' ? 'ArqInt' : clienteState?.clienteTipo === 'int' ? 'Interiores' : clienteState?.clienteTipo === 'com' ? 'Comercial' : clienteState?.clienteTipo) || 'ArqInt',
+          cidade: clienteState?.clienteCidade || '',
           estado: 'SP',
-          area: 0,
+          area: parseFloat(clienteState?.clienteArea as any) || 0,
           objetivo: ''
         });
         setPhases([]);
