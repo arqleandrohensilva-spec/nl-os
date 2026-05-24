@@ -268,11 +268,14 @@ const PropostaCalculadora = () => {
           setSaving(false);
           return;
         }
+
+        console.log("Iniciando criação de proposta para:", proposal.cliente);
         
         const { data: newProp, error: propCreateError } = await supabase
           .from('proposals')
           .insert({
             cliente: proposal.cliente,
+            cliente_id: clienteState?.clienteId || null,
             tipo: proposal.tipo as any,
             cidade: proposal.cidade,
             area: proposal.area,
@@ -681,7 +684,7 @@ const PropostaCalculadora = () => {
               {!generatedLink ? (
                 <Button 
                   onClick={handleSaveAndGenerate}
-                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio)}
+                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !proposalId?.includes('nova'))}
                   className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
                 >
                   {isGeneratingLink ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
