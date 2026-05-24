@@ -227,7 +227,11 @@ const ClienteFicha = () => {
         area_m2: cliente.area_m2?.toString() || '',
         orcamento: cliente.orcamento || '',
         prazo: cliente.prazo || '',
-        quem_decide: cliente.quem_decide || ''
+        quem_decide: cliente.quem_decide || '',
+        reuniao_data: cliente.reuniao_data || '',
+        reuniao_local: cliente.reuniao_local || 'Presencial',
+        reuniao_link: cliente.reuniao_link || '',
+        reuniao_notas: cliente.reuniao_notas || ''
       }));
       if (cliente.etapa_fluxo) {
         setOpenSections([cliente.etapa_fluxo]);
