@@ -325,27 +325,23 @@ const PropostaCalculadora = () => {
 
       const baseSlug = gerarSlug(proposal?.cliente || '');
       const versaoSuffix = proposal.versao && proposal.versao > 1 ? `-v${proposal.versao}` : '';
-      const now = new Date();
-      const timestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
       
       const slugAttempts = [
         `${baseSlug}${versaoSuffix}`,
-        `${baseSlug}${versaoSuffix}-${timestamp}`,
-        `${baseSlug}-${timestamp}-${Math.floor(Math.random() * 1000)}`
+        `${baseSlug}${versaoSuffix}-${Math.floor(Math.random() * 1000)}`
       ];
 
       let finalLink = "";
 
       // 1. Determine existing slug
       let existingSlug = "";
-      if (proposal.link_proposta) {
+      if (proposal.link_proposta && proposal.link_proposta.includes('proposta.nl.arq.br')) {
         const urlParts = proposal.link_proposta.split('/');
         existingSlug = urlParts[urlParts.length - 1];
       }
 
       // 2. Decide if we can PATCH the existing slug
-      // We PATCH if the existing slug already contains the desired version suffix (or both have no version suffix)
-      const shouldPatch = proposal.link_proposta && (
+      const shouldPatch = existingSlug && (
         (versaoSuffix && existingSlug.includes(versaoSuffix)) || 
         (!versaoSuffix && !existingSlug.includes('-v'))
       );
@@ -373,7 +369,7 @@ const PropostaCalculadora = () => {
           });
 
           if (updateResponse.ok) {
-            finalLink = proposal.link_proposta;
+            finalLink = `https://proposta.nl.arq.br/${existingSlug}`;
           }
         } catch (err) {
           console.error("PATCH error:", err);
@@ -416,8 +412,7 @@ const PropostaCalculadora = () => {
       }
 
       if (!finalLink) {
-        finalLink = `${window.location.origin}/proposta/${typeSlug}?id=${currentProposalId}`;
-        console.warn("Usando link de fallback devido a falha na API externa");
+        throw new Error("Não foi possível gerar o link oficial da proposta. Verifique sua conexão e tente novamente.");
       }
 
       // 4. Update local proposal with the link and version
