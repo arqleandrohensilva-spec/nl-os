@@ -466,7 +466,7 @@ const PropostaCalculadora = () => {
             {/* Block 1 - Base Info */}
             <section className="bg-white/[0.02] border border-white/5 p-8 rounded-2xl">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">BASE DE CÁLCULO</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">BASE DE CÁLCULO</h2>
                 <Link to="/financeiro/base" className="text-[10px] uppercase tracking-widest text-bronze hover:underline flex items-center gap-1">
                   Alterar na Base Financeira <ExternalLink size={10} />
                 </Link>
@@ -489,7 +489,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 2 - Phases */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">FASES DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">FASES DO PROJETO</h2>
               <div className="space-y-2">
                 {phases.map((phase) => (
                   <div 
@@ -498,7 +498,7 @@ const PropostaCalculadora = () => {
                       "flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border",
                       phase.included 
                         ? "bg-white/[0.04] border-white/10" 
-                        : "bg-transparent border-transparent opacity-40 grayscale"
+                        : "bg-transparent border-transparent opacity-60 grayscale"
                     )}
                   >
                     <Checkbox 
@@ -543,7 +543,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 3 - Complexity */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">COMPLEXIDADE DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">COMPLEXIDADE DO PROJETO</h2>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { val: 1.0, label: 'Simples' },
@@ -555,10 +555,10 @@ const PropostaCalculadora = () => {
                     variant={complexity === item.val ? 'default' : 'outline'}
                     onClick={() => setComplexity(item.val as any)}
                     className={cn(
-                      "h-16 rounded-xl uppercase tracking-widest text-[10px] transition-all duration-300",
+                      "h-20 rounded-xl uppercase tracking-widest text-xs font-bold transition-all duration-300",
                       complexity === item.val 
                         ? "bg-bronze text-white shadow-lg shadow-bronze/20" 
-                        : "border-white/10 hover:border-white/20 hover:bg-white/5 text-white/60"
+                        : "border-white/10 hover:border-bronze/50 hover:bg-white/5 text-white/80"
                     )}
                   >
                     {item.label} (×{item.val.toFixed(1)})
@@ -576,7 +576,7 @@ const PropostaCalculadora = () => {
             {/* Block 4 - Notes & Extra Data */}
             <section className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">OBSERVAÇÕES E DADOS</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">OBSERVAÇÕES E DADOS</h2>
               </div>
               
               {proposal.tipo === 'Comercial' && (
