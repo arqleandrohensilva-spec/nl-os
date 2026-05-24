@@ -169,9 +169,3 @@ export const generateContractDocx = async (data: ContractData) => {
     return null;
   }
 };
-  } catch (error: any) {
-    console.error('Erro completo ao gerar DOCX:', error);
-    toast.error(`Erro ao carregar template do Dropbox: ${error.message || error}`);
-    return null;
-  }
-};
