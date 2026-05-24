@@ -110,6 +110,15 @@ const PropostaVisualizacao = () => {
     );
   }
 
+  if (!proposalData) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex flex-col items-center justify-center text-white p-6 text-center">
+        <h2 className="text-2xl font-cormorant font-bold mb-4">Proposta não encontrada</h2>
+        <p className="text-white/40 mb-8">O link pode estar expirado ou a proposta ainda não foi finalizada.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
       {/* Header / Brand */}
