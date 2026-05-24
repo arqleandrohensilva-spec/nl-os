@@ -78,9 +78,11 @@ const PropostaCalculadora = () => {
       setLoading(true);
       
       // Handle Standalone case
-      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
+      const isNew = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
+      
+      if (isNew) {
         setProposal({
-          id: proposalId as string,
+          id: (proposalId || 'nova') as string,
           cliente: clienteState?.clienteNome || '',
           cliente_id: clienteState?.clienteId || '',
           tipo: (clienteState?.clienteTipo === 'arq' ? 'ArqInt' : clienteState?.clienteTipo === 'int' ? 'Interiores' : clienteState?.clienteTipo === 'com' ? 'Comercial' : clienteState?.clienteTipo) || 'ArqInt',
@@ -249,7 +251,7 @@ const PropostaCalculadora = () => {
       let currentProposalId = proposalId;
 
       // Handle standalone creation
-      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
+      if (!proposalId || proposalId === 'nova' || proposalId === 'nova-proposta') {
         if (!proposal?.cliente) {
           toast.error("Por favor, informe o nome do cliente.");
           setIsGeneratingLink(false);
@@ -275,6 +277,9 @@ const PropostaCalculadora = () => {
           
         if (propCreateError) throw propCreateError;
         currentProposalId = newProp.id;
+        
+        // Update URL without reloading to reflect the new proposal ID
+        navigate(`/calculadora/${currentProposalId}`, { replace: true, state: clienteState });
       }
 
       // Save Calculation
@@ -400,7 +405,7 @@ const PropostaCalculadora = () => {
             <ChevronLeft size={16} /> Voltar
           </Button>
           <div className="flex-1 px-8">
-            {(proposalId === 'nova' || proposalId === 'nova-proposta') ? (
+            {(!proposalId || proposalId === 'nova' || proposalId === 'nova-proposta') ? (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-4">
                   <Input 
@@ -678,7 +683,7 @@ const PropostaCalculadora = () => {
               {!generatedLink ? (
                 <Button 
                   onClick={handleSaveAndGenerate}
-                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !proposalId?.includes('nova'))}
+                  disabled={saving || totals.totalHours === 0 || (proposal.tipo === 'Comercial' && !tipoNegocio && !!proposalId)}
                   className="w-full h-16 bg-bronze hover:bg-bronze/80 text-white font-bold uppercase tracking-[0.2em] rounded-xl mt-10 shadow-xl shadow-bronze/20 transition-all duration-300 active:scale-[0.98]"
                 >
                   {isGeneratingLink ? <Loader2 className="animate-spin" /> : "GERAR LINK DA PROPOSTA"}
