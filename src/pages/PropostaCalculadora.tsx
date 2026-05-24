@@ -78,7 +78,9 @@ const PropostaCalculadora = () => {
       setLoading(true);
       
       // Handle Standalone case
-      if (proposalId === 'nova' || proposalId === 'nova-proposta') {
+      const isNew = !proposalId || proposalId === 'nova' || proposalId === 'nova-proposta';
+      
+      if (isNew) {
         setProposal({
           id: proposalId as string,
           cliente: clienteState?.clienteNome || '',
