@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -129,6 +129,26 @@ const ClientesLista = () => {
     } catch (error) {
       console.error('Erro ao aprovar briefing:', error);
       toast.error('Erro ao aprovar briefing');
+    }
+  };
+
+  const handleExcluirCliente = async (e: React.MouseEvent, id: string, nome: string) => {
+    e.stopPropagation();
+    if (!confirm(`Tem certeza que deseja excluir o cliente ${nome}? Esta ação não pode ser desfeita.`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('clientes')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+
+      toast.success("Cliente excluído com sucesso");
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error);
+      toast.error('Erro ao excluir cliente');
     }
   };
 
@@ -291,9 +311,18 @@ const ClientesLista = () => {
                   </div>
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-4 group-hover:text-[#8B7355] transition-colors uppercase font-['Courier_New']">
-                  {cliente.nome}
-                </h3>
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-white group-hover:text-[#8B7355] transition-colors uppercase font-['Courier_New']">
+                    {cliente.nome}
+                  </h3>
+                  <button
+                    onClick={(e) => handleExcluirCliente(e, cliente.id, cliente.nome)}
+                    className="text-white/20 hover:text-red-500 transition-colors p-1"
+                    title="Excluir Cliente"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-white/40">
