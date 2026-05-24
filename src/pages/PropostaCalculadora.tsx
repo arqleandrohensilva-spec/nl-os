@@ -44,6 +44,7 @@ interface ProposalData {
   objetivo: string;
   valor_executivo?: number;
   valor_completo?: number;
+  link_proposta?: string;
 }
 
 const PropostaCalculadora = () => {
@@ -334,43 +335,38 @@ const PropostaCalculadora = () => {
       let finalLink = "";
       let finalSlug = "";
 
-      for (const attemptSlug of slugAttempts) {
+      // If updating an existing proposal that already has a link_proposta, we update the external server
+      if (proposal.link_proposta) {
+        const urlParts = proposal.link_proposta.split('/');
+        const existingSlug = urlParts[urlParts.length - 1];
+        
         try {
-          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
-            method: 'POST',
+          const updateResponse = await fetch(`https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes?slug=eq.${existingSlug}`, {
+            method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
               'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Prefer': 'return=representation'
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI'
             },
             body: JSON.stringify({
-              tipo: typeSlug,
-              slug: attemptSlug,
-              nome_cliente: proposal?.cliente,
-              cidade: proposal?.cidade,
-              estado: proposal?.estado,
-              area: proposal?.area || null,
+              nome_cliente: proposal.cliente,
+              cidade: proposal.cidade,
+              estado: proposal.estado,
+              area: proposal.area || null,
               valor_executivo: Math.round(totals.valorExecutivo).toString(),
               valor_completo: Math.round(totals.valorCompleto).toString(),
-              objetivo: proposal?.objetivo || "",
+              objetivo: proposal.objetivo || "",
               tipo_negocio: finalTipoNegocio,
+              updated_at: new Date().toISOString()
             })
           });
 
-          if (response.ok) {
-            finalSlug = attemptSlug;
-            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${finalSlug}`;
-            break;
-          } else if (response.status === 409) {
-            continue;
-          } else {
-            console.error(`Erro no servidor externo: ${response.status}`);
-            // If it's the last attempt and it failed, we don't throw yet, 
-            // we let the loop finish or handle it after
+          if (updateResponse.ok) {
+            finalLink = proposal.link_proposta;
+            console.log("Servidor externo atualizado com sucesso");
           }
         } catch (err) {
-          console.warn(`Tentativa com slug "${attemptSlug}" falhou:`, err);
+          console.error("Falha ao atualizar servidor externo:", err);
         }
       }
 
