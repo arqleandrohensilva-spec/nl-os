@@ -933,7 +933,8 @@ const ClienteFicha = () => {
                         // 6. Salvar no Banco
                         const { data: newContract, error: dbError } = await supabase.from('contratos').insert({
                           numero: numeroContrato,
-                          lead_id: cliente?.id,
+                          cliente_id: cliente?.id,
+                          lead_id: null,
                           cliente_nome: contractData.cliente.nome,
                           tipo: contractData.projeto.tipo,
                           plano: contractData.projeto.plano,
