@@ -57,15 +57,30 @@ export const generateContractDocx = async (data: ContractData) => {
     let docXml = zip.files['word/document.xml'].asText();
     
     const filledXml = docXml
+      // Número e data
+      .replace(/NL-\[ANO\]-\[NR\]/g, data.numero || 'NL-2026-001')
+      .replace(/\[DATA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
+      
+      // Dados do contratante — capa
+      .replace(/\[NOME COMPLETO DO CONTRATANTE\]/g, data.cliente.nome || '')
+      .replace(/\[ENDEREÇO COMPLETO DO IMÓVEL \/ TERRENO\]/g, data.projeto.endereco || '')
+      
+      // Dados do contratante — cláusula primeira
       .replace(/\[NOME COMPLETO\]/g, data.cliente.nome || '')
-      .replace(/\[xxx\]/g, data.cliente.cpf || '')
-      .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || '')
+      .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || 'brasileiro(a)')
       .replace(/\[estado civil\]/g, data.cliente.estadoCivil || '')
       .replace(/\[profissão\]/g, data.cliente.profissao || '')
       .replace(/\[endereço completo\]/g, data.cliente.endereco || '')
-      .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco || '')
-      .replace(/\[DATA DA ASSINATURA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
-      .replace(/NL-\[ANO\]-\[NR\]/g, data.numero || '');
+      
+      // CPF — primeiro [xxx] é do contratante, demais são dos contratados
+      .replace(/\[xxx\]/, data.cliente.cpf || '')
+      
+      // Valores — R$ __________ (por extenso)
+      .replace(/R\$ __________/, `R$ ${data.honorarios.totalExecutivo || ''}`)
+      .replace(/\(____________________________________________________\)/, `(${data.honorarios.totalExtenso || ''})`)
+      
+      // Prazo total
+      .replace(/______ semanas/, `${data.prazos.total || '12'} semanas`);
       
     zip.file('word/document.xml', filledXml);
 

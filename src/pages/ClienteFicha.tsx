@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { generateContractDocx } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
+import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
@@ -914,6 +915,7 @@ const ClienteFicha = () => {
                           honorarios: {
                             totalExecutivo: totalExec.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
                             totalCompleto: totalComp.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                            totalExtenso: valorPorExtenso(totalExec),
                             marco1: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
                             marco2: (totalExec * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
                             marco3: (totalExec * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
