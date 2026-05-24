@@ -600,53 +600,122 @@ const ClienteFicha = () => {
                 <div className="p-6 bg-[#0D0D0D] border border-white/5 space-y-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">RESUMO DA PROPOSTA</span>
-                      <h3 className="text-xl font-bold mt-1">NL.P{String(proposta.id).slice(-4).toUpperCase()}</h3>
-                    </div>
-                    <div className="bg-[#8B7355]/10 px-3 py-1 text-[9px] font-bold text-[#8B7355] uppercase tracking-widest">
-                      {proposta.status || 'ENVIADA'}
+                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">PROPOSTAS E TRACKING</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-8">
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Data de Envio</span>
-                      <p className="text-xs uppercase">{proposta.created_at ? format(new Date(proposta.created_at), 'dd/MM/yyyy') : '—'}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Plano Executivo</span>
-                      <p className="text-xs uppercase">R$ {proposta.valor_executivo?.toLocaleString() || '—'}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[9px] uppercase text-white/20 font-['Courier_New']">Plano Completo</span>
-                      <p className="text-xs uppercase">R$ {proposta.valor_completo?.toLocaleString() || '—'}</p>
-                    </div>
-                  </div>
+                  <div className="space-y-6">
+                    {propostas.map((p, idx) => {
+                      const views = p.proposal_views || [];
+                      const viewsCount = views.length;
+                      const lastView = views.length > 0 
+                        ? views.sort((a: any, b: any) => new Date(b.viewed_at).getTime() - new Date(a.viewed_at).getTime())[0].viewed_at 
+                        : null;
+                      
+                      const timeSinceLastView = lastView 
+                        ? format(new Date(lastView), "HH:mm 'de' dd/MM", { locale: ptBR })
+                        : null;
 
-                  <div className="pt-4 flex flex-wrap gap-4">
-                    <Button 
-                      variant="outline" 
-                      className="border-[#8B7355]/30 bg-transparent text-[#E8E4DF] hover:bg-[#8B7355]/10 hover:border-[#8B7355] rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-6"
-                      onClick={() => {
-                        if (proposta.link_proposta) {
-                          window.open(proposta.link_proposta, '_blank');
-                        } else {
-                          navigate(`/proposta/${(proposta.tipo === 'ArqInt' ? 'arqint' : proposta.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${proposta.id}`);
-                        }
-                      }}
-                    >
-                      VER CARTA PROPOSTA
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="border-[#8B7355]/60 bg-[#8B7355]/5 text-[#E8E4DF] hover:bg-[#8B7355]/20 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-6"
-                      onClick={() => navigate(`/calculadora/${proposta.id}`)}
-                    >
-                      EDITAR ATUAL
-                    </Button>
+                      return (
+                        <div key={p.id} className="p-6 bg-white/[0.02] border border-white/5 space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-white/80 uppercase">{p.cliente} — {p.tipo}</span>
+                                <Badge variant="outline" className="text-[7px] border-white/10 text-white/40 h-4 px-1">V{idx + 1}</Badge>
+                              </div>
+                              <p className="text-[10px] text-white/30 font-mono break-all">{p.link_proposta || 'Sem link gerado'}</p>
+                            </div>
+                            <Select 
+                              value={p.status || 'Enviada'} 
+                              onValueChange={async (newStatus) => {
+                                try {
+                                  const { error } = await supabase
+                                    .from('proposals')
+                                    .update({ status: newStatus })
+                                    .eq('id', p.id);
+                                  if (error) throw error;
+                                  toast.success(`Status da V${idx + 1} atualizado para ${newStatus}`);
+                                  queryClient.invalidateQueries({ queryKey: ['propostas_cliente'] });
+                                  
+                                  if (newStatus === 'Aprovada') {
+                                    setSelectedProposalForProject(p);
+                                    setIsProjectModalOpen(true);
+                                  }
+                                } catch (err) {
+                                  toast.error("Erro ao atualizar status");
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="w-32 h-7 text-[9px] uppercase tracking-widest bg-[#8B7355]/10 border-none text-[#8B7355] font-bold rounded-none">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Enviada">Enviada</SelectItem>
+                                <SelectItem value="Vista">Vista</SelectItem>
+                                <SelectItem value="Aprovada">Aprovada</SelectItem>
+                                <SelectItem value="Recusada">Recusada</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="flex items-center gap-6 py-2 border-y border-white/5">
+                            <div className="flex items-center gap-2">
+                              <Eye size={12} className="text-[#8B7355]" />
+                              <span className="text-[10px] text-white/60 uppercase tracking-widest">
+                                {viewsCount > 0 ? `Aberta ${viewsCount} vezes` : 'Ainda não aberta'}
+                              </span>
+                            </div>
+                            {timeSinceLastView && (
+                              <div className="flex items-center gap-2">
+                                <Clock size={12} className="text-[#8B7355]" />
+                                <span className="text-[10px] text-white/60 uppercase tracking-widest">
+                                  Última abertura: {timeSinceLastView}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex gap-3">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 border-white/10 bg-transparent text-white/40 hover:text-white hover:bg-white/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                              onClick={() => {
+                                if (p.link_proposta) {
+                                  navigator.clipboard.writeText(p.link_proposta);
+                                  toast.success("Link copiado!");
+                                }
+                              }}
+                            >
+                              <Copy size={12} className="mr-2" /> COPIAR LINK
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-8 border-[#8B7355]/30 bg-transparent text-[#8B7355] hover:bg-[#8B7355]/10 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                              onClick={() => navigate(`/calculadora/${p.id}`)}
+                            >
+                              <Calculator size={12} className="mr-2" /> CALCULAR
+                            </Button>
+                            {p.link_proposta && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="h-8 text-white/20 hover:text-white rounded-none text-[9px] uppercase tracking-widest"
+                                onClick={() => window.open(p.link_proposta, '_blank')}
+                              >
+                                <ExternalLink size={12} />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
                     <Button 
                       variant="ghost" 
-                      className="text-[#8B7355] hover:bg-[#8B7355]/5 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-4"
+                      className="w-full border border-dashed border-white/10 text-white/20 hover:text-[#8B7355] hover:border-[#8B7355]/50 hover:bg-[#8B7355]/5 rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-12"
                       onClick={() => navigate('/calculadora/nova-proposta', { 
                         state: { 
                           clienteId: id,
@@ -658,49 +727,9 @@ const ClienteFicha = () => {
                         } 
                       })}
                     >
-                      + CRIAR NOVA VERSÃO
+                      + CRIAR NOVA VERSÃO DA PROPOSTA
                     </Button>
                   </div>
-
-                  {propostas.length > 1 && (
-                    <div className="pt-6 border-t border-white/5 space-y-4">
-                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">HISTÓRICO DE VERSÕES</span>
-                      <div className="space-y-2">
-                        {propostas.slice(1).map((p, idx) => (
-                          <div key={p.id} className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 hover:border-[#8B7355]/30 transition-colors">
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-white/60">VERSÃO {propostas.length - 1 - idx}</span>
-                              <span className="text-[8px] text-white/20">{format(new Date(p.created_at), 'dd/MM/yyyy HH:mm')}</span>
-                            </div>
-                            <div className="flex gap-2">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                className="h-7 text-[8px] text-white/40 hover:text-[#8B7355] hover:bg-[#8B7355]/10"
-                                onClick={() => navigate(`/calculadora/${p.id}`)}
-                              >
-                                MODIFICAR
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                className="h-7 text-[8px] text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10"
-                                onClick={() => {
-                                  if (p.link_proposta) {
-                                    window.open(p.link_proposta, '_blank');
-                                  } else {
-                                    navigate(`/proposta/${(p.tipo === 'ArqInt' ? 'arqint' : p.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${p.id}`);
-                                  }
-                                }}
-                              >
-                                ACESSAR
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 
