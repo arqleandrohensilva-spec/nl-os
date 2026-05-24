@@ -122,6 +122,9 @@ const PropostaCalculadora = () => {
         return;
       }
       setProposal(proposalData);
+      if (proposalData.link_proposta) {
+        setGeneratedLink(proposalData.link_proposta);
+      }
 
       // Fetch Config
       const { data: configData, error: configError } = await supabase
