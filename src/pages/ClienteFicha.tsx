@@ -113,16 +113,33 @@ const ClienteFicha = () => {
   });
 
   const { data: briefing } = useQuery({
-    queryKey: ['briefing_cliente', id],
+    queryKey: ['briefing_cliente', id, cliente?.whatsapp],
     queryFn: async () => {
-      const { data } = await supabase
+      // Primeiro tenta por cliente_id
+      const { data: porId } = await supabase
         .from('briefings')
         .select('*')
         .eq('cliente_id', id)
         .maybeSingle();
-      return data;
+      
+      if (porId) return porId;
+      
+      // Se não encontrou, tenta pelo whatsapp
+      if (cliente?.whatsapp) {
+        const { data: porWhats } = await supabase
+          .from('briefings')
+          .select('*')
+          .eq('whatsapp', cliente.whatsapp)
+          .order('criado_em', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        return porWhats;
+      }
+      
+      return null;
     },
-    enabled: !!id
+    enabled: !!id && !!cliente
   });
 
   const { data: propostas = [] } = useQuery({
