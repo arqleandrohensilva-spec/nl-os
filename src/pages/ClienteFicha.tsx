@@ -776,7 +776,7 @@ const ClienteFicha = () => {
                               tipo: 'reagendamento',
                               descricao: `Apresentação reagendada de ${dataAnterior} para ${novaData}`,
                               data_hora: new Date().toISOString()
-                            });
+                            } as any);
                           }
 
                           const { error } = await supabase
