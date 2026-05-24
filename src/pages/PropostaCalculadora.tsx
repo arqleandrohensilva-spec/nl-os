@@ -489,7 +489,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 2 - Phases */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">FASES DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">FASES DO PROJETO</h2>
               <div className="space-y-2">
                 {phases.map((phase) => (
                   <div 
@@ -498,7 +498,7 @@ const PropostaCalculadora = () => {
                       "flex items-center gap-4 p-4 rounded-xl transition-all duration-300 border",
                       phase.included 
                         ? "bg-white/[0.04] border-white/10" 
-                        : "bg-transparent border-transparent opacity-40 grayscale"
+                        : "bg-transparent border-transparent opacity-60 grayscale"
                     )}
                   >
                     <Checkbox 
