@@ -703,14 +703,14 @@ const PropostaCalculadora = () => {
                     <Button 
                       variant="outline" 
                       onClick={handleCopyLink}
-                      className="h-12 border-white/10 text-[10px] uppercase tracking-widest gap-2 hover:bg-white/5"
+                      className="h-12 border-[#8B7355]/30 bg-transparent text-[#E8E4DF] hover:bg-[#8B7355]/10 hover:border-[#8B7355] text-[10px] uppercase tracking-widest gap-2"
                     >
-                      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                      {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} className="text-[#8B7355]" />}
                       {copied ? "COPIADO" : "COPIAR LINK"}
                     </Button>
                     <Button 
                       onClick={() => window.open(generatedLink, '_blank')}
-                      className="h-12 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-[10px] uppercase tracking-widest gap-2"
+                      className="h-12 bg-[#8B7355] hover:bg-[#8B7355]/90 text-[#0A0A0A] font-bold text-[10px] uppercase tracking-widest gap-2"
                     >
                       <ExternalLink size={14} />
                       ABRIR
