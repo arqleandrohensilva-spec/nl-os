@@ -466,7 +466,7 @@ const PropostaCalculadora = () => {
             {/* Block 1 - Base Info */}
             <section className="bg-white/[0.02] border border-white/5 p-8 rounded-2xl">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-white/40">BASE DE CÁLCULO</h2>
+                <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">BASE DE CÁLCULO</h2>
                 <Link to="/financeiro/base" className="text-[10px] uppercase tracking-widest text-bronze hover:underline flex items-center gap-1">
                   Alterar na Base Financeira <ExternalLink size={10} />
                 </Link>
