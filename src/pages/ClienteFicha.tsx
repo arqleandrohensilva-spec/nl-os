@@ -607,7 +607,7 @@ const ClienteFicha = () => {
                     <Button 
                       variant="outline" 
                       className="border-[#8B7355]/30 bg-transparent text-[#E8E4DF] hover:bg-[#8B7355]/10 hover:border-[#8B7355] rounded-none text-[10px] uppercase tracking-widest font-['Courier_New'] font-bold h-10 px-6"
-                      onClick={() => navigate(`/proposta/executivo?id=${proposta.id}`)}
+                      onClick={() => navigate(`/proposta/${(proposta.tipo === 'ArqInt' ? 'arqint' : proposta.tipo === 'Interiores' ? 'int' : 'comercial')}?id=${proposta.id}`)}
                     >
                       VER CARTA PROPOSTA
                     </Button>
