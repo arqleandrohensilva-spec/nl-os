@@ -371,9 +371,9 @@ const PropostaCalculadora = () => {
       }
 
       if (!finalLink) {
-        // Fallback: use local preview link if external fails
-        finalLink = `${window.location.origin}/proposta/executivo?id=${currentProposalId}`;
-        toast.warning("Link externo não gerado. Usando link interno temporário.");
+        // Use the proper visualização route for the fallback link
+        finalLink = `${window.location.origin}/proposta/${typeSlug}?id=${currentProposalId}`;
+        toast.warning("Link externo não gerado. Usando link interno.");
       }
 
       // 4. Update local proposal with the link

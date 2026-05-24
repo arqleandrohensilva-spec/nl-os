@@ -20,26 +20,67 @@ const PropostaVisualizacao = () => {
   const { tipo } = useParams();
   const [searchParams] = useSearchParams();
   const [recorded, setRecorded] = useState(false);
-
-  const proposalData = {
+  const [proposalData, setProposalData] = useState<any>({
     id: searchParams.get('id'),
     nome: searchParams.get('nome'),
     tipo: searchParams.get('tipo'),
     cidade: searchParams.get('cidade'),
-    estado: searchParams.get('estado'),
+    estado: searchParams.get('estado') || 'SP',
     area: searchParams.get('area'),
     objetivo: searchParams.get('objetivo'),
     data: searchParams.get('data'),
     valor_executivo: searchParams.get('valor_executivo'),
     valor_completo: searchParams.get('valor_completo'),
     validade: searchParams.get('validade') || '30'
-  };
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProposal = async () => {
+      const id = searchParams.get('id');
+      if (!id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('proposals')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setProposalData({
+            id: data.id,
+            nome: data.cliente,
+            tipo: data.tipo,
+            cidade: data.cidade,
+            estado: data.estado || 'SP',
+            area: data.area,
+            objetivo: data.objetivo,
+            data: data.data || data.created_at,
+            valor_executivo: data.valor_executivo,
+            valor_completo: data.valor_completo,
+            validade: data.validade || '30'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching proposal:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProposal();
+  }, [searchParams]);
 
   useEffect(() => {
     const recordView = async () => {
       if (proposalData.id && !recorded) {
         try {
-          // Only record the view
           await supabase
             .from('proposal_views')
             .insert([{ proposal_id: proposalData.id }]);
@@ -50,8 +91,10 @@ const PropostaVisualizacao = () => {
       }
     };
 
-    recordView();
-  }, [proposalData.id, recorded]);
+    if (!loading) {
+      recordView();
+    }
+  }, [proposalData.id, recorded, loading]);
 
   const getIcon = () => {
     switch (tipo) {
@@ -70,6 +113,14 @@ const PropostaVisualizacao = () => {
       default: return proposalData.tipo || 'Proposta de Projeto';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0F0F0F] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bronze"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
