@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { generateContractDocx } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
+import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
