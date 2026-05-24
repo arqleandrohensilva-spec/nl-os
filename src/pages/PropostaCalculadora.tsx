@@ -543,7 +543,7 @@ const PropostaCalculadora = () => {
 
             {/* Block 3 - Complexity */}
             <section className="space-y-6">
-              <h2 className="text-xs font-bold uppercase tracking-widest text-white/60">COMPLEXIDADE DO PROJETO</h2>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B7355]">COMPLEXIDADE DO PROJETO</h2>
               <div className="grid grid-cols-3 gap-4">
                 {[
                   { val: 1.0, label: 'Simples' },
