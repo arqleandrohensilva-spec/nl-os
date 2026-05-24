@@ -2,7 +2,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import PizZip from 'pizzip';
-import Docxtemplater from 'docxtemplater';
 import { ContractData } from '@/utils/contractTemplates';
 import { toast } from 'sonner';
 
@@ -25,7 +24,7 @@ export const generateContractDocx = async (data: ContractData) => {
     if (!response.data) {
       throw new Error('A resposta da Edge Function está vazia');
     }
-
+    
     if (response.data && response.data.error) {
       console.error('Erro retornado pelo Dropbox:', response.data.error);
       const errorData = response.data.error;
@@ -56,79 +55,109 @@ export const generateContractDocx = async (data: ContractData) => {
     // 1. Manual replacement for non-standard placeholders
     let docXml = zip.files['word/document.xml'].asText();
     
-    const filledXml = docXml
-      // Número e data
-      .replace(/NL-\[ANO\]-\[NR\]/g, data.numero || 'NL-2026-001')
-      .replace(/\[DATA\]/g, data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'))
+    const hoje = format(new Date(), 'dd/MM/yyyy');
+    const ano = new Date().getFullYear();
+
+    // Formatar valores por extenso (simplificado)
+    const formatarValor = (v: number) => v?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00';
+
+    const parseNum = (val: string | undefined) => {
+      if (!val) return 0;
+      return parseFloat(val.replace(/\./g, '').replace(',', '.'));
+    };
+
+    const valor = data.projeto.plano === 'Completo' 
+      ? parseNum(data.honorarios.totalCompleto) 
+      : parseNum(data.honorarios.totalExecutivo);
       
-      // Dados do contratante — capa
+    const marco1 = Math.round(valor * 0.30);
+    const marco2 = Math.round(valor * 0.40);
+    const marco3 = Math.round(valor * 0.30);
+
+    const filledXml = docXml
+      // Número do contrato
+      .replace(/\[ANO\]/g, String(ano))
+      .replace(/\[NR\]/g, data.numero || '001')
+      
+      // Datas
+      .replace(/\[DATA\]/g, hoje)
+      .replace(/\[DATA DA ASSINATURA\]/g, hoje)
+      
+      // Contratante — capa
       .replace(/\[NOME COMPLETO DO CONTRATANTE\]/g, data.cliente.nome || '')
       .replace(/\[ENDEREÇO COMPLETO DO IMÓVEL \/ TERRENO\]/g, data.projeto.endereco || '')
       
-      // Dados do contratante — cláusula primeira
+      // Contratante — cláusula primeira
       .replace(/\[NOME COMPLETO\]/g, data.cliente.nome || '')
       .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || 'brasileiro(a)')
       .replace(/\[estado civil\]/g, data.cliente.estadoCivil || '')
       .replace(/\[profissão\]/g, data.cliente.profissao || '')
       .replace(/\[endereço completo\]/g, data.cliente.endereco || '')
+      .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco || '')
       
-      // CPF — primeiro [xxx] é do contratante, demais são dos contratados
+      // CPF — primeiro [xxx] é do contratante
       .replace(/\[xxx\]/, data.cliente.cpf || '')
       
-      // Valores — R$ __________ (por extenso)
-      .replace(/R\$ __________/, `R$ ${data.honorarios.totalExecutivo || ''}`)
-      .replace(/\(____________________________________________________\)/, `(${data.honorarios.totalExtenso || ''})`)
+      // Tipo de projeto — marcar o correto com [X]
+      .replace(
+        /\[ \] Arquitetura \+ Interiores    \[ \] Interiores    \[ \] Comercial/,
+        data.projeto.tipo === 'ARQ+INT' 
+          ? '[X] Arquitetura + Interiores    [ ] Interiores    [ ] Comercial'
+          : data.projeto.tipo === 'Interiores'
+          ? '[ ] Arquitetura + Interiores    [X] Interiores    [ ] Comercial'
+          : '[ ] Arquitetura + Interiores    [ ] Interiores    [X] Comercial'
+      )
       
-      // Prazo total
-      .replace(/______ semanas/, `${data.prazos.total || '12'} semanas`);
+      // Plano contratado
+      .replace(
+        /\[ \] Plano Executivo    \[ \] Plano Completo/g,
+        data.projeto.plano === 'Completo'
+          ? '[ ] Plano Executivo    [X] Plano Completo'
+          : '[X] Plano Executivo    [ ] Plano Completo'
+      )
       
+      // Áreas
+      .replace(/\[____ m²\] de terreno/, `[${data.projeto.areaTerreno || data.projeto.areaConstruida || ''}  m²] de terreno`)
+      .replace(/previsão estimada de \[____ m²\]/, `previsão estimada de [${data.projeto.areaConstruida || ''} m²]`)
+      .replace(/corresponde a \[____ m²\]/, `corresponde a [${data.projeto.areaConstruida || ''} m²]`)
+      
+      // Matrícula e Cartório
+      .replace(/Matrícula nº: __________________/, `Matrícula nº: ${data.projeto.matricula || ''}`)
+      .replace(/Cartório: ______________________/, `Cartório: ${data.projeto.cartorio || ''}`)
+      
+      // Prazo total em semanas
+      .replace(/______ semanas/, `${data.prazos.total || '12'} semanas`)
+      
+      // Prazos por etapa (dias úteis) — substituir em ordem
+      .replace(/____ dias úteis\./, `${data.prazos.briefing || '5'} dias úteis.`)
+      .replace(/____ dias úteis\./, `${data.prazos.briefing || '5'} dias úteis.`)
+      .replace(/____ dias úteis\./, `${data.prazos.estudo || '15'} dias úteis.`)
+      .replace(/____ dias úteis\./, `${data.prazos.estudo || '15'} dias úteis.`)
+      .replace(/____ dias úteis\./, `${data.prazos.legal || '10'} dias úteis.`)
+      .replace(/____ dias úteis\./, `${data.prazos.executivo || '30'} dias úteis.`)
+      
+      // Prazo total em dias úteis
+      .replace(/_____ \n/, `${data.prazos.totalDias || '65'} dias úteis\n`)
+      
+      // Valor total
+      .replace(/R\$ __________  \(_______________________________________________\)/, 
+        `R$ ${formatarValor(valor)} (${data.honorarios.totalExtenso || 'valor por extenso'})`)
+      
+      // Valor total cláusula honorários
+      .replace(/R\$ __________ \(________________________________________\)\./, 
+        `R$ ${formatarValor(valor)} (${data.honorarios.totalExtenso || 'valor por extenso'}).`)
+      
+      // Marcos de pagamento
+      .replace(/Valor: R\$ __________ \(____________________________\)\.[\s\S]*?Marco 2/, 
+        `Valor: R$ ${formatarValor(marco1)} (30% do total).\nMarco 2`)
+      .replace(/Valor: R\$ __________ \(____________________________\)\.[\s\S]*?Marco 3/, 
+        `Valor: R$ ${formatarValor(marco2)} (40% do total).\nMarco 3`)
+      .replace(/Valor: R\$ __________ \(____________________________\)\.$/, 
+        `Valor: R$ ${formatarValor(marco3)} (30% do total).`);
+        
     zip.file('word/document.xml', filledXml);
 
-    // 2. Docxtemplater for standard {TAG} placeholders
-    const doc = new Docxtemplater(zip, { 
-      paragraphLoop: true,
-      linebreaks: true 
-    });
-
-    doc.setData({
-      NOME_CLIENTE: data.cliente.nome,
-      CPF_CLIENTE: data.cliente.cpf,
-      NACIONALIDADE: data.cliente.nacionalidade,
-      ESTADO_CIVIL: data.cliente.estadoCivil,
-      PROFISSAO: data.cliente.profissao,
-      ENDERECO_CLIENTE: data.cliente.endereco,
-      CAU_LEANDRO: data.nl.cauLeandro,
-      CAU_NEANDRO: data.nl.cauNeandro,
-      CPF_NEANDRO: data.nl.cpfNeandro,
-      TIPO_PROJETO: data.projeto.tipo,
-      PLANO: data.projeto.plano,
-      ENDERECO_IMOVEL: data.projeto.endereco,
-      TIPO_IMOVEL: data.projeto.tipoImovel,
-      AREA_TERRENO: data.projeto.areaTerreno,
-      AREA_CONSTRUIDA: data.projeto.areaConstruida,
-      MATRICULA: data.projeto.matricula,
-      CARTORIO: data.projeto.cartorio,
-      PRAZO_LEVANTAMENTO: data.prazos.briefing,
-      PRAZO_ESTUDO: data.prazos.estudo,
-      PRAZO_LEGAL: data.prazos.legal,
-      PRAZO_EXECUTIVO: data.prazos.executivo,
-      PRAZO_TOTAL: data.prazos.total,
-      VALOR_EXECUTIVO: data.honorarios.totalExecutivo,
-      VALOR_COMPLETO: data.honorarios.totalCompleto,
-      MARCO1: data.honorarios.marco1,
-      MARCO2: data.honorarios.marco2,
-      MARCO3: data.honorarios.marco3,
-      NUMERO_CONTRATO: data.numero,
-      DATA_ASSINATURA: data.dataAssinatura || format(new Date(), 'dd/MM/yyyy'),
-    });
-
-    try {
-      doc.render();
-    } catch (error) {
-      console.error('Erro ao renderizar Docxtemplater:', error);
-    }
-    
-    const blob = doc.getZip().generate({ 
+    const blob = zip.generate({ 
       type: 'blob', 
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
     });
