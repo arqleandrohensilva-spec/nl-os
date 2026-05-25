@@ -107,8 +107,15 @@ export const generateContractDocx = async (data: ContractData) => {
 
     const zip = new PizZip(arrayBuffer);
     const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true, errorLogging: false });
-    doc.setData(templateData);
-    doc.render();
+    try {
+      doc.setData(templateData);
+      doc.render();
+    } catch (renderError: any) {
+      const message = renderError?.properties?.errors
+        ?.map((e: any) => e.message)
+        ?.join(', ') || renderError.message;
+      throw new Error(`Erro ao preencher template: ${message}`);
+    }
 
     return doc.getZip().generate({
       type: 'blob',
