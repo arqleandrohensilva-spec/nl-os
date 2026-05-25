@@ -5,6 +5,12 @@ import PropostaArqint from './PropostaArqint';
 import PropostaInt from './PropostaInt';
 import PropostaComercial from './PropostaComercial';
 import { PropostaProvider } from '@/hooks/use-proposta-context';
+import { createClient } from "@supabase/supabase-js";
+
+const nlSupabase = createClient(
+  "https://krzuroijejfozljhchok.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtyenVyb2lqZWpmb3psamhjaG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5Mjg4MjEsImV4cCI6MjA5MzUwNDgyMX0.mFMFfY8TdviFVzHvfKYUrZENpcT4wdyW-52-CUNqsOo"
+);
 
 const PropostaCliente = () => {
   const { tipo, slug } = useParams();
@@ -49,7 +55,29 @@ const PropostaCliente = () => {
         // Incrementar acessos na tabela de clientes externos
         await supabase.rpc('increment_proposal_access', { p_id: data.id });
 
-        // Registrar visualização de forma robusta
+        // Registrar view no NL OS para tracking interno
+        try {
+          const { data: propostas } = await nlSupabase
+            .from("proposals")
+            .select("id, link_proposta")
+            .not("link_proposta", "is", null);
+
+          const propostaNl = propostas?.find((p: any) => {
+            const link = (p.link_proposta || "").toLowerCase();
+            return link.endsWith(`/${slug}`) || link.includes(`/${tipo}/${slug}`);
+          });
+
+          if (propostaNl?.id) {
+            await nlSupabase.from("proposal_views").insert({
+              proposal_id: propostaNl.id,
+              viewed_at: new Date().toISOString()
+            });
+          }
+        } catch (trackErr) {
+          console.error("Erro ao registrar tracking:", trackErr);
+        }
+
+        // Registrar visualização de forma robusta localmente
         if (tipo && slug) {
           registrarView(tipo, slug);
         }
