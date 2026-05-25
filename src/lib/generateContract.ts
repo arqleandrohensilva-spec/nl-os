@@ -1,171 +1,123 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
-import PizZip from 'pizzip';
 import { ContractData } from '@/utils/contractTemplates';
 import { toast } from 'sonner';
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
+
+const valorPorExtenso = (valor: number): string => {
+  if (!valor || valor === 0) return 'zero reais';
+  const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove',
+    'dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+  const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+  const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+  const converterAte999 = (n: number): string => {
+    if (n === 100) return 'cem';
+    if (n === 0) return '';
+    const c = Math.floor(n / 100);
+    const d = Math.floor((n % 100) / 10);
+    const u = n % 10;
+    const partes = [];
+    if (c > 0) partes.push(centenas[c]);
+    if (n % 100 < 20 && n % 100 > 0) { partes.push(unidades[n % 100]); }
+    else { if (d > 0) partes.push(dezenas[d]); if (u > 0) partes.push(unidades[u]); }
+    return partes.join(' e ');
+  };
+  const inteiro = Math.floor(valor);
+  const centavos = Math.round((valor - inteiro) * 100);
+  let resultado = '';
+  if (inteiro >= 1000000) { const m = Math.floor(inteiro / 1000000); resultado += converterAte999(m) + (m === 1 ? ' milhão' : ' milhões'); if (inteiro % 1000000 > 0) resultado += ' e '; }
+  if (inteiro >= 1000 && inteiro < 1000000) { const mil = Math.floor(inteiro / 1000); resultado += converterAte999(mil) + ' mil'; if (inteiro % 1000 > 0) resultado += ' e '; }
+  const resto = inteiro % 1000;
+  if (resto > 0) resultado += converterAte999(resto);
+  resultado += inteiro === 1 ? ' real' : ' reais';
+  if (centavos > 0) resultado += ' e ' + converterAte999(centavos) + (centavos === 1 ? ' centavo' : ' centavos');
+  return resultado;
+};
 
 export const generateContractDocx = async (data: ContractData) => {
   try {
-    console.log('Iniciando geração de DOCX via template do Dropbox...');
-    
     const response = await supabase.functions.invoke('dropbox-proxy', {
-      body: {
-        action: 'download',
-        path: '/NL Arquitetos/07 - PROJETOS NL OS/00 - TEMPLATES/NL_Contrato_Final.docx'
-      }
+      body: { action: 'download', path: '/NL Arquitetos/07 - PROJETOS NL OS/00 - TEMPLATES/NL_Contrato_Final.docx' }
     });
-
-    if (response.error) {
-      console.error('Erro de rede na Edge Function:', response.error);
-      throw new Error(`Erro de rede: ${response.error.message || 'Falha ao conectar com a Edge Function'}`);
+    if (response.error) throw new Error(`Erro de rede: ${response.error.message}`);
+    if (!response.data) throw new Error('Resposta vazia');
+    if (response.data?.error) {
+      const err = response.data.error;
+      if (err['.tag'] === 'expired_access_token') throw new Error('Conexão com Dropbox expirou. Reconecte nas configurações.');
+      throw new Error(`Erro no Dropbox: ${response.data.error_summary || JSON.stringify(err)}`);
     }
-    
-    if (!response.data) {
-      throw new Error('A resposta da Edge Function está vazia');
-    }
-    
-    if (response.data && response.data.error) {
-      console.error('Erro retornado pelo Dropbox:', response.data.error);
-      const errorData = response.data.error;
-      let errorMsg = typeof errorData === 'string' ? errorData : '';
-      
-      if (errorData['.tag'] === 'expired_access_token' || (typeof errorData === 'object' && errorData.error && errorData.error['.tag'] === 'expired_access_token')) {
-        throw new Error('A conexão com o Dropbox expirou. Por favor, reconecte o Dropbox nas configurações do sistema.');
-      }
-      
-      if (!errorMsg && response.data.error_summary) errorMsg = response.data.error_summary;
-      if (!errorMsg && typeof errorData === 'object') errorMsg = JSON.stringify(errorData);
-      
-      throw new Error(`Erro no Dropbox: ${errorMsg || 'Erro desconhecido'}`);
-    }
-
     let arrayBuffer: ArrayBuffer;
-    if (response.data instanceof Blob) {
-      arrayBuffer = await response.data.arrayBuffer();
-    } else if (response.data instanceof ArrayBuffer) {
-      arrayBuffer = response.data;
-    } else {
-      console.error('Tipo de dado inesperado recebido:', typeof response.data);
-      throw new Error('Formato de arquivo inválido recebido do Dropbox');
-    }
+    if (response.data instanceof Blob) { arrayBuffer = await response.data.arrayBuffer(); }
+    else if (response.data instanceof ArrayBuffer) { arrayBuffer = response.data; }
+    else { throw new Error('Formato de arquivo inválido'); }
 
-    const zip = new PizZip(arrayBuffer);
-    
-    // 1. Manual replacement for non-standard placeholders
-    let docXml = zip.files['word/document.xml'].asText();
-    
-    const hoje = format(new Date(), 'dd/MM/yyyy');
-    const ano = new Date().getFullYear();
-
-    // Formatar valores por extenso (simplificado)
-    const formatarValor = (v: number) => v?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00';
-
-    const parseNum = (val: string | undefined) => {
+    const parseNum = (val: string | undefined): number => {
       if (!val) return 0;
-      return parseFloat(val.replace(/\./g, '').replace(',', '.'));
+      return parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0;
     };
+    const formatVal = (n: number): string => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    const valor = data.projeto.plano === 'Completo' 
-      ? parseNum(data.honorarios.totalCompleto) 
-      : parseNum(data.honorarios.totalExecutivo);
-      
+    const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : parseNum(data.honorarios.totalExecutivo);
     const marco1 = Math.round(valor * 0.30);
     const marco2 = Math.round(valor * 0.40);
-    const marco3 = Math.round(valor * 0.30);
+    const marco3 = valor - marco1 - marco2;
 
-    const filledXml = docXml
-      // Número do contrato
-      .replace(/\[ANO\]/g, String(ano))
-      .replace(/\[NR\]/g, data.numero || '001')
-      
-      // Datas
-      .replace(/\[DATA\]/g, hoje)
-      .replace(/\[DATA DA ASSINATURA\]/g, hoje)
-      
-      // Contratante — capa
-      .replace(/\[NOME COMPLETO DO CONTRATANTE\]/g, data.cliente.nome || '')
-      .replace(/\[ENDEREÇO COMPLETO DO IMÓVEL \/ TERRENO\]/g, data.projeto.endereco || '')
-      
-      // Contratante — cláusula primeira
-      .replace(/\[NOME COMPLETO\]/g, data.cliente.nome || '')
-      .replace(/\[nacionalidade\]/g, data.cliente.nacionalidade || 'brasileiro(a)')
-      .replace(/\[estado civil\]/g, data.cliente.estadoCivil || '')
-      .replace(/\[profissão\]/g, data.cliente.profissao || '')
-      .replace(/\[endereço completo\]/g, data.cliente.endereco || '')
-      .replace(/\[ENDEREÇO DO TERRENO OU CONDOMÍNIO\]/g, data.projeto.endereco || '')
-      
-      // CPF — primeiro [xxx] é do contratante
-      .replace(/\[xxx\]/, data.cliente.cpf || '')
-      
-      // Tipo de projeto — marcar o correto com [X]
-      .replace(
-        /\[ \] Arquitetura \+ Interiores    \[ \] Interiores    \[ \] Comercial/,
-        data.projeto.tipo === 'ARQ+INT' 
-          ? '[X] Arquitetura + Interiores    [ ] Interiores    [ ] Comercial'
-          : data.projeto.tipo === 'Interiores'
-          ? '[ ] Arquitetura + Interiores    [X] Interiores    [ ] Comercial'
-          : '[ ] Arquitetura + Interiores    [ ] Interiores    [X] Comercial'
-      )
-      
-      // Plano contratado
-      .replace(
-        /\[ \] Plano Executivo    \[ \] Plano Completo/g,
-        data.projeto.plano === 'Completo'
-          ? '[ ] Plano Executivo    [X] Plano Completo'
-          : '[X] Plano Executivo    [ ] Plano Completo'
-      )
-      
-      // Áreas
-      .replace(/\[____ m²\] de terreno/, `[${data.projeto.areaTerreno || data.projeto.areaConstruida || ''}  m²] de terreno`)
-      .replace(/previsão estimada de \[____ m²\]/, `previsão estimada de [${data.projeto.areaConstruida || ''} m²]`)
-      .replace(/corresponde a \[____ m²\]/, `corresponde a [${data.projeto.areaConstruida || ''} m²]`)
-      
-      // Matrícula e Cartório
-      .replace(/Matrícula nº: __________________/, `Matrícula nº: ${data.projeto.matricula || ''}`)
-      .replace(/Cartório: ______________________/, `Cartório: ${data.projeto.cartorio || ''}`)
-      
-      // Prazo total em semanas
-      .replace(/______ semanas/, `${data.prazos.total || '12'} semanas`)
-      
-      // Prazos por etapa (dias úteis) — substituir em ordem
-      .replace(/____ dias úteis\./, `${data.prazos.briefing || '5'} dias úteis.`)
-      .replace(/____ dias úteis\./, `${data.prazos.briefing || '5'} dias úteis.`)
-      .replace(/____ dias úteis\./, `${data.prazos.estudo || '15'} dias úteis.`)
-      .replace(/____ dias úteis\./, `${data.prazos.estudo || '15'} dias úteis.`)
-      .replace(/____ dias úteis\./, `${data.prazos.legal || '10'} dias úteis.`)
-      .replace(/____ dias úteis\./, `${data.prazos.executivo || '30'} dias úteis.`)
-      
-      // Prazo total em dias úteis
-      .replace(/_____ \n/, `${data.prazos.totalDias || '65'} dias úteis\n`)
-      
-      // Valor total
-      .replace(/R\$ __________  \(_______________________________________________\)/, 
-        `R$ ${formatarValor(valor)} (${data.honorarios.totalExtenso || 'valor por extenso'})`)
-      
-      // Valor total cláusula honorários
-      .replace(/R\$ __________ \(________________________________________\)\./, 
-        `R$ ${formatarValor(valor)} (${data.honorarios.totalExtenso || 'valor por extenso'}).`)
-      
-      // Marcos de pagamento
-      .replace(/Valor: R\$ __________ \(____________________________\)\.[\s\S]*?Marco 2/, 
-        `Valor: R$ ${formatarValor(marco1)} (30% do total).\nMarco 2`)
-      .replace(/Valor: R\$ __________ \(____________________________\)\.[\s\S]*?Marco 3/, 
-        `Valor: R$ ${formatarValor(marco2)} (40% do total).\nMarco 3`)
-      .replace(/Valor: R\$ __________ \(____________________________\)\.$/, 
-        `Valor: R$ ${formatarValor(marco3)} (30% do total).`);
-        
-    zip.file('word/document.xml', filledXml);
+    const tipoImovel = data.projeto.tipoImovel || 'Residência Existente';
 
-    const blob = zip.generate({ 
-      type: 'blob', 
-      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+    const templateData = {
+      ano: String(new Date().getFullYear()),
+      numero: data.numero || '001',
+      data: data.dataAssinatura || new Date().toLocaleDateString('pt-BR'),
+      nome_cliente: data.cliente.nome || '',
+      cpf_cliente: data.cliente.cpf || '',
+      nacionalidade: data.cliente.nacionalidade || 'brasileiro(a)',
+      estado_civil: data.cliente.estadoCivil || '',
+      profissao: data.cliente.profissao || '',
+      endereco_cliente: data.cliente.endereco || '',
+      endereco_imovel: data.projeto.endereco || '',
+      tipo_arqint:    data.projeto.tipo === 'ARQ+INT'     ? '[X]' : '[ ]',
+      tipo_interiores: data.projeto.tipo === 'Interiores' ? '[X]' : '[ ]',
+      tipo_comercial: data.projeto.tipo === 'Comercial'   ? '[X]' : '[ ]',
+      plano_executivo: data.projeto.plano !== 'Completo'  ? '[X]' : '[ ]',
+      plano_completo:  data.projeto.plano === 'Completo'  ? '[X]' : '[ ]',
+      tipo_imovel_terreno:    tipoImovel === 'Terreno'              ? '[X]' : '[ ]',
+      tipo_imovel_residencia: tipoImovel === 'Residência Existente' ? '[X]' : '[ ]',
+      tipo_imovel_apartamento: tipoImovel === 'Apartamento'         ? '[X]' : '[ ]',
+      tipo_imovel_sala:       tipoImovel === 'Sala Comercial'       ? '[X]' : '[ ]',
+      area_terreno: data.projeto.areaTerreno || data.projeto.areaConstruida || '',
+      area_construida: data.projeto.areaConstruida || '',
+      matricula: data.projeto.matricula || '',
+      cartorio: data.projeto.cartorio || '',
+      prazo_briefing: data.prazos.briefing || '5',
+      prazo_estudo: data.prazos.estudo || '15',
+      prazo_legal: data.prazos.legal || '10',
+      prazo_executivo: data.prazos.executivo || '30',
+      prazo_semanas: data.prazos.total || '12',
+      prazo_total_dias: data.prazos.totalDias || '65',
+      valor_total: formatVal(valor),
+      valor_total_extenso: valorPorExtenso(valor),
+      marco1_valor: formatVal(marco1),
+      marco1_extenso: valorPorExtenso(marco1),
+      marco2_valor: formatVal(marco2),
+      marco2_extenso: valorPorExtenso(marco2),
+      marco3_valor: formatVal(marco3),
+      marco3_extenso: valorPorExtenso(marco3),
+      cpf_testemunha: '',
+    };
+
+    const zip = new PizZip(arrayBuffer);
+    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true, errorLogging: false });
+    doc.setData(templateData);
+    doc.render();
+
+    return doc.getZip().generate({
+      type: 'blob',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
-    
-    return blob;
+
   } catch (error: any) {
-    console.error('Erro completo ao gerar DOCX:', error);
-    toast.error(`Erro ao carregar template do Dropbox: ${error.message || error}`);
+    console.error('Erro ao gerar contrato:', error);
+    toast.error(`Erro ao gerar contrato: ${error.message || error}`);
     return null;
   }
 };
