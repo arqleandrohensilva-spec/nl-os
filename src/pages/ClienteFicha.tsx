@@ -159,7 +159,9 @@ const ClienteFicha = () => {
         .select(`
           *,
           proposal_views (
-            viewed_at
+            viewed_at,
+            tempo_segundos,
+            secoes_tempo
           )
         `)
         .order('created_at', { ascending: true });
@@ -1016,19 +1018,60 @@ const ClienteFicha = () => {
                           )}>
                             <div className="overflow-hidden">
                               <div className="px-4 pb-6 pt-2 space-y-4">
-                                <div className="flex items-center gap-6 py-3 border-y border-white/5">
-                                  <div className="flex items-center gap-2">
-                                    <Eye size={12} className="text-[#8B7355]" />
-                                    <span className="text-[10px] text-white/60 uppercase tracking-widest">
-                                      {viewsCount > 0 ? `Aberta ${viewsCount} vezes` : 'Ainda não aberta'}
-                                    </span>
-                                  </div>
-                                  {timeSinceLastView && (
-                                    <div className="flex items-center gap-2">
-                                      <Clock size={12} className="text-[#8B7355]" />
-                                      <span className="text-[10px] text-white/60 uppercase tracking-widest">
-                                        Última abertura: {timeSinceLastView}
+                                <div className=\"flex flex-col gap-4 py-3 border-y border-white/5\">
+                                  <div className=\"flex items-center gap-6\">
+                                    <div className=\"flex items-center gap-2\">
+                                      <Eye size={12} className=\"text-[#8B7355]\" />
+                                      <span className=\"text-[10px] text-white/60 uppercase tracking-widest\">
+                                        {viewsCount > 0 ? `Vista ${viewsCount} ${viewsCount === 1 ? 'vez' : 'vezes'}` : 'Ainda não aberta'}
                                       </span>
+                                    </div>
+                                    
+                                    {viewsCount > 0 && views[0].tempo_segundos && (
+                                      <div className=\"flex items-center gap-2\">
+                                        <Clock size={12} className=\"text-[#8B7355]\" />
+                                        <span className=\"text-[10px] text-white/60 uppercase tracking-widest\">
+                                          {Math.floor(views[0].tempo_segundos / 60)} min {views[0].tempo_segundos % 60}s
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {timeSinceLastView && (
+                                      <div className=\"flex items-center gap-2\">
+                                        <Calendar size={12} className=\"text-[#8B7355]\" />
+                                        <span className=\"text-[10px] text-white/60 uppercase tracking-widest\">
+                                          Última: {timeSinceLastView}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Tracking de Seções */}
+                                  {viewsCount > 0 && views[0].secoes_tempo && Object.keys(views[0].secoes_tempo).length > 0 && (
+                                    <div className=\"space-y-3 pt-2\">
+                                      <div className=\"h-px bg-white/5 w-full\" />
+                                      {Object.entries(views[0].secoes_tempo as Record<string, number>)
+                                        .sort(([, a], [, b]) => b - a)
+                                        .map(([secao, tempo]) => {
+                                          const maxTempo = Math.max(...Object.values(views[0].secoes_tempo as Record<string, number>));
+                                          const porcentagem = (tempo / maxTempo) * 100;
+                                          const label = secao.replace('secao-', '').charAt(0).toUpperCase() + secao.replace('secao-', '').slice(1);
+                                          
+                                          return (
+                                            <div key={secao} className=\"space-y-1\">
+                                              <div className=\"flex justify-between items-center text-[9px] font-['Courier_New'] uppercase tracking-tight\">
+                                                <span className=\"text-white/40\">{label}</span>
+                                                <span className=\"text-[#8B7355]\">{tempo}s</span>
+                                              </div>
+                                              <div className=\"h-1 bg-white/5 w-full overflow-hidden\">
+                                                <div 
+                                                  className=\"h-full bg-[#8B7355] transition-all duration-500\"
+                                                  style={{ width: `${porcentagem}%` }}
+                                                />
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
                                     </div>
                                   )}
                                 </div>
