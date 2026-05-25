@@ -501,8 +501,8 @@ const ClienteFicha = () => {
                         setIsEditing(true);
                       }
                     }}
-                    variant="outline"
-                    className="border-white/10 text-white/40 hover:text-[#8B7355] hover:border-[#8B7355] rounded-none px-6 ml-8 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest"
+                    variant="ghost"
+                    className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#0D0D0D] rounded-none px-6 ml-8 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-colors"
                   >
                     {isEditing ? 'SALVAR' : 'EDITAR'}
                   </Button>
@@ -559,16 +559,14 @@ const ClienteFicha = () => {
                 </div>
               </div>
 
-              {currentStepIndex === 0 && (
-                <div className="flex justify-end pt-4">
-                  <Button 
-                    onClick={() => updateEtapa('pre_briefing')}
-                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
-                  >
-                    ENVIAR PRÉ-BRIEFING →
-                  </Button>
-                </div>
-              )}
+              <div className="flex justify-end pt-4">
+                <Button 
+                  onClick={() => updateEtapa('pre_briefing')}
+                  className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 font-['Courier_New'] text-[10px] font-bold tracking-widest uppercase"
+                >
+                  ENVIAR PRÉ-BRIEFING →
+                </Button>
+              </div>
             </div>
           )}
         </section>
