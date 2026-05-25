@@ -15,7 +15,7 @@ const PropostaComercial = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#1A1A1A] pb-20">
-      <div className="bg-[#0F0F0F] py-12 px-6 text-center">
+      <div id="secao-introducao" className="bg-[#0F0F0F] py-12 px-6 text-center">
         <div className="inline-block w-16 h-16 bg-bronze flex items-center justify-center text-white font-cormorant text-3xl mb-6 mx-auto shadow-lg">
           NL
         </div>
@@ -38,7 +38,7 @@ const PropostaComercial = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+          <div id="secao-metodo" className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             <div className="space-y-8">
               <h3 className="text-xl font-bold font-cormorant border-l-2 border-bronze pl-4 text-graphite">Detalhes do Projeto</h3>
               
@@ -87,7 +87,7 @@ const PropostaComercial = () => {
               </div>
             </div>
 
-            <div className="space-y-8">
+            <div id="secao-valores" className="space-y-8">
               <h3 className="text-xl font-bold font-cormorant border-l-2 border-bronze pl-4 text-graphite">Investimento</h3>
               
               <div className="space-y-6">
@@ -115,7 +115,7 @@ const PropostaComercial = () => {
             </div>
           </div>
 
-          <div className="bg-[#F8F9FA] p-8 border-t border-[#F0EDEA] text-center">
+          <div id="secao-contato" className="bg-[#F8F9FA] p-8 border-t border-[#F0EDEA] text-center">
             <h4 className="font-cormorant text-xl font-bold mb-4 text-graphite">Próximos Passos</h4>
             <p className="text-sm text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
               Ficamos à disposição para esclarecer qualquer dúvida. Para seguir com a aprovação ou solicitar ajustes, entre em contato com nossa equipe.

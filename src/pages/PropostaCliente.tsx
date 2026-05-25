@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import PropostaArqint from './PropostaArqint';
@@ -17,6 +17,78 @@ const PropostaCliente = () => {
   const [proposta, setProposta] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const proposalIdRef = useRef<string | null>(null);
+
+  // Tracking de tempo total
+  useEffect(() => {
+    const startTime = Date.now();
+    
+    return () => {
+      if (proposalIdRef.current) {
+        const tempoSegundos = Math.round((Date.now() - startTime) / 1000);
+        
+        // Salvar tempo no NL OS
+        nlSupabase
+          .from("proposal_views")
+          .update({ tempo_segundos: tempoSegundos })
+          .eq("proposal_id", proposalIdRef.current)
+          .order("viewed_at", { ascending: false })
+          .limit(1)
+          .then(({ error }) => {
+            if (error) console.error("Erro ao salvar tempo total:", error);
+          });
+      }
+    };
+  }, []);
+
+  // Tracking de seções
+  useEffect(() => {
+    const secoes: Record<string, number> = {};
+    const temposSecao: Record<string, number> = {};
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = entry.target.id;
+        if (entry.isIntersecting) {
+          secoes[id] = Date.now();
+        } else if (secoes[id]) {
+          temposSecao[id] = (temposSecao[id] || 0) + (Date.now() - secoes[id]);
+          delete secoes[id];
+        }
+      });
+    }, { threshold: 0.5 });
+
+    // Observar elementos que começam com secao-
+    const elements = document.querySelectorAll('[id^="secao-"]');
+    elements.forEach(el => observer.observe(el));
+
+    return () => {
+      observer.disconnect();
+      // Finalizar tempos das seções ativas no momento da saída
+      Object.keys(secoes).forEach(id => {
+        temposSecao[id] = (temposSecao[id] || 0) + (Date.now() - secoes[id]);
+      });
+
+      // Salvar tempos das seções no NL OS
+      if (Object.keys(temposSecao).length > 0 && proposalIdRef.current) {
+        // Converter de ms para s
+        const temposFormatados: Record<string, number> = {};
+        Object.keys(temposSecao).forEach(key => {
+          temposFormatados[key] = Math.round(temposSecao[key] / 1000);
+        });
+
+        nlSupabase
+          .from("proposal_views")
+          .update({ secoes_tempo: temposFormatados })
+          .eq("proposal_id", proposalIdRef.current)
+          .order("viewed_at", { ascending: false })
+          .limit(1)
+          .then(({ error }) => {
+            if (error) console.error("Erro ao salvar tempos das seções:", error);
+          });
+      }
+    };
+  }, []);
 
   const registrarView = async (pTipo: string, pSlug: string) => {
     try {
@@ -68,6 +140,7 @@ const PropostaCliente = () => {
           });
 
           if (propostaNl?.id) {
+            proposalIdRef.current = propostaNl.id;
             await nlSupabase.from("proposal_views").insert({
               proposal_id: propostaNl.id,
               viewed_at: new Date().toISOString()

@@ -1460,16 +1460,22 @@ export type Database = {
         Row: {
           id: string
           proposal_id: string | null
+          secoes_tempo: Json | null
+          tempo_segundos: number | null
           viewed_at: string
         }
         Insert: {
           id?: string
           proposal_id?: string | null
+          secoes_tempo?: Json | null
+          tempo_segundos?: number | null
           viewed_at?: string
         }
         Update: {
           id?: string
           proposal_id?: string | null
+          secoes_tempo?: Json | null
+          tempo_segundos?: number | null
           viewed_at?: string
         }
         Relationships: [
