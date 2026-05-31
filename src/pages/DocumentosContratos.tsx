@@ -504,6 +504,8 @@ const DocumentosContratos = () => {
       setLoading(true);
       const data: ContractData = {
         numero: contract.numero,
+        revisao: contract.revisao,
+
         cliente: contract.dados_gerais,
         projeto: {
           tipo: contract.tipo,
