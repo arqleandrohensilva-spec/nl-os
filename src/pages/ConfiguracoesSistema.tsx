@@ -166,7 +166,11 @@ const ConfiguracoesSistema = () => {
       } else {
         setDropboxStatus('connected');
         setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
+        const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        setContractTemplatePath(path);
+        setOriginalTemplatePath(path);
       }
+
     } catch (err) {
       setDropboxStatus('disconnected');
     }
