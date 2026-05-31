@@ -504,8 +504,10 @@ const ClienteFicha = () => {
         dados_gerais: contractData.cliente as any,
         prazos: contractData.prazos as any,
         valores: contractData.honorarios as any,
-        status: 'Gerado'
+        status: 'Gerado',
+        revisao: novaRevisao
       });
+
 
       if (dbError) throw dbError;
 
