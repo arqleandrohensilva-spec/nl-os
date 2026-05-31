@@ -38,17 +38,21 @@ const valorPorExtenso = (valor: number): string => {
 
 export const generateContractDocx = async (data: ContractData) => {
   try {
-    // Buscar caminho do template dinamicamente
+    // Buscar configurações dinamicamente
     const { data: dropboxSettings } = await supabase
       .from('dropbox_settings')
-      .select('contract_template_path')
+      .select('contract_template_path, vendor_template_path')
       .eq('id', '00000000-0000-0000-0000-000000000001')
       .single();
 
     const templatePath = (dropboxSettings as any)?.contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+    const vendorTemplatePath = (dropboxSettings as any)?.vendor_template_path;
+
+    // Se o plano for 'Fornecedor' e houver um template configurado, usa ele
+    const activePath = (data.projeto.plano === 'Fornecedor' && vendorTemplatePath) ? vendorTemplatePath : templatePath;
 
     const response = await supabase.functions.invoke('dropbox-proxy', {
-      body: { action: 'download', path: templatePath },
+      body: { action: 'download', path: activePath },
       headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
     });
     if (response.error) throw new Error(`Erro de rede: ${response.error.message}`);
