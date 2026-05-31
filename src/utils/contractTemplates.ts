@@ -19,8 +19,8 @@ export interface ContractData {
     plano: string;
     endereco: string;
     tipoImovel: string;
-    areaTerreno: string;
-    areaConstruida: string;
+    areaTerreno: string | null;
+    areaConstruida: string | null;
     matricula: string;
     cartorio: string;
   };
