@@ -1501,6 +1501,55 @@ const ClienteFicha = () => {
                     </div>
                   </div>
 
+                  {/* Pré-visualização de Tags */}
+                  <div className="bg-[#1A1816] border border-white/5 p-4 space-y-4">
+                    <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                      <Info size={14} className="text-bronze" />
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/60">Resumo de Substituição (Tags)</h4>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-y-3 gap-x-6">
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{nome_cliente}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">{formData.nome || cliente?.nome || '—'}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{cpf_cliente}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">{cliente?.cpf_cnpj || '—'}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{valor_total}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">
+                          R$ {(() => {
+                            let val = 0;
+                            if (selectedProposals.length > 0) {
+                              const props = (propostas as any[]).filter(p => selectedProposals.includes(p.id));
+                              props.forEach(p => {
+                                const c = p.calculos_proposta?.[0];
+                                val += contractFormData.plano === 'Completo' ? Number(c?.valor_completo || p.valor_completo || 0) : Number(c?.valor_executivo || p.valor_executivo || 0);
+                              });
+                            }
+                            return val.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                          })()}
+                        </p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{plano_selecionado}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">{contractFormData.plano}</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{prazo_semanas}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">{contractFormData.prazoTotal} SEMANAS</p>
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{data_contrato}`}</p>
+                        <p className="text-[10px] text-bronze uppercase truncate font-medium">{new Date().toLocaleDateString('pt-BR')}</p>
+                      </div>
+                    </div>
+                    <p className="text-[8px] text-white/10 italic text-center pt-2 border-t border-white/[0.02]">
+                      Os campos acima serão inseridos automaticamente no template DOCX/PDF
+                    </p>
+                  </div>
+
                   <div className="flex justify-center pt-4">
                     <div className="flex gap-4 pt-4">
                       <Button 
