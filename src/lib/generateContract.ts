@@ -157,7 +157,17 @@ export const getContractPreviewHtml = async (data: ContractData) => {
     if (!docxBlob) return null;
 
     const arrayBuffer = await docxBlob.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const result = await mammoth.convertToHtml({ arrayBuffer }, {
+      styleMap: [
+        "p[style-name='Title'] => h1:fresh",
+        "p[style-name='Heading 1'] => h2:fresh",
+        "p[style-name='Heading 2'] => h3:fresh",
+        "b => strong",
+        "i => em",
+        "u => u",
+        "strike => del"
+      ]
+    });
     return result.value;
   } catch (error: any) {
     console.error('Erro ao gerar preview do contrato:', error);
