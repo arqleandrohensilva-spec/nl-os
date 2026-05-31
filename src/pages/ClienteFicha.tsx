@@ -1655,7 +1655,16 @@ const ClienteFicha = () => {
                   <div className="flex justify-center pt-4">
                     <div className="flex gap-4 pt-4">
                       <Button 
+                        disabled={isGeneratingContract || isGeneratingPreview || selectedProposals.length === 0}
+                        onClick={handleShowPreview}
+                        className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
+                      >
+                        {isGeneratingPreview ? <Loader2 className="animate-spin mr-2" /> : null}
+                        PRÉ-VISUALIZAR
+                      </Button>
+                      <Button 
                         disabled={isGeneratingContract || selectedProposals.length === 0}
+
                         onClick={() => handleGenerateContract('docx')}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
                       >
