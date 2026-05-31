@@ -1928,7 +1928,7 @@ const DocumentosContratos = () => {
                 </div>
               </section>
 
-              {/* Pré-visualização de Tags */}
+              {/* PRÉ-VISUALIZAÇÃO DE TAGS */}
               <section className="bg-white/[0.02] border border-white/5 p-6 mt-8 space-y-6">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <Info size={14} className="text-bronze" />
