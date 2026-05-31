@@ -140,8 +140,8 @@ export const generateContractDocx = async (data: ContractData) => {
     const m2raw = parseNum(data.honorarios.marco2);
     const m3raw = parseNum(data.honorarios.marco3);
 
-    const marco1 = m1raw > 0 ? m1raw : Math.round(valor * 0.3 * 100) / 100;
-    const marco2 = m2raw > 0 ? m2raw : Math.round(valor * 0.4 * 100) / 100;
+    const marco1 = m1raw > 0 ? m1raw : Math.round(valor * 0.30 * 100) / 100;
+    const marco2 = m2raw > 0 ? m2raw : Math.round(valor * 0.40 * 100) / 100;
     const marco3 = m3raw > 0 ? m3raw : Math.round((valor - marco1 - marco2) * 100) / 100;
 
     const tipoImovel = data.projeto.tipoImovel || "Residência Existente";
