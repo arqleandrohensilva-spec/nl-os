@@ -464,8 +464,10 @@ const DocumentosContratos = () => {
         dados_gerais: contractFormData.cliente,
         prazos: contractFormData.prazos,
         valores: contractFormData.honorarios,
-        status: 'Gerado'
+        status: 'Gerado',
+        revisao: (contractFormData as any).revisao || 1
       }).select().single();
+
 
       if (error) throw error;
       
