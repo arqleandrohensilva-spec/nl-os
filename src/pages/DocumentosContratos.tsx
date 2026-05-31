@@ -1978,6 +1978,7 @@ const DocumentosContratos = () => {
               </section>
 
 
+
               {/* DADOS FIXOS NL */}
               <section className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
