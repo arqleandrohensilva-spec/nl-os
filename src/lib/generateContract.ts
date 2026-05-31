@@ -76,9 +76,9 @@ export const generateContractDocx = async (data: ContractData) => {
     const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : 
                   data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) : // Fornecedor usa campo executivo como base se necessário
                   parseNum(data.honorarios.totalExecutivo);
-    const marco1 = Math.round(valor * 0.30);
-    const marco2 = Math.round(valor * 0.40);
-    const marco3 = valor - marco1 - marco2;
+    const marco1 = Math.round(valor * 0.30 * 100) / 100;
+    const marco2 = Math.round(valor * 0.40 * 100) / 100;
+    const marco3 = Math.round((valor - marco1 - marco2) * 100) / 100;
 
     const tipoImovel = data.projeto.tipoImovel || 'Residência Existente';
 
@@ -96,13 +96,13 @@ export const generateContractDocx = async (data: ContractData) => {
       tipo_arqint:    data.projeto.tipo === 'ARQ+INT'     ? '[X]' : '[ ]',
       tipo_interiores: data.projeto.tipo === 'Interiores' ? '[X]' : '[ ]',
       tipo_comercial: data.projeto.tipo === 'Comercial'   ? '[X]' : '[ ]',
-      plano_executivo: data.projeto.plano !== 'Completo'  ? '[X]' : '[ ]',
-      plano_completo:  data.projeto.plano === 'Completo'  ? '[X]' : '[ ]',
-      tipo_imovel_terreno:    tipoImovel === 'Terreno'              ? '[X]' : '[ ]',
-      tipo_imovel_residencia: tipoImovel === 'Residência Existente' ? '[X]' : '[ ]',
-      tipo_imovel_apartamento: tipoImovel === 'Apartamento'         ? '[X]' : '[ ]',
-      tipo_imovel_sala:       tipoImovel === 'Sala Comercial'       ? '[X]' : '[ ]',
-      area_terreno: data.projeto.areaTerreno || data.projeto.areaConstruida || '',
+      plano_executivo: (data.projeto.plano === 'Executivo' || data.projeto.plano !== 'Completo') ? '[X]' : '[ ]',
+      plano_completo:  (data.projeto.plano === 'Completo') ? '[X]' : '[ ]',
+      tipo_imovel_terreno:    (data.projeto.tipoImovel === 'Terreno')             ? '[X]' : '[ ]',
+      tipo_imovel_residencia:  (data.projeto.tipoImovel === 'Residência' || data.projeto.tipoImovel === 'Residência Existente') ? '[X]' : '[ ]',
+      tipo_imovel_apartamento: (data.projeto.tipoImovel === 'Apartamento')         ? '[X]' : '[ ]',
+      tipo_imovel_sala:        (data.projeto.tipoImovel === 'Sala Comercial')      ? '[X]' : '[ ]',
+      area_terreno:    data.projeto.areaTerreno    || '',
       area_construida: data.projeto.areaConstruida || '',
       matricula: data.projeto.matricula || '',
       cartorio: data.projeto.cartorio || '',
@@ -134,7 +134,8 @@ export const generateContractDocx = async (data: ContractData) => {
       marco2_extenso: valorPorExtenso(marco2),
       marco3_valor: formatVal(marco3),
       marco3_extenso: valorPorExtenso(marco3),
-      cpf_testemunha: '',
+      nome_cliente_testemunha: data.cliente.testemunhaNome || '',
+      cpf_testemunha: data.cliente.testemunhaCpf || '',
       tipo_projeto_nome: (() => {
         const t = String(data.projeto.tipo || '').trim();
         console.log('DEBUG tipo_projeto:', JSON.stringify(t));
