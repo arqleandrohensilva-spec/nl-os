@@ -2024,7 +2024,6 @@ const DocumentosContratos = () => {
               </Button>
               <Button 
                 variant="outline"
-
                 onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
                 className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
