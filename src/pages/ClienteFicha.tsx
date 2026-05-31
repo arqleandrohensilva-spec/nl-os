@@ -1878,71 +1878,98 @@ const ClienteFicha = () => {
               )}
 
               {/* HISTÓRICO DE CONTRATOS */}
-              {contratos.length > 0 && (
+              {sortedContratos.length > 0 && (
                 <div className="pt-8 border-t border-white/5 space-y-4">
-                  <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold">HISTÓRICO DE CONTRATOS GERADOS</h3>
-                  <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
-                    <table className="w-full text-left text-[10px]">
-                      <thead className="bg-white/5 border-b border-white/5">
-                        <tr>
-                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
-                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
-                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
-                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">STATUS</th>
-                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5">
-                        {contratos.map((c: any) => (
-                          <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
-                            <td className="px-4 py-3 text-white/80 font-mono">{c.numero}</td>
-                            <td className="px-4 py-3 text-white/60">REV{c.revisao || 1}</td>
-                             <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
-                             <td className="px-4 py-3">
-                               <Badge variant="outline" className={cn(
-                                 "text-[8px] rounded-none border-white/10 uppercase tracking-tighter",
-                                 c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : "text-green-500 bg-green-500/5"
-                               )}>
-                                 {c.status || 'Ativo'}
-                               </Badge>
-                             </td>
-                             <td className="px-4 py-3 text-right flex justify-end gap-2">
-                               {c.status === 'Inativo' && (
-                                 <Button 
-                                   variant="ghost" 
-                                   size="sm" 
-                                   onClick={async () => {
-                                     try {
-                                       const { error } = await supabase
-                                         .from('contratos')
-                                         .update({ status: 'Ativo' } as any)
-                                         .eq('id', c.id);
-                                       if (error) throw error;
-                                       toast.success("Contrato reativado");
-                                       queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
-                                     } catch (err) {
-                                       toast.error("Erro ao reativar");
-                                     }
-                                   }}
-                                   className="h-7 text-green-500 hover:text-green-400 hover:bg-green-500/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
-                                 >
-                                   REATIVAR
-                                 </Button>
-                               )}
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => handleDownloadContract(c)}
-                                className="h-7 text-[#8B7355] hover:text-[#8B7355]/80 hover:bg-[#8B7355]/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
-                              >
-                                <Download size={12} className="mr-1" /> BAIXAR
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <button 
+                    onClick={() => setIsHistoryOpen(!isHistoryOpen)}
+                    className="w-full flex items-center justify-between group transition-colors"
+                  >
+                    <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold">
+                      HISTÓRICO DE CONTRATOS GERADOS
+                    </h3>
+                    <ChevronDown 
+                      size={14} 
+                      className={cn(
+                        "text-[#8B7355] transition-transform duration-300",
+                        isHistoryOpen ? "rotate-0" : "-rotate-90"
+                      )} 
+                    />
+                  </button>
+                  
+                  <AnimatePresence>
+                    {isHistoryOpen && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
+                          <table className="w-full text-left text-[10px]">
+                            <thead className="bg-white/5 border-b border-white/5">
+                              <tr>
+                                 <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
+                                 <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
+                                 <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
+                                 <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">STATUS</th>
+                                 <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/5">
+                              {sortedContratos.map((c: any) => (
+                                <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
+                                  <td className="px-4 py-3 text-white/80 font-mono">{c.numero}</td>
+                                  <td className="px-4 py-3 text-white/60">REV{c.revisao || 1}</td>
+                                   <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
+                                   <td className="px-4 py-3">
+                                     <Badge variant="outline" className={cn(
+                                       "text-[8px] rounded-none border-white/10 uppercase tracking-tighter",
+                                       c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : "text-green-500 bg-green-500/5"
+                                     )}>
+                                       {c.status || 'Ativo'}
+                                     </Badge>
+                                   </td>
+                                   <td className="px-4 py-3 text-right flex justify-end gap-2">
+                                     {c.status === 'Inativo' && (
+                                       <button 
+                                         onClick={async (e) => {
+                                           e.stopPropagation();
+                                           try {
+                                             const { error } = await supabase
+                                               .from('contratos')
+                                               .update({ status: 'Ativo' } as any)
+                                               .eq('id', c.id);
+                                             if (error) throw error;
+                                             toast.success("Contrato reativado");
+                                             queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+                                           } catch (err) {
+                                             toast.error("Erro ao reativar");
+                                           }
+                                         }}
+                                         className="h-7 text-green-500 hover:text-green-400 px-2 text-[9px] uppercase tracking-widest font-bold"
+                                       >
+                                         REATIVAR
+                                       </button>
+                                     )}
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDownloadContract(c);
+                                      }}
+                                      className="h-7 text-[#8B7355] hover:text-[#8B7355]/80 px-2 flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold"
+                                    >
+                                      <Download size={12} /> BAIXAR
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
