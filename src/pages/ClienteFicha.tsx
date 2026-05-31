@@ -601,6 +601,7 @@ const ClienteFicha = () => {
       const html = await getContractPreviewHtml(contractData);
       if (html) {
         setPreviewHtml(html);
+        setCurrentContractData(contractData);
         setIsPreviewModalOpen(true);
       }
     } catch (err) {
