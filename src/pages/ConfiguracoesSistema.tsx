@@ -9,6 +9,7 @@ import {
   CheckCircle2, 
   XCircle, 
   RefreshCcw,
+  Search,
   Box,
   ClipboardList,
   Star,
@@ -151,6 +152,7 @@ const ConfiguracoesSistema = () => {
   const [contractTemplatePath, setContractTemplatePath] = useState('');
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalTemplatePath, setOriginalTemplatePath] = useState('');
+  const [templateStatus, setTemplateStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
@@ -169,7 +171,9 @@ const ConfiguracoesSistema = () => {
         const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
         setContractTemplatePath(path);
         setOriginalTemplatePath(path);
+        checkTemplateExists(path);
       }
+
 
     } catch (err) {
       setDropboxStatus('disconnected');
@@ -179,6 +183,25 @@ const ConfiguracoesSistema = () => {
   useEffect(() => {
     fetchDropboxStatus();
   }, []);
+
+  const checkTemplateExists = async (path: string) => {
+    if (!path || dropboxStatus !== 'connected') return;
+    
+    setTemplateStatus('checking');
+    try {
+      const response = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_metadata', path }
+      });
+      
+      if (response.data && !response.data.error) {
+        setTemplateStatus('found');
+      } else {
+        setTemplateStatus('not_found');
+      }
+    } catch (err) {
+      setTemplateStatus('not_found');
+    }
+  };
 
   const handleConnectDropbox = () => {
     const clientId = 'zjdj0yszvqy7wvz';
@@ -308,35 +331,70 @@ const ConfiguracoesSistema = () => {
               </div>
 
               <div className="relative z-10 space-y-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center rounded-[1px]">
-                    <FileText size={20} className="text-bronze" />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center rounded-[1px]">
+                      <FileText size={20} className="text-bronze" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Template do Contrato</h3>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">Caminho do arquivo no Dropbox</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Template do Contrato</h3>
-                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Caminho do arquivo no Dropbox</p>
+
+                  <div className={cn(
+                    "flex items-center gap-2 px-3 py-1 rounded-[1px] border text-[9px] font-bold uppercase tracking-widest",
+                    templateStatus === 'found' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
+                    templateStatus === 'not_found' ? "bg-rose-500/10 border-rose-500/20 text-rose-500" :
+                    "bg-white/5 border-white/10 text-white/40"
+                  )}>
+                    {templateStatus === 'found' ? (
+                      <><CheckCircle2 size={10} /> Arquivo Localizado</>
+                    ) : templateStatus === 'not_found' ? (
+                      <><XCircle size={10} /> Não Encontrado</>
+                    ) : templateStatus === 'checking' ? (
+                      <><RefreshCcw size={10} className="animate-spin" /> Verificando</>
+                    ) : (
+                      <><RefreshCcw size={10} /> Aguardando</>
+                    )}
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-[9px] uppercase tracking-widest text-white/40">Caminho Completo (.docx)</Label>
-                  <Input 
-                    value={contractTemplatePath}
-                    onChange={(e) => setContractTemplatePath(e.target.value)}
-                    placeholder="/NL Arquitetos/..."
-                    className="bg-black/40 border-white/10 rounded-[1px] text-[11px] text-white focus:ring-bronze h-11"
-                  />
-                  <p className="text-[9px] text-white/20 italic">Certifique-se de que o arquivo contenha as tags {`{nome_cliente}`}, {`{valor_total}`}, etc.</p>
-                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Caminho Completo (.docx)</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={contractTemplatePath}
+                        onChange={(e) => setContractTemplatePath(e.target.value)}
+                        placeholder="/NL Arquitetos/..."
+                        className="bg-black/40 border-white/10 rounded-[1px] text-[11px] text-white focus:ring-bronze h-11"
+                      />
+                      <Button 
+                        variant="outline"
+                        size="icon"
+                        onClick={() => checkTemplateExists(contractTemplatePath)}
+                        className="h-11 w-11 border-white/10 bg-white/5 hover:bg-white/10"
+                        title="Verificar arquivo agora"
+                      >
+                        <Search size={16} className="text-white/60" />
+                      </Button>
+                    </div>
+                    <p className="text-[9px] text-white/20 italic">Certifique-se de que o arquivo contenha as tags {`{nome_cliente}`}, {`{valor_total}`}, etc.</p>
+                  </div>
 
-                <Button
-                  onClick={handleSaveTemplatePath}
-                  disabled={isSavingTemplate || contractTemplatePath === originalTemplatePath}
-                  className="w-full h-12 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
-                >
-                  {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
-                  Salvar Configuração
-                </Button>
+                  <Button
+                    onClick={async () => {
+                      await handleSaveTemplatePath();
+                      checkTemplateExists(contractTemplatePath);
+                    }}
+                    disabled={isSavingTemplate || contractTemplatePath === originalTemplatePath}
+                    className="w-full h-12 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+                  >
+                    {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
+                    Salvar Configuração
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
