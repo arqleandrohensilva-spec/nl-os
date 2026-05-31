@@ -222,7 +222,16 @@ const ClienteFicha = () => {
     enabled: !!id
   });
 
-  const contrato = contratos.find((c: any) => c.status !== 'Inativo') || null;
+  const sortedContratos = [...contratos].sort((a, b) => {
+    // Primeiro: Status Ativo vem primeiro
+    if (a.status !== 'Inativo' && b.status === 'Inativo') return -1;
+    if (a.status === 'Inativo' && b.status !== 'Inativo') return 1;
+    
+    // Segundo: Ordem decrescente de data
+    return new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime();
+  });
+
+  const contrato = sortedContratos.find((c: any) => c.status !== 'Inativo') || null;
 
 
   useEffect(() => {
