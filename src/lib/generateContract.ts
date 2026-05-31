@@ -333,29 +333,31 @@ export const generateContractPDF = async (data: ContractData) => {
     console.log('generateContractPDF: HTML convertido via mammoth');
 
     const container = document.createElement('div');
-    // Forçar visibilidade para o html2canvas conseguir capturar
+    container.className = 'pdf-render-container';
     container.style.cssText = `
       position: absolute;
       left: -9999px;
       top: 0;
-      width: 794px;
+      width: 210mm;
       background: white;
       color: black;
-      font-family: Arial, sans-serif;
+      font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
       font-size: 11pt;
-      line-height: 1.5;
-      padding: 40px;
+      line-height: 1.6;
+      padding: 25mm 20mm;
       box-sizing: border-box;
     `;
 
     const style = document.createElement('style');
     style.textContent = `
-      h1 { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
-      h2 { font-size: 13pt; font-weight: bold; margin-top: 16px; margin-bottom: 8px; }
-      p { margin-bottom: 8px; text-align: justify; line-height: 1.5; font-size: 11pt; }
-      strong { font-weight: bold; }
-      table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-      td, th { border: 1px solid #000; padding: 6px; font-size: 10pt; }
+      .pdf-render-container h1 { font-size: 16pt; font-weight: bold; text-align: center; margin-bottom: 24pt; text-transform: uppercase; font-family: Arial, sans-serif; }
+      .pdf-render-container h2 { font-size: 12pt; font-weight: bold; margin-top: 18pt; margin-bottom: 9pt; border-bottom: 1pt solid #000; padding-bottom: 3pt; font-family: Arial, sans-serif; text-transform: uppercase; }
+      .pdf-render-container p { margin-bottom: 10pt; text-align: justify; line-height: 1.5; font-size: 11pt; orphans: 3; widows: 3; }
+      .pdf-render-container strong { font-weight: bold; }
+      .pdf-render-container table { width: 100%; border-collapse: collapse; margin: 12pt 0; page-break-inside: auto; }
+      .pdf-render-container tr { page-break-inside: avoid; page-break-after: auto; }
+      .pdf-render-container td, .pdf-render-container th { border: 1pt solid #000; padding: 6pt; font-size: 10pt; vertical-align: top; }
+      .pdf-render-container br { line-height: 1.5; }
     `;
     container.appendChild(style);
 
