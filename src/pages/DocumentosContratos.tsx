@@ -187,6 +187,41 @@ const DocumentosContratos = () => {
     }
   }, [location.state]);
 
+  // Cálculo automático dos marcos de honorários
+  useEffect(() => {
+    const parseValue = (val: string) => {
+      if (!val) return 0;
+      return parseFloat(val.replace(/\./g, '').replace(',', '.')) || 0;
+    };
+
+    const formatValue = (num: number) => {
+      return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
+    const base = contractFormData.projeto.plano === 'Completo'
+      ? parseValue(contractFormData.honorarios.totalCompleto)
+      : parseValue(contractFormData.honorarios.totalExecutivo);
+
+    if (base > 0) {
+      const marco1 = formatValue(base * 0.30);
+      const marco2 = formatValue(base * 0.40);
+      const marco3 = formatValue(base * 0.30);
+
+      setContractFormData(prev => {
+        // Só atualiza se for diferente para evitar loop infinito
+        if (prev.honorarios.marco1 === marco1 && 
+            prev.honorarios.marco2 === marco2 && 
+            prev.honorarios.marco3 === marco3) {
+          return prev;
+        }
+        return {
+          ...prev,
+          honorarios: { ...prev.honorarios, marco1, marco2, marco3 }
+        };
+      });
+    }
+  }, [contractFormData.honorarios.totalExecutivo, contractFormData.honorarios.totalCompleto, contractFormData.projeto.plano]);
+
   const handleSelectedProposalsFromState = async (proposalIds: string[]) => {
     try {
       setLoading(true);
@@ -335,7 +370,8 @@ const DocumentosContratos = () => {
   };
 
 
-  const handleSelectLeadForContract = (leadId: string) => {
+  const handleSelectLeadForContract = async (leadId: string) => {
+    setSelectedLeadId(leadId);
     const lead = leads.find(l => l.id === leadId);
     if (lead) {
       setContractFormData(prev => ({
@@ -346,6 +382,39 @@ const DocumentosContratos = () => {
           endereco: lead.cidade ? `${lead.cidade}${lead.estado ? ` - ${lead.estado}` : ''}` : ''
         }
       }));
+
+      // Buscar briefing mais recente
+      try {
+        const { data: briefingData } = await supabase
+          .from('briefings')
+          .select('*')
+          .eq('lead_id', leadId)
+          .eq('status', 'preenchido')
+          .order('criado_em', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (briefingData && briefingData.respostas) {
+          const resp = briefingData.respostas as any;
+          
+          setContractFormData(prev => ({
+            ...prev,
+            projeto: {
+              ...prev.projeto,
+              endereco: resp.endereco || prev.projeto.endereco,
+              areaTerreno: resp.area_terreno || prev.projeto.areaTerreno,
+              areaConstruida: resp.area_estimada || prev.projeto.areaConstruida,
+              tipo: briefingData.tipo_projeto === 'arq' ? 'Arquitetura + Interiores' : 
+                    briefingData.tipo_projeto === 'int' ? 'Interiores' : 
+                    briefingData.tipo_projeto === 'com' ? 'Comercial' : prev.projeto.tipo
+            }
+          }));
+          
+          toast.success("Dados do briefing preenchidos automaticamente");
+        }
+      } catch (err) {
+        console.error("Erro ao buscar briefing:", err);
+      }
     }
   };
 
@@ -1753,6 +1822,7 @@ const DocumentosContratos = () => {
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco1: e.target.value } }))}
                       className="bg-black/20 border-white/10 rounded-none h-10"
                     />
+                    <p className="text-[8px] text-white/30 italic">Calculado automaticamente — editável</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 2 — Anteprojeto (40%)</Label>
@@ -1761,6 +1831,7 @@ const DocumentosContratos = () => {
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco2: e.target.value } }))}
                       className="bg-black/20 border-white/10 rounded-none h-10"
                     />
+                    <p className="text-[8px] text-white/30 italic">Calculado automaticamente — editável</p>
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] uppercase tracking-widest text-white/40">Marco 3 — Executivo (30%)</Label>
@@ -1769,6 +1840,7 @@ const DocumentosContratos = () => {
                       onChange={(e) => setContractFormData(prev => ({ ...prev, honorarios: { ...prev.honorarios, marco3: e.target.value } }))}
                       className="bg-black/20 border-white/10 rounded-none h-10"
                     />
+                    <p className="text-[8px] text-white/30 italic">Calculado automaticamente — editável</p>
                   </div>
                 </div>
               </section>
