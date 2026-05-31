@@ -27,7 +27,8 @@ import {
   FileCheck,
   Ban,
   Save,
-  FileDown
+  FileDown,
+  Info
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
