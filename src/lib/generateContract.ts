@@ -121,6 +121,11 @@ export const generateContractDocx = async (data: ContractData) => {
       marco3_valor: formatVal(marco3),
       marco3_extenso: valorPorExtenso(marco3),
       cpf_testemunha: '',
+      tipo_projeto_nome: data.projeto.tipo === 'Arquitetura + Interiores' ? 'ARQUITETURA + INTERIORES' :
+                         data.projeto.tipo === 'Interiores' ? 'INTERIORES' :
+                         data.projeto.tipo === 'Comercial' ? 'COMERCIAL' : '',
+      plano_nome: data.projeto.plano === 'Completo' ? 'PLANO COMPLETO' : 'PLANO EXECUTIVO',
+      nro_contrato: data.numero || '',
     };
 
     const zip = new PizZip(arrayBuffer);
