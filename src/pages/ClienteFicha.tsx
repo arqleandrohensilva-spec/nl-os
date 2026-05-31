@@ -1508,23 +1508,39 @@ const ClienteFicha = () => {
                               });
                             }
                             
+                            const marco1 = (val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            const marco2 = (val * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            const marco3 = (val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            const valorTotalStr = val.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+                            // Atualiza o estado se os valores mudarem
+                            if (contractFormData.valorTotal !== valorTotalStr) {
+                              setContractFormData(prev => ({
+                                ...prev,
+                                valorTotal: valorTotalStr,
+                                marco1: marco1,
+                                marco2: marco2,
+                                marco3: marco3
+                              }));
+                            }
+                            
                             return (
                               <div className="space-y-2 bg-white/5 p-3 mt-2">
                                 <div className="flex justify-between text-[10px]">
                                   <span className="text-white/40 uppercase font-bold tracking-widest">VALOR TOTAL</span>
-                                  <span className="text-[#8B7355] font-bold">R$ {val.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  <span className="text-[#8B7355] font-bold">R$ {valorTotalStr}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px] border-t border-white/5 pt-2">
                                   <span className="text-white/40 uppercase tracking-widest">MARCO 1 (30%)</span>
-                                  <span className="text-white/60">R$ {(val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  <span className="text-white/60">R$ {marco1}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px]">
                                   <span className="text-white/40 uppercase tracking-widest">MARCO 2 (40%)</span>
-                                  <span className="text-white/60">R$ {(val * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  <span className="text-white/60">R$ {marco2}</span>
                                 </div>
                                 <div className="flex justify-between text-[10px]">
                                   <span className="text-white/40 uppercase tracking-widest">MARCO 3 (30%)</span>
-                                  <span className="text-white/60">R$ {(val * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                  <span className="text-white/60">R$ {marco3}</span>
                                 </div>
                               </div>
                             );
