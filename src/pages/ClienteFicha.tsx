@@ -192,6 +192,9 @@ const ClienteFicha = () => {
     plano: 'Executivo' as 'Executivo' | 'Completo'
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const proposta = propostas[propostas.length - 1] || null;
 
