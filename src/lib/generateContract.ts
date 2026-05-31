@@ -82,6 +82,10 @@ export const generateContractDocx = async (data: ContractData) => {
 
     const tipoImovel = data.projeto.tipoImovel || 'Residência Existente';
 
+    console.log('DEBUG projeto.tipo:', JSON.stringify(data.projeto.tipo));
+    console.log('DEBUG projeto.tipoImovel:', JSON.stringify(data.projeto.tipoImovel));
+    console.log('DEBUG projeto.plano:', JSON.stringify(data.projeto.plano));
+
     const templateData = {
       ano: String(new Date().getFullYear()),
       numero: data.numero || '001',
@@ -93,15 +97,16 @@ export const generateContractDocx = async (data: ContractData) => {
       profissao: data.cliente.profissao || '',
       endereco_cliente: data.cliente.endereco || '',
       endereco_imovel: (data.projeto.endereco || '').toUpperCase(),
-      tipo_arqint:    data.projeto.tipo === 'ARQ+INT'     ? '[X]' : '[ ]',
-      tipo_interiores: data.projeto.tipo === 'Interiores' ? '[X]' : '[ ]',
-      tipo_comercial: data.projeto.tipo === 'Comercial'   ? '[X]' : '[ ]',
+      tipo_arqint:    (data.projeto.tipo?.includes('Arquitetura') || data.projeto.tipo === 'ARQ+INT' || data.projeto.tipo === 'arq') ? '[X]' : '[ ]',
+      tipo_interiores:(data.projeto.tipo === 'Interiores' || data.projeto.tipo === 'int') ? '[X]' : '[ ]',
+      tipo_comercial: (data.projeto.tipo === 'Comercial' || data.projeto.tipo === 'com') ? '[X]' : '[ ]',
       plano_executivo: (data.projeto.plano === 'Executivo' || data.projeto.plano !== 'Completo') ? '[X]' : '[ ]',
       plano_completo:  (data.projeto.plano === 'Completo') ? '[X]' : '[ ]',
       tipo_imovel_terreno:    (data.projeto.tipoImovel === 'Terreno')             ? '[X]' : '[ ]',
       tipo_imovel_residencia:  (data.projeto.tipoImovel === 'Residência' || data.projeto.tipoImovel === 'Residência Existente') ? '[X]' : '[ ]',
       tipo_imovel_apartamento: (data.projeto.tipoImovel === 'Apartamento')         ? '[X]' : '[ ]',
       tipo_imovel_sala:        (data.projeto.tipoImovel === 'Sala Comercial')      ? '[X]' : '[ ]',
+      tipo_imovel_outro: '',
       area_terreno:    data.projeto.areaTerreno    || '',
       area_construida: data.projeto.areaConstruida || '',
       matricula: data.projeto.matricula || '',
