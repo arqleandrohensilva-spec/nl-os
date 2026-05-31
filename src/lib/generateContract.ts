@@ -129,4 +129,37 @@ export const generateContractDocx = async (data: ContractData) => {
     toast.error(`Erro ao gerar contrato: ${error.message || error}`);
     return null;
   }
+
+export const generateContractPDF = async (data: ContractData) => {
+  try {
+    const docxBlob = await generateContractDocx(data);
+    if (!docxBlob) return null;
+
+    const arrayBuffer = await docxBlob.arrayBuffer();
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    const html = result.value;
+
+    const element = document.createElement('div');
+    element.innerHTML = `
+      <div style="padding: 40px; font-family: Arial, sans-serif; line-height: 1.5; color: #333; background: white;">
+        ${html}
+      </div>
+    `;
+    
+    // Configurações do PDF para garantir qualidade e layout similar ao Word
+    const opt = {
+      margin: [15, 15, 15, 15],
+      filename: `${data.numero || 'Contrato'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
+    return pdfBlob;
+  } catch (error: any) {
+    console.error('Erro ao gerar PDF do contrato:', error);
+    toast.error(`Erro ao gerar PDF: ${error.message || error}`);
+    return null;
+  }
 };
