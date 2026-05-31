@@ -184,6 +184,25 @@ const ConfiguracoesSistema = () => {
     fetchDropboxStatus();
   }, []);
 
+  const checkTemplateExists = async (path: string) => {
+    if (!path || dropboxStatus !== 'connected') return;
+    
+    setTemplateStatus('checking');
+    try {
+      const response = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'get_metadata', path }
+      });
+      
+      if (response.data && !response.data.error) {
+        setTemplateStatus('found');
+      } else {
+        setTemplateStatus('not_found');
+      }
+    } catch (err) {
+      setTemplateStatus('not_found');
+    }
+  };
+
   const handleConnectDropbox = () => {
     const clientId = 'zjdj0yszvqy7wvz';
     const redirectUri = 'https://app.nl.arq.br/dropbox-callback';
