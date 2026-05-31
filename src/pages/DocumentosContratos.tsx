@@ -1959,18 +1959,6 @@ const DocumentosContratos = () => {
                     <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{prazo_semanas}`}</p>
                     <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.prazos.total || '0'} SEMANAS</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{plano}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.plano}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{tipo_imovel}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.tipoImovel}</p>
-                  </div>
-                  <div className="space-y-1 md:col-span-2">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{endereco_imovel}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.endereco || '—'}</p>
-                  </div>
                 </div>
                 <p className="text-[9px] text-white/20 italic text-center pt-2 border-t border-white/[0.02]">
                   Estes dados serão injetados nas tags correspondentes do arquivo .docx
