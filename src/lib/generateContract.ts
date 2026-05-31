@@ -321,27 +321,31 @@ export const generateContractPDF = async (data: ContractData) => {
     container.innerHTML = html;
     document.body.appendChild(container);
 
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Pequeno delay para garantir renderização dos estilos
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     const opt = {
-      margin: [10, 10, 10, 10] as [number, number, number, number],
-      filename: `${data.numero} - ${data.cliente.nome}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
+      margin: 10,
+      filename: `${data.numero || 'Contrato'} - ${data.cliente.nome}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: 794,
+        letterRendering: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: container.offsetWidth
       },
       jsPDF: { 
-        unit: 'mm' as const, 
-        format: 'a4' as const, 
-        orientation: 'portrait' as const 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait' 
       }
     };
 
-    const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
+    const worker = html2pdf().set(opt).from(container);
+    const pdfBlob = await worker.output('blob');
+    
     document.body.removeChild(container);
     return pdfBlob;
   } catch (error: any) {
