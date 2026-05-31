@@ -223,15 +223,22 @@ const ClienteFicha = () => {
   });
 
   const sortedContratos = [...contratos].sort((a, b) => {
-    // Primeiro: Status Ativo vem primeiro
-    if (a.status !== 'Inativo' && b.status === 'Inativo') return -1;
-    if (a.status === 'Inativo' && b.status !== 'Inativo') return 1;
+    // Primeiro: Status Ativo/Gerado vem primeiro
+    const isMainA = a.status !== 'Inativo' && a.status !== 'Arquivado';
+    const isMainB = b.status !== 'Inativo' && b.status !== 'Arquivado';
+    
+    if (isMainA && !isMainB) return -1;
+    if (!isMainA && isMainB) return 1;
+
+    // Se ambos não forem main, Inativo vem antes de Arquivado
+    if (a.status === 'Inativo' && b.status === 'Arquivado') return -1;
+    if (a.status === 'Arquivado' && b.status === 'Inativo') return 1;
     
     // Segundo: Ordem decrescente de data
     return new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime();
   });
 
-  const contrato = sortedContratos.find((c: any) => c.status !== 'Inativo') || null;
+  const contrato = sortedContratos.find((c: any) => c.status !== 'Arquivado') || null;
 
 
   useEffect(() => {
@@ -1736,79 +1743,88 @@ const ClienteFicha = () => {
                   </div>
                 </div>
               ) : (contrato.status === 'Inativo') ? (
-                <div className="p-12 text-center bg-[#0D0D0D] border border-white/5 space-y-4">
+                <div className="p-12 text-center bg-[#161616] border border-red-500/20 space-y-4">
                   <div className="mx-auto w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
                     <Info className="text-red-500" size={24} />
                   </div>
-                  <h3 className="text-white font-bold uppercase tracking-widest text-sm">CONTRATO INATIVADO</h3>
-                  <p className="text-white/40 text-[10px] uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
-                    ESTE CONTRATO FOI DESATIVADO. VOCÊ PODE GERAR UM NOVO CONTRATO OU REATIVAR ESTE NO HISTÓRICO ABAIXO.
+                  <h3 className="text-white font-bold uppercase tracking-[0.3em] text-sm font-['Courier_New']">CONTRATO INATIVADO</h3>
+                  <p className="text-white/40 text-[10px] uppercase tracking-widest max-w-md mx-auto leading-relaxed font-['Courier_New']">
+                    Este documento não possui mais validade comercial. Você pode gerar uma nova revisão ou reativar a anterior através do histórico abaixo.
                   </p>
-                  <Button 
-                    onClick={async () => {
-                      if (confirm('Deseja realmente arquivar permanentemente o contrato inativo para liberar a geração de um novo?')) {
+                  <div className="flex justify-center gap-4 pt-4">
+                    <Button 
+                      onClick={async () => {
                         try {
+                          // Apenas arquivamos para que o componente principal entenda que deve mostrar o formulário de geração
                           const { error } = await supabase
                             .from('contratos')
                             .update({ status: 'Arquivado' } as any)
                             .eq('id', contrato.id);
                           if (error) throw error;
-                          toast.success("Pronto para gerar novo contrato");
+                          
+                          toast.success("Iniciando nova revisão...");
                           queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
                         } catch (err) {
                           toast.error("Erro ao processar");
                         }
-                      }
-                    }}
-                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 text-[10px] font-bold uppercase mt-4"
-                  >
-                    CRIAR NOVO CONTRATO
-                  </Button>
+                      }}
+                      className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-10 text-[10px] font-bold uppercase tracking-widest h-12"
+                    >
+                      GERAR NOVA REVISÃO
+                    </Button>
+                  </div>
                 </div>
               ) : (
-                <div className="p-6 bg-[#0D0D0D] border border-white/5 space-y-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</span>
-                      <p className="text-xs uppercase mt-1">{contrato.numero}</p>
+                <div className="p-8 bg-[#161616] border border-white/5 space-y-8">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-[0.3em] font-['Courier_New']">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</span>
+                      <h3 className="text-xl font-['Cormorant_Garamond'] italic text-[#E8E4DF] uppercase">{contrato.numero}</h3>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Clock size={12} className="text-white/20" />
+                        <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest">GERADO EM {format(new Date(contrato.criado_em), 'dd/MM/yyyy')}</span>
+                      </div>
                     </div>
-                    <div className={cn(
-                      "px-3 py-1 text-[9px] font-bold uppercase tracking-widest",
-                      cliente?.contrato_assinado ? "bg-green-500/10 text-green-500" : "bg-orange-500/10 text-orange-500"
-                    )}>
-                      {cliente?.contrato_assinado ? 'ASSINADO ✓' : 'AGUARDANDO ASSINATURA'}
-                    </div>
-                    <Button 
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        if (confirm('Deseja realmente inativar este contrato para gerar um novo?')) {
-                          try {
-                            const { error } = await supabase
-                              .from('contratos')
-                              .update({ status: 'Inativo' } as any)
-                              .eq('id', contrato.id);
-                            
-                            if (error) throw error;
-                            
-                            await supabase
-                              .from('clientes')
-                              .update({ contrato_assinado: false } as any)
-                              .eq('id', id);
+                    <div className="flex flex-col items-end gap-3">
+                      <div className={cn(
+                        "px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] border",
+                        cliente?.contrato_assinado 
+                          ? "bg-green-500/10 border-green-500/20 text-green-500" 
+                          : "bg-orange-500/10 border-orange-500/20 text-orange-500"
+                      )}>
+                        {cliente?.contrato_assinado ? 'CONTRATO ASSINADO ✓' : 'AGUARDANDO ASSINATURA'}
+                      </div>
+                      
+                      <button 
+                        onClick={async () => {
+                          if (confirm('Deseja realmente inativar este contrato? Esta ação invalidará o documento atual para a geração de uma nova revisão.')) {
+                            try {
+                              const { error } = await supabase
+                                .from('contratos')
+                                .update({ status: 'Inativo' } as any)
+                                .eq('id', contrato.id);
+                              
+                              if (error) throw error;
+                              
+                              await supabase
+                                .from('clientes')
+                                .update({ contrato_assinado: false } as any)
+                                .eq('id', id);
 
-                            toast.success("Contrato inativado");
-                            queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
-                            queryClient.invalidateQueries({ queryKey: ['cliente', id] });
-                          } catch (error) {
-                            console.error(error);
-                            toast.error("Erro ao inativar contrato");
+                              toast.success("Contrato inativado com sucesso");
+                              queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+                              queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+                            } catch (error) {
+                              console.error(error);
+                              toast.error("Erro ao inativar contrato");
+                            }
                           }
-                        }
-                      }}
-                      className="text-[9px] text-white/20 hover:text-red-500 uppercase tracking-widest font-bold h-auto p-0"
-                    >
-                      Inativar
-                    </Button>
+                        }}
+                        className="text-[9px] text-white/20 hover:text-red-500 uppercase tracking-widest font-bold transition-colors flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-red-500/20"
+                      >
+                        INATIVAR DOCUMENTO
+                      </button>
+                    </div>
                   </div>
                   
                   <div className="flex gap-4">
@@ -1925,7 +1941,9 @@ const ClienteFicha = () => {
                                    <td className="px-4 py-3">
                                      <Badge variant="outline" className={cn(
                                        "text-[8px] rounded-none border-white/10 uppercase tracking-tighter",
-                                       c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : "text-green-500 bg-green-500/5"
+                                       c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : 
+                                       c.status === 'Arquivado' ? "text-white/30 bg-white/5" :
+                                       "text-green-500 bg-green-500/5"
                                      )}>
                                        {c.status || 'Ativo'}
                                      </Badge>
