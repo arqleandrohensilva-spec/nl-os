@@ -265,7 +265,8 @@ const ClienteFicha = () => {
         reuniao_notas: cliente.reuniao_notas || ''
       }));
       if (cliente.etapa_fluxo) {
-        setOpenSections([cliente.etapa_fluxo]);
+        // Se já estiver em projeto, abrir a última seção (contrato)
+        setOpenSections(cliente.etapa_fluxo === 'projeto' ? ['contrato'] : [cliente.etapa_fluxo]);
       }
     }
   }, [cliente]);
@@ -273,6 +274,7 @@ const ClienteFicha = () => {
   const updateEtapa = async (novaEtapa: string) => {
     if (!id) return;
     try {
+      const etapaAnterior = cliente?.etapa_fluxo || 'ficha';
       const { error } = await supabase
         .from('clientes')
         .update({ etapa_fluxo: novaEtapa } as any)
@@ -280,8 +282,19 @@ const ClienteFicha = () => {
       
       if (error) throw error;
       
+      // Registrar no histórico de logs
+      await supabase.from('historico_clientes').insert({
+        cliente_id: id,
+        tipo: 'etapa_fluxo',
+        descricao: `Avançado de ${etapaAnterior.toUpperCase()} para ${novaEtapa.toUpperCase()}`,
+        status_anterior: etapaAnterior,
+        status_novo: novaEtapa,
+        data_hora: new Date().toISOString()
+      } as any);
+      
       toast.success(`Avançado para etapa: ${novaEtapa.toUpperCase()}`);
       queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+      queryClient.invalidateQueries({ queryKey: ['historico_cliente', id] });
       setOpenSections([novaEtapa]);
     } catch (error) {
       console.error(error);
@@ -345,7 +358,9 @@ const ClienteFicha = () => {
     }
   };
 
-  const currentStepIndex = ETAPAS.findIndex(e => e.id === (cliente?.etapa_fluxo || 'ficha'));
+  const currentStepIndex = (cliente?.etapa_fluxo === 'projeto') 
+    ? ETAPAS.length 
+    : ETAPAS.findIndex(e => e.id === (cliente?.etapa_fluxo || 'ficha'));
 
   const toggleSection = (sectionId: string) => {
     setOpenSections(prev => 
@@ -1921,7 +1936,7 @@ const ClienteFicha = () => {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
+                        <div className="bg-[#0D0D0D] border border-white/5 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                           <table className="w-full text-left text-[10px]">
                             <thead className="bg-white/5 border-b border-white/5">
                               <tr>
