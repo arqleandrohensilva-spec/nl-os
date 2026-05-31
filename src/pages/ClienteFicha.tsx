@@ -1941,7 +1941,9 @@ const ClienteFicha = () => {
                                    <td className="px-4 py-3">
                                      <Badge variant="outline" className={cn(
                                        "text-[8px] rounded-none border-white/10 uppercase tracking-tighter",
-                                       c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : "text-green-500 bg-green-500/5"
+                                       c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : 
+                                       c.status === 'Arquivado' ? "text-white/30 bg-white/5" :
+                                       "text-green-500 bg-green-500/5"
                                      )}>
                                        {c.status || 'Ativo'}
                                      </Badge>
