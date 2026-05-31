@@ -1739,11 +1739,11 @@ const ClienteFicha = () => {
                   <div className="flex justify-center pt-4">
                     <div className="flex justify-center pt-8">
                       <Button 
-                        disabled={isGeneratingContract || isGeneratingContractPreview || selectedProposals.length === 0}
+                        disabled={isGeneratingContract || isGeneratingPreview || selectedProposals.length === 0}
                         onClick={handleShowPreview}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 text-[10px] font-bold uppercase h-14 tracking-widest shadow-xl transition-all hover:scale-[1.02]"
                       >
-                        {isGeneratingContractPreview ? <Loader2 className="animate-spin mr-2" /> : null}
+                        {isGeneratingPreview ? <Loader2 className="animate-spin mr-2" /> : null}
                         PRÉ-VISUALIZAR CONTRATO
                       </Button>
                     </div>
