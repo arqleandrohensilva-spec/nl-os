@@ -386,20 +386,45 @@ const ClienteFicha = () => {
         return;
       }
 
-      // 2. Gerar número do contrato
+      // 2. Gerar número do contrato e revisão
       const year = new Date().getFullYear();
-      const { data: lastContract } = await supabase
+      
+      // Buscar se o cliente já tem contrato
+      const { data: existingContracts } = await supabase
         .from('contratos')
-        .select('numero')
-        .order('criado_em', { ascending: false })
+        .select('numero, revisao')
+        .eq('cliente_id', id)
+        .order('revisao', { ascending: false })
         .limit(1);
 
-      let nextNumber = 1;
-      if (lastContract && lastContract[0]?.numero) {
-        const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-        if (match) nextNumber = parseInt(match[1]) + 1;
+      let numeroContrato = '';
+      let novaRevisao = 1;
+
+      if (existingContracts && existingContracts.length > 0) {
+        const last = existingContracts[0];
+        novaRevisao = (last.revisao || 1) + 1;
+        
+        // Pegar a base (NL-YYYY-XXX) do número existente
+        const baseMatch = last.numero.match(/(NL-\d{4}-\d{3})/);
+        const base = baseMatch ? baseMatch[1] : `NL-${year}-000`;
+        numeroContrato = `${base}-rev${novaRevisao}`;
+      } else {
+        // Novo contrato: buscar o último número global do ano
+        const { data: lastGlobal } = await supabase
+          .from('contratos')
+          .select('numero')
+          .like('numero', `NL-${year}-%`)
+          .order('criado_em', { ascending: false })
+          .limit(1);
+
+        let nextNum = 1;
+        if (lastGlobal && lastGlobal[0]?.numero) {
+          const match = lastGlobal[0].numero.match(/NL-\d{4}-(\d{3})/);
+          if (match) nextNum = parseInt(match[1]) + 1;
+        }
+        numeroContrato = `NL-${year}-${String(nextNum).padStart(3, '0')}`;
       }
-      const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
 
       // 3. Somar valores conforme o plano
       let totalValue = 0;
