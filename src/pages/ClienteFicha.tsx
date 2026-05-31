@@ -1734,9 +1734,20 @@ const ClienteFicha = () => {
                     ESTE CONTRATO FOI DESATIVADO. VOCÊ PODE GERAR UM NOVO CONTRATO OU REATIVAR ESTE NO HISTÓRICO ABAIXO.
                   </p>
                   <Button 
-                    onClick={() => {
-                      // Logic to allow generating a new one is to simply show the generation form again
-                      // We can do this by filtering out inactives from the main 'contrato' constant
+                    onClick={async () => {
+                      if (confirm('Deseja realmente arquivar permanentemente o contrato inativo para liberar a geração de um novo?')) {
+                        try {
+                          const { error } = await supabase
+                            .from('contratos')
+                            .update({ status: 'Arquivado' } as any)
+                            .eq('id', contrato.id);
+                          if (error) throw error;
+                          toast.success("Pronto para gerar novo contrato");
+                          queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+                        } catch (err) {
+                          toast.error("Erro ao processar");
+                        }
+                      }
                     }}
                     className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 text-[10px] font-bold uppercase mt-4"
                   >
