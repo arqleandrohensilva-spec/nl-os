@@ -148,6 +148,9 @@ const ConfiguracoesSistema = () => {
   const [dropboxStatus, setDropboxStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [contractTemplatePath, setContractTemplatePath] = useState('');
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const [originalTemplatePath, setOriginalTemplatePath] = useState('');
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
