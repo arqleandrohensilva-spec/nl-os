@@ -110,8 +110,22 @@ export const generateContractDocx = async (data: ContractData) => {
       prazo_estudo: data.prazos.estudo || '15',
       prazo_legal: data.prazos.legal || '10',
       prazo_executivo: data.prazos.executivo || '30',
-      prazo_semanas: data.prazos.total || '12',
-      prazo_total_dias: data.prazos.totalDias || '65',
+      prazo_semanas: data.prazos.total || '',
+      prazo_total_dias: (() => {
+        const b = parseInt(data.prazos.briefing || '0');
+        const e = parseInt(data.prazos.estudo || '0');
+        const l = parseInt(data.prazos.legal || '0');
+        const x = parseInt(data.prazos.executivo || '0');
+        return String(b + e + l + x);
+      })(),
+      prazo_total: (() => {
+        const b = parseInt(data.prazos.briefing || '0');
+        const e = parseInt(data.prazos.estudo || '0');
+        const l = parseInt(data.prazos.legal || '0');
+        const x = parseInt(data.prazos.executivo || '0');
+        const total = b + e + l + x;
+        return total > 0 ? String(total) : (data.prazos.total || '');
+      })(),
       valor_total: formatVal(valor),
       valor_total_extenso: valorPorExtenso(valor),
       marco1_valor: formatVal(marco1),
@@ -122,14 +136,12 @@ export const generateContractDocx = async (data: ContractData) => {
       marco3_extenso: valorPorExtenso(marco3),
       cpf_testemunha: '',
       tipo_projeto_nome: (() => {
-        const t = data.projeto.tipo;
-        if (t === 'Arquitetura + Interiores' || t === 'ARQ+INT' || t === 'arq') 
-          return 'ARQUITETURA + INTERIORES';
-        if (t === 'Interiores' || t === 'int') 
-          return 'INTERIORES';
-        if (t === 'Comercial' || t === 'com') 
-          return 'COMERCIAL';
-        return t || '';
+        const t = String(data.projeto.tipo || '').trim();
+        console.log('DEBUG tipo_projeto:', JSON.stringify(t));
+        if (t.includes('Arquitetura') || t === 'ARQ+INT' || t === 'arq') return 'ARQUITETURA + INTERIORES';
+        if (t === 'Interiores' || t === 'int') return 'INTERIORES';
+        if (t === 'Comercial' || t === 'com') return 'COMERCIAL';
+        return t;
       })(),
       plano_nome: data.projeto.plano === 'Completo' ? 'PLANO COMPLETO' : 'PLANO EXECUTIVO',
       nro_contrato: data.numero || '',
