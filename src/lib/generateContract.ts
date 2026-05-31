@@ -127,8 +127,8 @@ export const generateContractDocx = async (data: ContractData) => {
   } catch (error: any) {
     console.error('Erro ao gerar contrato:', error);
     toast.error(`Erro ao gerar contrato: ${error.message || error}`);
-    return null;
   }
+};
 
 export const generateContractPDF = async (data: ContractData) => {
   try {
