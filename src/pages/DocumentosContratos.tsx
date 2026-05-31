@@ -1731,6 +1731,10 @@ const DocumentosContratos = () => {
                         <RadioGroupItem value="Completo" id="comp" className="border-bronze text-bronze" />
                         <Label htmlFor="comp" className="text-[11px] cursor-pointer">Completo</Label>
                       </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Fornecedor" id="vend" className="border-bronze text-bronze" />
+                        <Label htmlFor="vend" className="text-[11px] cursor-pointer">Fornecedor</Label>
+                      </div>
                     </RadioGroup>
                   </div>
 
