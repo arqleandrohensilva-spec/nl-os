@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, dropbox-api-arg, x-action',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, dropbox-api-arg, x-action, cache-control, pragma',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 }
 
@@ -60,6 +60,8 @@ async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
 }
 
 serve(async (req) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
