@@ -1784,8 +1784,6 @@ const DocumentosContratos = () => {
                   </div>
                 </div>
               </section>
-                </div>
-              </section>
 
               {/* DADOS DO PROJETO */}
               <section className="space-y-4">
