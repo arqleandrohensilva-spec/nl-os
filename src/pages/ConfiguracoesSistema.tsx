@@ -234,19 +234,28 @@ const ConfiguracoesSistema = () => {
     }
   };
 
-  const handleSaveTemplatePath = async () => {
-    if (contractTemplatePath === originalTemplatePath) return;
+  const handleSaveTemplatePath = async (type: 'client' | 'vendor') => {
+    const path = type === 'client' ? contractTemplatePath : vendorTemplatePath;
+    const original = type === 'client' ? originalTemplatePath : originalVendorPath;
+    
+    if (path === original) return;
     
     setIsSavingTemplate(true);
     try {
+      const updateData = type === 'client' 
+        ? { contract_template_path: path }
+        : { vendor_template_path: path };
+
       const { error } = await supabase
         .from('dropbox_settings')
-        .update({ contract_template_path: contractTemplatePath } as any)
+        .update(updateData as any)
         .eq('id', '00000000-0000-0000-0000-000000000001');
 
       if (error) throw error;
       
-      setOriginalTemplatePath(contractTemplatePath);
+      if (type === 'client') setOriginalTemplatePath(path);
+      else setOriginalVendorPath(path);
+      
       toast.success("Caminho do template atualizado!");
     } catch (err) {
       console.error("Erro ao salvar template:", err);
