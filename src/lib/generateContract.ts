@@ -335,10 +335,11 @@ export const generateContractPDF = async (data: ContractData) => {
     const container = document.createElement('div');
     container.className = 'pdf-render-container';
     container.style.cssText = `
-      position: absolute;
-      left: -9999px;
+      position: fixed;
       top: 0;
+      left: 0;
       width: 210mm;
+      min-height: 297mm;
       background: white;
       color: black;
       font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -346,6 +347,7 @@ export const generateContractPDF = async (data: ContractData) => {
       line-height: 1.6;
       padding: 25mm 20mm;
       box-sizing: border-box;
+      z-index: 99999;
     `;
 
     const style = document.createElement('style');
