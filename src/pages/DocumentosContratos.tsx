@@ -163,23 +163,49 @@ const DocumentosContratos = () => {
 
   const generateContractNumber = async () => {
     const year = new Date().getFullYear();
-    const { data: lastContract } = await supabase
-      .from('contratos')
-      .select('numero')
-      .order('criado_em', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (lastContract && lastContract[0]?.numero) {
-      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
+    
+    // Se tiver um lead selecionado, verificar se já existe contrato para ele
+    let existingContract = null;
+    if (selectedLeadId) {
+      const { data } = await supabase
+        .from('contratos')
+        .select('numero, revisao')
+        .eq('lead_id', selectedLeadId)
+        .order('revisao', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        existingContract = data[0];
       }
     }
 
-    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
-    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+    let formattedNumber = '';
+    let novaRevisao = 1;
+
+    if (existingContract) {
+      novaRevisao = (existingContract.revisao || 1) + 1;
+      const baseMatch = existingContract.numero.match(/(NL-\d{4}-\d{3})/);
+      const base = baseMatch ? baseMatch[1] : `NL-${year}-000`;
+      formattedNumber = `${base}-rev${novaRevisao}`;
+    } else {
+      const { data: lastGlobal } = await supabase
+        .from('contratos')
+        .select('numero')
+        .like('numero', `NL-${year}-%`)
+        .order('criado_em', { ascending: false })
+        .limit(1);
+
+      let nextNumber = 1;
+      if (lastGlobal && lastGlobal[0]?.numero) {
+        const match = lastGlobal[0].numero.match(/NL-\d{4}-(\d{3})/);
+        if (match) nextNumber = parseInt(match[1]) + 1;
+      }
+      formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    }
+
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber, revisao: novaRevisao }));
   };
+
 
   useEffect(() => {
     fetchData();
