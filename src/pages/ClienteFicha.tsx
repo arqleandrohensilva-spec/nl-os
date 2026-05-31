@@ -189,7 +189,9 @@ const ClienteFicha = () => {
     prazoTotal: '12',
     matricula: '',
     cartorio: '',
-    plano: 'Executivo' as 'Executivo' | 'Completo'
+    plano: 'Executivo' as 'Executivo' | 'Completo',
+    areaTerreno: '',
+    areaConstruida: ''
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -423,8 +425,8 @@ const ClienteFicha = () => {
           plano: contractFormData.plano,
           endereco: cliente?.endereco_imovel || cliente?.cidade || '',
           tipoImovel: 'Residência',
-          areaTerreno: '',
-          areaConstruida: lastProp.area?.toString() || '',
+          areaTerreno: contractFormData.areaTerreno || '',
+          areaConstruida: contractFormData.areaConstruida || lastProp.area?.toString() || '',
           matricula: contractFormData.matricula,
           cartorio: contractFormData.cartorio
         },
@@ -552,8 +554,8 @@ const ClienteFicha = () => {
           plano: contractFormData.plano,
           endereco: cliente?.endereco_imovel || cliente?.cidade || '',
           tipoImovel: 'Residência',
-          areaTerreno: '',
-          areaConstruida: lastProp.area?.toString() || '',
+          areaTerreno: contractFormData.areaTerreno || '',
+          areaConstruida: contractFormData.areaConstruida || lastProp.area?.toString() || '',
           matricula: contractFormData.matricula,
           cartorio: contractFormData.cartorio
         },
@@ -1567,6 +1569,56 @@ const ClienteFicha = () => {
                             onChange={(e) => setContractFormData({...contractFormData, profissao: e.target.value})}
                             className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355] uppercase"
                           />
+                        </div>
+
+                        {/* Área do Terreno — opcional */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">ÁREA DO TERRENO (M²)</Label>
+                            <button
+                              type="button"
+                              onClick={() => setContractFormData({...contractFormData, areaTerreno: contractFormData.areaTerreno === null ? '' : null})}
+                              className="text-[8px] uppercase tracking-widest text-white/20 hover:text-[#8B7355] transition-colors"
+                            >
+                              {contractFormData.areaTerreno === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
+                            </button>
+                          </div>
+                          {contractFormData.areaTerreno !== null && (
+                            <Input
+                              value={contractFormData.areaTerreno || ''}
+                              onChange={(e) => setContractFormData({...contractFormData, areaTerreno: e.target.value})}
+                              placeholder="Ex: 450"
+                              className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355]"
+                            />
+                          )}
+                          {contractFormData.areaTerreno === null && (
+                            <p className="text-[9px] text-white/20 italic">Não será incluído no contrato</p>
+                          )}
+                        </div>
+
+                        {/* Área Construída — opcional */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-[9px] text-white/40 uppercase tracking-widest font-bold">ÁREA CONSTRUÍDA / INTERVENÇÃO (M²)</Label>
+                            <button
+                              type="button"
+                              onClick={() => setContractFormData({...contractFormData, areaConstruida: contractFormData.areaConstruida === null ? '' : null})}
+                              className="text-[8px] uppercase tracking-widest text-white/20 hover:text-[#8B7355] transition-colors"
+                            >
+                              {contractFormData.areaConstruida === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
+                            </button>
+                          </div>
+                          {contractFormData.areaConstruida !== null && (
+                            <Input
+                              value={contractFormData.areaConstruida || ''}
+                              onChange={(e) => setContractFormData({...contractFormData, areaConstruida: e.target.value})}
+                              placeholder="Ex: 280"
+                              className="bg-transparent border-white/10 text-xs h-9 rounded-none focus-visible:ring-1 focus-visible:ring-[#8B7355]"
+                            />
+                          )}
+                          {contractFormData.areaConstruida === null && (
+                            <p className="text-[9px] text-white/20 italic">Não será incluído no contrato</p>
+                          )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
