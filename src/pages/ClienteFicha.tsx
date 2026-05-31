@@ -1571,9 +1571,16 @@ const ClienteFicha = () => {
                               }
                             };
 
-                            const pdf = generateContractPDF(contractData);
-                            pdf.save(`Contrato - ${contractData.cliente.nome}.pdf`);
-                            toast.success("PDF gerado!");
+                            const pdfBlob = await generateContractPDF(contractData);
+                            if (pdfBlob) {
+                              const url = URL.createObjectURL(pdfBlob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `Contrato - ${contractData.cliente.nome}.pdf`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                              toast.success("PDF gerado!");
+                            }
                           } catch (err) {
                             console.error(err);
                           } finally {
