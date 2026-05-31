@@ -473,7 +473,10 @@ const ClienteFicha = () => {
         blob = await generateContractPDF(contractData);
       }
       
-      if (!blob) return;
+      if (!blob) {
+        toast.error(`Falha ao gerar o arquivo ${formatType.toUpperCase()}. Por favor, tente novamente ou verifique as configurações.`);
+        return;
+      }
 
       // 6. Salvar no Banco
       const { error: dbError } = await supabase.from('contratos').insert({
