@@ -146,6 +146,21 @@ export const generateContractDocx = async (data: ContractData) => {
   }
 };
 
+export const getContractPreviewHtml = async (data: ContractData) => {
+  try {
+    const docxBlob = await generateContractDocx(data);
+    if (!docxBlob) return null;
+
+    const arrayBuffer = await docxBlob.arrayBuffer();
+    const result = await mammoth.convertToHtml({ arrayBuffer });
+    return result.value;
+  } catch (error: any) {
+    console.error('Erro ao gerar preview do contrato:', error);
+    toast.error(`Erro ao gerar preview: ${error.message || error}`);
+    return null;
+  }
+};
+
 export const generateContractPDF = async (data: ContractData) => {
   try {
     const docxBlob = await generateContractDocx(data);
