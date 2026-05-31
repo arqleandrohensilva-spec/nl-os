@@ -135,30 +135,21 @@ export const generateContractPDF = async (data: ContractData) => {
     const docxBlob = await generateContractDocx(data);
     if (!docxBlob) return null;
 
-    const arrayBuffer = await docxBlob.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer });
-    const html = result.value;
+    const formData = new FormData();
+    formData.append('file', docxBlob, 'contract.docx');
 
-    const element = document.createElement('div');
-    element.innerHTML = `
-      <div style="padding: 40px; font-family: Arial, sans-serif; line-height: 1.5; color: #333; background: white;">
-        ${html}
-      </div>
-    `;
-    
-    // Configurações do PDF para garantir qualidade e layout similar ao Word
-    const opt = {
-      margin: 15,
-      filename: `${data.numero || 'Contrato'}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
-    };
+    const response = await fetch('https://gotenberg.lovable.app/forms/libreoffice/convert', {
+      method: 'POST',
+      body: formData,
+    });
 
-    const pdfBlob = await html2pdf().from(element).set(opt).output('blob');
-    return pdfBlob;
+    if (!response.ok) {
+      throw new Error(`Erro na conversão Gotenberg: ${response.statusText}`);
+    }
+
+    return await response.blob();
   } catch (error: any) {
-    console.error('Erro ao gerar PDF do contrato:', error);
+    console.error('Erro ao gerar PDF via Gotenberg:', error);
     toast.error(`Erro ao gerar PDF: ${error.message || error}`);
     return null;
   }
