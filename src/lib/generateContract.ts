@@ -38,8 +38,17 @@ const valorPorExtenso = (valor: number): string => {
 
 export const generateContractDocx = async (data: ContractData) => {
   try {
+    // Buscar caminho do template dinamicamente
+    const { data: dropboxSettings } = await supabase
+      .from('dropbox_settings')
+      .select('contract_template_path')
+      .eq('id', '00000000-0000-0000-0000-000000000001')
+      .single();
+
+    const templatePath = (dropboxSettings as any)?.contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+
     const response = await supabase.functions.invoke('dropbox-proxy', {
-      body: { action: 'download', path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx' },
+      body: { action: 'download', path: templatePath },
       headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
     });
     if (response.error) throw new Error(`Erro de rede: ${response.error.message}`);
