@@ -1097,7 +1097,7 @@ const DocumentosContratos = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} {c.revisao > 1 ? `(REV${c.revisao})` : ''} · {c.tipo}</p>
                     </div>
                     <Badge className={cn(
                       "text-[8px] uppercase tracking-tighter",
