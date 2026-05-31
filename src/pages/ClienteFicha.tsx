@@ -223,15 +223,22 @@ const ClienteFicha = () => {
   });
 
   const sortedContratos = [...contratos].sort((a, b) => {
-    // Primeiro: Status Ativo vem primeiro
-    if (a.status !== 'Inativo' && b.status === 'Inativo') return -1;
-    if (a.status === 'Inativo' && b.status !== 'Inativo') return 1;
+    // Primeiro: Status Ativo/Gerado vem primeiro
+    const isMainA = a.status !== 'Inativo' && a.status !== 'Arquivado';
+    const isMainB = b.status !== 'Inativo' && b.status !== 'Arquivado';
+    
+    if (isMainA && !isMainB) return -1;
+    if (!isMainA && isMainB) return 1;
+
+    // Se ambos não forem main, Inativo vem antes de Arquivado
+    if (a.status === 'Inativo' && b.status === 'Arquivado') return -1;
+    if (a.status === 'Arquivado' && b.status === 'Inativo') return 1;
     
     // Segundo: Ordem decrescente de data
     return new Date(b.criado_em).getTime() - new Date(a.criado_em).getTime();
   });
 
-  const contrato = sortedContratos.find((c: any) => c.status !== 'Inativo') || null;
+  const contrato = sortedContratos.find((c: any) => c.status !== 'Arquivado') || null;
 
 
   useEffect(() => {
