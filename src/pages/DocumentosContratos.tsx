@@ -1078,7 +1078,7 @@ const DocumentosContratos = () => {
                       {c.status}
                     </Badge>
                   </div>
-                  <div className="mt-2">
+                  <div className="grid grid-cols-1 gap-2 mt-2">
                     <Button 
                       variant="outline" 
                       onClick={() => handleDownloadExistingContract(c)}
@@ -1086,7 +1086,6 @@ const DocumentosContratos = () => {
                     >
                       <FileDown size={12} className="mr-1" /> REBAIXAR DOCX
                     </Button>
-                  </div>
                     <Button 
                       variant="outline" 
                       onClick={() => handleSaveExistingToDropbox(c)}
