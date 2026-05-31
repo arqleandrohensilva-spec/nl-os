@@ -478,14 +478,32 @@ const DocumentosContratos = () => {
   const handleShowPreview = async () => {
     try {
       setIsGeneratingContractPreview(true);
+
+      // Diagnóstico: verificar settings do Dropbox
+      const { data: settings } = await supabase
+        .from('dropbox_settings')
+        .select('access_token, refresh_token, contract_template_path, expires_at')
+        .eq('id', '00000000-0000-0000-0000-000000000001')
+        .single();
+
+      if (!settings?.access_token && !settings?.refresh_token) {
+        toast.error('Dropbox não conectado. Vá em Configurações e reconecte o Dropbox.');
+        return;
+      }
+
+      if (!settings?.contract_template_path) {
+        toast.error('Caminho do template não configurado. Vá em Configurações > Dropbox.');
+        return;
+      }
+
       const html = await getContractPreviewHtml(contractFormData);
       if (html) {
         setPreviewHtml(html);
         setIsPreviewModalOpen(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Erro ao gerar preview");
+      toast.error(`Erro ao gerar preview: ${err.message}`);
     } finally {
       setIsGeneratingContractPreview(false);
     }
