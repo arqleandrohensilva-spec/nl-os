@@ -1997,9 +1997,9 @@ const ClienteFicha = () => {
                 PRÉ-VISUALIZAÇÃO DO CONTRATO
               </DialogTitle>
             </DialogHeader>
-            <div className="flex-1 overflow-y-auto p-12 bg-white text-black">
+            <div className="flex-1 overflow-y-auto bg-[#1A1A1A]">
               <div 
-                className="prose prose-sm max-w-none contract-preview"
+                className="max-w-none"
                 dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
               />
             </div>
