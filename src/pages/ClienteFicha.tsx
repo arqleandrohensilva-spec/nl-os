@@ -189,7 +189,9 @@ const ClienteFicha = () => {
     prazoTotal: '12',
     matricula: '',
     cartorio: '',
-    plano: 'Executivo' as 'Executivo' | 'Completo'
+    plano: 'Executivo' as 'Executivo' | 'Completo',
+    areaTerreno: '',
+    areaConstruida: ''
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
