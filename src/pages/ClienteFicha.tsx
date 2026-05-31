@@ -370,7 +370,48 @@ const ClienteFicha = () => {
     queryClient.invalidateQueries({ queryKey: ['cliente', id] });
   }, [formData, id, queryClient]);
   
+  const handleDownloadContract = async (contract: any) => {
+    try {
+      const dadosGerais = contract.dados_gerais as any;
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: dadosGerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: dadosGerais?.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos as any,
+        honorarios: contract.valores as any,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+      };
+      const blob = await generateContractDocx(data);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${contract.numero} - ${contract.cliente_nome}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error downloading contract:', err);
+      toast.error("Erro ao baixar contrato");
+    }
+  };
+
   const handleGenerateContract = async () => {
+
     if (isGeneratingContract) return;
     setIsGeneratingContract(true);
     try {
