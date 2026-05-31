@@ -202,6 +202,29 @@ const ConfiguracoesSistema = () => {
     }
   };
 
+  const handleSaveTemplatePath = async () => {
+    if (contractTemplatePath === originalTemplatePath) return;
+    
+    setIsSavingTemplate(true);
+    try {
+      const { error } = await supabase
+        .from('dropbox_settings')
+        .update({ contract_template_path: contractTemplatePath } as any)
+        .eq('id', '00000000-0000-0000-0000-000000000001');
+
+      if (error) throw error;
+      
+      setOriginalTemplatePath(contractTemplatePath);
+      toast.success("Caminho do template atualizado!");
+    } catch (err) {
+      console.error("Erro ao salvar template:", err);
+      toast.error("Erro ao salvar o caminho do template");
+    } finally {
+      setIsSavingTemplate(false);
+    }
+  };
+
+
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
