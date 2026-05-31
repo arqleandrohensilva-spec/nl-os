@@ -15,9 +15,13 @@ import {
   MessageSquare,
   Copy,
   Link2,
-  Layout
+  Layout,
+  FileText,
+  Save
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const iconMap: Record<string, any> = {
   ClipboardList,
