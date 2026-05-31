@@ -1737,32 +1737,14 @@ const ClienteFicha = () => {
                   </div>
 
                   <div className="flex justify-center pt-4">
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex justify-center pt-8">
                       <Button 
-                        disabled={isGeneratingContract || isGeneratingPreview || selectedProposals.length === 0}
+                        disabled={isGeneratingContract || isGeneratingContractPreview || selectedProposals.length === 0}
                         onClick={handleShowPreview}
-                        className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
+                        className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 text-[10px] font-bold uppercase h-14 tracking-widest shadow-xl transition-all hover:scale-[1.02]"
                       >
-                        {isGeneratingPreview ? <Loader2 className="animate-spin mr-2" /> : null}
-                        PRÉ-VISUALIZAR
-                      </Button>
-                      <Button 
-                        disabled={isGeneratingContract || selectedProposals.length === 0}
-
-                        onClick={() => handleGenerateContract('docx')}
-                        className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
-                      >
-                        {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
-                        GERAR DOCX
-                      </Button>
-
-                      <Button 
-                        disabled={isGeneratingContract || selectedProposals.length === 0}
-                        onClick={() => handleGenerateContract('pdf')}
-                        className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
-                      >
-                        {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
-                        GERAR PDF
+                        {isGeneratingContractPreview ? <Loader2 className="animate-spin mr-2" /> : null}
+                        PRÉ-VISUALIZAR CONTRATO
                       </Button>
                     </div>
                   </div>
