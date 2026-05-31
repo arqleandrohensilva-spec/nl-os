@@ -172,10 +172,15 @@ const ConfiguracoesSistema = () => {
         setDropboxStatus('connected');
         setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
         const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        const vPath = (data as any).vendor_template_path || '';
         setContractTemplatePath(path);
         setOriginalTemplatePath(path);
-        checkTemplateExists(path);
+        setVendorTemplatePath(vPath);
+        setOriginalVendorPath(vPath);
+        checkTemplateExists(path, 'client');
+        if (vPath) checkTemplateExists(vPath, 'vendor');
       }
+
 
 
     } catch (err) {
