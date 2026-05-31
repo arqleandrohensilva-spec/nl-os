@@ -554,8 +554,8 @@ const ClienteFicha = () => {
           plano: contractFormData.plano,
           endereco: cliente?.endereco_imovel || cliente?.cidade || '',
           tipoImovel: 'Residência',
-          areaTerreno: '',
-          areaConstruida: lastProp.area?.toString() || '',
+          areaTerreno: contractFormData.areaTerreno || '',
+          areaConstruida: contractFormData.areaConstruida || lastProp.area?.toString() || '',
           matricula: contractFormData.matricula,
           cartorio: contractFormData.cartorio
         },
