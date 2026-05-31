@@ -359,7 +359,7 @@ export const generateContractPDF = async (data: ContractData) => {
     container.appendChild(content);
     document.body.appendChild(container);
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const opt = {
       margin: [10, 10, 10, 10] as [number, number, number, number],
