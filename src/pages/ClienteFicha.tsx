@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
+import { generateContractDocx } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
 import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
@@ -198,10 +198,7 @@ const ClienteFicha = () => {
     marco3: ''
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [currentContractData, setCurrentContractData] = useState<ContractData | null>(null);
-  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
-  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -369,7 +366,7 @@ const ClienteFicha = () => {
     queryClient.invalidateQueries({ queryKey: ['cliente', id] });
   }, [formData, id, queryClient]);
   
-  const handleGenerateContract = async (formatType: 'docx' | 'pdf') => {
+  const handleGenerateContract = async () => {
     if (isGeneratingContract) return;
     setIsGeneratingContract(true);
     try {
@@ -460,22 +457,10 @@ const ClienteFicha = () => {
       };
 
       // 5. Gerar arquivo
-      let blob;
-      console.log('MARCO DEBUG:', {
-        valorTotal: contractFormData.valorTotal,
-        marco1: contractFormData.marco1,
-        marco2: contractFormData.marco2,
-        marco3: contractFormData.marco3,
-        plano: contractFormData.plano,
-      });
-      if (formatType === 'docx') {
-        blob = await generateContractDocx(contractData);
-      } else {
-        blob = await generateContractPDF(contractData);
-      }
+      const blob = await generateContractDocx(contractData);
       
       if (!blob) {
-        toast.error(`Falha ao gerar o arquivo ${formatType.toUpperCase()}. Por favor, tente novamente ou verifique as configurações.`);
+        toast.error(`Falha ao gerar o arquivo DOCX. Por favor, tente novamente ou verifique as configurações.`);
         return;
       }
 
@@ -499,11 +484,11 @@ const ClienteFicha = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${numeroContrato} - ${contractData.cliente.nome}.${formatType}`;
+      a.download = `${numeroContrato} - ${contractData.cliente.nome}.docx`;
       a.click();
       URL.revokeObjectURL(url);
 
-      toast.success(`Contrato (${formatType.toUpperCase()}) gerado com sucesso!`);
+      toast.success(`Contrato gerado com sucesso!`);
       queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
       setIsGeneratingContract(false);
     } catch (err: any) {
@@ -1739,12 +1724,12 @@ const ClienteFicha = () => {
                   <div className="flex justify-center pt-4">
                     <div className="flex justify-center pt-8">
                       <Button 
-                        disabled={isGeneratingContract || isGeneratingPreview || selectedProposals.length === 0}
-                        onClick={handleShowPreview}
+                        disabled={isGeneratingContract || selectedProposals.length === 0}
+                        onClick={handleGenerateContract}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 text-[10px] font-bold uppercase h-14 tracking-widest shadow-xl transition-all hover:scale-[1.02]"
                       >
-                        {isGeneratingPreview ? <Loader2 className="animate-spin mr-2" /> : null}
-                        PRÉ-VISUALIZAR CONTRATO
+                        {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : <FileDown className="mr-2 h-4 w-4" />}
+                        GERAR CONTRATO DOCX
                       </Button>
                     </div>
                   </div>
@@ -1989,56 +1974,6 @@ const ClienteFicha = () => {
           </DialogContent>
         </Dialog>
 
-        {/* MODAL PARA PRE-VISUALIZACAO DO CONTRATO */}
-        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-none">
-            <DialogHeader className="p-6 border-b border-white/5 shrink-0">
-              <DialogTitle className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B7355]">
-                PRÉ-VISUALIZAÇÃO DO CONTRATO
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto bg-[#1A1A1A]">
-              <div 
-                className="max-w-none"
-                dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
-              />
-            </div>
-            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A] flex items-center justify-between">
-              <Button 
-                onClick={() => setIsPreviewModalOpen(false)}
-                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8 h-10"
-              >
-                FECHAR
-              </Button>
-              <div className="flex gap-4">
-                <Button 
-                  disabled={isGeneratingContract || !currentContractData}
-                  onClick={async () => {
-                    if (currentContractData) {
-                      await handleGenerateContract('docx');
-                    }
-                  }}
-                  className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest"
-                >
-                  {isGeneratingContract ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
-                  BAIXAR DOCX
-                </Button>
-                <Button 
-                  disabled={isGeneratingContract || !currentContractData}
-                  onClick={async () => {
-                    if (currentContractData) {
-                      await handleGenerateContract('pdf');
-                    }
-                  }}
-                  className="bg-white text-black hover:bg-white/90 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest"
-                >
-                  {isGeneratingContract ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
-                  BAIXAR PDF
-                </Button>
-              </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );
