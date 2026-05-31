@@ -535,7 +535,7 @@ const ClienteFicha = () => {
       }
 
       // 6. Salvar no Banco
-      const { error: dbError } = await supabase.from('contratos').insert({
+      const { data: newContractData, error: dbError } = await supabase.from('contratos').insert({
         numero: numeroContrato,
         cliente_id: cliente?.id,
         lead_id: null,
@@ -547,8 +547,7 @@ const ClienteFicha = () => {
         valores: contractData.honorarios as any,
         status: 'Gerado',
         revisao: novaRevisao
-      });
-
+      }).select().single();
 
       if (dbError) throw dbError;
 
@@ -563,19 +562,22 @@ const ClienteFicha = () => {
       toast.success(`Contrato gerado com sucesso!`);
       
       // Log no histórico
-      try {
-        await supabase.from('contratos_historico').insert({
-          contrato_id: dbError ? undefined : (await supabase.from('contratos').select('id').eq('numero', numeroContrato).single()).data?.id,
-          numero: numeroContrato,
-          acao: 'GERADO',
-          observacao: `Contrato gerado para ${contractData.cliente.nome} (REV${novaRevisao})`
-        });
-      } catch (err) {
-        console.error("Error logging history:", err);
+      if (newContractData) {
+        try {
+          await supabase.from('contratos_historico').insert({
+            contrato_id: newContractData.id,
+            numero: numeroContrato,
+            acao: 'GERADO',
+            observacao: `Contrato gerado para ${contractData.cliente.nome} (REV${novaRevisao})`
+          });
+        } catch (err) {
+          console.error("Error logging history:", err);
+        }
       }
 
       queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
       setIsGeneratingContract(false);
+
 
     } catch (err: any) {
       console.error('Erro detalhado:', err);
