@@ -812,6 +812,7 @@ export type Database = {
           id: string
           refresh_token: string | null
           updated_at: string | null
+          vendor_template_path: string | null
         }
         Insert: {
           access_token?: string | null
@@ -822,6 +823,7 @@ export type Database = {
           id?: string
           refresh_token?: string | null
           updated_at?: string | null
+          vendor_template_path?: string | null
         }
         Update: {
           access_token?: string | null
@@ -832,6 +834,7 @@ export type Database = {
           id?: string
           refresh_token?: string | null
           updated_at?: string | null
+          vendor_template_path?: string | null
         }
         Relationships: []
       }
