@@ -272,6 +272,7 @@ export const getContractPreviewHtml = async (data: ContractData) => {
           "p[style-name='Title'] => h1:fresh",
           "p[style-name='Heading 1'] => h2:fresh",
           "p[style-name='Heading 2'] => h3:fresh",
+          "p[style-name='Normal'] => p:fresh",
           "b => strong",
           "i => em",
           "u => u",
@@ -284,14 +285,14 @@ export const getContractPreviewHtml = async (data: ContractData) => {
 
     return `
       <style>
-        .contract-preview h1 { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
-        .contract-preview h2 { font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .contract-preview p { margin-bottom: 12px; text-align: justify; line-height: 1.6; font-size: 14px; }
+        .contract-preview h1 { font-size: 20pt; font-weight: bold; text-align: center; margin-bottom: 24pt; text-transform: uppercase; font-family: Arial, sans-serif; }
+        .contract-preview h2 { font-size: 14pt; font-weight: bold; margin-top: 18pt; margin-bottom: 9pt; border-bottom: 1px solid #000; padding-bottom: 3pt; font-family: Arial, sans-serif; }
+        .contract-preview p { margin-bottom: 10pt; text-align: justify; line-height: 1.5; font-size: 11pt; font-family: Arial, sans-serif; }
         .contract-preview strong { font-weight: bold; }
-        .contract-preview table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .contract-preview td, .contract-preview th { border: 1px solid #ddd; padding: 8px; font-size: 12px; }
+        .contract-preview table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
+        .contract-preview td, .contract-preview th { border: 1px solid #000; padding: 6pt; font-size: 10pt; }
       </style>
-      <div class="contract-preview-container">
+      <div class="contract-preview">
         ${html}
       </div>
     `;
