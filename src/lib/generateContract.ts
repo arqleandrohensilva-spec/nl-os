@@ -327,7 +327,7 @@ export const generateContractPDF = async (data: ContractData) => {
     const opt = {
       margin: 10,
       filename: `${data.numero || 'Contrato'} - ${data.cliente.nome}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { 
         scale: 2, 
         useCORS: true,
@@ -337,9 +337,9 @@ export const generateContractPDF = async (data: ContractData) => {
         windowWidth: container.offsetWidth
       },
       jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait' 
+        unit: 'mm' as const, 
+        format: 'a4' as const, 
+        orientation: 'portrait' as const 
       }
     };
 
