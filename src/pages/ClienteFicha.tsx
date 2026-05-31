@@ -358,6 +358,141 @@ const ClienteFicha = () => {
     await supabase.from('leads').update({ score: newScore, temp: newTemp }).eq('cliente_id', id);
     queryClient.invalidateQueries({ queryKey: ['cliente', id] });
   }, [formData, id, queryClient]);
+  
+  const handleGenerateContract = async (formatType: 'docx' | 'pdf') => {
+    if (isGeneratingContract) return;
+    setIsGeneratingContract(true);
+    try {
+      // 1. Buscar propostas selecionadas
+      const { data: props, error: propError } = await supabase
+        .from('proposals')
+        .select('*, calculos_proposta (*)')
+        .in('id', selectedProposals);
+
+      if (propError) throw propError;
+      if (!props || props.length === 0) {
+        toast.error("Selecione ao menos uma proposta");
+        return;
+      }
+
+      // 2. Gerar número do contrato
+      const year = new Date().getFullYear();
+      const { data: lastContract } = await supabase
+        .from('contratos')
+        .select('numero')
+        .order('criado_em', { ascending: false })
+        .limit(1);
+
+      let nextNumber = 1;
+      if (lastContract && lastContract[0]?.numero) {
+        const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+        if (match) nextNumber = parseInt(match[1]) + 1;
+      }
+      const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
+      // 3. Somar valores conforme o plano
+      let totalValue = 0;
+      props.forEach(p => {
+        const c = p.calculos_proposta?.[0];
+        if (contractFormData.plano === 'Executivo') {
+          totalValue += Number(c?.valor_executivo || p.valor_executivo || 0);
+        } else {
+          totalValue += Number(c?.valor_completo || p.valor_completo || 0);
+        }
+      });
+
+      const lastProp = props[props.length - 1];
+
+      // 4. Montar dados para o contrato
+      const contractData: ContractData = {
+        numero: numeroContrato,
+        cliente: {
+          nome: formData.nome || cliente?.nome || '',
+          cpf: cliente?.cpf_cnpj || '',
+          endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+          nacionalidade: contractFormData.nacionalidade,
+          estadoCivil: contractFormData.estadoCivil,
+          profissao: contractFormData.profissao
+        },
+        projeto: {
+          tipo: lastProp.tipo === 'ArqInt' ? 'ARQ+INT' : 
+                lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+          plano: contractFormData.plano,
+          endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: lastProp.area?.toString() || '',
+          matricula: contractFormData.matricula,
+          cartorio: contractFormData.cartorio
+        },
+        prazos: {
+          briefing: '5',
+          estudo: '15',
+          legal: '10',
+          executivo: '30',
+          total: contractFormData.prazoTotal,
+          totalDias: '65'
+        },
+        honorarios: {
+          totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalExtenso: valorPorExtenso(totalValue),
+          marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+        },
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: new Date().toLocaleDateString('pt-BR')
+      };
+
+      // 5. Gerar arquivo
+      let blob;
+      if (formatType === 'docx') {
+        blob = await generateContractDocx(contractData);
+      } else {
+        blob = await generateContractPDF(contractData);
+      }
+      
+      if (!blob) return;
+
+      // 6. Salvar no Banco
+      const { error: dbError } = await supabase.from('contratos').insert({
+        numero: numeroContrato,
+        cliente_id: cliente?.id,
+        lead_id: null,
+        cliente_nome: contractData.cliente.nome,
+        tipo: contractData.projeto.tipo,
+        plano: contractData.projeto.plano,
+        dados_gerais: contractData.cliente as any,
+        prazos: contractData.prazos as any,
+        valores: contractData.honorarios as any,
+        status: 'Gerado'
+      });
+
+      if (dbError) throw dbError;
+
+      // 7. Download
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${numeroContrato} - ${contractData.cliente.nome}.${formatType}`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      toast.success(`Contrato (${formatType.toUpperCase()}) gerado com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+      setIsGeneratingContract(false);
+    } catch (err: any) {
+      console.error('Erro detalhado:', err);
+      toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
+      setIsGeneratingContract(false);
+    }
+  };
+
 
   if (isClienteLoading) return <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
 
