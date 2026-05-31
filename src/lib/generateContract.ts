@@ -308,18 +308,16 @@ export const generateContractPDF = async (data: ContractData) => {
     if (!html) return null;
 
     const container = document.createElement('div');
-    container.style.position = 'fixed';
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
     container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '794px';
-    container.style.background = '#ffffff';
-    container.style.color = '#000000';
-    container.style.fontFamily = 'Georgia, serif';
-    container.style.fontSize = '12px';
-    container.style.lineHeight = '1.6';
-    container.style.padding = '40px';
-    container.style.zIndex = '-9999';
-    container.style.visibility = 'hidden';
+    container.style.width = '210mm'; // A4 width
+    container.style.minHeight = '297mm';
+    container.style.padding = '20mm';
+    container.style.background = 'white';
+    container.style.color = 'black';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.className = 'pdf-render-container';
     container.innerHTML = html;
     document.body.appendChild(container);
 
