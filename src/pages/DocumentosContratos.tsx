@@ -1715,20 +1715,20 @@ const DocumentosContratos = () => {
                   {/* Área do Terreno — opcional */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Área do Terreno (m²)</Label>
+                      <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Área do Terreno (m²)</label>
                       <button
                         type="button"
                         onClick={() => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: prev.projeto.areaTerreno === null ? '' : null } }))}
-                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-bronze transition-colors"
+                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-[#8B7355] transition-colors"
                       >
                         {contractFormData.projeto.areaTerreno === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
                       </button>
                     </div>
                     {contractFormData.projeto.areaTerreno !== null && (
-                      <Input
+                      <input
                         value={contractFormData.projeto.areaTerreno || ''}
                         onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: e.target.value } }))}
-                        className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                        className="w-full bg-black/20 border border-white/10 rounded-none h-10 px-3 text-white text-sm"
                         placeholder="Ex: 450"
                       />
                     )}
@@ -1740,20 +1740,20 @@ const DocumentosContratos = () => {
                   {/* Área Construída — opcional */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Área Construída / Intervenção (m²)</Label>
+                      <label className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Área Construída / Intervenção (m²)</label>
                       <button
                         type="button"
                         onClick={() => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: prev.projeto.areaConstruida === null ? '' : null } }))}
-                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-bronze transition-colors"
+                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-[#8B7355] transition-colors"
                       >
                         {contractFormData.projeto.areaConstruida === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
                       </button>
                     </div>
                     {contractFormData.projeto.areaConstruida !== null && (
-                      <Input
+                      <input
                         value={contractFormData.projeto.areaConstruida || ''}
                         onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: e.target.value } }))}
-                        className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                        className="w-full bg-black/20 border border-white/10 rounded-none h-10 px-3 text-white text-sm"
                         placeholder="Ex: 280"
                       />
                     )}
