@@ -39,7 +39,7 @@ import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ContractData } from '@/utils/contractTemplates';
-import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
+import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
