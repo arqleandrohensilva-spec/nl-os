@@ -473,7 +473,10 @@ const ClienteFicha = () => {
         blob = await generateContractPDF(contractData);
       }
       
-      if (!blob) return;
+      if (!blob) {
+        toast.error(`Falha ao gerar o arquivo ${formatType.toUpperCase()}. Por favor, tente novamente ou verifique as configurações.`);
+        return;
+      }
 
       // 6. Salvar no Banco
       const { error: dbError } = await supabase.from('contratos').insert({
@@ -1881,6 +1884,9 @@ const ClienteFicha = () => {
                           a.href = url;
                           a.download = `${contrato.numero} - ${contrato.cliente_nome}.pdf`;
                           a.click();
+                          URL.revokeObjectURL(url);
+                        } else {
+                          toast.error("Não foi possível gerar o PDF para download.");
                         }
                       }}
                       className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest flex-1"
