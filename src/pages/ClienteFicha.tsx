@@ -191,7 +191,11 @@ const ClienteFicha = () => {
     cartorio: '',
     plano: 'Executivo' as 'Executivo' | 'Completo',
     areaTerreno: '',
-    areaConstruida: ''
+    areaConstruida: '',
+    valorTotal: '',
+    marco1: '',
+    marco2: '',
+    marco3: ''
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
