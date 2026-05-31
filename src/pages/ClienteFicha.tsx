@@ -1716,38 +1716,13 @@ const ClienteFicha = () => {
                           a.href = url;
                           a.download = `${contrato.numero} - ${contrato.cliente_nome}.docx`;
                           a.click();
+                          URL.revokeObjectURL(url);
                         }
                       }}
                       className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest flex-1"
                     >
-                      DOWNLOAD DOCX
+                      <Download size={14} className="mr-2" /> DOWNLOAD DOCX
                     </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={async () => {
-                        const dadosGerais = contrato.dados_gerais as any;
-                        const data = {
-                          numero: contrato.numero,
-                          cliente: dadosGerais,
-                          projeto: {
-                            tipo: contrato.tipo,
-                            plano: contrato.plano,
-                            endereco: dadosGerais?.endereco || '',
-                            tipoImovel: 'Residência',
-                            areaTerreno: '',
-                            areaConstruida: '',
-                            matricula: '',
-                            cartorio: ''
-                          },
-                          prazos: contrato.prazos as any,
-                          honorarios: contrato.valores as any,
-                          nl: {
-                            cauLeandro: 'A203598-7',
-                            cauNeandro: 'A203599-5',
-                            cpfNeandro: '000.000.000-00'
-                          },
-                          dataAssinatura: (contrato as any).data_assinatura || format(new Date(), 'dd/MM/yyyy')
-                        };
                         const blob = await generateContractPDF(data);
                         if (blob) {
                           const url = URL.createObjectURL(blob);
