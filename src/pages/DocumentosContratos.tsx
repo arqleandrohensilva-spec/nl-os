@@ -1980,7 +1980,7 @@ const DocumentosContratos = () => {
 
 
               {/* DADOS FIXOS NL */}
-              <section className="space-y-4">
+              <section className="space-y-4 mt-8">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <MapPin size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS FIXOS NL</h3>
