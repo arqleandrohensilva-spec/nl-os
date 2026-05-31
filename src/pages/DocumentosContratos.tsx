@@ -160,6 +160,9 @@ const DocumentosContratos = () => {
   const [categoriaCancelamento, setCategoriaCancelamento] = useState('');
   const [outroMotivo, setOutroMotivo] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const generateContractNumber = async () => {
     const year = new Date().getFullYear();
