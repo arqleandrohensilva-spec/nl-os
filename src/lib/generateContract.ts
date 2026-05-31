@@ -370,20 +370,22 @@ export const generateContractPDF = async (data: ContractData) => {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const opt = {
-      margin: [10, 10, 10, 10] as [number, number, number, number],
+      margin: 0, // Margens já definidas no container padding
       filename: `${data.numero || 'Contrato'} - ${data.cliente.nome}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        width: 794,
+        width: 794, // 210mm aprox em 96dpi
         windowWidth: 794,
+        letterRendering: true,
       },
       jsPDF: {
         unit: 'mm' as const, 
         format: 'a4' as const, 
-        orientation: 'portrait' as const
+        orientation: 'portrait' as const,
+        compress: true
       }
     };
 
