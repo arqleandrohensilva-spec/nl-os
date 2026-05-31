@@ -2016,7 +2016,15 @@ const DocumentosContratos = () => {
 
             <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/5">
               <Button 
+                onClick={handleShowPreview} 
+                disabled={loading || isGeneratingPreview || !contractFormData.cliente.nome} 
+                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
+              >
+                {isGeneratingPreview ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} className="mr-2" />} PRÉ-VISUALIZAR
+              </Button>
+              <Button 
                 variant="outline"
+
                 onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
                 className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
