@@ -1936,7 +1936,7 @@ const ClienteFicha = () => {
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
-                        <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
+                        <div className="bg-[#0D0D0D] border border-white/5 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                           <table className="w-full text-left text-[10px]">
                             <thead className="bg-white/5 border-b border-white/5">
                               <tr>
