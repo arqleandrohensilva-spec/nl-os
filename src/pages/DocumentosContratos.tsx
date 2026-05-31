@@ -475,6 +475,23 @@ const DocumentosContratos = () => {
     }
   };
 
+  const handleShowPreview = async () => {
+    try {
+      setIsGeneratingContractPreview(true);
+      const html = await getContractPreviewHtml(contractFormData);
+      if (html) {
+        setPreviewHtml(html);
+        setIsPreviewModalOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao gerar preview");
+    } finally {
+      setIsGeneratingContractPreview(false);
+    }
+  };
+
+
 
   const handleDownloadExistingContractPDF = async (contract: any) => {
     try {
