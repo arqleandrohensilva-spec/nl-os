@@ -419,11 +419,18 @@ const DocumentosContratos = () => {
   };
 
 
-  const handleGenerateContract = async () => {
+  const handleGenerateContract = async (formatType: 'docx' | 'pdf' = 'docx') => {
     try {
       setLoading(true);
-      const docxBlob = await generateContractDocx(contractFormData);
-      if (!docxBlob) return;
+      
+      let blob;
+      if (formatType === 'docx') {
+        blob = await generateContractDocx(contractFormData);
+      } else {
+        blob = await generateContractPDF(contractFormData);
+      }
+      
+      if (!blob) return;
 
       // Save to Supabase
       const { data: newContract, error } = await supabase.from('contratos').insert({
@@ -444,48 +451,26 @@ const DocumentosContratos = () => {
         await logContratoHistorico(newContract.id, newContract.numero, 'GERADO', `Contrato gerado para ${newContract.cliente_nome}`);
       }
       
-      toast.success('Contrato gerado e registrado com sucesso!');
+      toast.success(`Contrato (${formatType.toUpperCase()}) gerado e registrado com sucesso!`);
       
-      // Download DOCX automatically
-      const url = URL.createObjectURL(docxBlob);
+      // Download file automatically
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.${formatType}`;
       a.click();
       URL.revokeObjectURL(url);
       
       setIsContratoModalOpen(false);
       fetchData();
     } catch (error) {
-      console.error('Error generating contract:', error);
-      toast.error('Erro ao gerar contrato');
+      console.error(`Error generating ${formatType}:`, error);
+      toast.error(`Erro ao gerar ${formatType.toUpperCase()}`);
     } finally {
       setLoading(false);
     }
   };
 
-
-  const handleGeneratePDF = async () => {
-    try {
-      setLoading(true);
-      const pdfBlob = await generateContractPDF(contractFormData);
-      if (!pdfBlob) return;
-
-      toast.success('PDF do contrato gerado com sucesso!');
-      
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Erro ao gerar PDF do contrato');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDownloadExistingContractPDF = async (contract: any) => {
     try {
