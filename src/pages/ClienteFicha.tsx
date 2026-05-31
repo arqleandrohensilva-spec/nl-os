@@ -2021,13 +2021,39 @@ const ClienteFicha = () => {
                 dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
               />
             </div>
-            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A]">
+            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A] flex items-center justify-between">
               <Button 
                 onClick={() => setIsPreviewModalOpen(false)}
-                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8"
+                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8 h-10"
               >
                 FECHAR
               </Button>
+              <div className="flex gap-4">
+                <Button 
+                  disabled={isGeneratingContract || !currentContractData}
+                  onClick={async () => {
+                    if (currentContractData) {
+                      await handleGenerateContract('docx');
+                    }
+                  }}
+                  className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest"
+                >
+                  {isGeneratingContract ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                  BAIXAR DOCX
+                </Button>
+                <Button 
+                  disabled={isGeneratingContract || !currentContractData}
+                  onClick={async () => {
+                    if (currentContractData) {
+                      await handleGenerateContract('pdf');
+                    }
+                  }}
+                  className="bg-white text-black hover:bg-white/90 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest"
+                >
+                  {isGeneratingContract ? <Loader2 className="animate-spin mr-2" size={14} /> : null}
+                  BAIXAR PDF
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>
