@@ -39,7 +39,8 @@ const valorPorExtenso = (valor: number): string => {
 export const generateContractDocx = async (data: ContractData) => {
   try {
     const response = await supabase.functions.invoke('dropbox-proxy', {
-      body: { action: 'download', path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx' }
+      body: { action: 'download', path: '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx' },
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
     });
     if (response.error) throw new Error(`Erro de rede: ${response.error.message}`);
     if (!response.data) throw new Error('Resposta vazia');
