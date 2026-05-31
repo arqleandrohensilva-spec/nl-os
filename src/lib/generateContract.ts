@@ -379,7 +379,8 @@ export const generateContractPDF = async (data: ContractData) => {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        width: 794, // 210mm aprox em 96dpi
+        logging: true, // Habilitar logs para depurar o motivo do branco
+        width: 794,
         windowWidth: 794,
         letterRendering: true,
       },
