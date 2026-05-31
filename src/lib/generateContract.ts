@@ -148,7 +148,7 @@ export const generateContractPDF = async (data: ContractData) => {
     
     // Configurações do PDF para garantir qualidade e layout similar ao Word
     const opt = {
-      margin: [15, 15, 15, 15],
+      margin: 15,
       filename: `${data.numero || 'Contrato'}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, letterRendering: true },
