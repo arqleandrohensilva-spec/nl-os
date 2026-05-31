@@ -1,156 +1,216 @@
-import { supabase } from '@/integrations/supabase/client';
-import { ContractData } from '@/utils/contractTemplates';
-import { toast } from 'sonner';
-import PizZip from 'pizzip';
-import Docxtemplater from 'docxtemplater';
-import mammoth from 'mammoth';
-import html2pdf from 'html2pdf.js';
+import { supabase } from "@/integrations/supabase/client";
+import { ContractData } from "@/utils/contractTemplates";
+import { toast } from "sonner";
+import PizZip from "pizzip";
+import Docxtemplater from "docxtemplater";
+import mammoth from "mammoth";
+import html2pdf from "html2pdf.js";
 
 const valorPorExtenso = (valor: number): string => {
-  if (!valor || valor === 0) return 'zero reais';
-  const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove',
-    'dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
-  const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
-  const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+  if (!valor || valor === 0) return "zero reais";
+  const unidades = [
+    "",
+    "um",
+    "dois",
+    "três",
+    "quatro",
+    "cinco",
+    "seis",
+    "sete",
+    "oito",
+    "nove",
+    "dez",
+    "onze",
+    "doze",
+    "treze",
+    "quatorze",
+    "quinze",
+    "dezesseis",
+    "dezessete",
+    "dezoito",
+    "dezenove",
+  ];
+  const dezenas = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+  const centenas = [
+    "",
+    "cento",
+    "duzentos",
+    "trezentos",
+    "quatrocentos",
+    "quinhentos",
+    "seiscentos",
+    "setecentos",
+    "oitocentos",
+    "novecentos",
+  ];
   const converterAte999 = (n: number): string => {
-    if (n === 100) return 'cem';
-    if (n === 0) return '';
+    if (n === 100) return "cem";
+    if (n === 0) return "";
     const c = Math.floor(n / 100);
     const d = Math.floor((n % 100) / 10);
     const u = n % 10;
     const partes = [];
     if (c > 0) partes.push(centenas[c]);
-    if (n % 100 < 20 && n % 100 > 0) { partes.push(unidades[n % 100]); }
-    else { if (d > 0) partes.push(dezenas[d]); if (u > 0) partes.push(unidades[u]); }
-    return partes.join(' e ');
+    if (n % 100 < 20 && n % 100 > 0) {
+      partes.push(unidades[n % 100]);
+    } else {
+      if (d > 0) partes.push(dezenas[d]);
+      if (u > 0) partes.push(unidades[u]);
+    }
+    return partes.join(" e ");
   };
   const inteiro = Math.floor(valor);
   const centavos = Math.round((valor - inteiro) * 100);
-  let resultado = '';
-  if (inteiro >= 1000000) { const m = Math.floor(inteiro / 1000000); resultado += converterAte999(m) + (m === 1 ? ' milhão' : ' milhões'); if (inteiro % 1000000 > 0) resultado += ' e '; }
-  if (inteiro >= 1000 && inteiro < 1000000) { const mil = Math.floor(inteiro / 1000); resultado += converterAte999(mil) + ' mil'; if (inteiro % 1000 > 0) resultado += ' e '; }
+  let resultado = "";
+  if (inteiro >= 1000000) {
+    const m = Math.floor(inteiro / 1000000);
+    resultado += converterAte999(m) + (m === 1 ? " milhão" : " milhões");
+    if (inteiro % 1000000 > 0) resultado += " e ";
+  }
+  if (inteiro >= 1000 && inteiro < 1000000) {
+    const mil = Math.floor(inteiro / 1000);
+    resultado += converterAte999(mil) + " mil";
+    if (inteiro % 1000 > 0) resultado += " e ";
+  }
   const resto = inteiro % 1000;
   if (resto > 0) resultado += converterAte999(resto);
-  resultado += inteiro === 1 ? ' real' : ' reais';
-  if (centavos > 0) resultado += ' e ' + converterAte999(centavos) + (centavos === 1 ? ' centavo' : ' centavos');
+  resultado += inteiro === 1 ? " real" : " reais";
+  if (centavos > 0) resultado += " e " + converterAte999(centavos) + (centavos === 1 ? " centavo" : " centavos");
   return resultado;
 };
 
 export const generateContractDocx = async (data: ContractData) => {
   try {
-    // Buscar configurações dinamicamente
     const { data: dropboxSettings } = await supabase
-      .from('dropbox_settings')
-      .select('contract_template_path, vendor_template_path')
-      .eq('id', '00000000-0000-0000-0000-000000000001')
+      .from("dropbox_settings")
+      .select("contract_template_path, vendor_template_path")
+      .eq("id", "00000000-0000-0000-0000-000000000001")
       .single();
 
-    const templatePath = (dropboxSettings as any)?.contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+    const templatePath =
+      (dropboxSettings as any)?.contract_template_path ||
+      "/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx";
     const vendorTemplatePath = (dropboxSettings as any)?.vendor_template_path;
+    const activePath = data.projeto.plano === "Fornecedor" && vendorTemplatePath ? vendorTemplatePath : templatePath;
 
-    // Se o plano for 'Fornecedor' e houver um template configurado, usa ele
-    const activePath = (data.projeto.plano === 'Fornecedor' && vendorTemplatePath) ? vendorTemplatePath : templatePath;
-
-    const response = await supabase.functions.invoke('dropbox-proxy', {
-      body: { action: 'download', path: activePath },
-      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    const response = await supabase.functions.invoke("dropbox-proxy", {
+      body: { action: "download", path: activePath },
+      headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
     });
     if (response.error) throw new Error(`Erro de rede: ${response.error.message}`);
-    if (!response.data) throw new Error('Resposta vazia');
+    if (!response.data) throw new Error("Resposta vazia");
     if (response.data?.error) {
       const err = response.data.error;
-      if (err['.tag'] === 'expired_access_token') throw new Error('Conexão com Dropbox expirou. Reconecte nas configurações.');
+      if (err[".tag"] === "expired_access_token")
+        throw new Error("Conexão com Dropbox expirou. Reconecte nas configurações.");
       throw new Error(`Erro no Dropbox: ${response.data.error_summary || JSON.stringify(err)}`);
     }
     let arrayBuffer: ArrayBuffer;
-    if (response.data instanceof Blob) { arrayBuffer = await response.data.arrayBuffer(); }
-    else if (response.data instanceof ArrayBuffer) { arrayBuffer = response.data; }
-    else { throw new Error('Formato de arquivo inválido'); }
+    if (response.data instanceof Blob) {
+      arrayBuffer = await response.data.arrayBuffer();
+    } else if (response.data instanceof ArrayBuffer) {
+      arrayBuffer = response.data;
+    } else {
+      throw new Error("Formato de arquivo inválido");
+    }
 
     const parseNum = (val: string | undefined): number => {
       if (!val) return 0;
-      // Remove tudo exceto números, vírgula e ponto
-      const cleaned = String(val).replace(/[^\d,.]/g, '');
-      // Trata formato brasileiro: 33.687,22 → 33687.22
-      const normalized = cleaned.replace(/\./g, '').replace(',', '.');
+      const cleaned = String(val).replace(/[^\d,.]/g, "");
+      const normalized = cleaned.replace(/\./g, "").replace(",", ".");
       return parseFloat(normalized) || 0;
     };
-    const formatVal = (n: number): string => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatVal = (n: number): string =>
+      n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    console.log('DEBUG valor raw executivo:', data.honorarios.totalExecutivo);
-    console.log('DEBUG valor raw completo:', data.honorarios.totalCompleto);
-    console.log('DEBUG plano:', data.projeto.plano);
+    // Valor base — tenta totalExecutivo, totalCompleto, marco1*10/3 como fallback
+    const valorExec = parseNum(data.honorarios.totalExecutivo);
+    const valorComp = parseNum(data.honorarios.totalCompleto);
+    const valor =
+      data.projeto.plano === "Completo"
+        ? valorComp > 0
+          ? valorComp
+          : valorExec
+        : valorExec > 0
+          ? valorExec
+          : valorComp;
 
-    const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : 
-                  data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) :
-                  parseNum(data.honorarios.totalExecutivo);
+    // Marcos — usa os que vieram preenchidos, recalcula só se vazios
+    const m1raw = parseNum(data.honorarios.marco1);
+    const m2raw = parseNum(data.honorarios.marco2);
+    const m3raw = parseNum(data.honorarios.marco3);
 
-    const marco1 = (data.honorarios.marco1 && parseNum(data.honorarios.marco1) > 0)
-      ? parseNum(data.honorarios.marco1)
-      : Math.round(valor * 0.30 * 100) / 100;
+    const marco1 = m1raw > 0 ? m1raw : Math.round(valor * 0.3 * 100) / 100;
+    const marco2 = m2raw > 0 ? m2raw : Math.round(valor * 0.4 * 100) / 100;
+    const marco3 = m3raw > 0 ? m3raw : Math.round((valor - marco1 - marco2) * 100) / 100;
 
-    const marco2 = (data.honorarios.marco2 && parseNum(data.honorarios.marco2) > 0)
-      ? parseNum(data.honorarios.marco2)
-      : Math.round(valor * 0.40 * 100) / 100;
-
-    const marco3 = (data.honorarios.marco3 && parseNum(data.honorarios.marco3) > 0)
-      ? parseNum(data.honorarios.marco3)
-      : Math.round((valor - marco1 - marco2) * 100) / 100;
-
-    const tipoImovel = data.projeto.tipoImovel || 'Residência Existente';
-
-    console.log('DEBUG projeto.tipo:', JSON.stringify(data.projeto.tipo));
-    console.log('DEBUG projeto.tipoImovel:', JSON.stringify(data.projeto.tipoImovel));
-    console.log('DEBUG projeto.plano:', JSON.stringify(data.projeto.plano));
+    const tipoImovel = data.projeto.tipoImovel || "Residência Existente";
 
     const templateData = {
       ano: String(new Date().getFullYear()),
-      numero: data.numero || '001',
-      data: data.dataAssinatura || new Date().toLocaleDateString('pt-BR'),
-      nome_cliente: (data.cliente.nome || '').toUpperCase(),
-      cpf_cliente: data.cliente.cpf || '',
-      nacionalidade: data.cliente.nacionalidade || 'brasileiro(a)',
-      estado_civil: data.cliente.estadoCivil || '',
-      profissao: data.cliente.profissao || '',
-      endereco_cliente: data.cliente.endereco || '',
-      endereco_imovel: (data.projeto.endereco || '').toUpperCase(),
-      tipo_residencial: data.projeto.tipo === 'Residencial'                                                        ? 'X' : ' ',
-      tipo_interiores:  (data.projeto.tipo === 'Interiores' || data.projeto.tipo === 'int')                        ? 'X' : ' ',
-      tipo_comercial:   (data.projeto.tipo === 'Comercial'  || data.projeto.tipo === 'com')                        ? 'X' : ' ',
-      tipo_arqint:      (data.projeto.tipo === 'Arquitetura + Interiores' || data.projeto.tipo === 'ARQ+INT' || data.projeto.tipo === 'arq') ? 'X' : ' ',
+      nro_contrato: data.numero || "",
+      numero: data.numero || "001",
+      data: data.dataAssinatura || new Date().toLocaleDateString("pt-BR"),
+      nome_cliente: (data.cliente.nome || "").toUpperCase(),
+      cpf_cliente: data.cliente.cpf || "",
+      nacionalidade: data.cliente.nacionalidade || "brasileiro(a)",
+      estado_civil: data.cliente.estadoCivil || "",
+      profissao: data.cliente.profissao || "",
+      endereco_cliente: data.cliente.endereco || "",
+      endereco_imovel: (data.projeto.endereco || "").toUpperCase(),
 
-      plano_executivo:  (data.projeto.plano === 'Executivo' || data.projeto.plano !== 'Completo') ? 'X' : ' ',
-      plano_completo:   data.projeto.plano === 'Completo'                                         ? 'X' : ' ',
+      tipo_residencial: data.projeto.tipo === "Residencial" ? "X" : " ",
+      tipo_interiores: data.projeto.tipo === "Interiores" || data.projeto.tipo === "int" ? "X" : " ",
+      tipo_comercial: data.projeto.tipo === "Comercial" || data.projeto.tipo === "com" ? "X" : " ",
+      tipo_arqint:
+        data.projeto.tipo === "Arquitetura + Interiores" ||
+        data.projeto.tipo === "ARQ+INT" ||
+        data.projeto.tipo === "arq"
+          ? "X"
+          : " ",
 
-      tipo_imovel_terreno:     data.projeto.tipoImovel === 'Terreno'              ? 'X' : ' ',
-      tipo_imovel_residencia:  (data.projeto.tipoImovel === 'Residência' || data.projeto.tipoImovel === 'Residência Existente') ? 'X' : ' ',
-      tipo_imovel_apartamento: data.projeto.tipoImovel === 'Apartamento'          ? 'X' : ' ',
-      tipo_imovel_sala:        data.projeto.tipoImovel === 'Sala Comercial'       ? 'X' : ' ',
-      tipo_imovel_outro: '',
-      area_terreno:    (data.projeto.areaTerreno != null && data.projeto.areaTerreno !== '') ? data.projeto.areaTerreno : 'Não se aplica',
-      area_construida: (data.projeto.areaConstruida != null && data.projeto.areaConstruida !== '') ? data.projeto.areaConstruida : 'Não se aplica',
-      matricula: data.projeto.matricula || '',
-      cartorio: data.projeto.cartorio || '',
-      prazo_briefing: data.prazos.briefing || '5',
-      prazo_estudo: data.prazos.estudo || '15',
-      prazo_legal: data.prazos.legal || '10',
-      prazo_executivo: data.prazos.executivo || '30',
-      prazo_semanas: data.prazos.total || '',
+      plano_executivo: data.projeto.plano !== "Completo" ? "X" : " ",
+      plano_completo: data.projeto.plano === "Completo" ? "X" : " ",
+
+      tipo_imovel_terreno: tipoImovel === "Terreno" ? "X" : " ",
+      tipo_imovel_residencia: tipoImovel === "Residência" || tipoImovel === "Residência Existente" ? "X" : " ",
+      tipo_imovel_apartamento: tipoImovel === "Apartamento" ? "X" : " ",
+      tipo_imovel_sala: tipoImovel === "Sala Comercial" ? "X" : " ",
+      tipo_imovel_outro: "",
+
+      area_terreno:
+        data.projeto.areaTerreno != null && data.projeto.areaTerreno !== ""
+          ? data.projeto.areaTerreno
+          : "Não se aplica",
+      area_construida:
+        data.projeto.areaConstruida != null && data.projeto.areaConstruida !== ""
+          ? data.projeto.areaConstruida
+          : "Não se aplica",
+      matricula: data.projeto.matricula || "",
+      cartorio: data.projeto.cartorio || "",
+
+      prazo_briefing: data.prazos.briefing || "5",
+      prazo_estudo: data.prazos.estudo || "15",
+      prazo_legal: data.prazos.legal || "10",
+      prazo_executivo: data.prazos.executivo || "30",
+      prazo_semanas: data.prazos.total || "",
       prazo_total_dias: (() => {
-        const b = parseInt(data.prazos.briefing || '0');
-        const e = parseInt(data.prazos.estudo || '0');
-        const l = parseInt(data.prazos.legal || '0');
-        const x = parseInt(data.prazos.executivo || '0');
-        return String(b + e + l + x);
+        const b = parseInt(data.prazos.briefing || "0");
+        const e = parseInt(data.prazos.estudo || "0");
+        const l = parseInt(data.prazos.legal || "0");
+        const x = parseInt(data.prazos.executivo || "0");
+        const t = b + e + l + x;
+        return t > 0 ? String(t) : data.prazos.total || "";
       })(),
       prazo_total: (() => {
-        const b = parseInt(data.prazos.briefing || '0');
-        const e = parseInt(data.prazos.estudo || '0');
-        const l = parseInt(data.prazos.legal || '0');
-        const x = parseInt(data.prazos.executivo || '0');
-        const total = b + e + l + x;
-        return total > 0 ? String(total) : (data.prazos.total || '');
+        const b = parseInt(data.prazos.briefing || "0");
+        const e = parseInt(data.prazos.estudo || "0");
+        const l = parseInt(data.prazos.legal || "0");
+        const x = parseInt(data.prazos.executivo || "0");
+        const t = b + e + l + x;
+        return t > 0 ? String(t) : data.prazos.total || "";
       })(),
+
       valor_total: formatVal(valor),
       valor_total_extenso: valorPorExtenso(valor),
       marco1_valor: formatVal(marco1),
@@ -159,44 +219,42 @@ export const generateContractDocx = async (data: ContractData) => {
       marco2_extenso: valorPorExtenso(marco2),
       marco3_valor: formatVal(marco3),
       marco3_extenso: valorPorExtenso(marco3),
-      nome_cliente_testemunha: data.cliente.testemunhaNome || '',
-      cpf_testemunha: data.cliente.testemunhaCpf || '',
+
+      nome_cliente_testemunha: data.cliente.testemunhaNome || "",
+      cpf_testemunha: data.cliente.testemunhaCpf || "",
+
       tipo_projeto_nome: (() => {
-        const t = String(data.projeto.tipo || '').trim();
-        console.log('DEBUG tipo_projeto:', JSON.stringify(t));
-        if (t.includes('Arquitetura') || t === 'ARQ+INT' || t === 'arq') return 'ARQUITETURA + INTERIORES';
-        if (t === 'Interiores' || t === 'int') return 'INTERIORES';
-        if (t === 'Comercial' || t === 'com') return 'COMERCIAL';
+        const t = String(data.projeto.tipo || "").trim();
+        if (t.includes("Arquitetura") || t === "ARQ+INT" || t === "arq") return "ARQUITETURA + INTERIORES";
+        if (t === "Interiores" || t === "int") return "INTERIORES";
+        if (t === "Comercial" || t === "com") return "COMERCIAL";
+        if (t === "Residencial") return "ARQUITETURA RESIDENCIAL";
         return t;
       })(),
-      plano_nome: data.projeto.plano === 'Completo' ? 'PLANO COMPLETO' : 'PLANO EXECUTIVO',
-      nro_contrato: data.numero || '',
+      plano_nome: data.projeto.plano === "Completo" ? "PLANO COMPLETO" : "PLANO EXECUTIVO",
     };
 
     const zip = new PizZip(arrayBuffer);
-    const doc = new Docxtemplater(zip, { 
-      paragraphLoop: true, 
-      linebreaks: true, 
-      errorLogging: false, 
-      delimiters: { start: '{', end: '}' } 
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true,
+      errorLogging: false,
+      delimiters: { start: "{", end: "}" },
     });
     try {
       doc.setData(templateData);
       doc.render();
     } catch (renderError: any) {
-      const message = renderError?.properties?.errors
-        ?.map((e: any) => e.message)
-        ?.join(', ') || renderError.message;
+      const message = renderError?.properties?.errors?.map((e: any) => e.message)?.join(", ") || renderError.message;
       throw new Error(`Erro ao preencher template: ${message}`);
     }
 
     return doc.getZip().generate({
-      type: 'blob',
-      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      type: "blob",
+      mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     });
-
   } catch (error: any) {
-    console.error('Erro ao gerar contrato:', error);
+    console.error("Erro ao gerar contrato:", error);
     toast.error(`Erro ao gerar contrato: ${error.message || error}`);
   }
 };
@@ -207,21 +265,23 @@ export const getContractPreviewHtml = async (data: ContractData) => {
     if (!docxBlob) return null;
 
     const arrayBuffer = await docxBlob.arrayBuffer();
-    const result = await mammoth.convertToHtml({ arrayBuffer }, {
-      styleMap: [
-        "p[style-name='Title'] => h1:fresh",
-        "p[style-name='Heading 1'] => h2:fresh",
-        "p[style-name='Heading 2'] => h3:fresh",
-        "b => strong",
-        "i => em",
-        "u => u",
-        "strike => del"
-      ]
-    });
-    // Limpar o HTML para evitar tags vazias e melhorar visualização
+    const result = await mammoth.convertToHtml(
+      { arrayBuffer },
+      {
+        styleMap: [
+          "p[style-name='Title'] => h1:fresh",
+          "p[style-name='Heading 1'] => h2:fresh",
+          "p[style-name='Heading 2'] => h3:fresh",
+          "b => strong",
+          "i => em",
+          "u => u",
+          "strike => del",
+        ],
+      },
+    );
     let html = result.value;
-    html = html.replace(/<p><\/p>/g, '<br />');
-    
+    html = html.replace(/<p><\/p>/g, "<br />");
+
     return `
       <style>
         .contract-preview h1 { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
@@ -236,7 +296,7 @@ export const getContractPreviewHtml = async (data: ContractData) => {
       </div>
     `;
   } catch (error: any) {
-    console.error('Erro ao gerar preview do contrato:', error);
+    console.error("Erro ao gerar preview do contrato:", error);
     toast.error(`Erro ao gerar preview: ${error.message || error}`);
     return null;
   }
@@ -247,23 +307,21 @@ export const generateContractPDF = async (data: ContractData) => {
     const html = await getContractPreviewHtml(data);
     if (!html) return null;
 
-    const element = document.createElement('div');
+    const element = document.createElement("div");
     element.innerHTML = html;
-    // O html retornado por getContractPreviewHtml já contém estilos e um container
-    
+
     const opt = {
       margin: [15, 15, 15, 15] as [number, number, number, number],
       filename: `${data.numero} - ${data.cliente.nome}.pdf`,
-      image: { type: 'jpeg' as const, quality: 0.98 },
+      image: { type: "jpeg" as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+      jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },
     };
 
-    // Gerar o PDF diretamente no navegador usando html2pdf.js
-    const pdfBlob = await html2pdf().set(opt).from(element).output('blob');
+    const pdfBlob = await html2pdf().set(opt).from(element).output("blob");
     return pdfBlob;
   } catch (error: any) {
-    console.error('Erro ao gerar PDF via html2pdf:', error);
+    console.error("Erro ao gerar PDF via html2pdf:", error);
     toast.error(`Erro ao gerar PDF: ${error.message || error}`);
     return null;
   }
