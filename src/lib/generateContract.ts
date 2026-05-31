@@ -3,6 +3,8 @@ import { ContractData } from '@/utils/contractTemplates';
 import { toast } from 'sonner';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
+import mammoth from 'mammoth';
+import html2pdf from 'html2pdf.js';
 
 const valorPorExtenso = (valor: number): string => {
   if (!valor || valor === 0) return 'zero reais';
