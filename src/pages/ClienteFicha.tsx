@@ -460,6 +460,13 @@ const ClienteFicha = () => {
 
       // 5. Gerar arquivo
       let blob;
+      console.log('MARCO DEBUG:', {
+        valorTotal: contractFormData.valorTotal,
+        marco1: contractFormData.marco1,
+        marco2: contractFormData.marco2,
+        marco3: contractFormData.marco3,
+        plano: contractFormData.plano,
+      });
       if (formatType === 'docx') {
         blob = await generateContractDocx(contractData);
       } else {
