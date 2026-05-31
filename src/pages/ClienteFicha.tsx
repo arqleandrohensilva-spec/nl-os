@@ -1819,7 +1819,46 @@ const ClienteFicha = () => {
                   )}
                 </div>
               )}
+
+              {/* HISTÓRICO DE CONTRATOS */}
+              {contratos.length > 0 && (
+                <div className="pt-8 border-t border-white/5 space-y-4">
+                  <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold">HISTÓRICO DE CONTRATOS GERADOS</h3>
+                  <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
+                    <table className="w-full text-left text-[10px]">
+                      <thead className="bg-white/5 border-b border-white/5">
+                        <tr>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {contratos.map((c: any) => (
+                          <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
+                            <td className="px-4 py-3 text-white/80 font-mono">{c.numero}</td>
+                            <td className="px-4 py-3 text-white/60">REV{c.revisao || 1}</td>
+                            <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
+                            <td className="px-4 py-3 text-right">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleDownloadContract(c)}
+                                className="h-7 text-[#8B7355] hover:text-[#8B7355]/80 hover:bg-[#8B7355]/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                              >
+                                <Download size={12} className="mr-1" /> BAIXAR
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
+
           )}
         </section>
 
