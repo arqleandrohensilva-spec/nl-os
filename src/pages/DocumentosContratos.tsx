@@ -39,7 +39,7 @@ import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ContractData } from '@/utils/contractTemplates';
-import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
+import { generateContractDocx } from '@/lib/generateContract';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -160,9 +160,6 @@ const DocumentosContratos = () => {
   const [categoriaCancelamento, setCategoriaCancelamento] = useState('');
   const [outroMotivo, setOutroMotivo] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
-  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const generateContractNumber = async () => {
     const year = new Date().getFullYear();
@@ -423,16 +420,11 @@ const DocumentosContratos = () => {
   };
 
 
-  const handleGenerateContract = async (formatType: 'docx' | 'pdf' = 'docx') => {
+  const handleGenerateContract = async () => {
     try {
       setLoading(true);
       
-      let blob;
-      if (formatType === 'docx') {
-        blob = await generateContractDocx(contractFormData);
-      } else {
-        blob = await generateContractPDF(contractFormData);
-      }
+      const blob = await generateContractDocx(contractFormData);
       
       if (!blob) return;
 
@@ -455,104 +447,29 @@ const DocumentosContratos = () => {
         await logContratoHistorico(newContract.id, newContract.numero, 'GERADO', `Contrato gerado para ${newContract.cliente_nome}`);
       }
       
-      toast.success(`Contrato (${formatType.toUpperCase()}) gerado e registrado com sucesso!`);
+      toast.success(`Contrato gerado e registrado com sucesso!`);
       
       // Download file automatically
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.${formatType}`;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.docx`;
       a.click();
       URL.revokeObjectURL(url);
       
       setIsContratoModalOpen(false);
       fetchData();
     } catch (error) {
-      console.error(`Error generating ${formatType}:`, error);
-      toast.error(`Erro ao gerar ${formatType.toUpperCase()}`);
+      console.error(`Error generating DOCX:`, error);
+      toast.error(`Erro ao gerar DOCX`);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleShowPreview = async () => {
-    try {
-      setIsGeneratingContractPreview(true);
-
-      // Diagnóstico: verificar settings do Dropbox
-      const { data: settings } = await supabase
-        .from('dropbox_settings')
-        .select('access_token, refresh_token, contract_template_path, expires_at')
-        .eq('id', '00000000-0000-0000-0000-000000000001')
-        .single();
-
-      if (!settings?.access_token && !settings?.refresh_token) {
-        toast.error('Dropbox não conectado. Vá em Configurações e reconecte o Dropbox.');
-        return;
-      }
-
-      if (!settings?.contract_template_path) {
-        toast.error('Caminho do template não configurado. Vá em Configurações > Dropbox.');
-        return;
-      }
-
-      const html = await getContractPreviewHtml(contractFormData);
-      if (html) {
-        setPreviewHtml(html);
-        setIsPreviewModalOpen(true);
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`Erro ao gerar preview: ${err.message}`);
-    } finally {
-      setIsGeneratingContractPreview(false);
-    }
-  };
 
 
 
-  const handleDownloadExistingContractPDF = async (contract: any) => {
-    try {
-      setLoading(true);
-      const data: ContractData = {
-        numero: contract.numero,
-        cliente: contract.dados_gerais,
-        projeto: {
-          tipo: contract.tipo,
-          plano: contract.plano,
-          endereco: contract.dados_gerais.endereco || '',
-          tipoImovel: 'Residência',
-          areaTerreno: '',
-          areaConstruida: '',
-          matricula: '',
-          cartorio: ''
-        },
-        prazos: contract.prazos,
-        honorarios: contract.valores,
-        nl: {
-          cauLeandro: 'A203598-7',
-          cauNeandro: 'A203599-5',
-          cpfNeandro: '000.000.000-00'
-        },
-        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
-      };
-      
-      const pdfBlob = await generateContractPDF(data);
-      if (!pdfBlob) return;
-
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${contract.numero} - ${contract.cliente_nome}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast.error('Erro ao gerar PDF do contrato');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDownloadExistingContract = async (contract: any) => {
     try {
@@ -1161,21 +1078,15 @@ const DocumentosContratos = () => {
                       {c.status}
                     </Badge>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
+                  <div className="mt-2">
                     <Button 
                       variant="outline" 
                       onClick={() => handleDownloadExistingContract(c)}
-                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
+                      className="w-full bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
-                      <FileDown size={12} className="mr-1" /> DOCX
+                      <FileDown size={12} className="mr-1" /> REBAIXAR DOCX
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleDownloadExistingContractPDF(c)}
-                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
-                    >
-                      <FileDown size={12} className="mr-1" /> PDF
-                    </Button>
+                  </div>
                     <Button 
                       variant="outline" 
                       onClick={() => handleSaveExistingToDropbox(c)}
