@@ -11,6 +11,8 @@ export interface ContractData {
     nacionalidade: string;
     estadoCivil: string;
     profissao: string;
+    testemunhaNome?: string;
+    testemunhaCpf?: string;
   };
   projeto: {
     tipo: string;
