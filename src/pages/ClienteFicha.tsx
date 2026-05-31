@@ -1380,6 +1380,7 @@ const ClienteFicha = () => {
                               <SelectContent className="bg-[#1E1E1E] border-[#3A3A3A] text-[#F0EDE8]">
                                 <SelectItem value="Executivo" className="focus:bg-[#8B7355] focus:text-white">EXECUTIVO</SelectItem>
                                 <SelectItem value="Completo" className="focus:bg-[#8B7355] focus:text-white">COMPLETO</SelectItem>
+                                <SelectItem value="Fornecedor" className="focus:bg-[#8B7355] focus:text-white">FORNECEDOR</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>

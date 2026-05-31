@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 
 const iconMap: Record<string, any> = {
   ClipboardList,
@@ -152,7 +153,10 @@ const ConfiguracoesSistema = () => {
   const [contractTemplatePath, setContractTemplatePath] = useState('');
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalTemplatePath, setOriginalTemplatePath] = useState('');
+  const [vendorTemplatePath, setVendorTemplatePath] = useState('');
+  const [originalVendorPath, setOriginalVendorPath] = useState('');
   const [templateStatus, setTemplateStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
+  const [vendorStatus, setVendorStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
@@ -169,12 +173,14 @@ const ConfiguracoesSistema = () => {
         setDropboxStatus('connected');
         setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
         const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        const vPath = (data as any).vendor_template_path || '';
         setContractTemplatePath(path);
         setOriginalTemplatePath(path);
-        checkTemplateExists(path);
+        setVendorTemplatePath(vPath);
+        setOriginalVendorPath(vPath);
+        checkTemplateExists(path, 'client');
+        if (vPath) checkTemplateExists(vPath, 'vendor');
       }
-
-
     } catch (err) {
       setDropboxStatus('disconnected');
     }
@@ -184,40 +190,34 @@ const ConfiguracoesSistema = () => {
     fetchDropboxStatus();
   }, []);
 
-  const checkTemplateExists = async (path: string) => {
+  const checkTemplateExists = async (path: string, type: 'client' | 'vendor') => {
     if (!path || dropboxStatus !== 'connected') return;
     
-    setTemplateStatus('checking');
+    const setStatus = type === 'client' ? setTemplateStatus : setVendorStatus;
+    setStatus('checking');
     try {
       const response = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'get_metadata', path }
       });
       
       if (response.data && !response.data.error) {
-        setTemplateStatus('found');
+        setStatus('found');
       } else {
-        setTemplateStatus('not_found');
+        setStatus('not_found');
       }
     } catch (err) {
-      setTemplateStatus('not_found');
+      setStatus('not_found');
     }
   };
 
   const handleConnectDropbox = () => {
     const clientId = 'zjdj0yszvqy7wvz';
     const redirectUri = 'https://app.nl.arq.br/dropbox-callback';
-    
     const authUrl = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&token_access_type=offline`;
-    
-    // Tenta abrir em nova aba
     const newWindow = window.open(authUrl, '_blank');
-    
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      // Se o bloqueador de popup estiver ativo, redireciona na mesma aba
       toast.warning("O bloqueador de popups impediu a abertura automática. Redirecionando nesta aba...");
-      setTimeout(() => {
-        window.location.href = authUrl;
-      }, 2000);
+      setTimeout(() => { window.location.href = authUrl; }, 2000);
     } else {
       toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
       setDropboxStatus('loading');
@@ -225,20 +225,29 @@ const ConfiguracoesSistema = () => {
     }
   };
 
-  const handleSaveTemplatePath = async () => {
-    if (contractTemplatePath === originalTemplatePath) return;
+  const handleSaveTemplatePath = async (type: 'client' | 'vendor') => {
+    const path = type === 'client' ? contractTemplatePath : vendorTemplatePath;
+    const original = type === 'client' ? originalTemplatePath : originalVendorPath;
+    if (path === original) return;
     
     setIsSavingTemplate(true);
     try {
+      const updateData = type === 'client' 
+        ? { contract_template_path: path }
+        : { vendor_template_path: path };
+
       const { error } = await supabase
         .from('dropbox_settings')
-        .update({ contract_template_path: contractTemplatePath } as any)
+        .update(updateData as any)
         .eq('id', '00000000-0000-0000-0000-000000000001');
 
       if (error) throw error;
       
-      setOriginalTemplatePath(contractTemplatePath);
+      if (type === 'client') setOriginalTemplatePath(path);
+      else setOriginalVendorPath(path);
+      
       toast.success("Caminho do template atualizado!");
+      checkTemplateExists(path, type);
     } catch (err) {
       console.error("Erro ao salvar template:", err);
       toast.error("Erro ao salvar o caminho do template");
@@ -247,11 +256,9 @@ const ConfiguracoesSistema = () => {
     }
   };
 
-
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
-      
       <main className="flex-1 ml-[230px]">
         <div className="p-12 max-w-5xl">
           <header className="mb-12">
@@ -271,7 +278,6 @@ const ConfiguracoesSistema = () => {
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <Box size={80} className="text-white" />
               </div>
-
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-3">
@@ -283,7 +289,6 @@ const ConfiguracoesSistema = () => {
                       <p className="text-[10px] text-white/40 uppercase tracking-widest">Armazenamento e Templates</p>
                     </div>
                   </div>
-                  
                   <div className={cn(
                     "flex items-center gap-2 px-3 py-1 rounded-[1px] border text-[9px] font-bold uppercase tracking-widest",
                     dropboxStatus === 'connected' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
@@ -299,17 +304,14 @@ const ConfiguracoesSistema = () => {
                     )}
                   </div>
                 </div>
-
                 <p className="text-xs text-white/60 leading-relaxed mb-8 h-12">
                   Integração para geração automática de contratos a partir de templates DOCX e armazenamento organizado de documentos dos projetos.
                 </p>
-
                 {lastSync && (
                   <p className="text-[9px] text-white/20 uppercase tracking-widest mb-6 italic">
                     Última renovação de token: {lastSync}
                   </p>
                 )}
-
                 <Button
                   onClick={handleConnectDropbox}
                   variant="outline"
@@ -329,7 +331,6 @@ const ConfiguracoesSistema = () => {
               <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                 <FileText size={80} className="text-white" />
               </div>
-
               <div className="relative z-10 space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -337,32 +338,24 @@ const ConfiguracoesSistema = () => {
                       <FileText size={20} className="text-bronze" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Template do Contrato</h3>
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest">Caminho do arquivo no Dropbox</p>
+                      <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Templates de Contrato</h3>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">Configuração de arquivos no Dropbox</p>
                     </div>
                   </div>
-
-                  <div className={cn(
-                    "flex items-center gap-2 px-3 py-1 rounded-[1px] border text-[9px] font-bold uppercase tracking-widest",
-                    templateStatus === 'found' ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" :
-                    templateStatus === 'not_found' ? "bg-rose-500/10 border-rose-500/20 text-rose-500" :
-                    "bg-white/5 border-white/10 text-white/40"
-                  )}>
-                    {templateStatus === 'found' ? (
-                      <><CheckCircle2 size={10} /> Arquivo Localizado</>
-                    ) : templateStatus === 'not_found' ? (
-                      <><XCircle size={10} /> Não Encontrado</>
-                    ) : templateStatus === 'checking' ? (
-                      <><RefreshCcw size={10} className="animate-spin" /> Verificando</>
-                    ) : (
-                      <><RefreshCcw size={10} /> Aguardando</>
-                    )}
-                  </div>
                 </div>
-
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Caminho Completo (.docx)</Label>
+                    <div className="flex justify-between items-center">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Contrato Padrão (.docx)</Label>
+                      <Badge className={cn(
+                        "text-[8px] uppercase tracking-tighter rounded-[1px]",
+                        templateStatus === 'found' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                        templateStatus === 'not_found' ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
+                        "bg-white/5 text-white/40 border-white/10"
+                      )}>
+                        {templateStatus === 'found' ? 'Localizado' : templateStatus === 'not_found' ? 'Não Encontrado' : 'Aguardando'}
+                      </Badge>
+                    </div>
                     <div className="flex gap-2">
                       <Input 
                         value={contractTemplatePath}
@@ -373,27 +366,59 @@ const ConfiguracoesSistema = () => {
                       <Button 
                         variant="outline"
                         size="icon"
-                        onClick={() => checkTemplateExists(contractTemplatePath)}
+                        onClick={() => checkTemplateExists(contractTemplatePath, 'client')}
                         className="h-11 w-11 border-white/10 bg-white/5 hover:bg-white/10"
-                        title="Verificar arquivo agora"
                       >
                         <Search size={16} className="text-white/60" />
                       </Button>
                     </div>
-                    <p className="text-[9px] text-white/20 italic">Certifique-se de que o arquivo contenha as tags {`{nome_cliente}`}, {`{valor_total}`}, etc.</p>
+                    <Button
+                      onClick={() => handleSaveTemplatePath('client')}
+                      disabled={isSavingTemplate || contractTemplatePath === originalTemplatePath}
+                      className="w-full h-10 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+                    >
+                      {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
+                      Salvar Padrão
+                    </Button>
                   </div>
-
-                  <Button
-                    onClick={async () => {
-                      await handleSaveTemplatePath();
-                      checkTemplateExists(contractTemplatePath);
-                    }}
-                    disabled={isSavingTemplate || contractTemplatePath === originalTemplatePath}
-                    className="w-full h-12 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
-                  >
-                    {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
-                    Salvar Configuração
-                  </Button>
+                  <div className="h-px bg-white/5 my-4" />
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Contrato Fornecedor (.docx)</Label>
+                      <Badge className={cn(
+                        "text-[8px] uppercase tracking-tighter rounded-[1px]",
+                        vendorStatus === 'found' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
+                        vendorStatus === 'not_found' ? "bg-rose-500/10 text-rose-500 border-rose-500/20" :
+                        "bg-white/5 text-white/40 border-white/10"
+                      )}>
+                        {vendorStatus === 'found' ? 'Localizado' : vendorStatus === 'not_found' ? 'Não Encontrado' : 'Aguardando'}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={vendorTemplatePath}
+                        onChange={(e) => setVendorTemplatePath(e.target.value)}
+                        placeholder="/NL Arquitetos/..."
+                        className="bg-black/40 border-white/10 rounded-[1px] text-[11px] text-white focus:ring-bronze h-11"
+                      />
+                      <Button 
+                        variant="outline"
+                        size="icon"
+                        onClick={() => checkTemplateExists(vendorTemplatePath, 'vendor')}
+                        className="h-11 w-11 border-white/10 bg-white/5 hover:bg-white/10"
+                      >
+                        <Search size={16} className="text-white/60" />
+                      </Button>
+                    </div>
+                    <Button
+                      onClick={() => handleSaveTemplatePath('vendor')}
+                      disabled={isSavingTemplate || vendorTemplatePath === originalVendorPath}
+                      className="w-full h-10 rounded-[2px] bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+                    >
+                      {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
+                      Salvar Fornecedor
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -401,7 +426,6 @@ const ConfiguracoesSistema = () => {
         </div>
       </main>
     </div>
-
   );
 };
 
