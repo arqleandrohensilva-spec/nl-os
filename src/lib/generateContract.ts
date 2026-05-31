@@ -305,8 +305,13 @@ export const getContractPreviewHtml = async (data: ContractData) => {
 
 export const generateContractPDF = async (data: ContractData) => {
   try {
+    console.log('Gerando PDF a partir do DOCX...');
     const docxBlob = await generateContractDocx(data);
-    if (!docxBlob) return null;
+    if (!docxBlob) {
+      console.error('Falha ao gerar DOCX base para o PDF');
+      return null;
+    }
+    console.log('DOCX base gerado com sucesso, convertendo para HTML...');
 
     const arrayBuffer = await docxBlob.arrayBuffer();
     const result = await mammoth.convertToHtml(
@@ -324,9 +329,9 @@ export const generateContractPDF = async (data: ContractData) => {
 
     const container = document.createElement('div');
     container.style.cssText = `
-      position: fixed;
+      position: absolute;
+      left: -9999px;
       top: 0;
-      left: 0;
       width: 794px;
       background: #ffffff;
       color: #000000;
@@ -335,9 +340,7 @@ export const generateContractPDF = async (data: ContractData) => {
       line-height: 1.5;
       padding: 40px;
       box-sizing: border-box;
-      z-index: 99999;
-      opacity: 0;
-      pointer-events: none;
+      z-index: -9999;
     `;
 
     const style = document.createElement('style');
@@ -356,7 +359,7 @@ export const generateContractPDF = async (data: ContractData) => {
     container.appendChild(content);
     document.body.appendChild(container);
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const opt = {
       margin: [10, 10, 10, 10] as [number, number, number, number],
