@@ -60,6 +60,8 @@ async function refreshDropboxToken(supabaseClient: any, refreshToken: string) {
 }
 
 serve(async (req) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
