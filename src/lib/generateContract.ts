@@ -330,15 +330,21 @@ export const generateContractPDF = async (data: ContractData) => {
         ],
       }
     );
+    
+    if (!result.value || result.value.trim() === '') {
+       throw new Error("O conteúdo convertido do DOCX está vazio.");
+    }
+    console.log('generateContractPDF: HTML convertido (tamanho):', result.value.length);
     console.log('generateContractPDF: HTML convertido via mammoth');
 
     const container = document.createElement('div');
     container.className = 'pdf-render-container';
     container.style.cssText = `
-      position: absolute;
-      left: -9999px;
+      position: fixed;
       top: 0;
+      left: 0;
       width: 210mm;
+      min-height: 297mm;
       background: white;
       color: black;
       font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -346,6 +352,7 @@ export const generateContractPDF = async (data: ContractData) => {
       line-height: 1.6;
       padding: 25mm 20mm;
       box-sizing: border-box;
+      z-index: 99999;
     `;
 
     const style = document.createElement('style');
@@ -377,7 +384,8 @@ export const generateContractPDF = async (data: ContractData) => {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        width: 794, // 210mm aprox em 96dpi
+        logging: true, // Habilitar logs para depurar o motivo do branco
+        width: 794,
         windowWidth: 794,
         letterRendering: true,
       },
