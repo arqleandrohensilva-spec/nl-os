@@ -15,9 +15,13 @@ import {
   MessageSquare,
   Copy,
   Link2,
-  Layout
+  Layout,
+  FileText,
+  Save
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const iconMap: Record<string, any> = {
   ClipboardList,
@@ -144,6 +148,9 @@ const ConfiguracoesSistema = () => {
   const [dropboxStatus, setDropboxStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [contractTemplatePath, setContractTemplatePath] = useState('');
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const [originalTemplatePath, setOriginalTemplatePath] = useState('');
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
@@ -159,7 +166,11 @@ const ConfiguracoesSistema = () => {
       } else {
         setDropboxStatus('connected');
         setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
+        const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        setContractTemplatePath(path);
+        setOriginalTemplatePath(path);
       }
+
     } catch (err) {
       setDropboxStatus('disconnected');
     }
@@ -190,6 +201,29 @@ const ConfiguracoesSistema = () => {
       setTimeout(fetchDropboxStatus, 15000);
     }
   };
+
+  const handleSaveTemplatePath = async () => {
+    if (contractTemplatePath === originalTemplatePath) return;
+    
+    setIsSavingTemplate(true);
+    try {
+      const { error } = await supabase
+        .from('dropbox_settings')
+        .update({ contract_template_path: contractTemplatePath } as any)
+        .eq('id', '00000000-0000-0000-0000-000000000001');
+
+      if (error) throw error;
+      
+      setOriginalTemplatePath(contractTemplatePath);
+      toast.success("Caminho do template atualizado!");
+    } catch (err) {
+      console.error("Erro ao salvar template:", err);
+      toast.error("Erro ao salvar o caminho do template");
+    } finally {
+      setIsSavingTemplate(false);
+    }
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
@@ -267,20 +301,49 @@ const ConfiguracoesSistema = () => {
               </div>
             </div>
 
-            {/* Outras Configs (Placeholder) */}
-            <div className="bg-white/[0.01] border border-white/5 p-8 opacity-40">
-              <h3 className="text-sm font-bold text-white/60 tracking-[0.1em] uppercase mb-4 italic">Outras Integrações</h3>
-              <div className="space-y-4">
-                <div className="h-4 w-3/4 bg-white/5 animate-pulse" />
-                <div className="h-4 w-1/2 bg-white/5 animate-pulse" />
-                <div className="h-4 w-2/3 bg-white/5 animate-pulse" />
+            {/* Contract Template Card */}
+            <div className="bg-white/[0.03] border border-white/5 p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <FileText size={80} className="text-white" />
               </div>
-              <p className="mt-8 text-[9px] text-white/20 uppercase tracking-widest italic">Expansão em breve...</p>
+
+              <div className="relative z-10 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center rounded-[1px]">
+                    <FileText size={20} className="text-bronze" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Template do Contrato</h3>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Caminho do arquivo no Dropbox</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[9px] uppercase tracking-widest text-white/40">Caminho Completo (.docx)</Label>
+                  <Input 
+                    value={contractTemplatePath}
+                    onChange={(e) => setContractTemplatePath(e.target.value)}
+                    placeholder="/NL Arquitetos/..."
+                    className="bg-black/40 border-white/10 rounded-[1px] text-[11px] text-white focus:ring-bronze h-11"
+                  />
+                  <p className="text-[9px] text-white/20 italic">Certifique-se de que o arquivo contenha as tags {`{nome_cliente}`}, {`{valor_total}`}, etc.</p>
+                </div>
+
+                <Button
+                  onClick={handleSaveTemplatePath}
+                  disabled={isSavingTemplate || contractTemplatePath === originalTemplatePath}
+                  className="w-full h-12 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+                >
+                  {isSavingTemplate ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
+                  Salvar Configuração
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </main>
     </div>
+
   );
 };
 
