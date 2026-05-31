@@ -305,8 +305,13 @@ export const getContractPreviewHtml = async (data: ContractData) => {
 
 export const generateContractPDF = async (data: ContractData) => {
   try {
+    console.log('Gerando PDF a partir do DOCX...');
     const docxBlob = await generateContractDocx(data);
-    if (!docxBlob) return null;
+    if (!docxBlob) {
+      console.error('Falha ao gerar DOCX base para o PDF');
+      return null;
+    }
+    console.log('DOCX base gerado com sucesso, convertendo para HTML...');
 
     const arrayBuffer = await docxBlob.arrayBuffer();
     const result = await mammoth.convertToHtml(
