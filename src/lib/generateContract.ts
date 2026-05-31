@@ -168,7 +168,23 @@ export const getContractPreviewHtml = async (data: ContractData) => {
         "strike => del"
       ]
     });
-    return result.value;
+    // Limpar o HTML para evitar tags vazias e melhorar visualização
+    let html = result.value;
+    html = html.replace(/<p><\/p>/g, '<br />');
+    
+    return `
+      <style>
+        .contract-preview h1 { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+        .contract-preview h2 { font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .contract-preview p { margin-bottom: 12px; text-align: justify; line-height: 1.6; font-size: 14px; }
+        .contract-preview strong { font-weight: bold; }
+        .contract-preview table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .contract-preview td, .contract-preview th { border: 1px solid #ddd; padding: 8px; font-size: 12px; }
+      </style>
+      <div class="contract-preview-container">
+        ${html}
+      </div>
+    `;
   } catch (error: any) {
     console.error('Erro ao gerar preview do contrato:', error);
     toast.error(`Erro ao gerar preview: ${error.message || error}`);
