@@ -1801,22 +1801,54 @@ const DocumentosContratos = () => {
                     </Select>
                   </div>
 
+                  {/* Área do Terreno — opcional */}
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área do Terreno (m²)</Label>
-                    <Input 
-                      value={contractFormData.projeto.areaTerreno}
-                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: e.target.value } }))}
-                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
-                    />
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Área do Terreno (m²)</Label>
+                      <button
+                        type="button"
+                        onClick={() => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: prev.projeto.areaTerreno === null ? '' : null } }))}
+                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-bronze transition-colors"
+                      >
+                        {contractFormData.projeto.areaTerreno === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
+                      </button>
+                    </div>
+                    {contractFormData.projeto.areaTerreno !== null && (
+                      <Input
+                        value={contractFormData.projeto.areaTerreno || ''}
+                        onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaTerreno: e.target.value } }))}
+                        className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                        placeholder="Ex: 450"
+                      />
+                    )}
+                    {contractFormData.projeto.areaTerreno === null && (
+                      <p className="text-[9px] text-white/20 italic px-1">Não será incluído no contrato</p>
+                    )}
                   </div>
 
+                  {/* Área Construída — opcional */}
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Área Construída Estimada (m²)</Label>
-                    <Input 
-                      value={contractFormData.projeto.areaConstruida}
-                      onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: e.target.value } }))}
-                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
-                    />
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[9px] uppercase tracking-widest text-white/40">Área Construída / Intervenção (m²)</Label>
+                      <button
+                        type="button"
+                        onClick={() => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: prev.projeto.areaConstruida === null ? '' : null } }))}
+                        className="text-[8px] uppercase tracking-widest text-white/20 hover:text-bronze transition-colors"
+                      >
+                        {contractFormData.projeto.areaConstruida === null ? '+ INCLUIR' : '— NÃO SE APLICA'}
+                      </button>
+                    </div>
+                    {contractFormData.projeto.areaConstruida !== null && (
+                      <Input
+                        value={contractFormData.projeto.areaConstruida || ''}
+                        onChange={(e) => setContractFormData(prev => ({ ...prev, projeto: { ...prev.projeto, areaConstruida: e.target.value } }))}
+                        className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                        placeholder="Ex: 280"
+                      />
+                    )}
+                    {contractFormData.projeto.areaConstruida === null && (
+                      <p className="text-[9px] text-white/20 italic px-1">Não será incluído no contrato</p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
