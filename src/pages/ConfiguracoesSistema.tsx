@@ -192,22 +192,23 @@ const ConfiguracoesSistema = () => {
     fetchDropboxStatus();
   }, []);
 
-  const checkTemplateExists = async (path: string) => {
+  const checkTemplateExists = async (path: string, type: 'client' | 'vendor') => {
     if (!path || dropboxStatus !== 'connected') return;
     
-    setTemplateStatus('checking');
+    const setStatus = type === 'client' ? setTemplateStatus : setVendorStatus;
+    setStatus('checking');
     try {
       const response = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'get_metadata', path }
       });
       
       if (response.data && !response.data.error) {
-        setTemplateStatus('found');
+        setStatus('found');
       } else {
-        setTemplateStatus('not_found');
+        setStatus('not_found');
       }
     } catch (err) {
-      setTemplateStatus('not_found');
+      setStatus('not_found');
     }
   };
 
