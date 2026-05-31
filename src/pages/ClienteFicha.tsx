@@ -1630,7 +1630,7 @@ const ClienteFicha = () => {
                         onClick={handleGenerateContract}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-12 text-[10px] font-bold uppercase h-14 tracking-widest shadow-xl transition-all hover:scale-[1.02]"
                       >
-                        {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : <FileDown className="mr-2 h-4 w-4" />}
+                        {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : <Download className="mr-2 h-4 w-4" />}
                         GERAR CONTRATO DOCX
                       </Button>
                     </div>
