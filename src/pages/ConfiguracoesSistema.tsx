@@ -152,6 +152,7 @@ const ConfiguracoesSistema = () => {
   const [contractTemplatePath, setContractTemplatePath] = useState('');
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalTemplatePath, setOriginalTemplatePath] = useState('');
+  const [templateStatus, setTemplateStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
 
   const fetchDropboxStatus = async () => {
     setDropboxStatus('loading');
