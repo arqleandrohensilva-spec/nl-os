@@ -572,12 +572,12 @@ const ClienteFicha = () => {
           totalDias: '65'
         },
         honorarios: {
-          totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-          totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalExecutivo: contractFormData.valorTotal || '',
+          totalCompleto: contractFormData.valorTotal || '',
           totalExtenso: valorPorExtenso(totalValue),
-          marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-          marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-          marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          marco1: contractFormData.marco1 || '',
+          marco2: contractFormData.marco2 || '',
+          marco3: contractFormData.marco3 || '',
         },
         nl: {
           cauLeandro: 'A203598-7',
