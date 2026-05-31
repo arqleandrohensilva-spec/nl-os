@@ -202,22 +202,26 @@ const ClienteFicha = () => {
 
   const proposta = propostas[propostas.length - 1] || null;
 
-  const { data: contrato } = useQuery({
-    queryKey: ['contrato_cliente', id],
+  const { data: contratos = [], refetch: refetchContratos } = useQuery({
+    queryKey: ['contratos_cliente', id],
     queryFn: async () => {
-      if (!id) return null;
-      // Using raw query to avoid complex type instantiation depth issue in this specific view
+      if (!id) return [];
       const { data, error } = await supabase
         .from('contratos')
         .select('*')
         .eq('cliente_id', id)
-        .eq('status', 'Gerado')
-        .maybeSingle();
-      if (error) console.error("Error fetching contract:", error);
-      return data;
+        .order('criado_em', { ascending: false });
+      if (error) {
+        console.error("Error fetching contracts:", error);
+        return [];
+      }
+      return data || [];
     },
     enabled: !!id
   });
+
+  const contrato = contratos[0] || null;
+
 
   useEffect(() => {
     if (cliente) {
