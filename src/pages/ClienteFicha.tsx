@@ -561,8 +561,22 @@ const ClienteFicha = () => {
       URL.revokeObjectURL(url);
 
       toast.success(`Contrato gerado com sucesso!`);
-      queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+      
+      // Log no histórico
+      try {
+        await supabase.from('contratos_historico').insert({
+          contrato_id: dbError ? undefined : (await supabase.from('contratos').select('id').eq('numero', numeroContrato).single()).data?.id,
+          numero: numeroContrato,
+          acao: 'GERADO',
+          observacao: `Contrato gerado para ${contractData.cliente.nome} (REV${novaRevisao})`
+        });
+      } catch (err) {
+        console.error("Error logging history:", err);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
       setIsGeneratingContract(false);
+
     } catch (err: any) {
       console.error('Erro detalhado:', err);
       toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
