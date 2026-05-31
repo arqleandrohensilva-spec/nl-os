@@ -1504,134 +1504,7 @@ const ClienteFicha = () => {
                     <div className="flex gap-4 pt-4">
                       <Button 
                         disabled={isGeneratingContract || selectedProposals.length === 0}
-                        onClick={async () => {
-                          try {
-                            setIsGeneratingContract(true);
-                            
-                            // 1. Obter dados das propostas selecionadas
-                            const { data: props, error } = await supabase
-                              .from('proposals')
-                              .select('*, calculos_proposta (*)')
-                              .in('id', selectedProposals);
-
-                            if (error) throw error;
-                            if (!props || props.length === 0) {
-                              toast.error("Selecione pelo menos uma proposta");
-                              return;
-                            }
-
-                            // 2. Gerar número do contrato
-                            const year = new Date().getFullYear();
-                            const { data: lastContract } = await supabase
-                              .from('contratos')
-                              .select('numero')
-                              .order('criado_em', { ascending: false })
-                              .limit(1);
-
-                            let nextNumber = 1;
-                            if (lastContract?.[0]?.numero) {
-                              const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-                              if (match) nextNumber = parseInt(match[1]) + 1;
-                            }
-                            const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
-
-                            // 3. Somar valores conforme o plano
-                            let totalValue = 0;
-                            props.forEach(p => {
-                              const c = p.calculos_proposta?.[0];
-                              if (contractFormData.plano === 'Executivo') {
-                                totalValue += Number(c?.valor_executivo || p.valor_executivo || 0);
-                              } else {
-                                totalValue += Number(c?.valor_completo || p.valor_completo || 0);
-                              }
-                            });
-
-                            const lastProp = props[props.length - 1];
-
-                            // 4. Montar dados para o contrato
-                            const contractData: ContractData = {
-                              numero: numeroContrato,
-                              cliente: {
-                                nome: formData.nome || cliente?.nome || '',
-                                cpf: cliente?.cpf_cnpj || '',
-                                endereco: cliente?.endereco_imovel || cliente?.cidade || '',
-                                nacionalidade: contractFormData.nacionalidade,
-                                estadoCivil: contractFormData.estadoCivil,
-                                profissao: contractFormData.profissao
-                              },
-                              projeto: {
-                                tipo: lastProp.tipo === 'ArqInt' ? 'ARQ+INT' : 
-                                      lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
-                                plano: contractFormData.plano,
-                                endereco: cliente?.endereco_imovel || cliente?.cidade || '',
-                                tipoImovel: 'Residência',
-                                areaTerreno: '',
-                                areaConstruida: lastProp.area?.toString() || '',
-                                matricula: contractFormData.matricula,
-                                cartorio: contractFormData.cartorio
-                              },
-                              prazos: {
-                                briefing: '5',
-                                estudo: '15',
-                                legal: '10',
-                                executivo: '30',
-                                total: contractFormData.prazoTotal,
-                                totalDias: '65'
-                              },
-                              honorarios: {
-                                totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                totalExtenso: valorPorExtenso(totalValue),
-                                marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                              },
-                              nl: {
-                                cauLeandro: 'A203598-7',
-                                cauNeandro: 'A203599-5',
-                                cpfNeandro: '000.000.000-00'
-                              },
-                              dataAssinatura: new Date().toLocaleDateString('pt-BR')
-                            };
-
-                            // 5. Gerar DOCX
-                            const docxBlob = await generateContractDocx(contractData);
-                            if (!docxBlob) return;
-
-                            // 6. Salvar no Banco
-                            const { error: dbError } = await supabase.from('contratos').insert({
-                              numero: numeroContrato,
-                              cliente_id: cliente?.id,
-                              lead_id: null,
-                              cliente_nome: contractData.cliente.nome,
-                              tipo: contractData.projeto.tipo,
-                              plano: contractData.projeto.plano,
-                              dados_gerais: contractData.cliente as any,
-                              prazos: contractData.prazos as any,
-                              valores: contractData.honorarios as any,
-                              status: 'Gerado'
-                            });
-
-                            if (dbError) throw dbError;
-
-                            // 7. Download
-                            const url = URL.createObjectURL(docxBlob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${numeroContrato} - ${contractData.cliente.nome}.docx`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-
-                            toast.success("Contrato gerado com sucesso!");
-                            queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
-                          } catch (err: any) {
-                            console.error('Erro detalhado:', err);
-                            toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
-                          } finally {
-                            setIsGeneratingContract(false);
-                          }
-                        }
-                        }
+                        onClick={() => handleGenerateContract('docx')}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
                       >
                         {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
@@ -1640,88 +1513,7 @@ const ClienteFicha = () => {
 
                       <Button 
                         disabled={isGeneratingContract || selectedProposals.length === 0}
-                        onClick={async () => {
-                          try {
-                            setIsGeneratingContract(true);
-                            // Mesma lógica de dados
-                            const { data: props } = await supabase
-                              .from('proposals')
-                              .select('*, calculos_proposta (*)')
-                              .in('id', selectedProposals);
-
-                            if (!props || props.length === 0) return;
-
-                            let totalValue = 0;
-                            props.forEach(p => {
-                              const c = p.calculos_proposta?.[0];
-                              if (contractFormData.plano === 'Executivo') {
-                                totalValue += Number(c?.valor_executivo || p.valor_executivo || 0);
-                              } else {
-                                totalValue += Number(c?.valor_completo || p.valor_completo || 0);
-                              }
-                            });
-
-                            const lastProp = props[props.length - 1];
-                            const contractData: ContractData = {
-                              numero: 'NL-2026-001', // Simplificado para o PDF fallback
-                              cliente: {
-                                nome: formData.nome || cliente?.nome || '',
-                                cpf: cliente?.cpf_cnpj || '',
-                                endereco: cliente?.endereco_imovel || cliente?.cidade || '',
-                                nacionalidade: contractFormData.nacionalidade,
-                                estadoCivil: contractFormData.estadoCivil,
-                                profissao: contractFormData.profissao
-                              },
-                              projeto: {
-                                tipo: lastProp.tipo === 'ArqInt' ? 'ARQ+INT' : 
-                                      lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
-                                plano: contractFormData.plano,
-                                endereco: cliente?.endereco_imovel || cliente?.cidade || '',
-                                tipoImovel: 'Residência',
-                                areaTerreno: '',
-                                areaConstruida: lastProp.area?.toString() || '',
-                                matricula: contractFormData.matricula,
-                                cartorio: contractFormData.cartorio
-                              },
-                              prazos: {
-                                briefing: '5',
-                                estudo: '15',
-                                legal: '10',
-                                executivo: '30',
-                                total: contractFormData.prazoTotal,
-                                totalDias: '65'
-                              },
-                              honorarios: {
-                                totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                totalExtenso: valorPorExtenso(totalValue),
-                                marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                                marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                              },
-                              nl: {
-                                cauLeandro: 'A203598-7',
-                                cauNeandro: 'A203599-5',
-                                cpfNeandro: '000.000.000-00'
-                              }
-                            };
-
-                            const pdfBlob = await generateContractPDF(contractData);
-                            if (pdfBlob) {
-                              const url = URL.createObjectURL(pdfBlob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = `Contrato - ${contractData.cliente.nome}.pdf`;
-                              a.click();
-                              URL.revokeObjectURL(url);
-                              toast.success("PDF gerado!");
-                            }
-                          } catch (err) {
-                            console.error(err);
-                          } finally {
-                            setIsGeneratingContract(false);
-                          }
-                        }}
+                        onClick={() => handleGenerateContract('pdf')}
                         className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
                       >
                         {isGeneratingContract ? <Loader2 className="animate-spin mr-2" /> : null}
@@ -1735,7 +1527,7 @@ const ClienteFicha = () => {
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</span>
-                      <p className="text-xs uppercase mt-1">NL.C{String(contrato.id).slice(-4).toUpperCase()}</p>
+                      <p className="text-xs uppercase mt-1">{contrato.numero}</p>
                     </div>
                     <div className={cn(
                       "px-3 py-1 text-[9px] font-bold uppercase tracking-widest",
@@ -1756,7 +1548,6 @@ const ClienteFicha = () => {
                             
                             if (error) throw error;
                             
-                            // Também resetar status de assinado no cliente se necessário
                             await supabase
                               .from('clientes')
                               .update({ contrato_assinado: false } as any)
@@ -1776,6 +1567,86 @@ const ClienteFicha = () => {
                       Inativar
                     </Button>
                   </div>
+                  
+                  <div className="flex gap-4">
+                    <Button 
+                      variant="outline"
+                      onClick={async () => {
+                        const data = {
+                          numero: contrato.numero,
+                          cliente: contrato.dados_gerais,
+                          projeto: {
+                            tipo: contrato.tipo,
+                            plano: contrato.plano,
+                            endereco: contrato.dados_gerais.endereco || '',
+                            tipoImovel: 'Residência',
+                            areaTerreno: '',
+                            areaConstruida: '',
+                            matricula: '',
+                            cartorio: ''
+                          },
+                          prazos: contrato.prazos,
+                          honorarios: contrato.valores,
+                          nl: {
+                            cauLeandro: 'A203598-7',
+                            cauNeandro: 'A203599-5',
+                            cpfNeandro: '000.000.000-00'
+                          },
+                          dataAssinatura: contrato.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+                        };
+                        const blob = await generateContractDocx(data);
+                        if (blob) {
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${contrato.numero} - ${contrato.cliente_nome}.docx`;
+                          a.click();
+                        }
+                      }}
+                      className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest flex-1"
+                    >
+                      DOWNLOAD DOCX
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={async () => {
+                        const data = {
+                          numero: contrato.numero,
+                          cliente: contrato.dados_gerais,
+                          projeto: {
+                            tipo: contrato.tipo,
+                            plano: contrato.plano,
+                            endereco: contrato.dados_gerais.endereco || '',
+                            tipoImovel: 'Residência',
+                            areaTerreno: '',
+                            areaConstruida: '',
+                            matricula: '',
+                            cartorio: ''
+                          },
+                          prazos: contrato.prazos,
+                          honorarios: contrato.valores,
+                          nl: {
+                            cauLeandro: 'A203598-7',
+                            cauNeandro: 'A203599-5',
+                            cpfNeandro: '000.000.000-00'
+                          },
+                          dataAssinatura: contrato.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+                        };
+                        const blob = await generateContractPDF(data);
+                        if (blob) {
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = `${contrato.numero} - ${contrato.cliente_nome}.pdf`;
+                          a.click();
+                        }
+                      }}
+                      className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-10 tracking-widest flex-1"
+                    >
+                      DOWNLOAD PDF
+                    </Button>
+                  </div>
+
                   
                   {!cliente?.contrato_assinado ? (
                     <Button 
