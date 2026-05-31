@@ -199,6 +199,7 @@ const ClienteFicha = () => {
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [currentContractData, setCurrentContractData] = useState<ContractData | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
