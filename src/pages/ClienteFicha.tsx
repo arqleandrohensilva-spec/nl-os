@@ -1572,27 +1572,28 @@ const ClienteFicha = () => {
                     <Button 
                       variant="outline"
                       onClick={async () => {
+                        const dadosGerais = contrato.dados_gerais as any;
                         const data = {
                           numero: contrato.numero,
-                          cliente: contrato.dados_gerais,
+                          cliente: dadosGerais,
                           projeto: {
                             tipo: contrato.tipo,
                             plano: contrato.plano,
-                            endereco: contrato.dados_gerais.endereco || '',
+                            endereco: dadosGerais?.endereco || '',
                             tipoImovel: 'Residência',
                             areaTerreno: '',
                             areaConstruida: '',
                             matricula: '',
                             cartorio: ''
                           },
-                          prazos: contrato.prazos,
-                          honorarios: contrato.valores,
+                          prazos: contrato.prazos as any,
+                          honorarios: contrato.valores as any,
                           nl: {
                             cauLeandro: 'A203598-7',
                             cauNeandro: 'A203599-5',
                             cpfNeandro: '000.000.000-00'
                           },
-                          dataAssinatura: contrato.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+                          dataAssinatura: (contrato as any).data_assinatura || format(new Date(), 'dd/MM/yyyy')
                         };
                         const blob = await generateContractDocx(data);
                         if (blob) {
@@ -1610,27 +1611,28 @@ const ClienteFicha = () => {
                     <Button 
                       variant="outline"
                       onClick={async () => {
+                        const dadosGerais = contrato.dados_gerais as any;
                         const data = {
                           numero: contrato.numero,
-                          cliente: contrato.dados_gerais,
+                          cliente: dadosGerais,
                           projeto: {
                             tipo: contrato.tipo,
                             plano: contrato.plano,
-                            endereco: contrato.dados_gerais.endereco || '',
+                            endereco: dadosGerais?.endereco || '',
                             tipoImovel: 'Residência',
                             areaTerreno: '',
                             areaConstruida: '',
                             matricula: '',
                             cartorio: ''
                           },
-                          prazos: contrato.prazos,
-                          honorarios: contrato.valores,
+                          prazos: contrato.prazos as any,
+                          honorarios: contrato.valores as any,
                           nl: {
                             cauLeandro: 'A203598-7',
                             cauNeandro: 'A203599-5',
                             cpfNeandro: '000.000.000-00'
                           },
-                          dataAssinatura: contrato.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+                          dataAssinatura: (contrato as any).data_assinatura || format(new Date(), 'dd/MM/yyyy')
                         };
                         const blob = await generateContractPDF(data);
                         if (blob) {
@@ -1646,6 +1648,7 @@ const ClienteFicha = () => {
                       DOWNLOAD PDF
                     </Button>
                   </div>
+
 
                   
                   {!cliente?.contrato_assinado ? (
