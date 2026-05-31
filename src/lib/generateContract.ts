@@ -307,21 +307,47 @@ export const generateContractPDF = async (data: ContractData) => {
     const html = await getContractPreviewHtml(data);
     if (!html) return null;
 
-    const element = document.createElement("div");
-    element.innerHTML = html;
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '794px';
+    container.style.background = '#ffffff';
+    container.style.color = '#000000';
+    container.style.fontFamily = 'Georgia, serif';
+    container.style.fontSize = '12px';
+    container.style.lineHeight = '1.6';
+    container.style.padding = '40px';
+    container.style.zIndex = '-9999';
+    container.style.visibility = 'hidden';
+    container.innerHTML = html;
+    document.body.appendChild(container);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
 
     const opt = {
-      margin: [15, 15, 15, 15] as [number, number, number, number],
+      margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: `${data.numero} - ${data.cliente.nome}.pdf`,
-      image: { type: "jpeg" as const, quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm" as const, format: "a4" as const, orientation: "portrait" as const },
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: 794,
+      },
+      jsPDF: { 
+        unit: 'mm' as const, 
+        format: 'a4' as const, 
+        orientation: 'portrait' as const 
+      }
     };
 
-    const pdfBlob = await html2pdf().set(opt).from(element).output("blob");
+    const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
+    document.body.removeChild(container);
     return pdfBlob;
   } catch (error: any) {
-    console.error("Erro ao gerar PDF via html2pdf:", error);
+    console.error('Erro ao gerar PDF via html2pdf:', error);
     toast.error(`Erro ao gerar PDF: ${error.message || error}`);
     return null;
   }
