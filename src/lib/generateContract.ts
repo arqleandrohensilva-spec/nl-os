@@ -82,11 +82,20 @@ export const generateContractDocx = async (data: ContractData) => {
     console.log('DEBUG plano:', data.projeto.plano);
 
     const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : 
-                  data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) : // Fornecedor usa campo executivo como base se necessário
+                  data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) :
                   parseNum(data.honorarios.totalExecutivo);
-    const marco1 = Math.round(valor * 0.30 * 100) / 100;
-    const marco2 = Math.round(valor * 0.40 * 100) / 100;
-    const marco3 = Math.round((valor - marco1 - marco2) * 100) / 100;
+
+    const marco1 = (data.honorarios.marco1 && parseNum(data.honorarios.marco1) > 0)
+      ? parseNum(data.honorarios.marco1)
+      : Math.round(valor * 0.30 * 100) / 100;
+
+    const marco2 = (data.honorarios.marco2 && parseNum(data.honorarios.marco2) > 0)
+      ? parseNum(data.honorarios.marco2)
+      : Math.round(valor * 0.40 * 100) / 100;
+
+    const marco3 = (data.honorarios.marco3 && parseNum(data.honorarios.marco3) > 0)
+      ? parseNum(data.honorarios.marco3)
+      : Math.round((valor - marco1 - marco2) * 100) / 100;
 
     const tipoImovel = data.projeto.tipoImovel || 'Residência Existente';
 
