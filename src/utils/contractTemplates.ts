@@ -4,6 +4,8 @@ import { format } from 'date-fns';
 
 export interface ContractData {
   numero: string;
+  revisao?: number;
+
   cliente: {
     nome: string;
     cpf: string;

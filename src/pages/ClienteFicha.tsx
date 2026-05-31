@@ -202,22 +202,26 @@ const ClienteFicha = () => {
 
   const proposta = propostas[propostas.length - 1] || null;
 
-  const { data: contrato } = useQuery({
-    queryKey: ['contrato_cliente', id],
+  const { data: contratos = [], refetch: refetchContratos } = useQuery({
+    queryKey: ['contratos_cliente', id],
     queryFn: async () => {
-      if (!id) return null;
-      // Using raw query to avoid complex type instantiation depth issue in this specific view
+      if (!id) return [];
       const { data, error } = await supabase
         .from('contratos')
         .select('*')
         .eq('cliente_id', id)
-        .eq('status', 'Gerado')
-        .maybeSingle();
-      if (error) console.error("Error fetching contract:", error);
-      return data;
+        .order('criado_em', { ascending: false });
+      if (error) {
+        console.error("Error fetching contracts:", error);
+        return [];
+      }
+      return data || [];
     },
     enabled: !!id
   });
+
+  const contrato = contratos[0] || null;
+
 
   useEffect(() => {
     if (cliente) {
@@ -366,7 +370,48 @@ const ClienteFicha = () => {
     queryClient.invalidateQueries({ queryKey: ['cliente', id] });
   }, [formData, id, queryClient]);
   
+  const handleDownloadContract = async (contract: any) => {
+    try {
+      const dadosGerais = contract.dados_gerais as any;
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: dadosGerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: dadosGerais?.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos as any,
+        honorarios: contract.valores as any,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+      };
+      const blob = await generateContractDocx(data);
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${contract.numero} - ${contract.cliente_nome}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (err) {
+      console.error('Error downloading contract:', err);
+      toast.error("Erro ao baixar contrato");
+    }
+  };
+
   const handleGenerateContract = async () => {
+
     if (isGeneratingContract) return;
     setIsGeneratingContract(true);
     try {
@@ -382,20 +427,45 @@ const ClienteFicha = () => {
         return;
       }
 
-      // 2. Gerar número do contrato
+      // 2. Gerar número do contrato e revisão
       const year = new Date().getFullYear();
-      const { data: lastContract } = await supabase
+      
+      // Buscar se o cliente já tem contrato
+      const { data: existingContracts } = await supabase
         .from('contratos')
-        .select('numero')
-        .order('criado_em', { ascending: false })
+        .select('numero, revisao')
+        .eq('cliente_id', id)
+        .order('revisao', { ascending: false })
         .limit(1);
 
-      let nextNumber = 1;
-      if (lastContract && lastContract[0]?.numero) {
-        const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-        if (match) nextNumber = parseInt(match[1]) + 1;
+      let numeroContrato = '';
+      let novaRevisao = 1;
+
+      if (existingContracts && existingContracts.length > 0) {
+        const last = existingContracts[0];
+        novaRevisao = (last.revisao || 1) + 1;
+        
+        // Pegar a base (NL-YYYY-XXX) do número existente
+        const baseMatch = last.numero.match(/(NL-\d{4}-\d{3})/);
+        const base = baseMatch ? baseMatch[1] : `NL-${year}-000`;
+        numeroContrato = `${base}-rev${novaRevisao}`;
+      } else {
+        // Novo contrato: buscar o último número global do ano
+        const { data: lastGlobal } = await supabase
+          .from('contratos')
+          .select('numero')
+          .like('numero', `NL-${year}-%`)
+          .order('criado_em', { ascending: false })
+          .limit(1);
+
+        let nextNum = 1;
+        if (lastGlobal && lastGlobal[0]?.numero) {
+          const match = lastGlobal[0].numero.match(/NL-\d{4}-(\d{3})/);
+          if (match) nextNum = parseInt(match[1]) + 1;
+        }
+        numeroContrato = `NL-${year}-${String(nextNum).padStart(3, '0')}`;
       }
-      const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
 
       // 3. Somar valores conforme o plano
       let totalValue = 0;
@@ -465,7 +535,7 @@ const ClienteFicha = () => {
       }
 
       // 6. Salvar no Banco
-      const { error: dbError } = await supabase.from('contratos').insert({
+      const { data: newContractData, error: dbError } = await supabase.from('contratos').insert({
         numero: numeroContrato,
         cliente_id: cliente?.id,
         lead_id: null,
@@ -475,8 +545,9 @@ const ClienteFicha = () => {
         dados_gerais: contractData.cliente as any,
         prazos: contractData.prazos as any,
         valores: contractData.honorarios as any,
-        status: 'Gerado'
-      });
+        status: 'Gerado',
+        revisao: novaRevisao
+      }).select().single();
 
       if (dbError) throw dbError;
 
@@ -489,8 +560,25 @@ const ClienteFicha = () => {
       URL.revokeObjectURL(url);
 
       toast.success(`Contrato gerado com sucesso!`);
-      queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+      
+      // Log no histórico
+      if (newContractData) {
+        try {
+          await supabase.from('contratos_historico').insert({
+            contrato_id: newContractData.id,
+            numero: numeroContrato,
+            acao: 'GERADO',
+            observacao: `Contrato gerado para ${contractData.cliente.nome} (REV${novaRevisao})`
+          });
+        } catch (err) {
+          console.error("Error logging history:", err);
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
       setIsGeneratingContract(false);
+
+
     } catch (err: any) {
       console.error('Erro detalhado:', err);
       toast.error(`Erro ao gerar contrato: ${err.message || 'Erro desconhecido'}`);
@@ -1747,7 +1835,46 @@ const ClienteFicha = () => {
                   )}
                 </div>
               )}
+
+              {/* HISTÓRICO DE CONTRATOS */}
+              {contratos.length > 0 && (
+                <div className="pt-8 border-t border-white/5 space-y-4">
+                  <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.2em] font-bold">HISTÓRICO DE CONTRATOS GERADOS</h3>
+                  <div className="bg-[#0D0D0D] border border-white/5 overflow-hidden">
+                    <table className="w-full text-left text-[10px]">
+                      <thead className="bg-white/5 border-b border-white/5">
+                        <tr>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
+                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {contratos.map((c: any) => (
+                          <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
+                            <td className="px-4 py-3 text-white/80 font-mono">{c.numero}</td>
+                            <td className="px-4 py-3 text-white/60">REV{c.revisao || 1}</td>
+                            <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
+                            <td className="px-4 py-3 text-right">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleDownloadContract(c)}
+                                className="h-7 text-[#8B7355] hover:text-[#8B7355]/80 hover:bg-[#8B7355]/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                              >
+                                <Download size={12} className="mr-1" /> BAIXAR
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
+
           )}
         </section>
 

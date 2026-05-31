@@ -163,23 +163,49 @@ const DocumentosContratos = () => {
 
   const generateContractNumber = async () => {
     const year = new Date().getFullYear();
-    const { data: lastContract } = await supabase
-      .from('contratos')
-      .select('numero')
-      .order('criado_em', { ascending: false })
-      .limit(1);
-
-    let nextNumber = 1;
-    if (lastContract && lastContract[0]?.numero) {
-      const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
-      if (match) {
-        nextNumber = parseInt(match[1]) + 1;
+    
+    // Se tiver um lead selecionado, verificar se já existe contrato para ele
+    let existingContract = null;
+    if (selectedLeadId) {
+      const { data } = await supabase
+        .from('contratos')
+        .select('numero, revisao')
+        .eq('lead_id', selectedLeadId)
+        .order('revisao', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        existingContract = data[0];
       }
     }
 
-    const formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
-    setContractFormData(prev => ({ ...prev, numero: formattedNumber }));
+    let formattedNumber = '';
+    let novaRevisao = 1;
+
+    if (existingContract) {
+      novaRevisao = (existingContract.revisao || 1) + 1;
+      const baseMatch = existingContract.numero.match(/(NL-\d{4}-\d{3})/);
+      const base = baseMatch ? baseMatch[1] : `NL-${year}-000`;
+      formattedNumber = `${base}-rev${novaRevisao}`;
+    } else {
+      const { data: lastGlobal } = await supabase
+        .from('contratos')
+        .select('numero')
+        .like('numero', `NL-${year}-%`)
+        .order('criado_em', { ascending: false })
+        .limit(1);
+
+      let nextNumber = 1;
+      if (lastGlobal && lastGlobal[0]?.numero) {
+        const match = lastGlobal[0].numero.match(/NL-\d{4}-(\d{3})/);
+        if (match) nextNumber = parseInt(match[1]) + 1;
+      }
+      formattedNumber = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+    }
+
+    setContractFormData(prev => ({ ...prev, numero: formattedNumber, revisao: novaRevisao }));
   };
+
 
   useEffect(() => {
     fetchData();
@@ -438,8 +464,10 @@ const DocumentosContratos = () => {
         dados_gerais: contractFormData.cliente,
         prazos: contractFormData.prazos,
         valores: contractFormData.honorarios,
-        status: 'Gerado'
+        status: 'Gerado',
+        revisao: (contractFormData as any).revisao || 1
       }).select().single();
+
 
       if (error) throw error;
       
@@ -476,6 +504,8 @@ const DocumentosContratos = () => {
       setLoading(true);
       const data: ContractData = {
         numero: contract.numero,
+        revisao: contract.revisao,
+
         cliente: contract.dados_gerais,
         projeto: {
           tipo: contract.tipo,
@@ -1069,7 +1099,7 @@ const DocumentosContratos = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="text-sm font-bold text-white mb-1 uppercase tracking-tight">{c.cliente_nome}</h3>
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} · {c.tipo}</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest">{c.numero} {c.revisao > 1 ? `(REV${c.revisao})` : ''} · {c.tipo}</p>
                     </div>
                     <Badge className={cn(
                       "text-[8px] uppercase tracking-tighter",

@@ -450,6 +450,7 @@ export type Database = {
           plano: string | null
           prazos: Json | null
           projeto_id: string | null
+          revisao: number | null
           status: string
           tipo: string
           updated_at: string | null
@@ -470,6 +471,7 @@ export type Database = {
           plano?: string | null
           prazos?: Json | null
           projeto_id?: string | null
+          revisao?: number | null
           status?: string
           tipo: string
           updated_at?: string | null
@@ -490,6 +492,7 @@ export type Database = {
           plano?: string | null
           prazos?: Json | null
           projeto_id?: string | null
+          revisao?: number | null
           status?: string
           tipo?: string
           updated_at?: string | null
