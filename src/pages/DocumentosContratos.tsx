@@ -1975,15 +1975,8 @@ const DocumentosContratos = () => {
 
             <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/5">
               <Button 
-                onClick={handleShowPreview} 
-                disabled={loading || isGeneratingPreview || !contractFormData.cliente.nome} 
-                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
-              >
-                {isGeneratingPreview ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} className="mr-2" />} PRÉ-VISUALIZAR
-              </Button>
-              <Button 
                 variant="outline"
-                onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
+                onClick={() => toast.info("Integração com ClickSign em breve. Baixe o DOCX e envie manualmente.")}
                 className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
                 <Send size={16} className="mr-2" /> ENVIAR P/ ASSINATURA
@@ -1997,14 +1990,7 @@ const DocumentosContratos = () => {
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Cloud size={16} className="mr-2" />} SALVAR NO DROPBOX
               </Button>
               <Button 
-                onClick={() => handleGenerateContract('pdf')} 
-                disabled={loading || !contractFormData.cliente.nome} 
-                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
-              >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR PDF
-              </Button>
-              <Button 
-                onClick={() => handleGenerateContract('docx')} 
+                onClick={handleGenerateContract} 
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
@@ -2248,30 +2234,6 @@ const DocumentosContratos = () => {
                   FECHAR
                 </Button>
               </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        {/* MODAL PARA PRE-VISUALIZACAO DO CONTRATO */}
-        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-none">
-            <DialogHeader className="p-6 border-b border-white/5 shrink-0">
-              <DialogTitle className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B7355]">
-                PRÉ-VISUALIZAÇÃO DO CONTRATO
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto p-12 bg-white text-black">
-              <div 
-                className="prose prose-sm max-w-none contract-preview"
-                dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
-              />
-            </div>
-            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A]">
-              <Button 
-                onClick={() => setIsPreviewModalOpen(false)}
-                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8"
-              >
-                FECHAR
-              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
