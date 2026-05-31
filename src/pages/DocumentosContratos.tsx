@@ -27,7 +27,8 @@ import {
   FileCheck,
   Ban,
   Save,
-  FileDown
+  FileDown,
+  Info
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
@@ -1906,6 +1907,56 @@ const DocumentosContratos = () => {
                   </div>
                 </div>
               </section>
+
+              {/* Pré-visualização de Tags */}
+              <section className="bg-white/[0.02] border border-white/5 p-6 mt-8 space-y-6">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <Info size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">RESUMO DE SUBSTITUIÇÃO (TAGS)</h3>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{nome_cliente}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.cliente.nome || '—'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{cpf_cliente}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.cliente.cpf || '—'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{valor_total}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">
+                      R$ {(() => {
+                        const val = contractFormData.projeto.plano === 'Completo' 
+                          ? contractFormData.honorarios.totalCompleto 
+                          : contractFormData.honorarios.totalExecutivo;
+                        return val || '0,00';
+                      })()}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{prazo_semanas}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.prazos.total || '0'} SEMANAS</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{plano}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.plano}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{tipo_imovel}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.tipoImovel}</p>
+                  </div>
+                  <div className="space-y-1 md:col-span-2">
+                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{endereco_imovel}`}</p>
+                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.endereco || '—'}</p>
+                  </div>
+                </div>
+                <p className="text-[9px] text-white/20 italic text-center pt-2 border-t border-white/[0.02]">
+                  Estes dados serão injetados nas tags correspondentes do arquivo .docx
+                </p>
+              </section>
+
 
               {/* DADOS FIXOS NL */}
               <section className="space-y-4">
