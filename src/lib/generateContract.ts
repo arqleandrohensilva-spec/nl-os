@@ -330,6 +330,11 @@ export const generateContractPDF = async (data: ContractData) => {
         ],
       }
     );
+    
+    if (!result.value || result.value.trim() === '') {
+       throw new Error("O conteúdo convertido do DOCX está vazio.");
+    }
+    console.log('generateContractPDF: HTML convertido (tamanho):', result.value.length);
     console.log('generateContractPDF: HTML convertido via mammoth');
 
     const container = document.createElement('div');
