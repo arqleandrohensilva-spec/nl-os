@@ -1956,14 +1956,14 @@ const DocumentosContratos = () => {
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Cloud size={16} className="mr-2" />} SALVAR NO DROPBOX
               </Button>
               <Button 
-                onClick={handleGeneratePDF} 
+                onClick={() => handleGenerateContract('pdf')} 
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR PDF
               </Button>
               <Button 
-                onClick={handleGenerateContract} 
+                onClick={() => handleGenerateContract('docx')} 
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
