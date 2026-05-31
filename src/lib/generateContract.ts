@@ -304,14 +304,15 @@ export const getContractPreviewHtml = async (data: ContractData) => {
 };
 
 export const generateContractPDF = async (data: ContractData) => {
+  console.log('Iniciando generateContractPDF...', data);
   try {
-    console.log('Gerando PDF a partir do DOCX...');
     const docxBlob = await generateContractDocx(data);
     if (!docxBlob) {
-      console.error('Falha ao gerar DOCX base para o PDF');
+      console.error('generateContractPDF: docxBlob é nulo');
+      toast.error('Erro ao gerar base do contrato (DOCX)');
       return null;
     }
-    console.log('DOCX base gerado com sucesso, convertendo para HTML...');
+    console.log('generateContractPDF: DOCX gerado, iniciando mammoth...');
 
     const arrayBuffer = await docxBlob.arrayBuffer();
     const result = await mammoth.convertToHtml(
@@ -326,21 +327,22 @@ export const generateContractPDF = async (data: ContractData) => {
         ],
       }
     );
+    console.log('generateContractPDF: HTML convertido via mammoth');
 
     const container = document.createElement('div');
+    // Forçar visibilidade para o html2canvas conseguir capturar
     container.style.cssText = `
       position: absolute;
       left: -9999px;
       top: 0;
       width: 794px;
-      background: #ffffff;
-      color: #000000;
+      background: white;
+      color: black;
       font-family: Arial, sans-serif;
       font-size: 11pt;
       line-height: 1.5;
       padding: 40px;
       box-sizing: border-box;
-      z-index: -9999;
     `;
 
     const style = document.createElement('style');
@@ -359,6 +361,7 @@ export const generateContractPDF = async (data: ContractData) => {
     container.appendChild(content);
     document.body.appendChild(container);
 
+    console.log('generateContractPDF: Container adicionado ao DOM, aguardando renderização...');
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const opt = {
@@ -373,13 +376,16 @@ export const generateContractPDF = async (data: ContractData) => {
         windowWidth: 794,
       },
       jsPDF: {
-        unit: 'mm' as const,
-        format: 'a4' as const,
+        unit: 'mm' as const, 
+        format: 'a4' as const, 
         orientation: 'portrait' as const
       }
     };
 
+    console.log('generateContractPDF: Chamando html2pdf...');
     const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
+    console.log('generateContractPDF: PDF gerado com sucesso!');
+    
     document.body.removeChild(container);
     return pdfBlob;
   } catch (error: any) {
