@@ -464,6 +464,72 @@ const DocumentosContratos = () => {
     }
   };
 
+
+  const handleGeneratePDF = async () => {
+    try {
+      setLoading(true);
+      const pdfBlob = await generateContractPDF(contractFormData);
+      if (!pdfBlob) return;
+
+      toast.success('PDF do contrato gerado com sucesso!');
+      
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Erro ao gerar PDF do contrato');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadExistingContractPDF = async (contract: any) => {
+    try {
+      setLoading(true);
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+      };
+      
+      const pdfBlob = await generateContractPDF(data);
+      if (!pdfBlob) return;
+
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contract.numero} - ${contract.cliente_nome}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Erro ao gerar PDF do contrato');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDownloadExistingContract = async (contract: any) => {
     try {
       setLoading(true);
