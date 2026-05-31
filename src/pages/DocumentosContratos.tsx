@@ -39,7 +39,7 @@ import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ContractData } from '@/utils/contractTemplates';
-import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
+import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -160,6 +160,9 @@ const DocumentosContratos = () => {
   const [categoriaCancelamento, setCategoriaCancelamento] = useState('');
   const [outroMotivo, setOutroMotivo] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const generateContractNumber = async () => {
     const year = new Date().getFullYear();
@@ -471,6 +474,23 @@ const DocumentosContratos = () => {
       setLoading(false);
     }
   };
+
+  const handleShowPreview = async () => {
+    try {
+      setIsGeneratingContractPreview(true);
+      const html = await getContractPreviewHtml(contractFormData);
+      if (html) {
+        setPreviewHtml(html);
+        setIsPreviewModalOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao gerar preview");
+    } finally {
+      setIsGeneratingContractPreview(false);
+    }
+  };
+
 
 
   const handleDownloadExistingContractPDF = async (contract: any) => {
@@ -1908,7 +1928,7 @@ const DocumentosContratos = () => {
                 </div>
               </section>
 
-              {/* Pré-visualização de Tags */}
+              {/* PRÉ-VISUALIZAÇÃO DE TAGS */}
               <section className="bg-white/[0.02] border border-white/5 p-6 mt-8 space-y-6">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <Info size={14} className="text-bronze" />
@@ -1939,18 +1959,6 @@ const DocumentosContratos = () => {
                     <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{prazo_semanas}`}</p>
                     <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.prazos.total || '0'} SEMANAS</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{plano}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.plano}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{tipo_imovel}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.tipoImovel}</p>
-                  </div>
-                  <div className="space-y-1 md:col-span-2">
-                    <p className="text-[8px] text-white/20 uppercase font-bold tracking-tighter">{`{endereco_imovel}`}</p>
-                    <p className="text-[11px] text-bronze uppercase truncate font-medium">{contractFormData.projeto.endereco || '—'}</p>
-                  </div>
                 </div>
                 <p className="text-[9px] text-white/20 italic text-center pt-2 border-t border-white/[0.02]">
                   Estes dados serão injetados nas tags correspondentes do arquivo .docx
@@ -1958,8 +1966,9 @@ const DocumentosContratos = () => {
               </section>
 
 
+
               {/* DADOS FIXOS NL */}
-              <section className="space-y-4">
+              <section className="space-y-4 mt-8">
                 <div className="flex items-center gap-2 border-b border-white/5 pb-2">
                   <MapPin size={14} className="text-bronze" />
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">DADOS FIXOS NL</h3>
@@ -1995,6 +2004,13 @@ const DocumentosContratos = () => {
             </div>
 
             <DialogFooter className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-white/5">
+              <Button 
+                onClick={handleShowPreview} 
+                disabled={loading || isGeneratingPreview || !contractFormData.cliente.nome} 
+                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
+              >
+                {isGeneratingPreview ? <Loader2 size={16} className="animate-spin" /> : <Eye size={16} className="mr-2" />} PRÉ-VISUALIZAR
+              </Button>
               <Button 
                 variant="outline"
                 onClick={() => toast.info("Integração com ClickSign em breve. Baixe o PDF e envie manualmente.")}
@@ -2262,6 +2278,30 @@ const DocumentosContratos = () => {
                   FECHAR
                 </Button>
               </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* MODAL PARA PRE-VISUALIZACAO DO CONTRATO */}
+        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-none">
+            <DialogHeader className="p-6 border-b border-white/5 shrink-0">
+              <DialogTitle className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B7355]">
+                PRÉ-VISUALIZAÇÃO DO CONTRATO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto p-12 bg-white text-black">
+              <div 
+                className="prose prose-sm max-w-none contract-preview"
+                dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
+              />
+            </div>
+            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A]">
+              <Button 
+                onClick={() => setIsPreviewModalOpen(false)}
+                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8"
+              >
+                FECHAR
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

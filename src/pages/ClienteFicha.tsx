@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
+import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
 import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
@@ -192,6 +192,9 @@ const ClienteFicha = () => {
     plano: 'Executivo' as 'Executivo' | 'Completo'
   });
   const [isBriefingOpen, setIsBriefingOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [isGeneratingPreview, setIsGeneratingContractPreview] = useState(false);
 
   const proposta = propostas[propostas.length - 1] || null;
 
@@ -492,6 +495,105 @@ const ClienteFicha = () => {
       setIsGeneratingContract(false);
     }
   };
+
+  const handleShowPreview = async () => {
+    try {
+      setIsGeneratingContractPreview(true);
+      
+      const { data: props } = await supabase
+        .from('proposals')
+        .select('*, calculos_proposta (*)')
+        .in('id', selectedProposals);
+
+      if (!props || props.length === 0) {
+        toast.error("Selecione ao menos uma proposta");
+        return;
+      }
+
+      const year = new Date().getFullYear();
+      const { data: lastContract } = await supabase
+        .from('contratos')
+        .select('numero')
+        .order('criado_em', { ascending: false })
+        .limit(1);
+
+      let nextNumber = 1;
+      if (lastContract?.[0]?.numero) {
+        const match = lastContract[0].numero.match(/NL-\d{4}-(\d{3})/);
+        if (match) nextNumber = parseInt(match[1]) + 1;
+      }
+      const numeroContrato = `NL-${year}-${String(nextNumber).padStart(3, '0')}`;
+
+      let totalValue = 0;
+      props.forEach(p => {
+        const c = p.calculos_proposta?.[0];
+        if (contractFormData.plano === 'Executivo') {
+          totalValue += Number(c?.valor_executivo || p.valor_executivo || 0);
+        } else {
+          totalValue += Number(c?.valor_completo || p.valor_completo || 0);
+        }
+      });
+
+      const lastProp = props[props.length - 1];
+
+      const contractData: ContractData = {
+        numero: numeroContrato,
+        cliente: {
+          nome: formData.nome || cliente?.nome || '',
+          cpf: cliente?.cpf_cnpj || '',
+          endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+          nacionalidade: contractFormData.nacionalidade,
+          estadoCivil: contractFormData.estadoCivil,
+          profissao: contractFormData.profissao
+        },
+        projeto: {
+          tipo: lastProp.tipo === 'ArqInt' ? 'ARQ+INT' : 
+                lastProp.tipo === 'Interiores' ? 'Interiores' : 'Comercial',
+          plano: contractFormData.plano,
+          endereco: cliente?.endereco_imovel || cliente?.cidade || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: lastProp.area?.toString() || '',
+          matricula: contractFormData.matricula,
+          cartorio: contractFormData.cartorio
+        },
+        prazos: {
+          briefing: '5',
+          estudo: '15',
+          legal: '10',
+          executivo: '30',
+          total: contractFormData.prazoTotal,
+          totalDias: '65'
+        },
+        honorarios: {
+          totalExecutivo: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalCompleto: totalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          totalExtenso: valorPorExtenso(totalValue),
+          marco1: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          marco2: (totalValue * 0.4).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+          marco3: (totalValue * 0.3).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+        },
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: new Date().toLocaleDateString('pt-BR')
+      };
+
+      const html = await getContractPreviewHtml(contractData);
+      if (html) {
+        setPreviewHtml(html);
+        setIsPreviewModalOpen(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao gerar preview");
+    } finally {
+      setIsGeneratingContractPreview(false);
+    }
+  };
+
 
 
   if (isClienteLoading) return <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#8B7355]"></div></div>;
@@ -1553,7 +1655,16 @@ const ClienteFicha = () => {
                   <div className="flex justify-center pt-4">
                     <div className="flex gap-4 pt-4">
                       <Button 
+                        disabled={isGeneratingContract || isGeneratingPreview || selectedProposals.length === 0}
+                        onClick={handleShowPreview}
+                        className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
+                      >
+                        {isGeneratingPreview ? <Loader2 className="animate-spin mr-2" /> : null}
+                        PRÉ-VISUALIZAR
+                      </Button>
+                      <Button 
                         disabled={isGeneratingContract || selectedProposals.length === 0}
+
                         onClick={() => handleGenerateContract('docx')}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-6 text-[10px] font-bold uppercase h-12 tracking-widest flex-1"
                       >
@@ -1804,6 +1915,31 @@ const ClienteFicha = () => {
                 className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white uppercase tracking-widest text-[10px] font-bold"
               >
                 CRIAR PROJETO AGORA
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* MODAL PARA PRE-VISUALIZACAO DO CONTRATO */}
+        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+          <DialogContent className="bg-[#0A0A0A] border-white/10 text-white max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-none">
+            <DialogHeader className="p-6 border-b border-white/5 shrink-0">
+              <DialogTitle className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B7355]">
+                PRÉ-VISUALIZAÇÃO DO CONTRATO
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto p-12 bg-white text-black">
+              <div 
+                className="prose prose-sm max-w-none contract-preview"
+                dangerouslySetInnerHTML={{ __html: previewHtml || '' }} 
+              />
+            </div>
+            <DialogFooter className="p-4 border-t border-white/5 shrink-0 bg-[#0A0A0A]">
+              <Button 
+                onClick={() => setIsPreviewModalOpen(false)}
+                className="bg-transparent border border-white/10 text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest px-8"
+              >
+                FECHAR
               </Button>
             </DialogFooter>
           </DialogContent>
