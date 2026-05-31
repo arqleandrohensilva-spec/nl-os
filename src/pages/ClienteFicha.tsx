@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
+import { generateContractDocx, generateContractPDF, getContractPreviewHtml } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
 import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
