@@ -220,7 +220,7 @@ const ClienteFicha = () => {
     enabled: !!id
   });
 
-  const contrato = contratos[0] || null;
+  const contrato = contratos.find((c: any) => c.status !== 'Inativo') || null;
 
 
   useEffect(() => {
@@ -1724,6 +1724,36 @@ const ClienteFicha = () => {
                     </div>
                   </div>
                 </div>
+              ) : (contrato.status === 'Inativo') ? (
+                <div className="p-12 text-center bg-[#0D0D0D] border border-white/5 space-y-4">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+                    <Info className="text-red-500" size={24} />
+                  </div>
+                  <h3 className="text-white font-bold uppercase tracking-widest text-sm">CONTRATO INATIVADO</h3>
+                  <p className="text-white/40 text-[10px] uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                    ESTE CONTRATO FOI DESATIVADO. VOCÊ PODE GERAR UM NOVO CONTRATO OU REATIVAR ESTE NO HISTÓRICO ABAIXO.
+                  </p>
+                  <Button 
+                    onClick={async () => {
+                      if (confirm('Deseja realmente arquivar permanentemente o contrato inativo para liberar a geração de um novo?')) {
+                        try {
+                          const { error } = await supabase
+                            .from('contratos')
+                            .update({ status: 'Arquivado' } as any)
+                            .eq('id', contrato.id);
+                          if (error) throw error;
+                          toast.success("Pronto para gerar novo contrato");
+                          queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+                        } catch (err) {
+                          toast.error("Erro ao processar");
+                        }
+                      }
+                    }}
+                    className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 text-[10px] font-bold uppercase mt-4"
+                  >
+                    CRIAR NOVO CONTRATO
+                  </Button>
+                </div>
               ) : (
                 <div className="p-6 bg-[#0D0D0D] border border-white/5 space-y-6">
                   <div className="flex justify-between items-center">
@@ -1756,7 +1786,7 @@ const ClienteFicha = () => {
                               .eq('id', id);
 
                             toast.success("Contrato inativado");
-                            queryClient.invalidateQueries({ queryKey: ['contrato_cliente', id] });
+                            queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
                             queryClient.invalidateQueries({ queryKey: ['cliente', id] });
                           } catch (error) {
                             console.error(error);
@@ -1844,10 +1874,11 @@ const ClienteFicha = () => {
                     <table className="w-full text-left text-[10px]">
                       <thead className="bg-white/5 border-b border-white/5">
                         <tr>
-                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
-                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
-                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
-                          <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
+                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">NÚMERO</th>
+                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">REVISÃO</th>
+                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">DATA</th>
+                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold">STATUS</th>
+                           <th className="px-4 py-3 text-white/40 uppercase tracking-widest font-bold text-right">AÇÕES</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
@@ -1855,8 +1886,38 @@ const ClienteFicha = () => {
                           <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
                             <td className="px-4 py-3 text-white/80 font-mono">{c.numero}</td>
                             <td className="px-4 py-3 text-white/60">REV{c.revisao || 1}</td>
-                            <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
-                            <td className="px-4 py-3 text-right">
+                             <td className="px-4 py-3 text-white/40">{format(new Date(c.criado_em), 'dd/MM/yyyy')}</td>
+                             <td className="px-4 py-3">
+                               <Badge variant="outline" className={cn(
+                                 "text-[8px] rounded-none border-white/10 uppercase tracking-tighter",
+                                 c.status === 'Inativo' ? "text-red-500 bg-red-500/5" : "text-green-500 bg-green-500/5"
+                               )}>
+                                 {c.status || 'Ativo'}
+                               </Badge>
+                             </td>
+                             <td className="px-4 py-3 text-right flex justify-end gap-2">
+                               {c.status === 'Inativo' && (
+                                 <Button 
+                                   variant="ghost" 
+                                   size="sm" 
+                                   onClick={async () => {
+                                     try {
+                                       const { error } = await supabase
+                                         .from('contratos')
+                                         .update({ status: 'Ativo' } as any)
+                                         .eq('id', c.id);
+                                       if (error) throw error;
+                                       toast.success("Contrato reativado");
+                                       queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+                                     } catch (err) {
+                                       toast.error("Erro ao reativar");
+                                     }
+                                   }}
+                                   className="h-7 text-green-500 hover:text-green-400 hover:bg-green-500/5 rounded-none text-[9px] uppercase tracking-widest font-bold"
+                                 >
+                                   REATIVAR
+                                 </Button>
+                               )}
                               <Button 
                                 variant="ghost" 
                                 size="sm" 
