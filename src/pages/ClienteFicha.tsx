@@ -36,6 +36,7 @@ const ClienteFicha = () => {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [openSections, setOpenSections] = useState<string[]>(['ficha']);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isNewClient, setIsNewClient] = useState(!id);
   
   useEffect(() => {
