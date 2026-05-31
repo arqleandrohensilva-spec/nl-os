@@ -1712,6 +1712,27 @@ const DocumentosContratos = () => {
                     />
                   </div>
                   
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Data de Assinatura</Label>
+                    <Input 
+                      type="text"
+                      placeholder="Ex: 14 de maio de 2026"
+                      value={contractFormData.dataAssinatura || ''}
+                      onChange={(e) => setContractFormData(prev => ({ ...prev, dataAssinatura: e.target.value }))}
+                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* BLOCO 2 — CAMPOS QUE FALTAM */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+                  <ClipboardList size={14} className="text-bronze" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/60">BLOCO 2 — CAMPOS QUE FALTAM</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Área do Terreno — opcional */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -1760,17 +1781,6 @@ const DocumentosContratos = () => {
                     {contractFormData.projeto.areaConstruida === null && (
                       <p className="text-[9px] text-white/20 italic">Não será incluído no contrato</p>
                     )}
-                  </div>
-                  
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] uppercase tracking-widest text-white/60">Data de Assinatura</Label>
-                    <Input 
-                      type="text"
-                      placeholder="Ex: 14 de maio de 2026"
-                      value={contractFormData.dataAssinatura || ''}
-                      onChange={(e) => setContractFormData(prev => ({ ...prev, dataAssinatura: e.target.value }))}
-                      className="bg-black/20 border-white/10 rounded-none focus:ring-bronze h-10"
-                    />
                   </div>
                 </div>
               </section>
