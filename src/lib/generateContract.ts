@@ -108,7 +108,7 @@ export const generateContractDocx = async (data: ContractData) => {
     };
 
     const zip = new PizZip(arrayBuffer);
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true, errorLogging: false });
+    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true, errorLogging: false, delimiters: { start: '{', end: '}' } });
     try {
       doc.setData(templateData);
       doc.render();
