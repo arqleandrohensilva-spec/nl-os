@@ -18,6 +18,7 @@ import { generateContractDocx } from '@/lib/generateContract';
 import { ContractData } from '@/utils/contractTemplates';
 import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ORIGENS = ['Instagram', 'Indicação', 'Site', 'Outro'];
 
