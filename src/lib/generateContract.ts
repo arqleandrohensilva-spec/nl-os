@@ -305,52 +305,82 @@ export const getContractPreviewHtml = async (data: ContractData) => {
 
 export const generateContractPDF = async (data: ContractData) => {
   try {
-    const html = await getContractPreviewHtml(data);
-    if (!html) return null;
+    const docxBlob = await generateContractDocx(data);
+    if (!docxBlob) return null;
+
+    const arrayBuffer = await docxBlob.arrayBuffer();
+    const result = await mammoth.convertToHtml(
+      { arrayBuffer },
+      {
+        styleMap: [
+          "p[style-name='Title'] => h1:fresh",
+          "p[style-name='Heading 1'] => h2:fresh",
+          "p[style-name='Heading 2'] => h3:fresh",
+          "b => strong",
+          "i => em",
+        ],
+      }
+    );
 
     const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '0';
-    container.style.width = '210mm'; // A4 width
-    container.style.minHeight = '297mm';
-    container.style.padding = '20mm';
-    container.style.background = 'white';
-    container.style.color = 'black';
-    container.style.fontFamily = 'Arial, sans-serif';
-    container.className = 'pdf-render-container';
-    container.innerHTML = html;
+    container.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 794px;
+      background: #ffffff;
+      color: #000000;
+      font-family: Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      padding: 40px;
+      box-sizing: border-box;
+      z-index: 99999;
+      opacity: 0;
+      pointer-events: none;
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      h1 { font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+      h2 { font-size: 13pt; font-weight: bold; margin-top: 16px; margin-bottom: 8px; }
+      p { margin-bottom: 8px; text-align: justify; line-height: 1.5; font-size: 11pt; }
+      strong { font-weight: bold; }
+      table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+      td, th { border: 1px solid #000; padding: 6px; font-size: 10pt; }
+    `;
+    container.appendChild(style);
+
+    const content = document.createElement('div');
+    content.innerHTML = result.value;
+    container.appendChild(content);
     document.body.appendChild(container);
 
-    // Pequeno delay para garantir renderização dos estilos
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 600));
 
     const opt = {
-      margin: 10,
+      margin: [10, 10, 10, 10] as [number, number, number, number],
       filename: `${data.numero || 'Contrato'} - ${data.cliente.nome}.pdf`,
       image: { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas: { 
-        scale: 2, 
+      html2canvas: {
+        scale: 2,
         useCORS: true,
-        letterRendering: true,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: container.offsetWidth
+        backgroundColor: '#ffffff',
+        width: 794,
+        windowWidth: 794,
       },
-      jsPDF: { 
-        unit: 'mm' as const, 
-        format: 'a4' as const, 
-        orientation: 'portrait' as const 
+      jsPDF: {
+        unit: 'mm' as const,
+        format: 'a4' as const,
+        orientation: 'portrait' as const
       }
     };
 
-    const worker = html2pdf().set(opt).from(container);
-    const pdfBlob = await worker.output('blob');
-    
+    const pdfBlob = await html2pdf().set(opt).from(container).output('blob');
     document.body.removeChild(container);
     return pdfBlob;
   } catch (error: any) {
-    console.error('Erro ao gerar PDF via html2pdf:', error);
+    console.error('Erro ao gerar PDF:', error);
     toast.error(`Erro ao gerar PDF: ${error.message || error}`);
     return null;
   }
