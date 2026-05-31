@@ -280,20 +280,48 @@ export const getContractPreviewHtml = async (data: ContractData) => {
         ],
       },
     );
+    
     let html = result.value;
     html = html.replace(/<p><\/p>/g, "<br />");
 
     return `
       <style>
-        .contract-preview h1 { font-size: 20pt; font-weight: bold; text-align: center; margin-bottom: 24pt; text-transform: uppercase; font-family: Arial, sans-serif; }
-        .contract-preview h2 { font-size: 14pt; font-weight: bold; margin-top: 18pt; margin-bottom: 9pt; border-bottom: 1px solid #000; padding-bottom: 3pt; font-family: Arial, sans-serif; }
-        .contract-preview p { margin-bottom: 10pt; text-align: justify; line-height: 1.5; font-size: 11pt; font-family: Arial, sans-serif; }
-        .contract-preview strong { font-weight: bold; }
-        .contract-preview table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
-        .contract-preview td, .contract-preview th { border: 1px solid #000; padding: 6pt; font-size: 10pt; }
+        .contract-preview-wrapper {
+          background: #f5f5f5;
+          padding: 40px 20px;
+          display: flex;
+          justify-content: center;
+        }
+        .contract-preview-page {
+          background: white;
+          width: 210mm;
+          min-height: 297mm;
+          padding: 25mm 20mm;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+          box-sizing: border-box;
+          color: black;
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          position: relative;
+        }
+        .contract-preview-page h1 { font-size: 16pt; font-weight: bold; text-align: center; margin-bottom: 24pt; text-transform: uppercase; }
+        .contract-preview-page h2 { font-size: 12pt; font-weight: bold; margin-top: 18pt; margin-bottom: 9pt; border-bottom: 1pt solid #000; padding-bottom: 3pt; text-transform: uppercase; }
+        .contract-preview-page p { margin-bottom: 10pt; text-align: justify; font-size: 11pt; }
+        .contract-preview-page strong { font-weight: bold; }
+        .contract-preview-page table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
+        .contract-preview-page td, .contract-preview-page th { border: 1pt solid #000; padding: 6pt; font-size: 10pt; vertical-align: top; }
+        @media (max-width: 210mm) {
+          .contract-preview-page {
+            width: 100%;
+            height: auto;
+            padding: 15mm 10mm;
+          }
+        }
       </style>
-      <div class="contract-preview">
-        ${html}
+      <div class="contract-preview-wrapper">
+        <div class="contract-preview-page">
+          ${html}
+        </div>
       </div>
     `;
   } catch (error: any) {
