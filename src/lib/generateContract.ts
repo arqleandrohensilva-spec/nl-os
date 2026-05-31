@@ -324,9 +324,9 @@ export const generateContractPDF = async (data: ContractData) => {
 
     const container = document.createElement('div');
     container.style.cssText = `
-      position: fixed;
+      position: absolute;
+      left: -9999px;
       top: 0;
-      left: 0;
       width: 794px;
       background: #ffffff;
       color: #000000;
@@ -335,9 +335,7 @@ export const generateContractPDF = async (data: ContractData) => {
       line-height: 1.5;
       padding: 40px;
       box-sizing: border-box;
-      z-index: 99999;
-      opacity: 0;
-      pointer-events: none;
+      z-index: -9999;
     `;
 
     const style = document.createElement('style');
