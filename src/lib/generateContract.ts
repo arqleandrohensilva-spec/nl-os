@@ -73,7 +73,9 @@ export const generateContractDocx = async (data: ContractData) => {
     };
     const formatVal = (n: number): string => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : parseNum(data.honorarios.totalExecutivo);
+    const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : 
+                  data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) : // Fornecedor usa campo executivo como base se necessário
+                  parseNum(data.honorarios.totalExecutivo);
     const marco1 = Math.round(valor * 0.30);
     const marco2 = Math.round(valor * 0.40);
     const marco3 = valor - marco1 - marco2;
