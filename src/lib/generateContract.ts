@@ -150,7 +150,7 @@ export const generateContractPDF = async (data: ContractData) => {
     const opt = {
       margin: 15,
       filename: `${data.numero || 'Contrato'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg' as const, quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, letterRendering: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
