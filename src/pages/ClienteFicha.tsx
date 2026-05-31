@@ -14,8 +14,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { generateContractDocx } from '@/lib/generateContract';
-import { ContractData, generateContractPDF } from '@/utils/contractTemplates';
+import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
+import { ContractData } from '@/utils/contractTemplates';
 import { valorPorExtenso } from '@/utils/extenso';
 import { Progress } from '@/components/ui/progress';
 
@@ -1571,9 +1571,16 @@ const ClienteFicha = () => {
                               }
                             };
 
-                            const pdf = generateContractPDF(contractData);
-                            pdf.save(`Contrato - ${contractData.cliente.nome}.pdf`);
-                            toast.success("PDF gerado!");
+                            const pdfBlob = await generateContractPDF(contractData);
+                            if (pdfBlob) {
+                              const url = URL.createObjectURL(pdfBlob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `Contrato - ${contractData.cliente.nome}.pdf`;
+                              a.click();
+                              URL.revokeObjectURL(url);
+                              toast.success("PDF gerado!");
+                            }
                           } catch (err) {
                             console.error(err);
                           } finally {

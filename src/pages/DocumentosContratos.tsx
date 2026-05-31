@@ -38,7 +38,7 @@ import { toast } from "sonner";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ContractData } from '@/utils/contractTemplates';
-import { generateContractDocx } from '@/lib/generateContract';
+import { generateContractDocx, generateContractPDF } from '@/lib/generateContract';
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -459,6 +459,72 @@ const DocumentosContratos = () => {
     } catch (error) {
       console.error('Error generating contract:', error);
       toast.error('Erro ao gerar contrato');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleGeneratePDF = async () => {
+    try {
+      setLoading(true);
+      const pdfBlob = await generateContractPDF(contractFormData);
+      if (!pdfBlob) return;
+
+      toast.success('PDF do contrato gerado com sucesso!');
+      
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contractFormData.numero} - ${contractFormData.cliente.nome}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Erro ao gerar PDF do contrato');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadExistingContractPDF = async (contract: any) => {
+    try {
+      setLoading(true);
+      const data: ContractData = {
+        numero: contract.numero,
+        cliente: contract.dados_gerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: contract.dados_gerais.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos,
+        honorarios: contract.valores,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+      };
+      
+      const pdfBlob = await generateContractPDF(data);
+      if (!pdfBlob) return;
+
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${contract.numero} - ${contract.cliente_nome}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Erro ao gerar PDF do contrato');
     } finally {
       setLoading(false);
     }
@@ -1077,7 +1143,14 @@ const DocumentosContratos = () => {
                       onClick={() => handleDownloadExistingContract(c)}
                       className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
                     >
-                      <FileDown size={12} className="mr-1" /> BAIXAR DOCX
+                      <FileDown size={12} className="mr-1" /> DOCX
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleDownloadExistingContractPDF(c)}
+                      className="bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white text-[9px] uppercase tracking-widest h-8 rounded-none transition-colors"
+                    >
+                      <FileDown size={12} className="mr-1" /> PDF
                     </Button>
                     <Button 
                       variant="outline" 
@@ -1898,11 +1971,18 @@ const DocumentosContratos = () => {
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <Cloud size={16} className="mr-2" />} SALVAR NO DROPBOX
               </Button>
               <Button 
+                onClick={handleGeneratePDF} 
+                disabled={loading || !contractFormData.cliente.nome} 
+                className="flex-1 bg-transparent border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 transition-colors"
+              >
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR PDF
+              </Button>
+              <Button 
                 onClick={handleGenerateContract} 
                 disabled={loading || !contractFormData.cliente.nome} 
                 className="flex-1 bg-bronze hover:bg-bronze/80 text-white rounded-none uppercase text-[10px] tracking-widest h-12 font-bold transition-colors"
               >
-                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR E BAIXAR DOCX
+                {loading ? <Loader2 size={16} className="animate-spin" /> : <FileDown size={16} className="mr-2" />} GERAR DOCX
               </Button>
             </DialogFooter>
           </DialogContent>
