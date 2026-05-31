@@ -322,8 +322,11 @@ export const generateContractPDF = async (data: ContractData) => {
           "p[style-name='Title'] => h1:fresh",
           "p[style-name='Heading 1'] => h2:fresh",
           "p[style-name='Heading 2'] => h3:fresh",
+          "p[style-name='Normal'] => p:fresh",
           "b => strong",
           "i => em",
+          "u => u",
+          "strike => del",
         ],
       }
     );
