@@ -69,9 +69,17 @@ export const generateContractDocx = async (data: ContractData) => {
 
     const parseNum = (val: string | undefined): number => {
       if (!val) return 0;
-      return parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0;
+      // Remove tudo exceto números, vírgula e ponto
+      const cleaned = String(val).replace(/[^\d,.]/g, '');
+      // Trata formato brasileiro: 33.687,22 → 33687.22
+      const normalized = cleaned.replace(/\./g, '').replace(',', '.');
+      return parseFloat(normalized) || 0;
     };
     const formatVal = (n: number): string => n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    console.log('DEBUG valor raw executivo:', data.honorarios.totalExecutivo);
+    console.log('DEBUG valor raw completo:', data.honorarios.totalCompleto);
+    console.log('DEBUG plano:', data.projeto.plano);
 
     const valor = data.projeto.plano === 'Completo' ? parseNum(data.honorarios.totalCompleto) : 
                   data.projeto.plano === 'Fornecedor' ? parseNum(data.honorarios.totalExecutivo) : // Fornecedor usa campo executivo como base se necessário
