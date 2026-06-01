@@ -2020,6 +2020,28 @@ const ClienteFicha = () => {
                   ) : (
                     <div className="flex items-center gap-4">
                       <p className="text-[10px] text-white/40 uppercase tracking-widest">ASSINADO EM {format(new Date(cliente.contrato_assinado_em), 'dd/MM/yyyy')}</p>
+                      {cliente?.contrato_assinado && (
+                        <button
+                          onClick={async () => {
+                            // Verificar se já tem projeto
+                            const { data: projetoExistente } = await supabase
+                              .from('projetos')
+                              .select('id')
+                              .eq('cliente_id', id)
+                              .maybeSingle();
+                            
+                            if (projetoExistente) {
+                              toast.info('Projeto já existe na Gestão de Projetos.');
+                              navigate('/projetos/gestao');
+                            } else {
+                              await handleCreateProject();
+                            }
+                          }}
+                          className="text-[9px] uppercase tracking-widest text-[#8B7355] hover:text-white transition-colors mt-2"
+                        >
+                          → VER / CRIAR PROJETO
+                        </button>
+                      )}
                       <Button 
                         onClick={() => navigate('/projetos/gestao')}
                         className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 text-[10px] font-bold uppercase"
