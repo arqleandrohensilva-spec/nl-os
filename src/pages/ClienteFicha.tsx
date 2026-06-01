@@ -327,7 +327,7 @@ const ClienteFicha = () => {
           cidade: cliente.cidade,
           area_m2: parseFloat(cliente.area_m2 as any) || 0,
           etapa_atual: 'Briefing',
-          status_geral: 'Em andamento',
+          status_geral: 'ativo',
           data_inicio: new Date().toISOString().split('T')[0],
           cliente_id: id
         })

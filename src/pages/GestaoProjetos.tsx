@@ -229,7 +229,7 @@ const GestaoProjetos = () => {
     }
   };
 
-  const activeProjectsCount = projetos.filter(p => p.status_geral === 'Em andamento').length;
+  const activeProjectsCount = projetos.filter(p => p.status_geral === 'ativo' || p.status_geral === 'Em andamento').length;
   
   const deliveriesThisWeek = Object.values(etapas).flat().filter(e => {
     if (!e.data_entrega) return false;
