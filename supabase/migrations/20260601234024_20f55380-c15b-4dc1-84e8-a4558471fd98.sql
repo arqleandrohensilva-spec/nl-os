@@ -1,0 +1,1 @@
+ALTER TABLE projetos ADD COLUMN IF NOT EXISTS cliente_id uuid REFERENCES clientes(id);

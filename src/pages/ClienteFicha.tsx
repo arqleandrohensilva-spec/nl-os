@@ -318,19 +318,27 @@ const ClienteFicha = () => {
       if (updateError) throw updateError;
 
       // 2. Criar projeto
-      const { data: novoProjeto, error: projectError } = await supabase.from('projetos').insert({
-        nome: `Projeto ${cliente.nome}`,
-        nome_cliente: cliente.nome,
-        tipo: cliente.tipo_projeto || 'Arq+Int',
-        cidade: cliente.cidade,
-        area_m2: parseFloat(cliente.area_m2 as any) || 0,
-        etapa_atual: 'Briefing',
-        status_geral: 'Em andamento',
-        data_inicio: new Date().toISOString().split('T')[0],
-        cliente_id: id
-      }).select().single();
+      const { data: novoProjeto, error: projectError } = await supabase
+        .from('projetos')
+        .insert({
+          nome: `Projeto ${cliente.nome}`,
+          nome_cliente: cliente.nome,
+          tipo: cliente.tipo_projeto || 'Arq+Int',
+          cidade: cliente.cidade,
+          area_m2: parseFloat(cliente.area_m2 as any) || 0,
+          etapa_atual: 'Briefing',
+          status_geral: 'Em andamento',
+          data_inicio: new Date().toISOString().split('T')[0],
+          cliente_id: id
+        })
+        .select()
+        .single();
 
-      if (projectError) throw projectError;
+      if (projectError) {
+        console.error('ERRO ao criar projeto:', projectError);
+        toast.error(`Erro ao criar projeto: ${projectError.message}`);
+        return;
+      }
 
       // 3. Criar etapas padrão
       const etapasPadrao = [
