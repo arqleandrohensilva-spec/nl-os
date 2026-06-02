@@ -177,7 +177,7 @@ const GestaoProjetos = () => {
 
 const MetricCard = ({ label, value, accent, warning }: { label: string, value: string | number, accent?: boolean, warning?: boolean }) => (
   <div className="bg-[#1a1a1a] border border-white/5 p-6 transition-all duration-300">
-    <p className="text-[10px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-2">{label}</p>
+    <p className="text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-2" style={{ fontFamily: "'Courier New', Courier, monospace" }}>{label}</p>
     <p className={cn(
       "text-4xl font-light font-cormorant",
       accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
