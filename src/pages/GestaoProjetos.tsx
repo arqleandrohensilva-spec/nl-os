@@ -11,10 +11,8 @@ import {
   Clock 
 } from 'lucide-react';
 import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 
 interface Projeto {
   id: string;
@@ -28,6 +26,7 @@ interface Projeto {
   data_inicio: string;
   prazo_final: string;
   horas_estimadas: number;
+  criado_em?: string;
 }
 
 interface EtapaInfo {
@@ -37,15 +36,12 @@ interface EtapaInfo {
   data_inicio?: string;
 }
 
-const PREMIUM_STAGES = ['Briefing', 'Conceito', 'Est.Prel.', 'Executivo', 'Entrega'];
-
 const GestaoProjetos = () => {
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [etapas, setEtapas] = useState<Record<string, EtapaInfo[]>>({});
   const [loading, setLoading] = useState(true);
   const [totalHorasMes, setTotalHorasMes] = useState(0);
-  const [projetoHoras, setProjetoHoras] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchData();
@@ -72,20 +68,6 @@ const GestaoProjetos = () => {
             return acc;
           }, {});
           setEtapas(grouped);
-        }
-
-        const { data: phData } = await supabase
-          .from('sessoes_horas')
-          .select('projeto_id, duracao_minutos');
-        
-        if (phData) {
-          const groupedHours = phData.reduce((acc: Record<string, number>, curr) => {
-            const val = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
-            const minutes = (Number.isNaN(val) ? 0 : (val || 0));
-            acc[curr.projeto_id] = (acc[curr.projeto_id] || 0) + minutes;
-            return acc;
-          }, {});
-          setProjetoHoras(groupedHours);
         }
       }
 
@@ -139,28 +121,102 @@ const GestaoProjetos = () => {
           <MetricCard label="Horas no mês" value={`${totalHorasMes}h`} />
         </div>
 
-        {/* Projects List */}
-        <div className="grid grid-cols-1 gap-2">
+        {/* Projects List - Redesign Monograph Style */}
+        <div style={{ background: '#0d0d0d', borderRadius: '10px', overflow: 'hidden', border: '1px solid #1c1c1c' }}>
+          {/* Cabeçalho de colunas */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1c1c1c' }}>
+            {['Cliente', 'Tipo', 'Fase atual', 'Próxima entrega', 'Status'].map(col => (
+              <span key={col} style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#2e2e2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
+            ))}
+          </div>
+
           {projetos.map(projeto => {
             const projetoEtapas = etapas[projeto.id] || [];
-            const currentEtapaInfo = projetoEtapas.find(e => e.etapa.toLowerCase() === projeto.etapa_atual.toLowerCase());
-            const daysRemaining = currentEtapaInfo?.data_entrega 
-              ? differenceInDays(parseISO(currentEtapaInfo.data_entrega), new Date()) 
-              : null;
-            
-            const horasTrabalhadas = Math.round((projetoHoras[projeto.id] || 0) / 60);
-            const horasEstimadas = projeto.horas_estimadas || 80; // Fallback to 80 as seen in example
+            const emAndamento = projetoEtapas.find(e => e.status === 'em_andamento' || e.status === 'Em andamento');
+            const etapaTexto = emAndamento?.etapa || projeto.etapa_atual;
 
             return (
-              <ProjectCard 
+              <div
                 key={projeto.id}
-                projeto={projeto}
-                currentEtapaInfo={currentEtapaInfo}
-                daysRemaining={daysRemaining}
-                horasTrabalhadas={horasTrabalhadas}
-                horasEstimadas={horasEstimadas}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-              />
+                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                {/* Cliente */}
+                <div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#d8d8d8' }}>{projeto.nome_cliente}</div>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#3a3a3a', marginTop: '1px' }}>
+                    {projeto.cidade} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'} · desde {projeto.data_inicio ? new Date(projeto.data_inicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
+                  </div>
+                </div>
+
+                {/* Tipo */}
+                <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#6b5c45', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  {projeto.tipo}
+                </div>
+
+                {/* Fase atual com barra de progresso */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355' }}>
+                    {etapaTexto}
+                  </div>
+                  <div style={{ height: '2px', background: '#1c1c1c', borderRadius: '1px', width: '100%' }}>
+                    <div style={{
+                      height: '2px', background: '#8B7355', borderRadius: '1px',
+                      width: `${(() => {
+                        const ordem = ['Briefing', 'Conceito', 'Estudo Preliminar', 'Executivo', 'Entrega'];
+                        const matchIdx = ordem.findIndex(o => 
+                          o.toLowerCase().includes(etapaTexto.toLowerCase()) || 
+                          etapaTexto.toLowerCase().includes(o.toLowerCase()) ||
+                          (o === 'Estudo Preliminar' && (etapaTexto.toLowerCase().includes('est.prel') || etapaTexto.toLowerCase().includes('preliminar')))
+                        );
+                        return matchIdx >= 0 ? ((matchIdx + 1) / ordem.length * 100) : 10;
+                      })()}%`
+                    }} />
+                  </div>
+                </div>
+
+                {/* Próxima entrega */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555' }}>
+                    {etapaTexto ? `Aprovação ${etapaTexto}` : '—'}
+                  </div>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: (() => {
+                    const dataEntrega = emAndamento?.data_entrega;
+                    if (!dataEntrega) return '#555';
+                    const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
+                    return dias < 0 ? '#f87171' : dias <= 7 ? '#fbbf24' : '#888';
+                  })() }}>
+                    {(() => {
+                      const dataEntrega = emAndamento?.data_entrega;
+                      if (!dataEntrega) return 'N/A';
+                      const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
+                      const dataFormatada = new Date(dataEntrega).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                      return dias < 0 ? `Atrasado ${Math.abs(dias)}d` : dias === 0 ? 'Hoje' : `${dataFormatada} · em ${dias}d`;
+                    })()}
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div style={{ 
+                    width: '5px', 
+                    height: '5px', 
+                    borderRadius: '50%', 
+                    background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
+                  }} />
+                  <span style={{ 
+                    fontFamily: 'Courier New', 
+                    fontSize: '7px', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.08em', 
+                    color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
+                  }}>
+                    {projeto.status_geral}
+                  </span>
+                </div>
+              </div>
             );
           })}
 
@@ -176,125 +232,13 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, accent, warning }: { label: string, value: string | number, accent?: boolean, warning?: boolean }) => (
-  <div className="bg-[#1a1a1a] border border-white/5 p-6 transition-all duration-300">
-    <p className="text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-2" style={{ fontFamily: "'Courier New', Courier, monospace" }}>{label}</p>
+  <div className="bg-[#1a1a1a] border border-white/5 p-[10px_14px] transition-all duration-300 rounded-lg">
+    <p className="text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-1" style={{ fontFamily: "'Courier New', Courier, monospace" }}>{label}</p>
     <p className={cn(
-      "text-4xl font-light font-cormorant",
+      "text-[20px] font-light font-cormorant",
       accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
-    )}>{value}</p>
+    )} style={{ fontFamily: "Georgia, serif" }}>{value}</p>
   </div>
 );
-
-const ProjectCard = ({ 
-  projeto, 
-  currentEtapaInfo, 
-  daysRemaining, 
-  horasTrabalhadas, 
-  horasEstimadas,
-  onClick 
-}: { 
-  projeto: Projeto, 
-  currentEtapaInfo?: EtapaInfo, 
-  daysRemaining: number | null, 
-  horasTrabalhadas: number,
-  horasEstimadas: number,
-  onClick: () => void 
-}) => {
-  const healthColor = daysRemaining === null ? '#4ade80' : 
-                     daysRemaining < 0 ? '#f87171' : 
-                     daysRemaining < 7 ? '#fbbf24' : '#4ade80';
-
-  const courierFont = { fontFamily: "'Courier New', Courier, monospace" };
-
-  return (
-    <div 
-      onClick={onClick}
-      className="bg-[#1a1a1a] border border-white/10 px-6 py-4 cursor-pointer hover:border-[#8B7355] transition-all duration-500 group relative"
-    >
-      {/* Top Header */}
-      <div className="flex justify-between items-start mb-0.5">
-        <h3 className="text-[18px] font-cormorant text-white uppercase tracking-tight leading-tight">
-          {projeto.nome_cliente}
-        </h3>
-        <div className="flex items-center gap-6">
-          <span className="text-[10px] text-[#8B7355] font-mono tracking-widest uppercase" style={courierFont}>
-            {projeto.tipo || 'ARQ+INT'}
-          </span>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: healthColor }} />
-            <span className="text-[10px] text-white font-mono tracking-widest uppercase" style={courierFont}>
-              {projeto.status_geral || 'EM ANDAMENTO'}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Sub Header */}
-      <div className="flex justify-between items-center mb-3">
-        <span className="text-[10px] text-[#777] font-mono tracking-widest uppercase" style={courierFont}>
-          {projeto.cidade || 'N/A'} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'}
-        </span>
-        <span className="text-[10px] text-[#777] font-mono tracking-widest" style={courierFont}>
-          desde {projeto.data_inicio ? format(parseISO(projeto.data_inicio), 'dd/MM/yyyy') : 'N/A'}
-        </span>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="relative mb-3 px-4">
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-white/10" />
-        <div className="flex justify-between items-center relative z-10">
-          {PREMIUM_STAGES.map((stage) => {
-            const isDone = PREMIUM_STAGES.indexOf(stage) < PREMIUM_STAGES.indexOf(projeto.etapa_atual);
-            const isCurrent = stage.toLowerCase() === projeto.etapa_atual.toLowerCase();
-            
-            return (
-              <div key={stage} className="flex flex-col items-center">
-                <div className={cn(
-                  "w-2.5 h-2.5 rounded-full transition-all duration-500",
-                  isDone ? "bg-[#8B7355]" : 
-                  isCurrent ? "bg-[#8B7355] shadow-[0_0_12px_#8B7355]" : 
-                  "bg-[#1a1a1a] border border-white/20"
-                )}>
-                  {isCurrent && (
-                    <motion.div 
-                      className="absolute w-2.5 h-2.5 rounded-full bg-[#8B7355]"
-                      animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0, 0.6] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                    />
-                  )}
-                </div>
-                <span className="absolute top-6 text-[8px] uppercase tracking-[0.2em] text-[#8B7355] font-mono whitespace-nowrap" style={courierFont}>
-                  {stage}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Bottom Info */}
-      <div className="grid grid-cols-3 gap-4">
-        <div>
-          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>PRÓXIMA ENTREGA</p>
-          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
-            {daysRemaining !== null ? (daysRemaining < 0 ? `Atrasado ${Math.abs(daysRemaining)}d` : `Em ${daysRemaining} dias`) : 'N/A'}
-          </p>
-        </div>
-        <div>
-          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>ETAPA ATUAL</p>
-          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
-            {projeto.etapa_atual}
-          </p>
-        </div>
-        <div>
-          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>HORAS</p>
-          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
-            {horasTrabalhadas}h / {horasEstimadas}h
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default GestaoProjetos;
