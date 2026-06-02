@@ -99,6 +99,8 @@ const ProjetoDetalhe = () => {
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [whatsappCliente, setWhatsappCliente] = useState<string>('');
+  const [contrato, setContrato] = useState<any>(null);
+  const [lead, setLead] = useState<any>(null);
 
   const fetchData = async () => {
     try {
@@ -106,9 +108,27 @@ const ProjetoDetalhe = () => {
       const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).single();
       if (pData) {
         setProjeto(pData);
+        
         if (pData.cliente_id) {
-            const { data: lead } = await supabase.from('leads').select('whats').eq('id', pData.cliente_id).single();
-            if (lead) setWhatsappCliente(lead.whats?.replace(/\D/g, '') || '');
+          const { data: contratoData } = await supabase
+            .from('contratos_clientes')
+            .select('valor_total, marco1_valor, marco2_valor, marco3_valor, numero')
+            .eq('cliente_id', pData.cliente_id)
+            .eq('status', 'assinado')
+            .order('criado_em', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (contratoData) setContrato(contratoData);
+
+          const { data: leadData } = await supabase
+            .from('leads')
+            .select('nome, whats, endereco')
+            .eq('id', pData.cliente_id)
+            .maybeSingle();
+
+          if (leadData) setLead(leadData);
+          if (leadData?.whats) setWhatsappCliente(leadData.whats.replace(/\D/g, ''));
         }
       }
       const { data: eData } = await supabase.from('projeto_etapas').select('*').eq('projeto_id', id).order('criado_em', { ascending: true });
