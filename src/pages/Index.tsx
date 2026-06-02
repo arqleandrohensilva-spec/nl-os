@@ -1072,11 +1072,17 @@ const Index = () => {
                         // Se falhou o Dropbox, continuamos para criar o projeto mas avisaremos no final
                       }
 
+                      const tipoMapeado = (conversionLead.tipo === 'ARQ+INT' || conversionLead.tipo === 'arq' || conversionLead.tipo === 'Arq+Int' || !conversionLead.tipo)
+                        ? 'Arq+Int'
+                        : (conversionLead.tipo === 'INT' || conversionLead.tipo === 'Interiores')
+                        ? 'Interiores'
+                        : 'Comercial';
+
                       const projetoData = {
                         nome: conversionLead.nome,
                         nome_cliente: conversionLead.nome,
                         cliente_id: conversionLead.id,
-                        tipo: conversionLead.tipo,
+                        tipo: tipoMapeado,
                         area_m2: conversionLead.area,
                         valor_proposta: conversionLead.orcamento,
                         valor_total: conversionLead.orcamento,
@@ -1087,7 +1093,7 @@ const Index = () => {
                         horas_executivo: conversionHours.executivo,
                         horas_detalhamento: conversionHours.detalhamento,
                         horas_acompanhamento: conversionHours.acompanhamento,
-                        status_geral: 'Em andamento',
+                        status_geral: 'ativo',
                         etapa_atual: 'Briefing',
                         token_cliente: tokenCliente,
                         dropbox_folder: dropboxFolder || null
