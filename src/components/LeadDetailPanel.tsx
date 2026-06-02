@@ -92,13 +92,20 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
       const slugCliente = gerarSlug(lead.nome);
 
+      const tipoStr = (lead.tipo as string) || '';
+      const tipoMapeado = (tipoStr === 'ARQ+INT' || tipoStr === 'arq' || tipoStr === 'Arq+Int' || tipoStr === 'ArqInt' || !tipoStr)
+        ? 'Arq+Int'
+        : (tipoStr === 'INT' || tipoStr === 'Interiores')
+        ? 'Interiores'
+        : 'Comercial';
+
       const { data: newProject, error } = await supabase
         .from('projetos')
         .insert({
           nome: `PROJETO - ${lead.nome}`,
           nome_cliente: lead.nome,
           cliente_id: lead.id,
-          tipo: lead.tipo,
+          tipo: tipoMapeado,
           cidade: lead.cidade,
           area_m2: lead.area,
           etapa_atual: 'BRIEFING',
