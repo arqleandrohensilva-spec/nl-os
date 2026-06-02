@@ -104,21 +104,21 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className=\"flex min-h-screen bg-[#0A0A0A] text-white font-mono\">
-      <Sidebar user=\"Equipe NL\" />
+    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
+      <Sidebar user="Equipe NL" />
       
-      <main className=\"flex-1 ml-[230px] p-12\">
-        <header className=\"mb-12\">
-          <h1 className=\"text-5xl font-cormorant font-light tracking-tight mb-2 italic\">Gestão de Projetos</h1>
-          <p className=\"text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase\">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
+      <main className="flex-1 ml-[230px] p-12">
+        <header className="mb-12">
+          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">Gestão de Projetos</h1>
+          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
         </header>
 
         {/* Metric Cards */}
-        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-6 mb-12\">
-          <MetricCard label=\"Projetos Ativos\" value={activeProjectsCount} />
-          <MetricCard label=\"Entregas esta semana\" value={deliveriesThisWeek} accent={deliveriesThisWeek > 0} />
-          <MetricCard label=\"Aprovações pendentes\" value={pendingApprovals} warning={pendingApprovals > 0} />
-          <MetricCard label=\"Horas no mês\" value={`${totalHorasMes}h`} />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <MetricCard label="Projetos Ativos" value={activeProjectsCount} />
+          <MetricCard label="Entregas esta semana" value={deliveriesThisWeek} accent={deliveriesThisWeek > 0} />
+          <MetricCard label="Aprovações pendentes" value={pendingApprovals} warning={pendingApprovals > 0} />
+          <MetricCard label="Horas no mês" value={`${totalHorasMes}h`} />
         </div>
 
         {/* Projects List - Redesign Monograph Style */}
@@ -221,8 +221,8 @@ const GestaoProjetos = () => {
           })}
 
           {projetos.length === 0 && !loading && (
-            <div className=\"text-center py-24 border border-dashed border-white/10\">
-              <p className=\"text-white/40 uppercase tracking-widest text-[11px]\">Nenhum projeto ativo encontrado.</p>
+            <div className="text-center py-24 border border-dashed border-white/10">
+              <p className="text-white/40 uppercase tracking-widest text-[11px]">Nenhum projeto ativo encontrado.</p>
             </div>
           )}
         </div>
@@ -232,12 +232,12 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, accent, warning }: { label: string, value: string | number, accent?: boolean, warning?: boolean }) => (
-  <div className=\"bg-[#1a1a1a] border border-white/5 p-[10px_14px] transition-all duration-300 rounded-lg\">
-    <p className=\"text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-1\" style={{ fontFamily: \"'Courier New', Courier, monospace\" }}>{label}</p>
+  <div className="bg-[#1a1a1a] border border-white/5 p-[10px_14px] transition-all duration-300 rounded-lg">
+    <p className="text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-1" style={{ fontFamily: "'Courier New', Courier, monospace" }}>{label}</p>
     <p className={cn(
-      \"text-[20px] font-light font-cormorant\",
-      accent ? \"text-[#8B7355]\" : warning ? \"text-rose-500\" : \"text-white\"
-    )} style={{ fontFamily: \"Georgia, serif\" }}>{value}</p>
+      "text-[20px] font-light font-cormorant",
+      accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
+    )} style={{ fontFamily: "Georgia, serif" }}>{value}</p>
   </div>
 );
 
