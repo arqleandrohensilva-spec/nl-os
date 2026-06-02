@@ -126,7 +126,7 @@ const GestaoProjetos = () => {
           {/* Cabeçalho de colunas */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1a1a1a' }}>
             {['Cliente', 'Tipo', 'Fase atual', 'Próxima entrega', 'Status'].map(col => (
-              <span key={col} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#333', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
+              <span key={col} style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
             ))}
           </div>
 
@@ -139,26 +139,26 @@ const GestaoProjetos = () => {
               <div
                 key={projeto.id}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 {/* Cliente */}
                 <div>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#ffffff', fontWeight: 500 }}>{projeto.nome_cliente}</div>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', marginTop: '1px' }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '15px', color: '#ffffff', fontWeight: 500 }}>{projeto.nome_cliente}</div>
+                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px', color: '#555', marginTop: '1px' }}>
                     {projeto.cidade} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'} · desde {projeto.data_inicio ? new Date(projeto.data_inicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
                   </div>
                 </div>
 
                 {/* Tipo */}
-                <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px', color: '#8B7355', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 500 }}>
                   {projeto.tipo}
                 </div>
 
                 {/* Fase atual com barra de progresso */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '11px', color: '#cccccc' }}>
+                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '13px', color: '#cccccc' }}>
                     {etapaTexto}
                   </div>
                   <div style={{ height: '3px', background: '#222', borderRadius: '1.5px', width: '100%' }}>
@@ -179,10 +179,10 @@ const GestaoProjetos = () => {
 
                 {/* Próxima entrega */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444' }}>
+                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555' }}>
                     {etapaTexto ? `Aprovação ${etapaTexto}` : '—'}
                   </div>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '11px', color: (() => {
+                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '13px', color: (() => {
                     const dataEntrega = emAndamento?.data_entrega;
                     if (!dataEntrega) return '#555';
                     const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
@@ -207,8 +207,8 @@ const GestaoProjetos = () => {
                     background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
                   }} />
                   <span style={{ 
-                    fontFamily: 'Courier New', 
-                    fontSize: '9px', 
+                    fontFamily: 'Arial, sans-serif', 
+                    fontSize: '12px', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.08em', 
                     color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
