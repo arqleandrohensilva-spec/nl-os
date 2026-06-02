@@ -189,6 +189,73 @@ const ProjetoFinanceiro = () => {
     }
   };
 
+  const handleImportarContrato = async () => {
+    if (!projeto) return;
+    
+    const { data: contrato } = await supabase
+      .from('contratos_clientes')
+      .select('valor_total, marco1_valor, marco2_valor, marco3_valor')
+      .eq('cliente_id', projeto.cliente_id)
+      .eq('status', 'assinado')
+      .order('criado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!contrato) {
+      toast.error('Nenhum contrato assinado encontrado para este cliente.');
+      return;
+    }
+
+    const parseValor = (val: string) => parseFloat(String(val || '0').replace(/\./g, '').replace(',', '.')) || 0;
+    const hoje = new Date();
+
+    const novasParcelas = [
+      {
+        projeto_id: id,
+        cliente_id: projeto.cliente_id,
+        cliente_nome: projeto.nome_cliente,
+        numero_parcela: 1,
+        total_parcelas: 3,
+        descricao: 'Marco 1 — Entrada (30%)',
+        valor: parseValor(contrato.marco1_valor),
+        data_vencimento: new Date().toISOString().split('T')[0],
+        status: 'PENDENTE',
+      },
+      {
+        projeto_id: id,
+        cliente_id: projeto.cliente_id,
+        cliente_nome: projeto.nome_cliente,
+        numero_parcela: 2,
+        total_parcelas: 3,
+        descricao: 'Marco 2 — Anteprojeto aprovado (40%)',
+        valor: parseValor(contrato.marco2_valor),
+        data_vencimento: new Date(hoje.setDate(hoje.getDate() + 45)).toISOString().split('T')[0],
+        status: 'PENDENTE',
+      },
+      {
+        projeto_id: id,
+        cliente_id: projeto.cliente_id,
+        cliente_nome: projeto.nome_cliente,
+        numero_parcela: 3,
+        total_parcelas: 3,
+        descricao: 'Marco 3 — Entrega do executivo (30%)',
+        valor: parseValor(contrato.marco3_valor),
+        data_vencimento: new Date(hoje.setDate(hoje.getDate() + 90)).toISOString().split('T')[0],
+        status: 'PENDENTE',
+      },
+    ];
+
+    const { error } = await supabase.from('financeiro_parcelas').insert(novasParcelas);
+
+    if (error) {
+      toast.error('Erro ao importar parcelas: ' + error.message);
+      return;
+    }
+
+    toast.success('Parcelas importadas do contrato com sucesso!');
+    fetchData();
+  };
+
   const handleCobrarWhatsApp = (parcela: Parcela) => {
     if (!projeto || !lead?.whats) {
         toast.error('Dados de contato do cliente não encontrados');
@@ -371,6 +438,20 @@ const ProjetoFinanceiro = () => {
                 </div>
             ))}
         </div>
+
+        {parcelas.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#555' }}>
+            <p style={{ fontFamily: 'Arial', fontSize: '13px', marginBottom: '16px' }}>
+              Nenhuma parcela cadastrada para este projeto.
+            </p>
+            <button
+              onClick={handleImportarContrato}
+              style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', background: 'none', border: '1px solid #8B7355', padding: '8px 16px', cursor: 'pointer', borderRadius: '4px' }}
+            >
+              IMPORTAR DO CONTRATO
+            </button>
+          </div>
+        )}
 
         {/* SEÇÃO DE HISTÓRICO */}
         <section className="mt-16">
