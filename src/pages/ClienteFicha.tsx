@@ -357,11 +357,12 @@ const ClienteFicha = () => {
       ];
 
       for (let i = 0; i < etapasPadrao.length; i++) {
-        await supabase.from('projeto_etapas').insert({
+        const { error: etapaError } = await supabase.from('projeto_etapas').insert({
           projeto_id: novoProjeto.id,
           etapa: etapasPadrao[i].etapa,
           status: etapasPadrao[i].status
         });
+        if (etapaError) throw etapaError;
       }
 
       // 4. Criar estrutura de pastas no Dropbox
@@ -462,9 +463,10 @@ const ClienteFicha = () => {
       // Criar todas as pastas
       toast.info('Criando estrutura de pastas no Dropbox...');
       for (const pasta of todasAsPastas) {
-        await supabase.functions.invoke('dropbox-proxy', {
+        const { error: dropboxError } = await supabase.functions.invoke('dropbox-proxy', {
           body: { action: 'create_folder', path: pasta }
         });
+        if (dropboxError) console.warn(`Aviso: Erro ao criar pasta ${pasta}:`, dropboxError);
       }
 
       // Salvar contrato na pasta do cliente
