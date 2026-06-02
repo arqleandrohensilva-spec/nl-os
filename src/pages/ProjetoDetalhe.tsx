@@ -145,6 +145,27 @@ const ProjetoDetalhe = () => {
             </div>
         </header>
 
+        {/* PROGRESS BAR */}
+        <div className="mb-12">
+            <div className="flex justify-between items-center px-2">
+                {ETAPAS_CONFIG.map((config, index) => {
+                    const etapaData = etapas.find(e => e.etapa === config.id);
+                    const isDone = etapaData?.status === 'Aprovado';
+                    const isCurrent = projeto.etapa_atual === config.id;
+                    return (
+                        <div key={config.id} className="flex flex-col items-center gap-2">
+                            <div className={cn("w-3 h-3 rounded-full", isDone ? "bg-emerald-500" : isCurrent ? "bg-[#8B7355]" : "bg-[#555]")}></div>
+                            <span className="text-[8px] text-[#555] uppercase tracking-widest">{config.label.split('·')[1].trim()}</span>
+                        </div>
+                    )
+                })}
+            </div>
+            <div className="h-[2px] bg-[#222] mt-4">
+                <div className="h-full bg-[#8B7355]" style={{ width: `${(ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual) + 1) / ETAPAS_CONFIG.length * 100}%` }}></div>
+            </div>
+        </div>
+
+
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
             <section className="space-y-4">
                 <h2 className="text-[#8B7355] text-xs uppercase tracking-widest font-bold mb-4">Etapas do Projeto</h2>
