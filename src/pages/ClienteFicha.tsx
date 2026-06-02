@@ -318,9 +318,10 @@ const ClienteFicha = () => {
       if (updateError) throw updateError;
 
       // 2. Criar projeto
-      const tipoMapeado = (cliente.tipo_projeto === 'ARQ+INT' || cliente.tipo_projeto === 'arq' || cliente.tipo_projeto === 'Arq+Int' || !cliente.tipo_projeto) 
+      const tipoLimpo = cliente.tipo_projeto?.toUpperCase().trim();
+      const tipoMapeado = (tipoLimpo === 'ARQ+INT' || tipoLimpo === 'ARQ' || !tipoLimpo) 
         ? 'Arq+Int' 
-        : (cliente.tipo_projeto === 'INT' || cliente.tipo_projeto === 'Interiores') 
+        : (tipoLimpo === 'INT' || tipoLimpo === 'INTERIORES') 
         ? 'Interiores' 
         : 'Comercial';
 
@@ -335,7 +336,8 @@ const ClienteFicha = () => {
           etapa_atual: 'Briefing',
           status_geral: 'ativo',
           data_inicio: new Date().toISOString().split('T')[0],
-          cliente_id: id
+          cliente_id: id,
+          proposta_id: proposta?.id || null
         })
         .select()
         .single();
@@ -355,11 +357,12 @@ const ClienteFicha = () => {
       ];
 
       for (let i = 0; i < etapasPadrao.length; i++) {
-        await supabase.from('projeto_etapas').insert({
+        const { error: etapaError } = await supabase.from('projeto_etapas').insert({
           projeto_id: novoProjeto.id,
           etapa: etapasPadrao[i].etapa,
           status: etapasPadrao[i].status
         });
+        if (etapaError) throw etapaError;
       }
 
       // 4. Criar estrutura de pastas no Dropbox
@@ -460,9 +463,10 @@ const ClienteFicha = () => {
       // Criar todas as pastas
       toast.info('Criando estrutura de pastas no Dropbox...');
       for (const pasta of todasAsPastas) {
-        await supabase.functions.invoke('dropbox-proxy', {
+        const { error: dropboxError } = await supabase.functions.invoke('dropbox-proxy', {
           body: { action: 'create_folder', path: pasta }
         });
+        if (dropboxError) console.warn(`Aviso: Erro ao criar pasta ${pasta}:`, dropboxError);
       }
 
       // Salvar contrato na pasta do cliente
@@ -489,9 +493,9 @@ const ClienteFicha = () => {
       queryClient.invalidateQueries({ queryKey: ['cliente', id] });
       
       // Mostrar botão ver projeto no final da etapa 5
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao criar projeto");
+    } catch (error: any) {
+      console.error('ERRO DETALHADO ao criar projeto:', error);
+      toast.error(`Erro ao criar projeto: ${error.message || 'Erro desconhecido'}`);
     }
   };
 

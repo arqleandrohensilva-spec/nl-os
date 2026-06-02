@@ -1457,10 +1457,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "projetos_lead_id_fkey"
+            foreignKeyName: "projetos_cliente_id_fkey"
             columns: ["cliente_id"]
             isOneToOne: false
-            referencedRelation: "leads"
+            referencedRelation: "clientes"
             referencedColumns: ["id"]
           },
         ]
