@@ -98,7 +98,8 @@ const ProjetoFinanceiro = () => {
             .from('contratos')
             .select('*')
             .eq('cliente_id', pData.cliente_id)
-            .eq('status', 'assinado')
+            .not('status', 'eq', 'Arquivado')
+            .not('status', 'eq', 'Inativo')
             .order('criado_em', { ascending: false })
             .limit(1)
             .maybeSingle();
@@ -192,11 +193,12 @@ const ProjetoFinanceiro = () => {
   const handleImportarContrato = async () => {
     if (!projeto) return;
     
-    const { data: contrato } = await supabase
-      .from('contratos_clientes')
-      .select('valor_total, marco1_valor, marco2_valor, marco3_valor')
-      .eq('cliente_id', projeto.cliente_id)
-      .eq('status', 'assinado')
+      const { data: contrato } = await supabase
+        .from('contratos_clientes')
+        .select('valor_total, marco1_valor, marco2_valor, marco3_valor')
+        .eq('cliente_id', projeto.cliente_id)
+        .not('status', 'eq', 'Arquivado')
+        .not('status', 'eq', 'Inativo')
       .order('criado_em', { ascending: false })
       .limit(1)
       .maybeSingle();
