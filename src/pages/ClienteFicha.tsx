@@ -2046,22 +2046,16 @@ const ClienteFicha = () => {
                       {cliente?.contrato_assinado && (
                         <button
                           onClick={async () => {
-                            // Verificar se já tem projeto
-                            const { data: projetoExistente, error: checkError } = await supabase
+                            const { data: projetoExistente } = await supabase
                               .from('projetos')
                               .select('id')
                               .eq('cliente_id', id)
                               .maybeSingle();
 
-                            if (checkError) {
-                              console.error('Erro ao verificar projeto:', checkError);
-                              // Se coluna não existe, tenta criar direto
-                              await handleCreateProject();
-                              return;
-                            }
-
                             if (projetoExistente) {
-                              toast.info('Projeto já existe.');
+                              // Projeto existe — recriar pastas que faltam e navegar
+                              toast.info('Projeto encontrado. Verificando pastas no Dropbox...');
+                              await handleCreateFolders(); // só a parte das pastas
                               navigate('/projetos/gestao');
                             } else {
                               await handleCreateProject();
