@@ -318,7 +318,7 @@ const ClienteFicha = () => {
       if (updateError) throw updateError;
 
       // 2. Criar projeto
-      const tipoMapeado = (cliente.tipo_projeto === 'ARQ+INT' || cliente.tipo_projeto === 'arq' || cliente.tipo_projeto === 'Arq+Int') 
+      const tipoMapeado = (cliente.tipo_projeto === 'ARQ+INT' || cliente.tipo_projeto === 'arq' || cliente.tipo_projeto === 'Arq+Int' || !cliente.tipo_projeto) 
         ? 'Arq+Int' 
         : (cliente.tipo_projeto === 'INT' || cliente.tipo_projeto === 'Interiores') 
         ? 'Interiores' 
