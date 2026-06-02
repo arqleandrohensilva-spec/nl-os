@@ -111,23 +111,32 @@ const ProjetoDetalhe = () => {
         
         if (pData.cliente_id) {
           const { data: contratoData } = await supabase
-            .from('contratos_clientes')
-            .select('valor_total, marco1_valor, marco2_valor, marco3_valor, numero')
+            .from('contratos')
+            .select('valores, numero')
             .eq('cliente_id', pData.cliente_id)
             .eq('status', 'assinado')
             .order('criado_em', { ascending: false })
             .limit(1)
             .maybeSingle();
 
-          if (contratoData) setContrato(contratoData);
+          if (contratoData) {
+            const vals = (contratoData.valores as any) || {};
+            setContrato({
+              valor_total: vals.totalCompleto || vals.totalExecutivo || vals.valor_total,
+              marco1_valor: vals.marco1 || vals.marco1_valor,
+              marco2_valor: vals.marco2 || vals.marco2_valor,
+              marco3_valor: vals.marco3 || vals.marco3_valor,
+              numero: contratoData.numero
+            });
+          }
 
           const { data: leadData } = await supabase
             .from('leads')
-            .select('nome, whats, endereco')
+            .select('nome, whats, cidade')
             .eq('id', pData.cliente_id)
             .maybeSingle();
 
-          if (leadData) setLead(leadData);
+          if (leadData) setLead({ ...leadData, endereco: leadData.cidade });
           if (leadData?.whats) setWhatsappCliente(leadData.whats.replace(/\D/g, ''));
         }
       }
