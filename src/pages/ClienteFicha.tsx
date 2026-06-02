@@ -2038,14 +2038,21 @@ const ClienteFicha = () => {
                         <button
                           onClick={async () => {
                             // Verificar se já tem projeto
-                            const { data: projetoExistente } = await supabase
+                            const { data: projetoExistente, error: checkError } = await supabase
                               .from('projetos')
                               .select('id')
                               .eq('cliente_id', id)
                               .maybeSingle();
-                            
+
+                            if (checkError) {
+                              console.error('Erro ao verificar projeto:', checkError);
+                              // Se coluna não existe, tenta criar direto
+                              await handleCreateProject();
+                              return;
+                            }
+
                             if (projetoExistente) {
-                              toast.info('Projeto já existe na Gestão de Projetos.');
+                              toast.info('Projeto já existe.');
                               navigate('/projetos/gestao');
                             } else {
                               await handleCreateProject();
