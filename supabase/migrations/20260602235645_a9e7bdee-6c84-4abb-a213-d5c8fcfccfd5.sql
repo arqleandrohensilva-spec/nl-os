@@ -1,0 +1,1 @@
+ALTER TABLE public.financeiro_parcelas ADD COLUMN IF NOT EXISTS valor_recebido numeric;
