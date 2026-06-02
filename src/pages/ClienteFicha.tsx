@@ -375,37 +375,19 @@ const ClienteFicha = () => {
 
       if (relatorioExtra) todasAsPastas.push(relatorioExtra);
 
-      const resultados = await Promise.allSettled(
-        todasAsPastas.map(pasta =>
-          supabase.functions.invoke('dropbox-proxy', {
-            body: { action: 'create_folder', path: pasta }
-          })
-        )
-      );
+      const criarPasta = async (path: string) => {
+        try {
+          await supabase.functions.invoke('dropbox-proxy', {
+            body: { action: 'create_folder', path }
+          });
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } catch (e) {
+          console.warn('Pasta não criada (pode já existir):', path);
+        }
+      };
 
-      const erros = resultados.filter(r => r.status === 'rejected').length;
-      if (erros > 0) {
-        console.warn(`${erros} pastas não puderam ser criadas — podem já existir.`);
-      }
-
-      // Salvar contrato na pasta do cliente
-      const contratoRecente = await supabase
-        .from('contratos')
-        .select('numero')
-        .eq('cliente_id', id)
-        .order('criado_em', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (contratoRecente?.data?.numero) {
-        const numeroContrato = contratoRecente.data.numero;
-        await supabase.functions.invoke('dropbox-proxy', {
-          body: {
-            action: 'upload_from_storage',
-            from_path: `contratos/${numeroContrato}.docx`,
-            to_path: `${basePath}/08 - Documentos/02 - Proposta e Contrato/Contrato/${numeroContrato} - ${nomeCliente}.docx`
-          }
-        });
+      for (const pasta of todasAsPastas) {
+        await criarPasta(pasta);
       }
     } catch (error) {
       console.error('Erro ao criar pastas:', error);
