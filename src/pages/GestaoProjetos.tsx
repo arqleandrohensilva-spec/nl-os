@@ -140,7 +140,7 @@ const GestaoProjetos = () => {
         </div>
 
         {/* Projects List */}
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-2">
           {projetos.map(projeto => {
             const projetoEtapas = etapas[projeto.id] || [];
             const currentEtapaInfo = projetoEtapas.find(e => e.etapa.toLowerCase() === projeto.etapa_atual.toLowerCase());
@@ -209,11 +209,11 @@ const ProjectCard = ({
   return (
     <div 
       onClick={onClick}
-      className="bg-[#1a1a1a] border border-white/10 p-8 cursor-pointer hover:border-[#8B7355] transition-all duration-500 group relative"
+      className="bg-[#1a1a1a] border border-white/10 px-6 py-4 cursor-pointer hover:border-[#8B7355] transition-all duration-500 group relative"
     >
       {/* Top Header */}
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="text-[22px] font-cormorant text-white uppercase tracking-tight leading-tight">
+      <div className="flex justify-between items-start mb-0.5">
+        <h3 className="text-[18px] font-cormorant text-white uppercase tracking-tight leading-tight">
           {projeto.nome_cliente}
         </h3>
         <div className="flex items-center gap-6">
@@ -230,7 +230,7 @@ const ProjectCard = ({
       </div>
 
       {/* Sub Header */}
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between items-center mb-3">
         <span className="text-[10px] text-[#777] font-mono tracking-widest uppercase" style={courierFont}>
           {projeto.cidade || 'N/A'} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'}
         </span>
@@ -240,7 +240,7 @@ const ProjectCard = ({
       </div>
 
       {/* Progress Bar */}
-      <div className="relative mb-14 px-4">
+      <div className="relative mb-3 px-4">
         <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[1px] bg-white/10" />
         <div className="flex justify-between items-center relative z-10">
           {PREMIUM_STAGES.map((stage) => {
@@ -275,20 +275,20 @@ const ProjectCard = ({
       {/* Bottom Info */}
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <p className="text-[8px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>PRÓXIMA ENTREGA</p>
-          <p className="text-xs font-mono text-white tracking-widest" style={courierFont}>
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>PRÓXIMA ENTREGA</p>
+          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
             {daysRemaining !== null ? (daysRemaining < 0 ? `Atrasado ${Math.abs(daysRemaining)}d` : `Em ${daysRemaining} dias`) : 'N/A'}
           </p>
         </div>
         <div>
-          <p className="text-[8px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>ETAPA ATUAL</p>
-          <p className="text-xs font-mono text-white tracking-widest" style={courierFont}>
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>ETAPA ATUAL</p>
+          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
             {projeto.etapa_atual}
           </p>
         </div>
         <div>
-          <p className="text-[8px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>HORAS</p>
-          <p className="text-xs font-mono text-white tracking-widest" style={courierFont}>
+          <p className="text-[7px] uppercase tracking-[0.3em] text-[#8B7355] font-bold mb-1" style={courierFont}>HORAS</p>
+          <p className="text-[13px] font-mono text-white tracking-widest" style={courierFont}>
             {horasTrabalhadas}h / {horasEstimadas}h
           </p>
         </div>
