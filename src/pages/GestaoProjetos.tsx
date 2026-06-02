@@ -208,7 +208,7 @@ const GestaoProjetos = () => {
                   }} />
                   <span style={{ 
                     fontFamily: 'Courier New', 
-                    fontSize: '7px', 
+                    fontSize: '9px', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.08em', 
                     color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
