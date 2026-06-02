@@ -407,34 +407,60 @@ const ProjetoFinanceiro = () => {
                     <div className="flex justify-end gap-2">
                         {p.status !== 'PAGO' && (
                             <>
-                                <Button 
-                                    size="sm" 
-                                    variant="outline" 
-                                    className="h-7 text-[9px] uppercase font-bold border-white/10 hover:bg-[#8B7355] hover:text-white"
+                                <button 
+                                    style={{
+                                      fontFamily: 'Courier New',
+                                      fontSize: '9px',
+                                      color: '#8B7355',
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.1em',
+                                      background: 'transparent',
+                                      border: '1px solid #8B7355',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      borderRadius: '3px',
+                                    }}
                                     onClick={() => handleOpenConfirm(p)}
                                 >
                                     PAGO
-                                </Button>
-                                <Button 
-                                    size="sm" 
-                                    variant="ghost" 
-                                    className="h-7 text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10 p-2"
+                                </button>
+                                <button 
+                                    style={{
+                                      fontFamily: 'Courier New',
+                                      fontSize: '9px',
+                                      color: '#8B7355',
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.1em',
+                                      background: 'transparent',
+                                      border: '1px solid #8B7355',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      borderRadius: '3px',
+                                    }}
                                     onClick={() => handleCobrarWhatsApp(p)}
                                 >
-                                    <MessageCircle size={14} />
-                                </Button>
+                                    COBRAR
+                                </button>
                             </>
                         )}
                         {p.status === 'PAGO' && (
-                            <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                className="h-7 text-[#8B7355] hover:text-[#8B7355] hover:bg-[#8B7355]/10 p-2"
+                            <button 
+                                style={{
+                                  fontFamily: 'Courier New',
+                                  fontSize: '9px',
+                                  color: '#8B7355',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.1em',
+                                  background: 'transparent',
+                                  border: '1px solid #8B7355',
+                                  padding: '5px 10px',
+                                  cursor: 'pointer',
+                                  borderRadius: '3px',
+                                }}
                                 onClick={() => generateReceipt(p)}
                             >
-                                <Receipt size={14} className="mr-1" />
-                                <span className="text-[9px] uppercase font-bold">Recibo</span>
-                            </Button>
+                                RECIBO
+                            </button>
                         )}
                     </div>
                 </div>
