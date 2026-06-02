@@ -132,41 +132,117 @@ const GestaoProjetos = () => {
         </header>
 
         {/* Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <MetricCard label="Projetos Ativos" value={activeProjectsCount} />
-          <MetricCard label="Entregas esta semana" value={deliveriesThisWeek} accent={deliveriesThisWeek > 0} />
-          <MetricCard label="Aprovações pendentes" value={pendingApprovals} warning={pendingApprovals > 0} />
-          <MetricCard label="Horas no mês" value={`${totalHorasMes}h`} />
+        <div className=\"grid grid-cols-1 md:grid-cols-4 gap-6 mb-12\">
+          <MetricCard label=\"Projetos Ativos\" value={activeProjectsCount} />
+          <MetricCard label=\"Entregas esta semana\" value={deliveriesThisWeek} accent={deliveriesThisWeek > 0} />
+          <MetricCard label=\"Aprovações pendentes\" value={pendingApprovals} warning={pendingApprovals > 0} />
+          <MetricCard label=\"Horas no mês\" value={`${totalHorasMes}h`} />
         </div>
 
-        {/* Projects List */}
-        <div className="grid grid-cols-1 gap-2">
+        {/* Projects List - Redesign Monograph Style */}
+        <div style={{ background: '#0d0d0d', borderRadius: '10px', overflow: 'hidden', border: '1px solid #1c1c1c' }}>
+          {/* Cabeçalho de colunas */}
+          <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1c1c1c' }}>
+            {['Cliente', 'Tipo', 'Fase atual', 'Próxima entrega', 'Status'].map(col => (
+              <span key={col} style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#2e2e2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
+            ))}
+          </div>
+
           {projetos.map(projeto => {
             const projetoEtapas = etapas[projeto.id] || [];
-            const currentEtapaInfo = projetoEtapas.find(e => e.etapa.toLowerCase() === projeto.etapa_atual.toLowerCase());
-            const daysRemaining = currentEtapaInfo?.data_entrega 
-              ? differenceInDays(parseISO(currentEtapaInfo.data_entrega), new Date()) 
-              : null;
-            
-            const horasTrabalhadas = Math.round((projetoHoras[projeto.id] || 0) / 60);
-            const horasEstimadas = projeto.horas_estimadas || 80; // Fallback to 80 as seen in example
+            // Encontrar etapa em andamento ou usar a etapa_atual do projeto
+            const emAndamento = projetoEtapas.find(e => e.status === 'em_andamento' || e.status === 'Em andamento');
+            const etapaTexto = emAndamento?.etapa || projeto.etapa_atual;
 
             return (
-              <ProjectCard 
+              <div
                 key={projeto.id}
-                projeto={projeto}
-                currentEtapaInfo={currentEtapaInfo}
-                daysRemaining={daysRemaining}
-                horasTrabalhadas={horasTrabalhadas}
-                horasEstimadas={horasEstimadas}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-              />
+                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                {/* Cliente */}
+                <div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#d8d8d8' }}>{projeto.nome_cliente}</div>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#3a3a3a', marginTop: '1px' }}>
+                    {projeto.cidade} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'} · desde {projeto.data_inicio ? new Date(projeto.data_inicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
+                  </div>
+                </div>
+
+                {/* Tipo */}
+                <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#6b5c45', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  {projeto.tipo}
+                </div>
+
+                {/* Fase atual com barra de progresso */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355' }}>
+                    {etapaTexto}
+                  </div>
+                  <div style={{ height: '2px', background: '#1c1c1c', borderRadius: '1px', width: '100%' }}>
+                    <div style={{
+                      height: '2px', background: '#8B7355', borderRadius: '1px',
+                      width: `${(() => {
+                        const ordem = ['Briefing', 'Conceito', 'Estudo Preliminar', 'Executivo', 'Entrega'];
+                        // Tentativa de match flexível
+                        const matchIdx = ordem.findIndex(o => 
+                          o.toLowerCase().includes(etapaTexto.toLowerCase()) || 
+                          etapaTexto.toLowerCase().includes(o.toLowerCase()) ||
+                          (o === 'Estudo Preliminar' && (etapaTexto.toLowerCase().includes('est.prel') || etapaTexto.toLowerCase().includes('preliminar')))
+                        );
+                        return matchIdx >= 0 ? ((matchIdx + 1) / ordem.length * 100) : 10;
+                      })()}%`
+                    }} />
+                  </div>
+                </div>
+
+                {/* Próxima entrega */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555' }}>
+                    {etapaTexto ? `Aprovação ${etapaTexto}` : '—'}
+                  </div>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: (() => {
+                    const dataEntrega = emAndamento?.data_entrega;
+                    if (!dataEntrega) return '#555';
+                    const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
+                    return dias < 0 ? '#f87171' : dias <= 7 ? '#fbbf24' : '#888';
+                  })() }}>
+                    {(() => {
+                      const dataEntrega = emAndamento?.data_entrega;
+                      if (!dataEntrega) return 'N/A';
+                      const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
+                      const dataFormatada = new Date(dataEntrega).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                      return dias < 0 ? `Atrasado ${Math.abs(dias)}d` : dias === 0 ? 'Hoje' : `${dataFormatada} · em ${dias}d`;
+                    })()}
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div style={{ 
+                    width: '5px', 
+                    height: '5px', 
+                    borderRadius: '50%', 
+                    background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
+                  }} />
+                  <span style={{ 
+                    fontFamily: 'Courier New', 
+                    fontSize: '7px', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.08em', 
+                    color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
+                  }}>
+                    {projeto.status_geral}
+                  </span>
+                </div>
+              </div>
             );
           })}
 
           {projetos.length === 0 && !loading && (
-            <div className="text-center py-24 border border-dashed border-white/10">
-              <p className="text-white/40 uppercase tracking-widest text-[11px]">Nenhum projeto ativo encontrado.</p>
+            <div className=\"text-center py-24 border border-dashed border-white/10\">
+              <p className=\"text-white/40 uppercase tracking-widest text-[11px]\">Nenhum projeto ativo encontrado.</p>
             </div>
           )}
         </div>
