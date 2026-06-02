@@ -116,7 +116,7 @@ const ProjetoFinanceiro = () => {
 
       // Calcular status real de cada parcela
       const processedParcelas = (parcelasRaw || []).map(p => {
-        if (p.status === 'PAGO') return p;
+        if (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') return p;
         
         const dateVenc = parseISO(p.data_vencimento);
         const today = new Date();
@@ -148,10 +148,10 @@ const ProjetoFinanceiro = () => {
 
   const summary = useMemo(() => {
     const total = parcelas.reduce((acc, p) => acc + (p.valor || 0), 0);
-    const recebido = parcelas.filter(p => p.status === 'PAGO').reduce((acc, p) => acc + (p.valor_recebido || p.valor || 0), 0);
+    const recebido = parcelas.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((acc, p) => acc + (p.valor_recebido || p.valor || 0), 0);
     const emAberto = total - recebido;
     const proximoVencimento = parcelas
-      .filter(p => p.status !== 'PAGO')
+      .filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL')
       .sort((a, b) => new Date(a.data_vencimento).getTime() - new Date(b.data_vencimento).getTime())[0]?.data_vencimento;
 
     return { total, recebido, emAberto, proximoVencimento };
@@ -170,18 +170,46 @@ const ProjetoFinanceiro = () => {
     if (!selectedParcela) return;
     
     try {
+      const valorPago = parseFloat(confirmData.valor.replace(/\./g, '').replace(',', '.'));
+      const valorTotal = selectedParcela.valor;
+      const isParcial = valorPago < valorTotal;
+
+      // Atualizar parcela atual como paga
       const { error } = await supabase
         .from('financeiro_parcelas')
         .update({
-          status: 'PAGO',
+          status: isParcial ? 'PAGO PARCIAL' : 'PAGO',
           data_recebimento: new Date(confirmData.data).toISOString(),
-          valor_recebido: parseFloat(confirmData.valor)
+          valor_recebido: valorPago,
         })
         .eq('id', selectedParcela.id);
 
       if (error) throw error;
       
-      toast.success('Parcela marcada como paga!');
+      // Se pagamento parcial, criar nova parcela com saldo restante
+      if (isParcial) {
+        const saldo = valorTotal - valorPago;
+        const { error: insertError } = await supabase
+          .from('financeiro_parcelas')
+          .insert({
+            projeto_id: selectedParcela.projeto_id,
+            cliente_id: selectedParcela.cliente_id,
+            cliente_nome: selectedParcela.cliente_nome,
+            numero_parcela: selectedParcela.numero_parcela,
+            total_parcelas: selectedParcela.total_parcelas,
+            descricao: `${selectedParcela.descricao} — Saldo restante`,
+            valor: saldo,
+            data_vencimento: new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
+            status: 'PENDENTE',
+          });
+        
+        if (insertError) throw insertError;
+        
+        toast.success(`R$ ${valorPago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} registrado. Saldo de R$ ${saldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} criado como nova parcela.`);
+      } else {
+        toast.success('Pagamento registrado com sucesso!');
+      }
+
       setIsConfirmModalOpen(false);
       fetchData();
     } catch (error) {
@@ -317,7 +345,8 @@ const ProjetoFinanceiro = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PAGO': return '#4ade80';
+      case 'PAGO':
+      case 'PAGO PARCIAL': return '#4ade80';
       case 'ATRASADO': return '#f87171';
       case 'VENCE HOJE':
       case 'VENCE EM BREVE': return '#fbbf24';
@@ -400,12 +429,12 @@ const ProjetoFinanceiro = () => {
                                 style={{ backgroundColor: getStatusColor(p.status) }} 
                             />
                             <span className="text-[10px] uppercase font-bold tracking-widest font-['Arial']" style={{ color: getStatusColor(p.status) }}>
-                                {p.status === 'PAGO' ? '✅ PAGO' : p.status === 'ATRASADO' ? '⚠️ ATRASADO' : p.status === 'VENCE HOJE' ? '⏳ HOJE' : p.status === 'VENCE EM BREVE' ? `⏳ EM ${p.dias} DIAS` : '⬜ PENDENTE'}
+                                {p.status === 'PAGO' ? '✅ PAGO' : p.status === 'PAGO PARCIAL' ? '✅ PAGO PARCIAL' : p.status === 'ATRASADO' ? '⚠️ ATRASADO' : p.status === 'VENCE HOJE' ? '⏳ HOJE' : p.status === 'VENCE EM BREVE' ? `⏳ EM ${p.dias} DIAS` : '⬜ PENDENTE'}
                             </span>
                         </div>
                     </div>
                     <div className="flex justify-end gap-2">
-                        {p.status !== 'PAGO' && (
+                        {p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' && (
                             <>
                                 <button 
                                     style={{
@@ -443,7 +472,7 @@ const ProjetoFinanceiro = () => {
                                 </button>
                             </>
                         )}
-                        {p.status === 'PAGO' && (
+                        {(p.status === 'PAGO' || p.status === 'PAGO PARCIAL') && (
                             <button 
                                 style={{
                                   fontFamily: 'Courier New',
@@ -487,10 +516,10 @@ const ProjetoFinanceiro = () => {
                 <TrendingUp size={14} /> Histórico de Recebimentos
             </h2>
             <div className="space-y-4">
-                {parcelas.filter(p => p.status === 'PAGO').length === 0 ? (
+                {parcelas.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').length === 0 ? (
                     <div className="text-[#555] text-[12px] font-['Arial'] italic">Nenhum pagamento registrado ainda.</div>
                 ) : (
-                    parcelas.filter(p => p.status === 'PAGO').map(p => (
+                    parcelas.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').map(p => (
                         <div key={p.id} className="bg-[#141414] border-l-2 border-[#4ade80] p-4 flex items-center justify-between">
                             <div>
                                 <div className="text-[12px] font-['Arial'] text-white">{p.descricao}</div>
@@ -542,6 +571,11 @@ const ProjetoFinanceiro = () => {
                 onChange={(e) => setConfirmData({...confirmData, valor: e.target.value})}
                 className="bg-white/5 border-white/10"
               />
+              {confirmData.valor && parseFloat(confirmData.valor.replace(/\./g, '').replace(',', '.')) < (selectedParcela?.valor || 0) && (
+                <p style={{ fontFamily: 'Arial', fontSize: '11px', color: '#fbbf24', marginTop: '8px' }}>
+                  Pagamento parcial — saldo de R$ {( (selectedParcela?.valor || 0) - parseFloat(confirmData.valor.replace(/\./g, '').replace(',', '.'))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} será criado como nova parcela com vencimento em 15 dias.
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>
