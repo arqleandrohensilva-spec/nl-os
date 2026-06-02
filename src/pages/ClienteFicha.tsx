@@ -318,12 +318,18 @@ const ClienteFicha = () => {
       if (updateError) throw updateError;
 
       // 2. Criar projeto
+      const tipoMapeado = (cliente.tipo_projeto === 'ARQ+INT' || cliente.tipo_projeto === 'arq' || cliente.tipo_projeto === 'Arq+Int') 
+        ? 'Arq+Int' 
+        : (cliente.tipo_projeto === 'INT' || cliente.tipo_projeto === 'Interiores') 
+        ? 'Interiores' 
+        : 'Comercial';
+
       const { data: novoProjeto, error: projectError } = await supabase
         .from('projetos')
         .insert({
           nome: `Projeto ${cliente.nome}`,
           nome_cliente: cliente.nome,
-          tipo: cliente.tipo_projeto || 'Arq+Int',
+          tipo: tipoMapeado,
           cidade: cliente.cidade,
           area_m2: parseFloat(cliente.area_m2 as any) || 0,
           etapa_atual: 'Briefing',
