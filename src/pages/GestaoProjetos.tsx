@@ -67,6 +67,7 @@ const GestaoProjetos = () => {
   const [etapas, setEtapas] = useState<Record<string, EtapaInfo[]>>({});
   const [loading, setLoading] = useState(true);
   const [totalHorasMes, setTotalHorasMes] = useState(0);
+  const [projetoHoras, setProjetoHoras] = useState<Record<string, number>>({});
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
@@ -95,6 +96,21 @@ const GestaoProjetos = () => {
             return acc;
           }, {});
           setEtapas(grouped);
+        }
+
+        // Fetch hours per project
+        const { data: phData } = await supabase
+          .from('sessoes_horas')
+          .select('projeto_id, duracao_minutos');
+        
+        if (phData) {
+          const groupedHours = phData.reduce((acc: Record<string, number>, curr) => {
+            const val = typeof curr.duracao_minutos === 'string' ? parseFloat(curr.duracao_minutos) : curr.duracao_minutos;
+            const minutes = (Number.isNaN(val) ? 0 : (val || 0));
+            acc[curr.projeto_id] = (acc[curr.projeto_id] || 0) + minutes;
+            return acc;
+          }, {});
+          setProjetoHoras(groupedHours);
         }
       }
 
