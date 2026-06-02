@@ -460,13 +460,19 @@ const ClienteFicha = () => {
         `${basePath}/08 - Documentos/08 - Encerramento/Autorizacao de Publicacao`,
       ];
 
-      // Criar todas as pastas
+      // Criar todas as pastas — ignorar erros individuais
       toast.info('Criando estrutura de pastas no Dropbox...');
-      for (const pasta of todasAsPastas) {
-        const { error: dropboxError } = await supabase.functions.invoke('dropbox-proxy', {
-          body: { action: 'create_folder', path: pasta }
-        });
-        if (dropboxError) console.warn(`Aviso: Erro ao criar pasta ${pasta}:`, dropboxError);
+      const resultados = await Promise.allSettled(
+        todasAsPastas.map(pasta => 
+          supabase.functions.invoke('dropbox-proxy', {
+            body: { action: 'create_folder', path: pasta }
+          })
+        )
+      );
+
+      const erros = resultados.filter(r => r.status === 'rejected').length;
+      if (erros > 0) {
+        console.warn(`${erros} pastas não puderam ser criadas — podem já existir.`);
       }
 
       // Salvar contrato na pasta do cliente
