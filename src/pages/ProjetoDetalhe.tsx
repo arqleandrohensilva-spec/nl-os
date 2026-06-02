@@ -163,7 +163,44 @@ const ProjetoDetalhe = () => {
             <div className="h-[2px] bg-[#222] mt-4">
                 <div className="h-full bg-[#8B7355]" style={{ width: `${(ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual) + 1) / ETAPAS_CONFIG.length * 100}%` }}></div>
             </div>
-        </div>
+                </div>
+
+                {/* CLIENT CARD */}
+                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6 space-y-4">
+                    <h3 className="text-[#8B7355] text-xs font-bold uppercase">Cliente</h3>
+                    <div>
+                        <p className="text-sm font-bold">{projeto.nome_cliente}</p>
+                        <div className="flex gap-4 mt-2">
+                            <Button variant="outline" className="h-8 text-[10px] uppercase tracking-widest bg-transparent border-emerald-500/30 text-emerald-500 hover:bg-emerald-500 hover:text-white rounded-none">
+                                <MessageCircle size={12} className="mr-1" /> WhatsApp
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* DOCUMENTS CARD */}
+                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6 space-y-4">
+                    <h3 className="text-[#8B7355] text-xs font-bold uppercase">Documentos</h3>
+                    <div className="space-y-2">
+                        {['Contrato', 'Proposta', 'Briefing'].map(doc => (
+                            <div key={doc} className="flex justify-between items-center py-2 border-b border-white/5 cursor-pointer hover:bg-white/5">
+                                <span className="text-xs uppercase tracking-widest">{doc}</span>
+                                <ExternalLink size={12} className="text-[#555]" />
+                            </div>
+                        ))}
+                    </div>
+                    <Button className="w-full bg-[#141414] border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none text-[10px]">ABRIR PASTA NO DROPBOX</Button>
+                </div>
+
+                {/* INTERNAL NOTES */}
+                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6">
+                    <h3 className="text-[#8B7355] text-xs font-bold uppercase mb-4">Notas Internas</h3>
+                    <Textarea 
+                        placeholder="Anote detalhes internos..."
+                        className="bg-transparent border-white/10 rounded-none text-xs h-32"
+                    />
+                </div>
+
 
 
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-8">
