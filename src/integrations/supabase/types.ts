@@ -558,6 +558,13 @@ export type Database = {
             referencedRelation: "contratos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "contratos_historico_contrato_id_fkey"
+            columns: ["contrato_id"]
+            isOneToOne: false
+            referencedRelation: "contratos_clientes"
+            referencedColumns: ["id"]
+          },
         ]
       }
       custos_escritorio: {
@@ -844,11 +851,13 @@ export type Database = {
       financeiro_parcelas: {
         Row: {
           agendamento_cobranca: Json | null
+          cliente_id: string | null
           cliente_nome: string
           criado_em: string | null
           data_notificacao_cobranca: string | null
           data_recebimento: string | null
           data_vencimento: string
+          descricao: string | null
           id: string
           iss_aliquota: number | null
           iss_valor: number | null
@@ -866,11 +875,13 @@ export type Database = {
         }
         Insert: {
           agendamento_cobranca?: Json | null
+          cliente_id?: string | null
           cliente_nome: string
           criado_em?: string | null
           data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento: string
+          descricao?: string | null
           id?: string
           iss_aliquota?: number | null
           iss_valor?: number | null
@@ -888,11 +899,13 @@ export type Database = {
         }
         Update: {
           agendamento_cobranca?: Json | null
+          cliente_id?: string | null
           cliente_nome?: string
           criado_em?: string | null
           data_notificacao_cobranca?: string | null
           data_recebimento?: string | null
           data_vencimento?: string
+          descricao?: string | null
           id?: string
           iss_aliquota?: number | null
           iss_valor?: number | null
@@ -909,6 +922,13 @@ export type Database = {
           valor_recebido?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "financeiro_parcelas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "financeiro_parcelas_projeto_id_fkey"
             columns: ["projeto_id"]
@@ -1841,7 +1861,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      contratos_clientes: {
+        Row: {
+          cliente_id: string | null
+          criado_em: string | null
+          id: string | null
+          marco1_valor: string | null
+          marco2_valor: string | null
+          marco3_valor: string | null
+          numero: string | null
+          status: string | null
+          valor_total: string | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          criado_em?: string | null
+          id?: string | null
+          marco1_valor?: never
+          marco2_valor?: never
+          marco3_valor?: never
+          numero?: string | null
+          status?: string | null
+          valor_total?: never
+        }
+        Update: {
+          cliente_id?: string | null
+          criado_em?: string | null
+          id?: string | null
+          marco1_valor?: never
+          marco2_valor?: never
+          marco3_valor?: never
+          numero?: string | null
+          status?: string | null
+          valor_total?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contratos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_briefing_by_token: {
