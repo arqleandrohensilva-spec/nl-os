@@ -360,92 +360,85 @@ const ProjetoDetalhe = () => {
             {/* COLUMN RIGHT */}
             <section className="space-y-8">
                 
-                {/* FINANCEIRO */}
-                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-8 space-y-6">
-                    <h3 className="text-[#8B7355] text-[10px] font-bold uppercase tracking-[0.4em]">Financeiro</h3>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-end border-b border-white/5 pb-4">
-                            <span className="text-[10px] text-[#555] uppercase font-bold">Valor do Contrato</span>
-                            <span className="text-xl font-['Georgia'] text-white">R$ {projeto.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center text-[10px] text-[#e8e8e8]/70">
-                                <span className="uppercase">Marco 1 (30%)</span>
-                                <Badge className="bg-emerald-500/10 text-emerald-500 border-none rounded-none text-[8px]">PAGO</Badge>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] text-[#e8e8e8]/70">
-                                <span className="uppercase">Marco 2 (40%)</span>
-                                <Badge className="bg-white/5 text-[#555] border-none rounded-none text-[8px]">PENDENTE</Badge>
-                            </div>
-                            <div className="flex justify-between items-center text-[10px] text-[#e8e8e8]/70">
-                                <span className="uppercase">Marco 3 (30%)</span>
-                                <Badge className="bg-white/5 text-[#555] border-none rounded-none text-[8px]">PENDENTE</Badge>
-                            </div>
-                        </div>
-                        <div className="pt-4 grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="text-[8px] text-[#555] uppercase font-bold mb-1">Total Pago</p>
-                                <p className="text-sm font-bold text-emerald-500">R$ {((projeto.valor_total || 0) * 0.3).toLocaleString('pt-BR')}</p>
-                            </div>
-                            <div>
-                                <p className="text-[8px] text-[#555] uppercase font-bold mb-1">Em Aberto</p>
-                                <p className="text-sm font-bold text-amber-500">R$ {((projeto.valor_total || 0) * 0.7).toLocaleString('pt-BR')}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="space-y-2 pt-4">
-                        <Button className="w-full bg-[#8B7355] hover:bg-[#8B7355]/90 text-white rounded-none text-[9px] uppercase font-bold tracking-[0.2em] h-10">GERAR FLUXO DE CAIXA</Button>
-                        <Button className="w-full bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none text-[9px] uppercase font-bold tracking-[0.2em] h-10 transition-all">CONFIGURAR FINANCEIRO</Button>
-                    </div>
-                </div>
-
-                {/* CLIENTE */}
-                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-8 space-y-6">
-                    <h3 className="text-[#8B7355] text-[10px] font-bold uppercase tracking-[0.4em]">Cliente</h3>
-                    <div className="space-y-4">
-                        <div>
-                            <p className="text-[10px] text-[#555] uppercase font-bold mb-1">Nome Completo</p>
-                            <p className="text-sm font-bold">{projeto.nome_cliente}</p>
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-[#555] uppercase font-bold mb-1">Contato Direto</p>
-                            <div className="flex items-center gap-3">
-                                <Button 
-                                    onClick={() => whatsappCliente && window.open(`https://wa.me/55${whatsappCliente}`, '_blank')}
-                                    className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 rounded-none h-8 px-4 text-[9px] uppercase font-bold tracking-widest"
-                                >
-                                    <MessageCircle size={14} className="mr-2" /> WhatsApp
-                                </Button>
-                            </div>
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-[#555] uppercase font-bold mb-1">Localização do Imóvel</p>
-                            <p className="text-xs text-[#e8e8e8]/70 leading-relaxed italic">{projeto.cidade || 'Não informada'}</p>
-                        </div>
-                    </div>
-                    <Button 
-                        onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}
-                        className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-none text-[9px] uppercase font-bold tracking-[0.2em] h-10"
+                {/* Card Financeiro — resumo */}
+                <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '16px 20px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                    <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Financeiro</span>
+                    <button
+                      onClick={() => navigate('/financeiro/projetos')}
+                      style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', background: 'none', border: 'none', cursor: 'pointer' }}
                     >
-                        VER FICHA COMPLETA
-                    </Button>
+                      VER DETALHES →
+                    </button>
+                  </div>
+
+                  {/* Valor total */}
+                  <div style={{ marginBottom: '14px' }}>
+                    <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#555', marginBottom: '4px' }}>VALOR TOTAL DO CONTRATO</div>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8' }}>
+                      R$ {contrato?.valor_total || projeto.valor_total || '—'}
+                    </div>
+                  </div>
+
+                  {/* Marcos */}
+                  {[
+                    { num: '01', label: 'Entrada · 30%', valor: contrato?.marco1_valor },
+                    { num: '02', label: 'Anteprojeto · 40%', valor: contrato?.marco2_valor },
+                    { num: '03', label: 'Entrega · 30%', valor: contrato?.marco3_valor },
+                  ].map((marco) => (
+                    <div key={marco.num} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#333' }}>{marco.num}</span>
+                        <span style={{ fontFamily: 'Arial', fontSize: '12px', color: '#888' }}>{marco.label}</span>
+                      </div>
+                      <span style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#ccc' }}>
+                        R$ {marco.valor || '—'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* DOCUMENTOS */}
-                <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-8 space-y-6">
-                    <h3 className="text-[#8B7355] text-[10px] font-bold uppercase tracking-[0.4em]">Documentos</h3>
-                    <div className="space-y-0">
-                        {['Contrato de Prestação', 'Proposta Técnica', 'Briefing Inicial'].map((doc, i) => (
-                            <div key={i} className="flex justify-between items-center py-4 border-b border-white/5 cursor-pointer hover:bg-white/[0.02] transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <FileText size={14} className="text-[#555] group-hover:text-[#8B7355] transition-colors" />
-                                    <span className="text-[10px] uppercase tracking-widest font-bold">{doc}</span>
-                                </div>
-                                <ExternalLink size={12} className="text-[#555]" />
-                            </div>
-                        ))}
+                {/* Card Cliente */}
+                <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '16px 20px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Cliente</span>
+                    <button
+                      onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}
+                      style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      VER FICHA →
+                    </button>
+                  </div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '15px', color: '#e8e8e8', marginBottom: '4px' }}>{lead?.nome || projeto.nome_cliente}</div>
+                  {lead?.endereco && <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#555', marginBottom: '8px' }}>{lead.endereco}</div>}
+                  {whatsappCliente && (
+                    <a 
+                      href={`https://wa.me/55${whatsappCliente}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontFamily: 'Arial', fontSize: '12px', color: '#8B7355', textDecoration: 'none' }}
+                    >
+                      → WHATSAPP
+                    </a>
+                  )}
+                </div>
+
+                {/* Card Documentos */}
+                <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '16px 20px', marginBottom: '12px' }}>
+                  <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', display: 'block', marginBottom: '12px' }}>Documentos</span>
+                  {[
+                    { label: 'Pasta do Cliente', sub: 'Dropbox' },
+                    { label: 'Contrato', sub: '08 - Documentos / 02 - Proposta e Contrato' },
+                    { label: 'Briefing', sub: '08 - Documentos / 01 - Briefing' },
+                    { label: 'Atas e Reuniões', sub: '08 - Documentos / 04 - Atas e Reuniões' },
+                  ].map((doc) => (
+                    <div key={doc.label} style={{ padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}
+                      onClick={() => window.open('https://www.dropbox.com', '_blank')}
+                    >
+                      <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{doc.label}</div>
+                      <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#444', marginTop: '2px' }}>{doc.sub}</div>
                     </div>
-                    <Button className="w-full bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-white rounded-none text-[9px] uppercase font-bold tracking-[0.2em] h-10 transition-all mt-4">ABRIR PASTA NO DROPBOX</Button>
+                  ))}
                 </div>
 
                 {/* NOTAS INTERNAS */}
