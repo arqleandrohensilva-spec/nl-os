@@ -458,6 +458,68 @@ const ClienteFicha = () => {
         if (etapaError) throw etapaError;
       }
 
+      // 3.5 Criar parcelas financeiras baseadas no contrato
+      const { data: contratoRecente } = await supabase
+        .from('contratos_clientes')
+        .select('valor_total, marco1_valor, marco2_valor, marco3_valor, numero')
+        .eq('cliente_id', id)
+        .eq('status', 'assinado')
+        .order('criado_em', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (contratoRecente && novoProjeto) {
+        const hoje = new Date();
+        const parseValor = (val: string) => {
+          if (!val) return 0;
+          return parseFloat(String(val).replace(/\./g, '').replace(',', '.')) || 0;
+        };
+
+        const parcelas = [
+          {
+            projeto_id: novoProjeto.id,
+            cliente_id: id,
+            cliente_nome: cliente.nome,
+            numero_parcela: 1,
+            total_parcelas: 3,
+            descricao: 'Marco 1 — Entrada (30%)',
+            valor: parseValor(contratoRecente.marco1_valor),
+            data_vencimento: hoje.toISOString().split('T')[0],
+            status: 'PENDENTE',
+          },
+          {
+            projeto_id: novoProjeto.id,
+            cliente_id: id,
+            cliente_nome: cliente.nome,
+            numero_parcela: 2,
+            total_parcelas: 3,
+            descricao: 'Marco 2 — Anteprojeto aprovado (40%)',
+            valor: parseValor(contratoRecente.marco2_valor),
+            data_vencimento: new Date(hoje.setDate(hoje.getDate() + 45)).toISOString().split('T')[0],
+            status: 'PENDENTE',
+          },
+          {
+            projeto_id: novoProjeto.id,
+            cliente_id: id,
+            cliente_nome: cliente.nome,
+            numero_parcela: 3,
+            total_parcelas: 3,
+            descricao: 'Marco 3 — Entrega do executivo (30%)',
+            valor: parseValor(contratoRecente.marco3_valor),
+            data_vencimento: new Date(hoje.setDate(hoje.getDate() + 90)).toISOString().split('T')[0],
+            status: 'PENDENTE',
+          },
+        ];
+
+        const { error: parcelasError } = await supabase
+          .from('financeiro_parcelas')
+          .insert(parcelas);
+
+        if (parcelasError) {
+          console.error('Erro ao criar parcelas:', parcelasError);
+        }
+      }
+
       // 4. Criar pastas no Dropbox
       toast.info('Criando estrutura de pastas no Dropbox...');
       await handleCreateFolders();
