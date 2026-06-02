@@ -365,10 +365,10 @@ const ProjetoDetalhe = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                     <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em' }}>Financeiro</span>
                     <button
-                      onClick={() => navigate('/financeiro/projetos')}
-                      style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.08em', background: 'none', border: 'none', cursor: 'pointer' }}
+                      onClick={() => navigate(`/projetos/${id}/financeiro`)}
+                      style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.08em', background: 'none', border: 'none', cursor: 'pointer' }}
                     >
-                      VER DETALHES →
+                      VER FINANCEIRO COMPLETO →
                     </button>
                   </div>
 

@@ -15,6 +15,7 @@ import PropostasTracking from "./pages/PropostasTracking.tsx";
 import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
+import ProjetoFinanceiro from "./pages/ProjetoFinanceiro.tsx";
 import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 import DropboxCallback from "./pages/DropboxCallback.tsx";
@@ -66,6 +67,7 @@ const App = () => (
           <Route path="/propostas/biblioteca" element={<BibliotecaServicos />} />
           <Route path="/projetos/gestao" element={<GestaoProjetos />} />
           <Route path="/projetos/detalhe/:id" element={<ProjetoDetalhe />} />
+          <Route path="/projetos/:id/financeiro" element={<ProjetoFinanceiro />} />
           <Route path="/financeiro/projetos" element={<FinanceiroProjetos />} />
           <Route path="/propostas/documentos" element={<DocumentosContratos />} />
           <Route path="/propostas/tracking" element={<PropostasTracking />} />
