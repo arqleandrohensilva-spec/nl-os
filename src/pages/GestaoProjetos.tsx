@@ -126,7 +126,7 @@ const GestaoProjetos = () => {
           {/* Cabeçalho de colunas */}
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1c1c1c' }}>
             {['Cliente', 'Tipo', 'Fase atual', 'Próxima entrega', 'Status'].map(col => (
-              <span key={col} style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#2e2e2e', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
+              <span key={col} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
             ))}
           </div>
 
@@ -139,31 +139,31 @@ const GestaoProjetos = () => {
               <div
                 key={projeto.id}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 {/* Cliente */}
                 <div>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#d8d8d8' }}>{projeto.nome_cliente}</div>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#3a3a3a', marginTop: '1px' }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '15px', color: '#d8d8d8' }}>{projeto.nome_cliente}</div>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#3a3a3a', marginTop: '1px' }}>
                     {projeto.cidade} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'} · desde {projeto.data_inicio ? new Date(projeto.data_inicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
                   </div>
                 </div>
 
                 {/* Tipo */}
-                <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: '#6b5c45', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#6b5c45', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {projeto.tipo}
                 </div>
 
                 {/* Fase atual com barra de progresso */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#8B7355' }}>
                     {etapaTexto}
                   </div>
-                  <div style={{ height: '2px', background: '#1c1c1c', borderRadius: '1px', width: '100%' }}>
+                  <div style={{ height: '3px', background: '#1c1c1c', borderRadius: '1.5px', width: '100%' }}>
                     <div style={{
-                      height: '2px', background: '#8B7355', borderRadius: '1px',
+                      height: '3px', background: '#8B7355', borderRadius: '1.5px',
                       width: `${(() => {
                         const ordem = ['Briefing', 'Conceito', 'Estudo Preliminar', 'Executivo', 'Entrega'];
                         const matchIdx = ordem.findIndex(o => 
@@ -179,10 +179,10 @@ const GestaoProjetos = () => {
 
                 {/* Próxima entrega */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555' }}>
                     {etapaTexto ? `Aprovação ${etapaTexto}` : '—'}
                   </div>
-                  <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: (() => {
+                  <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: (() => {
                     const dataEntrega = emAndamento?.data_entrega;
                     if (!dataEntrega) return '#555';
                     const dias = Math.ceil((new Date(dataEntrega).getTime() - Date.now()) / 86400000);
@@ -208,7 +208,7 @@ const GestaoProjetos = () => {
                   }} />
                   <span style={{ 
                     fontFamily: 'Courier New', 
-                    fontSize: '7px', 
+                    fontSize: '9px', 
                     textTransform: 'uppercase', 
                     letterSpacing: '0.08em', 
                     color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : projeto.status_geral?.toLowerCase() === 'pausado' ? '#fbbf24' : '#555' 
@@ -232,10 +232,10 @@ const GestaoProjetos = () => {
 };
 
 const MetricCard = ({ label, value, accent, warning }: { label: string, value: string | number, accent?: boolean, warning?: boolean }) => (
-  <div className="bg-[#1a1a1a] border border-white/5 p-[10px_14px] transition-all duration-300 rounded-lg">
+  <div className="bg-[#1a1a1a] border border-white/5 p-[12px_16px] transition-all duration-300 rounded-lg">
     <p className="text-[8px] tracking-[0.4em] text-[#8B7355] font-bold uppercase mb-1" style={{ fontFamily: "'Courier New', Courier, monospace" }}>{label}</p>
     <p className={cn(
-      "text-[20px] font-light font-cormorant",
+      "text-[24px] font-light font-cormorant",
       accent ? "text-[#8B7355]" : warning ? "text-rose-500" : "text-white"
     )} style={{ fontFamily: "Georgia, serif" }}>{value}</p>
   </div>
