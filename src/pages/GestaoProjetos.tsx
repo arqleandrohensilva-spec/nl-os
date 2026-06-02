@@ -124,7 +124,7 @@ const GestaoProjetos = () => {
         {/* Projects List - Redesign Monograph Style */}
         <div style={{ background: '#0d0d0d', borderRadius: '10px', overflow: 'hidden', border: '1px solid #1c1c1c' }}>
           {/* Cabeçalho de colunas */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1a1a1a' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 0.5fr 1.2fr 1.2fr 0.6fr', gap: 0, padding: '6px 16px', borderBottom: '1px solid #1a1a1a', alignItems: 'center' }}>
             {['Cliente', 'Tipo', 'Fase atual', 'Próxima entrega', 'Status'].map(col => (
               <span key={col} style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.12em' }}>{col}</span>
             ))}
@@ -139,7 +139,7 @@ const GestaoProjetos = () => {
               <div
                 key={projeto.id}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                style={{ display: 'grid', gridTemplateColumns: '2fr 0.6fr 1.4fr 1fr 0.8fr', gap: 0, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                style={{ display: 'grid', gridTemplateColumns: '1.8fr 0.5fr 1.2fr 1.2fr 0.6fr', gap: 0, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
