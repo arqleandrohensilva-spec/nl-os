@@ -1072,9 +1072,10 @@ const Index = () => {
                         // Se falhou o Dropbox, continuamos para criar o projeto mas avisaremos no final
                       }
 
-                      const tipoMapeado = (conversionLead.tipo === 'ARQ+INT' || conversionLead.tipo === 'arq' || conversionLead.tipo === 'Arq+Int' || !conversionLead.tipo)
+                      const tipoStr = (conversionLead.tipo as string) || '';
+                      const tipoMapeado = (tipoStr === 'ARQ+INT' || tipoStr === 'arq' || tipoStr === 'Arq+Int' || !tipoStr)
                         ? 'Arq+Int'
-                        : (conversionLead.tipo === 'INT' || conversionLead.tipo === 'Interiores')
+                        : (tipoStr === 'INT' || tipoStr === 'Interiores')
                         ? 'Interiores'
                         : 'Comercial';
 
