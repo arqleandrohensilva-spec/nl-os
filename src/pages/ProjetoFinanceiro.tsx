@@ -31,6 +31,8 @@ import { toast } from "sonner";
 interface Parcela {
   id: string;
   projeto_id: string;
+  cliente_id?: string;
+  cliente_nome?: string;
   numero_parcela: number;
   total_parcelas: number;
   descricao: string;
