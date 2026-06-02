@@ -318,9 +318,10 @@ const ClienteFicha = () => {
       if (updateError) throw updateError;
 
       // 2. Criar projeto
-      const tipoMapeado = (cliente.tipo_projeto === 'ARQ+INT' || cliente.tipo_projeto === 'arq' || cliente.tipo_projeto === 'Arq+Int' || !cliente.tipo_projeto) 
+      const tipoLimpo = cliente.tipo_projeto?.toUpperCase().trim();
+      const tipoMapeado = (tipoLimpo === 'ARQ+INT' || tipoLimpo === 'ARQ' || !tipoLimpo) 
         ? 'Arq+Int' 
-        : (cliente.tipo_projeto === 'INT' || cliente.tipo_projeto === 'Interiores') 
+        : (tipoLimpo === 'INT' || tipoLimpo === 'INTERIORES') 
         ? 'Interiores' 
         : 'Comercial';
 
@@ -335,7 +336,8 @@ const ClienteFicha = () => {
           etapa_atual: 'Briefing',
           status_geral: 'ativo',
           data_inicio: new Date().toISOString().split('T')[0],
-          cliente_id: id
+          cliente_id: id,
+          proposta_id: proposta?.id || null
         })
         .select()
         .single();
@@ -489,9 +491,9 @@ const ClienteFicha = () => {
       queryClient.invalidateQueries({ queryKey: ['cliente', id] });
       
       // Mostrar botão ver projeto no final da etapa 5
-    } catch (error) {
-      console.error(error);
-      toast.error("Erro ao criar projeto");
+    } catch (error: any) {
+      console.error('ERRO DETALHADO ao criar projeto:', error);
+      toast.error(`Erro ao criar projeto: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
