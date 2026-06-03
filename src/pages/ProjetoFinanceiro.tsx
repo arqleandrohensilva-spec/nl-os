@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { useParams, useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
 import { 
   ArrowLeft, 
   DollarSign, 
@@ -298,51 +299,60 @@ const ProjetoFinanceiro = () => {
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const generateReceipt = (parcela: Parcela) => {
-    // Basic implementation using jspdf as seen in other parts of the app
-    const jspdf = (window as any).jspdf;
-    if (!jspdf) {
-      toast.error('Biblioteca de PDF não carregada');
-      return;
-    }
-    
-    const doc = new jspdf.jsPDF();
-    const dataRec = parcela.data_recebimento ? format(parseISO(parcela.data_recebimento), 'dd/MM/yyyy') : format(new Date(), 'dd/MM/yyyy');
-    const valor = (parcela.valor_recebido || parcela.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  const handleGerarRecibo = (parcela: any) => {
+    const doc = new jsPDF();
     
     // Header
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.setTextColor(58, 58, 58);
-    doc.text("NL ARQUITETOS", 105, 30, { align: "center" });
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('NL ARQUITETOS', 20, 25);
     
     doc.setFontSize(10);
-    doc.setTextColor(139, 115, 85);
-    doc.text("RECIBO DE PAGAMENTO", 105, 38, { align: "center" });
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100);
+    doc.text('São José dos Campos, SP', 20, 32);
+    doc.text('A ARQUITETURA COMO DECISÃO', 20, 38);
     
-    // Content
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
+    // Linha separadora
+    doc.setDrawColor(139, 115, 85);
+    doc.line(20, 43, 190, 43);
     
-    let y = 60;
-    const leftX = 20;
+    // Título
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0);
+    doc.text('RECIBO DE PAGAMENTO', 20, 55);
     
-    doc.text(`Cliente: ${projeto?.nome_cliente}`, leftX, y); y += 10;
-    doc.text(`Contrato: ${contrato?.numero || 'N/A'}`, leftX, y); y += 10;
-    doc.text(`Referente a: ${parcela.descricao}`, leftX, y); y += 10;
-    doc.text(`Parcela: ${parcela.numero_parcela}/${parcela.total_parcelas}`, leftX, y); y += 10;
-    
-    doc.setFont("helvetica", "bold");
-    doc.text(`Valor: R$ ${valor}`, leftX, y); y += 10;
-    doc.text(`Data de recebimento: ${dataRec}`, leftX, y); y += 30;
-    
+    // Dados
     doc.setFontSize(10);
-    doc.setFont("helvetica", "italic");
-    doc.text("Recibo gerado por NL Arquitetos", 105, y, { align: "center" });
+    doc.setFont('helvetica', 'normal');
     
-    doc.save(`Recibo_${projeto?.nome_cliente.replace(/\s+/g, '_')}_M${parcela.numero_parcela}.pdf`);
-    toast.success('Recibo gerado!');
+    const dados = [
+      ['Cliente:', projeto?.nome_cliente || ''],
+      ['Descrição:', parcela.descricao || ''],
+      ['Valor recebido:', `R$ ${(parcela.valor_recebido || parcela.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`],
+      ['Data de recebimento:', parcela.data_recebimento ? new Date(parcela.data_recebimento).toLocaleDateString('pt-BR') : '—'],
+      ['Status:', parcela.status || ''],
+    ];
+    
+    let y = 70;
+    dados.forEach(([label, valor]) => {
+      doc.setFont('helvetica', 'bold');
+      doc.text(label, 20, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(valor, 70, y);
+      y += 10;
+    });
+    
+    // Linha final
+    doc.setDrawColor(200);
+    doc.line(20, y + 5, 190, y + 5);
+    
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(`Recibo gerado em ${new Date().toLocaleDateString('pt-BR')} por NL Arquitetos`, 20, y + 12);
+    
+    doc.save(`Recibo_${projeto?.nome_cliente?.replace(/\s+/g, '_')}_${parcela.descricao?.replace(/\s+/g, '_')}.pdf`);
   };
 
   const getStatusColor = (status: string) => {
