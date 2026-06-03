@@ -404,6 +404,7 @@ const ProjetoFinanceiro = () => {
     };
 
     addLinha('CLIENTE:', parcela.cliente_nome || projeto?.nome_cliente || '—');
+    addLinha('IMÓVEL:', leadInfo?.endereco || projeto?.cidade || '—');
     addLinha('REFERENTE:', parcela.descricao || '—');
     addLinha('ESCOPO:', `${projeto?.tipo || 'Arquitetura + Interiores'} · ${projeto?.area_m2 ? projeto.area_m2 + 'm²' : 'N/A'} · ${projeto?.cidade || 'SJC'}`);
     addLinha('VALOR RECEBIDO:', `R$ ${(parcela.valor_recebido || parcela.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, true);
