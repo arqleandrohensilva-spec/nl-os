@@ -83,25 +83,25 @@ const FinanceiroGeral = () => {
         return sum + (Number(valor) || 0);
     }, 0);
 
-  const recebidoMes = parcelas?.filter(p => 
+  const recebidoMes = parcelasSeguras.filter(p => 
     (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') && p.data_recebimento &&
-    isWithinInterval(parseISO(p.data_recebimento), { start: inicioMes, end: fimMes })
-  ).reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0) || 0;
+    isWithinInterval(p.data_recebimento ? parseISO(p.data_recebimento) : new Date(), { start: inicioMes, end: fimMes })
+  ).reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
 
-  const previstoMes = parcelas?.filter(p =>
+  const previstoMes = parcelasSeguras.filter(p =>
     p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' &&
-    isWithinInterval(parseISO(p.data_vencimento), { start: inicioMes, end: fimMes })
-  ).reduce((s, p) => s + Number(p.valor), 0) || 0;
+    isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: inicioMes, end: fimMes })
+  ).reduce((s, p) => s + Number(p.valor), 0);
 
-  const totalAtrasado = parcelas?.filter(p =>
+  const totalAtrasado = parcelasSeguras.filter(p =>
     p.status === 'ATRASADO'
-  ).reduce((s, p) => s + Number(p.valor), 0) || 0;
+  ).reduce((s, p) => s + Number(p.valor), 0);
 
   const margemMes = recebidoMes - custoFixoMensal;
 
-  const próximosVencimentos = parcelas?.filter(p => 
+  const próximosVencimentos = parcelasSeguras.filter(p => 
     p.status !== 'PAGO' && 
-    isWithinInterval(parseISO(p.data_vencimento), { start: hoje, end: addDays(hoje, 7) })
+    isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: hoje, end: addDays(hoje, 7) })
   ).slice(0, 5);
 
   const parcelasFiltradas = useMemo(() => {
