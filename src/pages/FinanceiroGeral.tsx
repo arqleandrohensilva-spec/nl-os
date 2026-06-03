@@ -246,13 +246,13 @@ const FinanceiroGeral = () => {
                   </div>
 
                   {projetos?.map((projeto: any) => {
-                    const parcelasProjeto = parcelas?.filter(p => p.projeto_id === projeto.id) || [];
+                    const parcelasProjeto = parcelasSeguras.filter(p => p.projeto_id === projeto.id);
                     const contratoTotal = parcelasProjeto.reduce((s, p) => s + Number(p.valor), 0);
                     const pagoTotal = parcelasProjeto.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
                     const emAberto = contratoTotal - pagoTotal;
                     
                     const temAtraso = parcelasProjeto.some(p => p.status === 'ATRASADO');
-                    const vencePerto = parcelasProjeto.some(p => p.status !== 'PAGO' && differenceInDays(parseISO(p.data_vencimento), hoje) <= 7);
+                    const vencePerto = parcelasProjeto.some(p => p.status !== 'PAGO' && differenceInDays(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), hoje) <= 7);
                     const health = temAtraso ? { color: '#f87171', label: 'ATR' } : vencePerto ? { color: '#fbbf24', label: 'ATN' } : { color: '#4ade80', label: 'OK' };
 
                     return (
