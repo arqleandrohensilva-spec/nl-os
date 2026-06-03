@@ -329,7 +329,7 @@ const ProjetoFinanceiro = () => {
     // Data formatada corretamente
     const formatarData = (dataStr: string | null) => {
       if (!dataStr) return '—';
-      const d = new Date(dataStr + 'T12:00:00');
+      const d = new Date(dataStr.includes('T') ? dataStr : dataStr + 'T12:00:00');
       if (isNaN(d.getTime())) return '—';
       return d.toLocaleDateString('pt-BR');
     };
