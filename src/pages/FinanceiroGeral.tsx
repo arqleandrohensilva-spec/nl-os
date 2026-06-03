@@ -8,7 +8,7 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
-import { format, startOfMonth, endOfMonth, isAfter, isWithinInterval, parseISO, addMonths, addDays, isBefore } from 'date-fns';
+import { format, startOfMonth, endOfMonth, isAfter, isWithinInterval, parseISO, addMonths, addDays, isBefore, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { 
