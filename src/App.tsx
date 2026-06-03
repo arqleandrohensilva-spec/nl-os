@@ -16,7 +16,7 @@ import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 import ProjetoFinanceiro from "./pages/ProjetoFinanceiro.tsx";
-import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
+import FinanceiroGeral from "./pages/FinanceiroGeral.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 import DropboxCallback from "./pages/DropboxCallback.tsx";
 import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
