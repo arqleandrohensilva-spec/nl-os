@@ -799,6 +799,13 @@ const ProjetoFinanceiro = () => {
             ))}
         </div>
 
+        <button
+          onClick={() => setModalNovaParcela(true)}
+          style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', background: 'none', border: '1px solid #8B7355', padding: '7px 16px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '3px', marginTop: '12px' }}
+        >
+          + ADICIONAR COBRANÇA AVULSA
+        </button>
+
         {parcelas.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#555' }}>
             <p style={{ fontFamily: 'Arial', fontSize: '13px', marginBottom: '16px' }}>
