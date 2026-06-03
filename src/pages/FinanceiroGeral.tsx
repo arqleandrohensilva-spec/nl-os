@@ -35,6 +35,8 @@ const FinanceiroGeral = () => {
   const [baseFinanceira, setBaseFinanceira] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroParcelas, setFiltroParcelas] = useState('Todas');
+  
+  const parcelasSeguras = useMemo(() => (parcelas || []).filter(p => p && p.data_vencimento), [parcelas]);
 
   useEffect(() => {
     fetchData();
