@@ -302,7 +302,7 @@ const ProjetoFinanceiro = () => {
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const handleGerarRecibo = async (parcela: any) => {
+  const handleGerarRecibo = async (parcela: any, download = true) => {
     const { data: todasParcelas } = await supabase
       .from('financeiro_parcelas')
       .select('*')
