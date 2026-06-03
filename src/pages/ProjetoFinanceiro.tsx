@@ -53,6 +53,7 @@ interface Projeto {
   cidade: string;
   cliente_id?: string;
   valor_total?: number;
+  area_m2?: number;
 }
 
 const ProjetoFinanceiro = () => {
@@ -300,14 +301,12 @@ const ProjetoFinanceiro = () => {
   };
 
   const handleGerarRecibo = async (parcela: any) => {
-    // Buscar todas as parcelas do projeto para mostrar em aberto
     const { data: todasParcelas } = await supabase
       .from('financeiro_parcelas')
       .select('*')
       .eq('projeto_id', parcela.projeto_id)
       .order('numero_parcela', { ascending: true });
 
-    // Buscar número do contrato
     const { data: contratoInfo } = await supabase
       .from('contratos_clientes')
       .select('numero')
@@ -319,134 +318,199 @@ const ProjetoFinanceiro = () => {
 
     const doc = new jsPDF({ format: 'a4', unit: 'mm' });
     const W = 210;
-    const bronze = [139, 115, 85] as [number, number, number];
-    const grafite = [58, 58, 58] as [number, number, number];
-    const cinza = [120, 120, 120] as [number, number, number];
+    const bronze: [number, number, number] = [139, 115, 85];
+    const grafite: [number, number, number] = [58, 58, 58];
+    const cinza: [number, number, number] = [120, 120, 120];
 
-    // === FUNDO SUPERIOR GRAFITE ===
+    // Número do recibo baseado nas parcelas pagas
+    const pagas = (todasParcelas || []).filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL');
+    const nroRecibo = `REC-${String(pagas.length).padStart(3, '0')}/${new Date().getFullYear()}`;
+
+    // Data formatada corretamente
+    const formatarData = (dataStr: string | null) => {
+      if (!dataStr) return '—';
+      const d = new Date(dataStr + 'T12:00:00');
+      if (isNaN(d.getTime())) return '—';
+      return d.toLocaleDateString('pt-BR');
+    };
+
+    // === CABEÇALHO GRAFITE ===
     doc.setFillColor(...grafite);
     doc.rect(0, 0, W, 45, 'F');
 
-    // === LOGO NL EM SVG INLINE ===
-    // "NL" em texto grande branco
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('NL', 15, 22);
 
-    // Linha bronze vertical após NL
     doc.setDrawColor(...bronze);
     doc.setLineWidth(0.5);
     doc.line(30, 10, 30, 32);
 
-    // ARQUITETOS ao lado
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(200, 200, 200);
     doc.text('ARQUITETOS', 33, 18);
     doc.setFontSize(7);
-    doc.setTextColor(...bronze as [number, number, number]);
+    doc.setTextColor(...bronze);
     doc.text('A ARQUITETURA COMO DECISÃO', 33, 24);
 
-    // Número do contrato — direita
     doc.setFontSize(8);
     doc.setTextColor(160, 160, 160);
     doc.text(`Contrato: ${contratoInfo?.numero || '—'}`, W - 15, 18, { align: 'right' });
-    doc.text(`São José dos Campos, SP`, W - 15, 24, { align: 'right' });
+    doc.text('São José dos Campos, SP', W - 15, 24, { align: 'right' });
 
-    // === TÍTULO RECIBO ===
-    doc.setFillColor(255, 255, 255);
+    // === TÍTULO + NÚMERO DO RECIBO ===
     doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...grafite);
     doc.text('RECIBO DE PAGAMENTO', 15, 58);
 
-    // Linha bronze
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...cinza);
+    doc.text(`Nº ${nroRecibo}`, W - 15, 58, { align: 'right' });
+
     doc.setDrawColor(...bronze);
     doc.setLineWidth(0.8);
     doc.line(15, 62, W - 15, 62);
 
-    // === DADOS DO PAGAMENTO ===
+    // === DADOS ===
     let y = 72;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...cinza);
+    const col1 = 15;
+    const col2 = 65;
 
     const addLinha = (label: string, valor: string, destaque = false) => {
+      doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...cinza);
-      doc.text(label, 15, y);
+      doc.text(label, col1, y);
       doc.setFont('helvetica', 'normal');
       if (destaque) {
         doc.setTextColor(...bronze);
-        doc.setFontSize(10);
+        doc.setFontSize(11);
       } else {
         doc.setTextColor(...grafite);
         doc.setFontSize(9);
       }
-      doc.text(valor, 65, y);
-      doc.setFontSize(8);
+      doc.text(valor, col2, y);
       y += 8;
     };
 
     addLinha('CLIENTE:', parcela.cliente_nome || projeto?.nome_cliente || '—');
     addLinha('REFERENTE:', parcela.descricao || '—');
+    addLinha('ESCOPO:', `${projeto?.tipo || 'Arquitetura + Interiores'} · ${projeto?.area_m2 ? projeto.area_m2 + 'm²' : 'N/A'} · ${projeto?.cidade || 'SJC'}`);
     addLinha('VALOR RECEBIDO:', `R$ ${(parcela.valor_recebido || parcela.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, true);
-    addLinha('DATA DE RECEBIMENTO:', parcela.data_recebimento ? new Date(parcela.data_recebimento + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
+    addLinha('DATA DE RECEBIMENTO:', formatarData(parcela.data_recebimento));
     addLinha('FORMA DE PAGAMENTO:', 'Transferência bancária / PIX');
 
     y += 4;
     doc.setDrawColor(220, 220, 220);
     doc.setLineWidth(0.3);
-    doc.line(15, y, W - 15, y);
+    doc.line(col1, y, W - 15, y);
     y += 10;
 
+    // === HISTÓRICO DE PAGAMENTOS ===
+    const historico = (todasParcelas || []).filter(p =>
+      p.status === 'PAGO' || p.status === 'PAGO PARCIAL'
+    );
+
+    if (historico.length > 0) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...grafite);
+      doc.text('HISTÓRICO DE PAGAMENTOS', col1, y);
+      y += 6;
+
+      historico.forEach(p => {
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...cinza);
+        doc.text(`• ${p.descricao}`, col1, y);
+        doc.setTextColor(...grafite);
+        doc.text(`R$ ${Number(p.valor_recebido || p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 110, y);
+        doc.text(formatarData(p.data_recebimento), 148, y);
+        doc.setTextColor(80, 160, 80);
+        doc.text('✓ PAGO', 178, y);
+        y += 7;
+      });
+
+      y += 4;
+    }
+
     // === VALORES EM ABERTO ===
-    const emAberto = (todasParcelas || []).filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' && p.id !== parcela.id);
+    const emAberto = (todasParcelas || []).filter(p =>
+      p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL'
+    );
 
     if (emAberto.length > 0) {
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...grafite);
-      doc.text('VALORES AINDA EM ABERTO', 15, y);
+      doc.text('VALORES EM ABERTO', col1, y);
       y += 6;
 
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-
       emAberto.forEach(p => {
-        const venc = p.data_vencimento ? new Date(p.data_vencimento + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
-        const dias = p.data_vencimento ? Math.ceil((new Date(p.data_vencimento).getTime() - Date.now()) / 86400000) : null;
-        const diasStr = dias !== null ? (dias < 0 ? `ATRASADO ${Math.abs(dias)}d` : dias === 0 ? 'VENCE HOJE' : `em ${dias} dias`) : '';
+        const dias = p.data_vencimento
+          ? Math.ceil((new Date(p.data_vencimento + 'T12:00:00').getTime() - Date.now()) / 86400000)
+          : null;
+        const diasStr = dias !== null
+          ? dias < 0 ? `ATRASADO ${Math.abs(dias)}d` : dias === 0 ? 'VENCE HOJE' : `em ${dias} dias`
+          : '';
+        const corDias: [number, number, number] = dias !== null && dias < 0 ? [220, 80, 80] : [100, 100, 100];
 
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
         doc.setTextColor(...cinza);
-        doc.text(`• ${p.descricao}`, 15, y);
+        doc.text(`• ${p.descricao}`, col1, y);
         doc.setTextColor(...grafite);
         doc.text(`R$ ${Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 110, y);
-        doc.setTextColor(dias !== null && dias < 0 ? 220 : 100, dias !== null && dias < 0 ? 80 : 100, 80);
-        doc.text(`${venc} · ${diasStr}`, 145, y);
+        doc.text(formatarData(p.data_vencimento), 148, y);
+        doc.setTextColor(...corDias);
+        doc.text(diasStr, 178, y);
         y += 7;
       });
+
+      y += 4;
     } else {
       doc.setFontSize(8);
-      doc.setTextColor(100, 180, 100);
-      doc.text('✓ Não há valores em aberto para este projeto.', 15, y);
-      y += 8;
+      doc.setTextColor(80, 160, 80);
+      doc.text('✓ Não há valores em aberto para este projeto.', col1, y);
+      y += 10;
     }
 
-    y += 6;
+    // === CONTRATADOS ===
     doc.setDrawColor(...bronze);
     doc.setLineWidth(0.5);
-    doc.line(15, y, W - 15, y);
+    doc.line(col1, y, W - 15, y);
     y += 8;
 
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...grafite);
+    doc.text('CONTRATADOS', col1, y);
+    y += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...cinza);
+    doc.text('Leandro Henrique da Silva  ·  CPF 425.437.568-92  ·  CAU nº 252250-0', col1, y);
+    y += 6;
+    doc.text('Neandro Jacque Garcia  ·  CPF 382.857.218-92  ·  CAU nº 264629-3', col1, y);
+    y += 10;
+
     // === RODAPÉ ===
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(col1, y, W - 15, y);
+    y += 6;
+
     doc.setFontSize(7);
     doc.setTextColor(160, 160, 160);
-    doc.text(`Recibo gerado em ${new Date().toLocaleDateString('pt-BR')} · NL Arquitetos · app.nl.arq.br`, 15, y);
-    doc.text('Este documento comprova o recebimento do valor acima indicado.', 15, y + 5);
+    doc.text(`Recibo gerado em ${new Date().toLocaleDateString('pt-BR')} · NL Arquitetos · app.nl.arq.br`, col1, y);
+    y += 5;
+    doc.text('Este documento comprova o recebimento do valor acima indicado.', col1, y);
 
-    doc.save(`Recibo_NL_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}_${parcela.descricao?.split('—')[0].trim().replace(/\s+/g, '_')}.pdf`);
+    doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
   };
 
   const getStatusColor = (status: string) => {
