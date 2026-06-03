@@ -124,21 +124,21 @@ const FinanceiroGeral = () => {
         </div>
 
         {/* Metrics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6">
-                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px' }}>Recebido no Mês</div>
+                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Recebido no Mês</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#4ade80' }}>R$ {recebidoMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             </div>
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6">
-                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px' }}>Previsto no Mês</div>
+                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Previsto no Mês</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8' }}>R$ {previstoMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             </div>
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6">
-                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px' }}>Em Atraso</div>
+                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Em Atraso</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#f87171' }}>R$ {totalAtrasado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
             </div>
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)] p-6">
-                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px' }}>Margem</div>
+                <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.05em' }}>Margem</div>
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>
                     R$ {margemMes.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
