@@ -354,7 +354,12 @@ const FinanceiroGeral = () => {
                                   PAGO
                                 </button>
                               )}
-                              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
+                              <button 
+                                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} 
+                                className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#8B7355] border border-[#8B7355]/20 hover:bg-[#8B7355]/5"
+                              >
+                                COBRAR
+                              </button>
                               {p.status === 'PAGO' && (
                                 <button className="p-1 text-[#ccc] hover:bg-white/5"><Receipt size={14}/></button>
                               )}
