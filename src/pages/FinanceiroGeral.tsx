@@ -389,7 +389,7 @@ const FinanceiroGeral = () => {
               <div className="grid grid-cols-3 gap-6">
                   {[0, 1, 2].map(offset => {
                       const mesRef = addMonths(startOfMonth(hoje), offset);
-                      const parcelasMes = parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: mesRef, end: endOfMonth(mesRef) }));
+                      const parcelasMes = parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: mesRef, end: endOfMonth(mesRef) }));
                       const totalMes = parcelasMes.reduce((s, p) => s + Number(p.valor), 0);
 
                       return (
