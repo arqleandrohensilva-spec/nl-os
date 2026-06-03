@@ -53,7 +53,7 @@ const FinanceiroGeral = () => {
 
       const updatedParcelas = (pRes.data || []).map(p => {
         if (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') return p;
-        const dateVenc = parseISO(p.data_vencimento);
+        const dateVenc = p.data_vencimento ? parseISO(p.data_vencimento) : new Date();
         const today = new Date();
         today.setHours(0,0,0,0);
         let status = p.status;
