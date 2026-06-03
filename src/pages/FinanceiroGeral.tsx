@@ -218,10 +218,10 @@ const FinanceiroGeral = () => {
                             <div key={p.id} className="flex justify-between items-center py-3 border-b border-white/5">
                                 <div>
                                     <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
-                                    <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                    <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
                                 </div>
                                 <button 
-                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Olá ${p.cliente_nome}, lembrete da parcela de R$ ${p.valor.toLocaleString('pt-BR')} que vence em ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}.`)}`, '_blank')}
+                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Olá ${p.cliente_nome}, lembrete da parcela de R$ ${p.valor.toLocaleString('pt-BR')} que vence em ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}.`)}`, '_blank')}
                                     className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8B7355] border border-[#8B7355]/30 hover:bg-[#8B7355]/5 transition-colors"
                                 >
                                     COBRAR
