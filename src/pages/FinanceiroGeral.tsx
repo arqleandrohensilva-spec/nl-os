@@ -346,6 +346,7 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
+
           {/* ABA 5: LUCRATIVIDADE */}
           <TabsContent value="lucratividade">
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)]">
