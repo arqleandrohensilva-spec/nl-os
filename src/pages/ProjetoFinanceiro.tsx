@@ -73,6 +73,10 @@ const ProjetoFinanceiro = () => {
     valor: ''
   });
 
+  const [editandoData, setEditandoData] = useState<string | null>(null);
+  const [modalNovaParcela, setModalNovaParcela] = useState(false);
+  const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '' });
+
   const fetchData = async () => {
     if (!id) return;
     try {
