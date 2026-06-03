@@ -167,42 +167,52 @@ const FinanceiroGeral = () => {
           <TabsContent value="visao-geral">
               <div className="grid grid-cols-2 gap-8">
                   {/* Saúde do Mês */}
-                  <div className="bg-[#141414] p-8 border border-[rgba(255,255,255,0.06)]">
-                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', marginBottom: '24px' }}>Saúde do Mês</h3>
-                      
-                      <div className="space-y-6">
-                          <div>
-                            <div className="flex justify-between text-[11px] text-[#555] uppercase font-mono mb-2">
-                                <span>Progresso de Receita</span>
-                                <span>{((recebidoMes / (recebidoMes + previstoMes || 1)) * 100).toFixed(0)}%</span>
+                  <div>
+                    <div className="bg-[#141414] p-8 border border-[rgba(255,255,255,0.06)] mb-8">
+                        <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', marginBottom: '24px' }}>Saúde do Mês</h3>
+                        
+                        <div className="space-y-6">
+                            <div>
+                              <div className="flex justify-between text-[11px] text-[#555] uppercase font-mono mb-2">
+                                  <span>Progresso de Receita</span>
+                                  <span>{((recebidoMes / (recebidoMes + previstoMes || 1)) * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="h-2 bg-[#222] rounded-full overflow-hidden">
+                                  <div className="h-full bg-[#4ade80]" style={{ width: `${Math.min((recebidoMes / (recebidoMes + previstoMes || 1)) * 100, 100)}%` }}></div>
+                              </div>
                             </div>
-                            <div className="h-2 bg-[#222] rounded-full overflow-hidden">
-                                <div className="h-full bg-[#4ade80]" style={{ width: `${Math.min((recebidoMes / (recebidoMes + previstoMes || 1)) * 100, 100)}%` }}></div>
-                            </div>
-                          </div>
 
-                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                              <div>
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Confirmado</div>
-                                  <div className="text-lg text-[#4ade80]">R$ {recebidoMes.toLocaleString('pt-BR')}</div>
-                              </div>
-                              <div>
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Custo Fixo</div>
-                                  <div className="text-lg text-[#ccc]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
-                              </div>
-                              <div className="pt-4 col-span-2 border-t border-white/5">
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Margem Real</div>
-                                  <div className="text-xl" style={{ color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>R$ {margemMes.toLocaleString('pt-BR')}</div>
-                              </div>
-                          </div>
-
-                          {totalAtrasado > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] uppercase tracking-wider">
-                                <AlertCircle size={14} />
-                                Atenção: Existem parcelas em atraso
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                                <div>
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Confirmado</div>
+                                    <div className="text-lg text-[#4ade80]">R$ {recebidoMes.toLocaleString('pt-BR')}</div>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Custo Fixo</div>
+                                    <div className="text-lg text-[#ccc]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
+                                </div>
+                                <div className="pt-4 col-span-2 border-t border-white/5">
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Margem Real</div>
+                                    <div className="text-xl" style={{ color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>R$ {margemMes.toLocaleString('pt-BR')}</div>
+                                </div>
                             </div>
-                          )}
-                      </div>
+
+                            {totalAtrasado > 0 && (
+                              <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] uppercase tracking-wider">
+                                  <AlertCircle size={14} />
+                                  Atenção: Existem parcelas em atraso
+                              </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Acumulado Próximos 90 Dias */}
+                    <div className="p-6 bg-[#141414] border border-white/5 inline-block w-full">
+                        <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Acumulado Próximos 90 Dias</div>
+                        <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#8B7355' }}>
+                            R$ {parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
+                        </div>
+                    </div>
                   </div>
 
                   {/* Próximos Vencimentos */}
