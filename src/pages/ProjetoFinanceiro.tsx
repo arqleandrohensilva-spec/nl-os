@@ -299,60 +299,154 @@ const ProjetoFinanceiro = () => {
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const handleGerarRecibo = (parcela: any) => {
-    const doc = new jsPDF();
-    
-    // Header
-    doc.setFontSize(20);
+  const handleGerarRecibo = async (parcela: any) => {
+    // Buscar todas as parcelas do projeto para mostrar em aberto
+    const { data: todasParcelas } = await supabase
+      .from('financeiro_parcelas')
+      .select('*')
+      .eq('projeto_id', parcela.projeto_id)
+      .order('numero_parcela', { ascending: true });
+
+    // Buscar número do contrato
+    const { data: contratoInfo } = await supabase
+      .from('contratos_clientes')
+      .select('numero')
+      .eq('cliente_id', parcela.cliente_id)
+      .not('status', 'eq', 'Arquivado')
+      .order('criado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const doc = new jsPDF({ format: 'a4', unit: 'mm' });
+    const W = 210;
+    const bronze = [139, 115, 85] as [number, number, number];
+    const grafite = [58, 58, 58] as [number, number, number];
+    const cinza = [120, 120, 120] as [number, number, number];
+
+    // === FUNDO SUPERIOR GRAFITE ===
+    doc.setFillColor(...grafite);
+    doc.rect(0, 0, W, 45, 'F');
+
+    // === LOGO NL EM SVG INLINE ===
+    // "NL" em texto grande branco
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
-    doc.text('NL ARQUITETOS', 20, 25);
-    
-    doc.setFontSize(10);
+    doc.text('NL', 15, 22);
+
+    // Linha bronze vertical após NL
+    doc.setDrawColor(...bronze);
+    doc.setLineWidth(0.5);
+    doc.line(30, 10, 30, 32);
+
+    // ARQUITETOS ao lado
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(100);
-    doc.text('São José dos Campos, SP', 20, 32);
-    doc.text('A ARQUITETURA COMO DECISÃO', 20, 38);
-    
-    // Linha separadora
-    doc.setDrawColor(139, 115, 85);
-    doc.line(20, 43, 190, 43);
-    
-    // Título
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(0);
-    doc.text('RECIBO DE PAGAMENTO', 20, 55);
-    
-    // Dados
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    
-    const dados = [
-      ['Cliente:', projeto?.nome_cliente || ''],
-      ['Descrição:', parcela.descricao || ''],
-      ['Valor recebido:', `R$ ${(parcela.valor_recebido || parcela.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`],
-      ['Data de recebimento:', parcela.data_recebimento ? new Date(parcela.data_recebimento).toLocaleDateString('pt-BR') : '—'],
-      ['Status:', parcela.status || ''],
-    ];
-    
-    let y = 70;
-    dados.forEach(([label, valor]) => {
-      doc.setFont('helvetica', 'bold');
-      doc.text(label, 20, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(valor, 70, y);
-      y += 10;
-    });
-    
-    // Linha final
-    doc.setDrawColor(200);
-    doc.line(20, y + 5, 190, y + 5);
-    
+    doc.setTextColor(200, 200, 200);
+    doc.text('ARQUITETOS', 33, 18);
+    doc.setFontSize(7);
+    doc.setTextColor(...bronze as [number, number, number]);
+    doc.text('A ARQUITETURA COMO DECISÃO', 33, 24);
+
+    // Número do contrato — direita
     doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text(`Recibo gerado em ${new Date().toLocaleDateString('pt-BR')} por NL Arquitetos`, 20, y + 12);
-    
-    doc.save(`Recibo_${projeto?.nome_cliente?.replace(/\s+/g, '_')}_${parcela.descricao?.replace(/\s+/g, '_')}.pdf`);
+    doc.setTextColor(160, 160, 160);
+    doc.text(`Contrato: ${contratoInfo?.numero || '—'}`, W - 15, 18, { align: 'right' });
+    doc.text(`São José dos Campos, SP`, W - 15, 24, { align: 'right' });
+
+    // === TÍTULO RECIBO ===
+    doc.setFillColor(255, 255, 255);
+    doc.setFontSize(13);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...grafite);
+    doc.text('RECIBO DE PAGAMENTO', 15, 58);
+
+    // Linha bronze
+    doc.setDrawColor(...bronze);
+    doc.setLineWidth(0.8);
+    doc.line(15, 62, W - 15, 62);
+
+    // === DADOS DO PAGAMENTO ===
+    let y = 72;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...cinza);
+
+    const addLinha = (label: string, valor: string, destaque = false) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...cinza);
+      doc.text(label, 15, y);
+      doc.setFont('helvetica', 'normal');
+      if (destaque) {
+        doc.setTextColor(...bronze);
+        doc.setFontSize(10);
+      } else {
+        doc.setTextColor(...grafite);
+        doc.setFontSize(9);
+      }
+      doc.text(valor, 65, y);
+      doc.setFontSize(8);
+      y += 8;
+    };
+
+    addLinha('CLIENTE:', parcela.cliente_nome || projeto?.nome_cliente || '—');
+    addLinha('REFERENTE:', parcela.descricao || '—');
+    addLinha('VALOR RECEBIDO:', `R$ ${(parcela.valor_recebido || parcela.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, true);
+    addLinha('DATA DE RECEBIMENTO:', parcela.data_recebimento ? new Date(parcela.data_recebimento + 'T12:00:00').toLocaleDateString('pt-BR') : '—');
+    addLinha('FORMA DE PAGAMENTO:', 'Transferência bancária / PIX');
+
+    y += 4;
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(15, y, W - 15, y);
+    y += 10;
+
+    // === VALORES EM ABERTO ===
+    const emAberto = (todasParcelas || []).filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' && p.id !== parcela.id);
+
+    if (emAberto.length > 0) {
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...grafite);
+      doc.text('VALORES AINDA EM ABERTO', 15, y);
+      y += 6;
+
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+
+      emAberto.forEach(p => {
+        const venc = p.data_vencimento ? new Date(p.data_vencimento + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+        const dias = p.data_vencimento ? Math.ceil((new Date(p.data_vencimento).getTime() - Date.now()) / 86400000) : null;
+        const diasStr = dias !== null ? (dias < 0 ? `ATRASADO ${Math.abs(dias)}d` : dias === 0 ? 'VENCE HOJE' : `em ${dias} dias`) : '';
+
+        doc.setTextColor(...cinza);
+        doc.text(`• ${p.descricao}`, 15, y);
+        doc.setTextColor(...grafite);
+        doc.text(`R$ ${Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 110, y);
+        doc.setTextColor(dias !== null && dias < 0 ? 220 : 100, dias !== null && dias < 0 ? 80 : 100, 80);
+        doc.text(`${venc} · ${diasStr}`, 145, y);
+        y += 7;
+      });
+    } else {
+      doc.setFontSize(8);
+      doc.setTextColor(100, 180, 100);
+      doc.text('✓ Não há valores em aberto para este projeto.', 15, y);
+      y += 8;
+    }
+
+    y += 6;
+    doc.setDrawColor(...bronze);
+    doc.setLineWidth(0.5);
+    doc.line(15, y, W - 15, y);
+    y += 8;
+
+    // === RODAPÉ ===
+    doc.setFontSize(7);
+    doc.setTextColor(160, 160, 160);
+    doc.text(`Recibo gerado em ${new Date().toLocaleDateString('pt-BR')} · NL Arquitetos · app.nl.arq.br`, 15, y);
+    doc.text('Este documento comprova o recebimento do valor acima indicado.', 15, y + 5);
+
+    doc.save(`Recibo_NL_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}_${parcela.descricao?.split('—')[0].trim().replace(/\s+/g, '_')}.pdf`);
   };
 
   const getStatusColor = (status: string) => {
