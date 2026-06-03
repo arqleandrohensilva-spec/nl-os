@@ -780,7 +780,7 @@ const ProjetoFinanceiro = () => {
                                 <Button 
                                     variant="link" 
                                     className="h-auto p-0 text-[10px] text-[#8B7355] uppercase font-bold mt-1"
-                                    onClick={() => handleGerarRecibo(p)}
+                                    onClick={() => handlePreviewRecibo(p)}
                                 >
                                     Ver Recibo
                                 </Button>
