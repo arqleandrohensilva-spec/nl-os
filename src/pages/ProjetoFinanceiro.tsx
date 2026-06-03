@@ -849,6 +849,43 @@ const ProjetoFinanceiro = () => {
             </div>
         </section>
 
+        {modalNovaParcela && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '32px', width: '400px' }}>
+              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#e8e8e8', marginBottom: '20px' }}>Nova Cobrança Avulsa</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Descrição</label>
+                  <input value={novaParcelaData.descricao} onChange={e => setNovaParcelaData(p => ({ ...p, descricao: e.target.value }))} placeholder="Ex: Taxa de visita técnica" style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Valor (R$)</label>
+                  <input value={novaParcelaData.valor} onChange={e => setNovaParcelaData(p => ({ ...p, valor: e.target.value }))} placeholder="0,00" style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Data de Vencimento</label>
+                  <input type="date" value={novaParcelaData.data_vencimento} onChange={e => setNovaParcelaData(p => ({ ...p, data_vencimento: e.target.value }))} style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
+                <button
+                  onClick={async () => {
+                    const valor = parseFloat(novaParcelaData.valor.replace(/\./g, '').replace(',', '.'));
+                    if (!novaParcelaData.descricao || !valor || !novaParcelaData.data_vencimento) { toast.error('Preencha todos os campos'); return; }
+                    await supabase.from('financeiro_parcelas').insert({ projeto_id: id, cliente_id: projeto?.cliente_id, cliente_nome: projeto?.nome_cliente, numero_parcela: parcelas.length + 1, total_parcelas: parcelas.length + 1, descricao: novaParcelaData.descricao, valor, data_vencimento: novaParcelaData.data_vencimento, status: 'PENDENTE' });
+                    toast.success('Cobrança adicionada!');
+                    setModalNovaParcela(false);
+                    setNovaParcelaData({ descricao: '', valor: '', data_vencimento: '' });
+                    fetchData();
+                  }}
+                  style={{ flex: 1, background: '#8B7355', color: '#fff', border: 'none', padding: '10px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}
+                >ADICIONAR</button>
+                <button onClick={() => setModalNovaParcela(false)} style={{ flex: 1, background: 'none', color: '#555', border: '1px solid #333', padding: '10px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}>CANCELAR</button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
 
       {/* MODAL DE CONFIRMAÇÃO DE PAGAMENTO */}
