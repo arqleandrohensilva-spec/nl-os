@@ -183,7 +183,7 @@ const ProjetoFinanceiro = () => {
         .from('financeiro_parcelas')
         .update({
           status: isParcial ? 'PAGO PARCIAL' : 'PAGO',
-          data_recebimento: new Date(confirmData.data).toISOString(),
+          data_recebimento: confirmData.data,
           valor_recebido: valorPago,
         })
         .eq('id', selectedParcela.id);
