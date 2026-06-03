@@ -362,25 +362,23 @@ const FinanceiroGeral = () => {
                               </span>
                           </div>
                           <div className="flex gap-2">
-                              {(p.status === 'PENDENTE' || p.status === 'ATRASADO') && (
-                                <button 
-                                  onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} 
-                                  className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#4ade80] border border-[#4ade80]/20 hover:bg-[#4ade80]/5"
-                                >
-                                  PAGO
-                                </button>
-                              )}
-                              <button 
-                                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')})`)}`, '_blank')} 
-                                className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#8B7355] border border-[#8B7355]/20 hover:bg-[#8B7355]/5"
+                              <button
+                                onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}
+                                style={{
+                                  fontFamily: 'Courier New',
+                                  fontSize: '9px',
+                                  color: '#8B7355',
+                                  background: 'none',
+                                  border: '1px solid rgba(139,115,85,0.3)',
+                                  padding: '4px 10px',
+                                  cursor: 'pointer',
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.08em',
+                                  borderRadius: '3px'
+                                }}
                               >
-                                COBRAR
+                                VER →
                               </button>
-                              {p.status === 'PAGO' && (
-                                <button className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#ccc] border border-white/10 hover:bg-white/5">
-                                  RECIBO
-                                </button>
-                              )}
                           </div>
                       </div>
                   ))}
