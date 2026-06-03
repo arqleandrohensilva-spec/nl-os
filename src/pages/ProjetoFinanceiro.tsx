@@ -719,7 +719,8 @@ const ProjetoFinanceiro = () => {
                                   cursor: 'pointer',
                                   borderRadius: '3px',
                                 }}
-                                onClick={() => handlePreviewRecibo(p)}
+                                onClick={() => handleGerarRecibo(p)}
+
                             >
                                 RECIBO
                             </button>
@@ -767,7 +768,8 @@ const ProjetoFinanceiro = () => {
                                 <Button 
                                     variant="link" 
                                     className="h-auto p-0 text-[10px] text-[#8B7355] uppercase font-bold mt-1"
-                                    onClick={() => handlePreviewRecibo(p)}
+                                    onClick={() => handleGerarRecibo(p)}
+
                                 >
                                     Ver Recibo
                                 </Button>
