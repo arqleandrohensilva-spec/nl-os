@@ -61,14 +61,14 @@ const App = () => (
           <Route path="/clientes/novo" element={<ClienteFicha />} />
           <Route path="/clientes/:id" element={<ClienteFicha />} />
           <Route path="/pipeline" element={<Index />} />
-          <Route path="/financeiro" element={<FinanceiroVisaoGeral />} />
+          <Route path="/financeiro" element={<FinanceiroGeral />} />
           <Route path="/financeiro/base" element={<BaseFinanceira />} />
           <Route path="/projetos/horas" element={<ControleHoras />} />
           <Route path="/propostas/biblioteca" element={<BibliotecaServicos />} />
           <Route path="/projetos/gestao" element={<GestaoProjetos />} />
           <Route path="/projetos/detalhe/:id" element={<ProjetoDetalhe />} />
           <Route path="/projetos/:id/financeiro" element={<ProjetoFinanceiro />} />
-          <Route path="/financeiro/projetos" element={<FinanceiroProjetos />} />
+          
           <Route path="/propostas/documentos" element={<DocumentosContratos />} />
           <Route path="/propostas/tracking" element={<PropostasTracking />} />
           <Route path="/calculadora" element={<CalculadoraList />} />
