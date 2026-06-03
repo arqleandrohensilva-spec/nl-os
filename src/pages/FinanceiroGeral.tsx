@@ -214,9 +214,9 @@ const FinanceiroGeral = () => {
                                 </div>
                                 <button 
                                     onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Olá ${p.cliente_nome}, lembrete da parcela de R$ ${p.valor.toLocaleString('pt-BR')} que vence em ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}.`)}`, '_blank')}
-                                    className="p-2 text-[#8B7355] hover:bg-white/5 transition-colors"
+                                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8B7355] border border-[#8B7355]/30 hover:bg-[#8B7355]/5 transition-colors"
                                 >
-                                    <MessageCircle size={16} />
+                                    COBRAR
                                 </button>
                             </div>
                           )) : (
