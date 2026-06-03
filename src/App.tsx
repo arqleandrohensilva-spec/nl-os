@@ -32,7 +32,7 @@ import PropostaCalculadora from "./pages/PropostaCalculadora.tsx";
 import CalculadoraList from "./pages/CalculadoraList.tsx";
 import ClientesLista from "./pages/ClientesLista.tsx";
 import ClienteFicha from "./pages/ClienteFicha.tsx";
-import FinanceiroVisaoGeral from "./pages/FinanceiroVisaoGeral.tsx";
+
 
 const queryClient = new QueryClient();
 
