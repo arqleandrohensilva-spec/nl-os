@@ -64,6 +64,8 @@ const ProjetoFinanceiro = () => {
   const [loading, setLoading] = useState(true);
   const [lead, setLead] = useState<any>(null);
   const [contrato, setContrato] = useState<any>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewParcela, setPreviewParcela] = useState<any>(null);
   
   // Modal state
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
