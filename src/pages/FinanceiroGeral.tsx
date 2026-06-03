@@ -200,6 +200,11 @@ const FinanceiroGeral = () => {
                   {/* Próximos Vencimentos */}
                   <div className="bg-[#141414] p-8 border border-[rgba(255,255,255,0.06)]">
                       <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', marginBottom: '24px' }}>Próximos Vencimentos (7 dias)</h3>
+                      <div className="flex justify-between items-center mb-6">
+                        <span className="text-[10px] text-[#555] uppercase font-mono tracking-widest">Cliente / Valor</span>
+                        <span className="text-[10px] text-[#555] uppercase font-mono tracking-widest">Ações</span>
+                      </div>
+
                       <div className="space-y-4">
                           {próximosVencimentos?.length ? próximosVencimentos.map(p => (
                             <div key={p.id} className="flex justify-between items-center py-3 border-b border-white/5">
