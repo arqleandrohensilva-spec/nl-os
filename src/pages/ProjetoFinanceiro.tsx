@@ -316,6 +316,12 @@ const ProjetoFinanceiro = () => {
       .limit(1)
       .maybeSingle();
 
+    const { data: leadInfo } = await supabase
+      .from('leads')
+      .select('endereco, whats')
+      .eq('id', parcela.cliente_id)
+      .maybeSingle();
+
     const doc = new jsPDF({ format: 'a4', unit: 'mm' });
     const W = 210;
     const bronze: [number, number, number] = [139, 115, 85];
