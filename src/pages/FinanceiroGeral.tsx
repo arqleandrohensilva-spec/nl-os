@@ -346,8 +346,13 @@ const FinanceiroGeral = () => {
                               </span>
                           </div>
                           <div className="flex gap-2">
-                              {p.status !== 'PAGO' && (
-                                <button onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} className="p-1 text-[#4ade80] hover:bg-white/5"><DollarSign size={14}/></button>
+                              {(p.status === 'PENDENTE' || p.status === 'ATRASADO') && (
+                                <button 
+                                  onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} 
+                                  className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#4ade80] border border-[#4ade80]/20 hover:bg-[#4ade80]/5"
+                                >
+                                  PAGO
+                                </button>
                               )}
                               <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
                               {p.status === 'PAGO' && (
