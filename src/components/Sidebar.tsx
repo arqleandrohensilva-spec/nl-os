@@ -122,7 +122,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
   useEffect(() => {
     const path = location.pathname;
-    if (path === '/financeiro' || path === '/financeiro/base' || path === '/financeiro/projetos') {
+    if (path === '/financeiro' || path === '/financeiro/base') {
       setOpenSections(prev => ({ ...prev, 'FINANCEIRO': true }));
     } else if (path === '/projetos/gestao' || path === '/projetos/horas' || path.startsWith('/projetos/detalhe/')) {
       setOpenSections(prev => ({ ...prev, 'PROJETOS': true }));
@@ -404,14 +404,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onToggle={() => toggleSection('FINANCEIRO')}
         >
           <NavItem 
-            label="Visão Geral" 
+            label="Financeiro" 
             active={location.pathname === '/financeiro'} 
             onClick={() => navigate('/financeiro')} 
-          />
-          <NavItem 
-            label="Por Projeto" 
-            active={location.pathname === '/financeiro/projetos'} 
-            onClick={() => navigate('/financeiro/projetos')} 
           />
         </SectionAccordion>
 
