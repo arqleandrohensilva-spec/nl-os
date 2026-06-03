@@ -477,7 +477,7 @@ const FinanceiroGeral = () => {
                     ))}
                 </div>
                 {projetos?.map(projeto => {
-                  const parcelasProjeto = parcelas?.filter(p => p.projeto_id === projeto.id) || [];
+                  const parcelasProjeto = parcelasSeguras.filter(p => p.projeto_id === projeto.id);
                   const receitaTotal = parcelasProjeto.reduce((s, p) => s + Number(p.valor), 0);
                   const recebido = parcelasProjeto.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
                   const emAberto = receitaTotal - recebido;
