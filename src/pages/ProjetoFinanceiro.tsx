@@ -512,9 +512,9 @@ const ProjetoFinanceiro = () => {
       ['Saldo restante:', fmt(saldoRestante)],
     ].forEach(([label, valor], i) => {
       doc.setFont('helvetica', i === 2 ? 'bold' : 'normal');
-      doc.setTextColor(i === 2 ? ...bronze : ...cinza);
+      if (i === 2) doc.setTextColor(...bronze); else doc.setTextColor(...cinza);
       doc.text(label, col1, y);
-      doc.setTextColor(i === 2 ? ...bronze : ...grafite);
+      if (i === 2) doc.setTextColor(...bronze); else doc.setTextColor(...grafite);
       doc.text(valor, W - 15, y, { align: 'right' });
       y += 6;
     });
