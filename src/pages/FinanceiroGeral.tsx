@@ -167,42 +167,52 @@ const FinanceiroGeral = () => {
           <TabsContent value="visao-geral">
               <div className="grid grid-cols-2 gap-8">
                   {/* Saúde do Mês */}
-                  <div className="bg-[#141414] p-8 border border-[rgba(255,255,255,0.06)]">
-                      <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', marginBottom: '24px' }}>Saúde do Mês</h3>
-                      
-                      <div className="space-y-6">
-                          <div>
-                            <div className="flex justify-between text-[11px] text-[#555] uppercase font-mono mb-2">
-                                <span>Progresso de Receita</span>
-                                <span>{((recebidoMes / (recebidoMes + previstoMes || 1)) * 100).toFixed(0)}%</span>
+                  <div>
+                    <div className="bg-[#141414] p-8 border border-[rgba(255,255,255,0.06)] mb-8">
+                        <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '18px', marginBottom: '24px' }}>Saúde do Mês</h3>
+                        
+                        <div className="space-y-6">
+                            <div>
+                              <div className="flex justify-between text-[11px] text-[#555] uppercase font-mono mb-2">
+                                  <span>Progresso de Receita</span>
+                                  <span>{((recebidoMes / (recebidoMes + previstoMes || 1)) * 100).toFixed(0)}%</span>
+                              </div>
+                              <div className="h-2 bg-[#222] rounded-full overflow-hidden">
+                                  <div className="h-full bg-[#4ade80]" style={{ width: `${Math.min((recebidoMes / (recebidoMes + previstoMes || 1)) * 100, 100)}%` }}></div>
+                              </div>
                             </div>
-                            <div className="h-2 bg-[#222] rounded-full overflow-hidden">
-                                <div className="h-full bg-[#4ade80]" style={{ width: `${Math.min((recebidoMes / (recebidoMes + previstoMes || 1)) * 100, 100)}%` }}></div>
-                            </div>
-                          </div>
 
-                          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                              <div>
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Confirmado</div>
-                                  <div className="text-lg text-[#4ade80]">R$ {recebidoMes.toLocaleString('pt-BR')}</div>
-                              </div>
-                              <div>
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Custo Fixo</div>
-                                  <div className="text-lg text-[#ccc]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
-                              </div>
-                              <div className="pt-4 col-span-2 border-t border-white/5">
-                                  <div className="text-[10px] text-[#555] uppercase mb-1">Margem Real</div>
-                                  <div className="text-xl" style={{ color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>R$ {margemMes.toLocaleString('pt-BR')}</div>
-                              </div>
-                          </div>
-
-                          {totalAtrasado > 0 && (
-                            <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] uppercase tracking-wider">
-                                <AlertCircle size={14} />
-                                Atenção: Existem parcelas em atraso
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                                <div>
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Confirmado</div>
+                                    <div className="text-lg text-[#4ade80]">R$ {recebidoMes.toLocaleString('pt-BR')}</div>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Custo Fixo</div>
+                                    <div className="text-lg text-[#ccc]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
+                                </div>
+                                <div className="pt-4 col-span-2 border-t border-white/5">
+                                    <div className="text-[10px] text-[#555] uppercase mb-1">Margem Real</div>
+                                    <div className="text-xl" style={{ color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>R$ {margemMes.toLocaleString('pt-BR')}</div>
+                                </div>
                             </div>
-                          )}
-                      </div>
+
+                            {totalAtrasado > 0 && (
+                              <div className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] uppercase tracking-wider">
+                                  <AlertCircle size={14} />
+                                  Atenção: Existem parcelas em atraso
+                              </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Acumulado Próximos 90 Dias */}
+                    <div className="p-6 bg-[#141414] border border-white/5 inline-block w-full">
+                        <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Acumulado Próximos 90 Dias</div>
+                        <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#8B7355' }}>
+                            R$ {parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
+                        </div>
+                    </div>
                   </div>
 
                   {/* Próximos Vencimentos */}
@@ -312,13 +322,6 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
-          {/* Total acumulado dos 3 meses em destaque */}
-          <div className="mt-8 p-6 bg-[#141414] border border-white/5 inline-block">
-              <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Acumulado Próximos 90 Dias</div>
-              <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#8B7355' }}>
-                  R$ {parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
-              </div>
-          </div>
 
 
           {/* ABA 4: PARCELAS */}
@@ -384,88 +387,6 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
-          {/* ABA 3: FLUXO DE CAIXA */}
-          <TabsContent value="fluxo">
-              <div className="grid grid-cols-3 gap-6">
-                  {[0, 1, 2].map(offset => {
-                      const mesRef = addMonths(startOfMonth(hoje), offset);
-                      const parcelasMes = parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: mesRef, end: endOfMonth(mesRef) }));
-                      const totalMes = parcelasMes.reduce((s, p) => s + Number(p.valor), 0);
-
-                      return (
-                        <div key={offset} className="bg-[#141414] border border-white/5 p-6">
-                            <h4 style={{ fontFamily: 'Courier New', fontSize: '12px', color: '#8B7355', letterSpacing: '0.2em', marginBottom: '20px' }}>
-                                {format(mesRef, 'MMMM yyyy', { locale: ptBR }).toUpperCase()}
-                            </h4>
-                            <div className="space-y-4 min-h-[120px]">
-                                {parcelasMes.map(p => (
-                                    <div key={p.id} className="p-3 border-l border-[#8B7355] bg-white/[0.02] cursor-pointer" onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}>
-                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao ? p.descricao.split('—')[0] : ''}</div>
-                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
-                                    </div>
-                                ))}
-                                {!parcelasMes.length && <div className="text-[#333] italic text-xs py-4">—</div>}
-                            </div>
-                            <div className="mt-8 pt-4 border-t border-white/5">
-                                <div style={{ fontSize: '9px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Total Previsto</div>
-                                <div style={{ fontFamily: 'Georgia, serif', fontSize: '18px' }}>R$ {totalMes.toLocaleString('pt-BR')}</div>
-                            </div>
-                        </div>
-                      );
-                  })}
-              </div>
-          </TabsContent>
-
-          {/* ABA 4: PARCELAS */}
-          <TabsContent value="parcelas">
-              <div className="flex gap-2 mb-6">
-                  {['Todas', 'Pendentes', 'Pagas', 'Atrasadas'].map(f => (
-                      <button 
-                        key={f}
-                        onClick={() => setFiltroParcelas(f)}
-                        className={cn(
-                            "px-4 py-1.5 text-[10px] uppercase tracking-widest transition-colors border",
-                            filtroParcelas === f ? "bg-bronze border-bronze text-white" : "border-white/10 text-white/40 hover:text-white"
-                        )}
-                      >
-                          {f}
-                      </button>
-                  ))}
-              </div>
-              <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)]">
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 0.8fr 0.8fr 0.8fr 0.8fr', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
-                      {['CLIENTE', 'DESCRIÇÃO', 'VALOR', 'VENCIMENTO', 'STATUS', 'AÇÕES'].map(h => (
-                        <div key={h} style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', fontWeight: 'bold' }}>{h}</div>
-                      ))}
-                  </div>
-                  {parcelasFiltradas.map(p => (
-                      <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 0.8fr 0.8fr 0.8fr 0.8fr', gap: 0, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
-                          <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
-                          <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
-                          <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
-                          <div style={{ fontSize: '12px', color: '#555' }}>{format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}</div>
-                          <div>
-                              <span className={cn(
-                                  "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border",
-                                  p.status === 'PAGO' ? "text-[#4ade80] border-[#4ade80]/30 bg-[#4ade80]/5" :
-                                  p.status === 'ATRASADO' ? "text-[#f87171] border-[#f87171]/30 bg-[#f87171]/5" : "text-[#fbbf24] border-[#fbbf24]/30 bg-[#fbbf24]/5"
-                              )}>
-                                  {p.status}
-                              </span>
-                          </div>
-                          <div className="flex gap-2">
-                              {p.status !== 'PAGO' && (
-                                <button onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} className="p-1 text-[#4ade80] hover:bg-white/5"><DollarSign size={14}/></button>
-                              )}
-                              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
-                              {p.status === 'PAGO' && (
-                                <button className="p-1 text-[#ccc] hover:bg-white/5"><Receipt size={14}/></button>
-                              )}
-                          </div>
-                      </div>
-                  ))}
-              </div>
-          </TabsContent>
 
           {/* ABA 5: LUCRATIVIDADE */}
           <TabsContent value="lucratividade">
