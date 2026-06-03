@@ -640,12 +640,12 @@ const ProjetoFinanceiro = () => {
         </div>
 
         {/* Linha do tempo financeira */}
-        <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '20px 24px', marginBottom: '16px' }}>
+        <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '24px 28px', marginBottom: '16px' }}>
           <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>Linha do Tempo</div>
           
           <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
             {/* Linha horizontal de fundo */}
-            <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '1px', background: '#222' }} />
+            <div style={{ position: 'absolute', top: '8px', left: '0', right: '0', height: '2px', background: '#2a2a2a' }} />
             
             {parcelas.map((p, i) => {
               const isPago = p.status === 'PAGO' || p.status === 'PAGO PARCIAL';
@@ -657,25 +657,33 @@ const ProjetoFinanceiro = () => {
               return (
                 <div key={p.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
                   {/* Ponto */}
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: isPago ? corPonto : 'transparent', border: `2px solid ${corPonto}`, marginBottom: '8px', boxShadow: isPago ? `0 0 8px ${corPonto}40` : 'none' }} />
+                  <div style={{ 
+                    width: isPago ? '16px' : '14px', 
+                    height: isPago ? '16px' : '14px', 
+                    borderRadius: '50%', 
+                    background: isPago ? corPonto : 'transparent', 
+                    border: `2px solid ${corPonto}`, 
+                    marginBottom: '10px', 
+                    boxShadow: isPago ? '0 0 12px #4ade8060' : 'none' 
+                  }} />
                   
                   {/* Valor */}
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '11px', color: isPago ? '#4ade80' : '#e8e8e8', textAlign: 'center', marginBottom: '3px' }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: isPago ? '#4ade80' : '#e8e8e8', textAlign: 'center', marginBottom: '4px' }}>
                     R$ {Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </div>
                   
                   {/* Data */}
-                  <div style={{ fontFamily: 'Arial', fontSize: '9px', color: '#555', textAlign: 'center', marginBottom: '3px' }}>
+                  <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777', textAlign: 'center', marginBottom: '4px' }}>
                     {format(parseISO(p.data_vencimento), 'dd/MM/yy')}
                   </div>
                   
                   {/* Status */}
-                  <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: corBorda, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: corBorda, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '4px' }}>
                     {isPago ? '✓ PAGO' : isAtrasado ? 'ATRASADO' : isHoje ? 'HOJE' : p.status === 'VENCE EM BREVE' ? 'EM BREVE' : 'PENDENTE'}
                   </div>
                   
                   {/* Descrição curta */}
-                  <div style={{ fontFamily: 'Arial', fontSize: '8px', color: '#444', textAlign: 'center', marginTop: '3px', maxWidth: '80px' }}>
+                  <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555', textAlign: 'center', marginTop: '4px', maxWidth: '80px' }}>
                     {p.descricao?.split('—')[0].trim()}
                   </div>
                 </div>
