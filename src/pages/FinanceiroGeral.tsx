@@ -378,6 +378,57 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
+          {/* ABA 4: PARCELAS */}
+          <TabsContent value="parcelas">
+              <div className="flex gap-2 mb-6">
+                  {['Todas', 'Pendentes', 'Pagas', 'Atrasadas'].map(f => (
+                      <button 
+                        key={f}
+                        onClick={() => setFiltroParcelas(f)}
+                        className={cn(
+                            "px-4 py-1.5 text-[10px] uppercase tracking-widest transition-colors border",
+                            filtroParcelas === f ? "bg-bronze border-bronze text-white" : "border-white/10 text-white/40 hover:text-white"
+                        )}
+                      >
+                          {f}
+                      </button>
+                  ))}
+              </div>
+              <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)]">
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 0.8fr 0.8fr 0.8fr 0.8fr', gap: 0, padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.02)' }}>
+                      {['CLIENTE', 'DESCRIÇÃO', 'VALOR', 'VENCIMENTO', 'STATUS', 'AÇÕES'].map(h => (
+                        <div key={h} style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', fontWeight: 'bold' }}>{h}</div>
+                      ))}
+                  </div>
+                  {parcelasFiltradas.map(p => (
+                      <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 0.8fr 0.8fr 0.8fr 0.8fr', gap: 0, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
+                          <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
+                          <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
+                          <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
+                          <div style={{ fontSize: '12px', color: '#555' }}>{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</div>
+                          <div>
+                              <span className={cn(
+                                  "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border",
+                                  p.status === 'PAGO' ? "text-[#4ade80] border-[#4ade80]/30 bg-[#4ade80]/5" :
+                                  p.status === 'ATRASADO' ? "text-[#f87171] border-[#f87171]/30 bg-[#f87171]/5" : "text-[#fbbf24] border-[#fbbf24]/30 bg-[#fbbf24]/5"
+                              )}>
+                                  {p.status}
+                              </span>
+                          </div>
+                          <div className="flex gap-2">
+                              {p.status !== 'PAGO' && (
+                                <button onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} className="p-1 text-[#4ade80] hover:bg-white/5"><DollarSign size={14}/></button>
+                              )}
+                              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
+                              {p.status === 'PAGO' && (
+                                <button className="p-1 text-[#ccc] hover:bg-white/5"><Receipt size={14}/></button>
+                              )}
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </TabsContent>
+
           {/* ABA 5: LUCRATIVIDADE */}
           <TabsContent value="lucratividade">
             <div className="bg-[#141414] border border-[rgba(255,255,255,0.06)]">
