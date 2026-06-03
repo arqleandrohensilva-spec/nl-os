@@ -300,7 +300,7 @@ const ProjetoFinanceiro = () => {
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const handleGerarRecibo = async (parcela: any, download = true) => {
+  const handleGerarRecibo = async (parcela: any) => {
     const { data: todasParcelas } = await supabase
       .from('financeiro_parcelas')
       .select('*')
@@ -573,17 +573,7 @@ const ProjetoFinanceiro = () => {
     y += 5;
     doc.text('Este documento comprova o recebimento do valor acima indicado.', col1, y);
 
-    if (download) {
-      doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
-    } else {
-      const pdfBlob = doc.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      window.open(url, '_blank');
-    }
-  };
-
-  const handlePreviewRecibo = async (parcela: any) => {
-    await handleGerarRecibo(parcela, false);
+    doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
   };
 
   const getStatusColor = (status: string) => {
@@ -729,7 +719,8 @@ const ProjetoFinanceiro = () => {
                                   cursor: 'pointer',
                                   borderRadius: '3px',
                                 }}
-                                onClick={() => handlePreviewRecibo(p)}
+                                onClick={() => handleGerarRecibo(p)}
+
                             >
                                 RECIBO
                             </button>
@@ -777,7 +768,8 @@ const ProjetoFinanceiro = () => {
                                 <Button 
                                     variant="link" 
                                     className="h-auto p-0 text-[10px] text-[#8B7355] uppercase font-bold mt-1"
-                                    onClick={() => handlePreviewRecibo(p)}
+                                    onClick={() => handleGerarRecibo(p)}
+
                                 >
                                     Ver Recibo
                                 </Button>
