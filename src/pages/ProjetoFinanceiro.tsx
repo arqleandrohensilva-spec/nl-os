@@ -486,6 +486,41 @@ const ProjetoFinanceiro = () => {
       y += 10;
     }
 
+    // === RESUMO FINANCEIRO ===
+    const totalContrato = (todasParcelas || []).reduce((s, p) => s + Number(p.valor), 0);
+    const totalRecebido = (todasParcelas || [])
+      .filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL')
+      .reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
+    const saldoRestante = totalContrato - totalRecebido;
+
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(col1, y, W - 15, y);
+    y += 8;
+
+    const fmt = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...grafite);
+    doc.text('RESUMO FINANCEIRO', col1, y);
+    y += 6;
+
+    [
+      ['Valor total do contrato:', fmt(totalContrato)],
+      ['Total recebido até hoje:', fmt(totalRecebido)],
+      ['Saldo restante:', fmt(saldoRestante)],
+    ].forEach(([label, valor], i) => {
+      doc.setFont('helvetica', i === 2 ? 'bold' : 'normal');
+      doc.setTextColor(i === 2 ? ...bronze : ...cinza);
+      doc.text(label, col1, y);
+      doc.setTextColor(i === 2 ? ...bronze : ...grafite);
+      doc.text(valor, W - 15, y, { align: 'right' });
+      y += 6;
+    });
+
+    y += 6;
+
     // === CONTRATADOS ===
     doc.setDrawColor(...bronze);
     doc.setLineWidth(0.5);
@@ -503,6 +538,27 @@ const ProjetoFinanceiro = () => {
     doc.text('Leandro Henrique da Silva  ·  CPF 425.437.568-92  ·  CAU nº 252250-0', col1, y);
     y += 6;
     doc.text('Neandro Jacque Garcia  ·  CPF 382.857.218-92  ·  CAU nº 264629-3', col1, y);
+    y += 10;
+
+    // === ASSINATURA ===
+    y += 6;
+    doc.setDrawColor(180, 180, 180);
+    doc.setLineWidth(0.3);
+
+    // Duas linhas de assinatura lado a lado
+    doc.line(col1, y, 90, y);
+    doc.line(115, y, W - 15, y);
+    y += 5;
+
+    doc.setFontSize(7);
+    doc.setTextColor(...cinza);
+    doc.text('Leandro Henrique da Silva', col1, y);
+    doc.text('Neandro Jacque Garcia', 115, y);
+    y += 4;
+    doc.setFontSize(6);
+    doc.setTextColor(180, 180, 180);
+    doc.text('Contratado · CAU 252250-0', col1, y);
+    doc.text('Contratado · CAU 264629-3', 115, y);
     y += 10;
 
     // === RODAPÉ ===
