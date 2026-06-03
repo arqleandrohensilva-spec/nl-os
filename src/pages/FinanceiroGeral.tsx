@@ -105,7 +105,7 @@ const FinanceiroGeral = () => {
   ).slice(0, 5);
 
   const parcelasFiltradas = useMemo(() => {
-    let list = [...parcelas];
+    let list = [...parcelasSeguras];
     if (filtroParcelas === 'Pendentes') list = list.filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL');
     else if (filtroParcelas === 'Pagas') list = list.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL');
     else if (filtroParcelas === 'Atrasadas') list = list.filter(p => p.status === 'ATRASADO');
@@ -113,9 +113,11 @@ const FinanceiroGeral = () => {
     return list.sort((a, b) => {
         if (a.status === 'ATRASADO' && b.status !== 'ATRASADO') return -1;
         if (a.status !== 'ATRASADO' && b.status === 'ATRASADO') return 1;
-        return new Date(a.data_vencimento).getTime() - new Date(b.data_vencimento).getTime();
+        const dateA = a.data_vencimento ? new Date(a.data_vencimento + 'T12:00:00') : new Date();
+        const dateB = b.data_vencimento ? new Date(b.data_vencimento + 'T12:00:00') : new Date();
+        return dateA.getTime() - dateB.getTime();
     });
-  }, [parcelas, filtroParcelas]);
+  }, [parcelasSeguras, filtroParcelas]);
 
   return (
     <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8]">
