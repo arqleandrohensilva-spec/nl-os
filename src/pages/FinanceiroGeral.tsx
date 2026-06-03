@@ -147,12 +147,12 @@ const FinanceiroGeral = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="visao-geral" className="w-full">
-          <TabsList className="bg-[#141414] border border-[rgba(255,255,255,0.06)] h-12 p-1 mb-8">
-            <TabsTrigger value="visao-geral" className="px-6 text-[10px] tracking-widest uppercase">VISÃO GERAL</TabsTrigger>
-            <TabsTrigger value="projetos" className="px-6 text-[10px] tracking-widest uppercase">PROJETOS</TabsTrigger>
-            <TabsTrigger value="fluxo" className="px-6 text-[10px] tracking-widest uppercase">FLUXO DE CAIXA</TabsTrigger>
-            <TabsTrigger value="parcelas" className="px-6 text-[10px] tracking-widest uppercase">PARCELAS</TabsTrigger>
-            <TabsTrigger value="lucratividade" className="px-6 text-[10px] tracking-widest uppercase">LUCRATIVIDADE</TabsTrigger>
+          <TabsList className="bg-[#141414] border border-[rgba(255,255,255,0.06)] h-12 p-1 mb-8 rounded-none">
+            <TabsTrigger value="visao-geral" className="px-6 text-[9px] tracking-[0.2em] uppercase rounded-none data-[state=active]:bg-[#8B7355] data-[state=active]:text-white">VISÃO GERAL</TabsTrigger>
+            <TabsTrigger value="projetos" className="px-6 text-[9px] tracking-[0.2em] uppercase rounded-none data-[state=active]:bg-[#8B7355] data-[state=active]:text-white">PROJETOS</TabsTrigger>
+            <TabsTrigger value="fluxo" className="px-6 text-[9px] tracking-[0.2em] uppercase rounded-none data-[state=active]:bg-[#8B7355] data-[state=active]:text-white">FLUXO DE CAIXA</TabsTrigger>
+            <TabsTrigger value="parcelas" className="px-6 text-[9px] tracking-[0.2em] uppercase rounded-none data-[state=active]:bg-[#8B7355] data-[state=active]:text-white">PARCELAS</TabsTrigger>
+            <TabsTrigger value="lucratividade" className="px-6 text-[9px] tracking-[0.2em] uppercase rounded-none data-[state=active]:bg-[#8B7355] data-[state=active]:text-white">LUCRATIVIDADE</TabsTrigger>
           </TabsList>
           
           {/* ABA 1: VISÃO GERAL */}
