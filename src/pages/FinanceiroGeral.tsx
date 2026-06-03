@@ -35,6 +35,8 @@ const FinanceiroGeral = () => {
   const [baseFinanceira, setBaseFinanceira] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtroParcelas, setFiltroParcelas] = useState('Todas');
+  
+  const parcelasSeguras = useMemo(() => (parcelas || []).filter(p => p && p.data_vencimento), [parcelas]);
 
   useEffect(() => {
     fetchData();
@@ -51,7 +53,7 @@ const FinanceiroGeral = () => {
 
       const updatedParcelas = (pRes.data || []).map(p => {
         if (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') return p;
-        const dateVenc = parseISO(p.data_vencimento);
+        const dateVenc = p.data_vencimento ? parseISO(p.data_vencimento) : new Date();
         const today = new Date();
         today.setHours(0,0,0,0);
         let status = p.status;
@@ -81,29 +83,29 @@ const FinanceiroGeral = () => {
         return sum + (Number(valor) || 0);
     }, 0);
 
-  const recebidoMes = parcelas?.filter(p => 
+  const recebidoMes = parcelasSeguras.filter(p => 
     (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') && p.data_recebimento &&
-    isWithinInterval(parseISO(p.data_recebimento), { start: inicioMes, end: fimMes })
-  ).reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0) || 0;
+    isWithinInterval(p.data_recebimento ? parseISO(p.data_recebimento) : new Date(), { start: inicioMes, end: fimMes })
+  ).reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
 
-  const previstoMes = parcelas?.filter(p =>
+  const previstoMes = parcelasSeguras.filter(p =>
     p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' &&
-    isWithinInterval(parseISO(p.data_vencimento), { start: inicioMes, end: fimMes })
-  ).reduce((s, p) => s + Number(p.valor), 0) || 0;
+    isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: inicioMes, end: fimMes })
+  ).reduce((s, p) => s + Number(p.valor), 0);
 
-  const totalAtrasado = parcelas?.filter(p =>
+  const totalAtrasado = parcelasSeguras.filter(p =>
     p.status === 'ATRASADO'
-  ).reduce((s, p) => s + Number(p.valor), 0) || 0;
+  ).reduce((s, p) => s + Number(p.valor), 0);
 
   const margemMes = recebidoMes - custoFixoMensal;
 
-  const próximosVencimentos = parcelas?.filter(p => 
+  const próximosVencimentos = parcelasSeguras.filter(p => 
     p.status !== 'PAGO' && 
-    isWithinInterval(parseISO(p.data_vencimento), { start: hoje, end: addDays(hoje, 7) })
+    isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: hoje, end: addDays(hoje, 7) })
   ).slice(0, 5);
 
   const parcelasFiltradas = useMemo(() => {
-    let list = [...parcelas];
+    let list = [...parcelasSeguras];
     if (filtroParcelas === 'Pendentes') list = list.filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL');
     else if (filtroParcelas === 'Pagas') list = list.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL');
     else if (filtroParcelas === 'Atrasadas') list = list.filter(p => p.status === 'ATRASADO');
@@ -111,9 +113,11 @@ const FinanceiroGeral = () => {
     return list.sort((a, b) => {
         if (a.status === 'ATRASADO' && b.status !== 'ATRASADO') return -1;
         if (a.status !== 'ATRASADO' && b.status === 'ATRASADO') return 1;
-        return new Date(a.data_vencimento).getTime() - new Date(b.data_vencimento).getTime();
+        const dateA = a.data_vencimento ? new Date(a.data_vencimento + 'T12:00:00') : new Date();
+        const dateB = b.data_vencimento ? new Date(b.data_vencimento + 'T12:00:00') : new Date();
+        return dateA.getTime() - dateB.getTime();
     });
-  }, [parcelas, filtroParcelas]);
+  }, [parcelasSeguras, filtroParcelas]);
 
   return (
     <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8]">
@@ -214,10 +218,10 @@ const FinanceiroGeral = () => {
                             <div key={p.id} className="flex justify-between items-center py-3 border-b border-white/5">
                                 <div>
                                     <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
-                                    <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                    <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
                                 </div>
                                 <button 
-                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Olá ${p.cliente_nome}, lembrete da parcela de R$ ${p.valor.toLocaleString('pt-BR')} que vence em ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}.`)}`, '_blank')}
+                                    onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Olá ${p.cliente_nome}, lembrete da parcela de R$ ${p.valor.toLocaleString('pt-BR')} que vence em ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}.`)}`, '_blank')}
                                     className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8B7355] border border-[#8B7355]/30 hover:bg-[#8B7355]/5 transition-colors"
                                 >
                                     COBRAR
@@ -242,13 +246,13 @@ const FinanceiroGeral = () => {
                   </div>
 
                   {projetos?.map((projeto: any) => {
-                    const parcelasProjeto = parcelas?.filter(p => p.projeto_id === projeto.id) || [];
+                    const parcelasProjeto = parcelasSeguras.filter(p => p.projeto_id === projeto.id);
                     const contratoTotal = parcelasProjeto.reduce((s, p) => s + Number(p.valor), 0);
                     const pagoTotal = parcelasProjeto.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
                     const emAberto = contratoTotal - pagoTotal;
                     
                     const temAtraso = parcelasProjeto.some(p => p.status === 'ATRASADO');
-                    const vencePerto = parcelasProjeto.some(p => p.status !== 'PAGO' && differenceInDays(parseISO(p.data_vencimento), hoje) <= 7);
+                    const vencePerto = parcelasProjeto.some(p => p.status !== 'PAGO' && differenceInDays(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), hoje) <= 7);
                     const health = temAtraso ? { color: '#f87171', label: 'ATR' } : vencePerto ? { color: '#fbbf24', label: 'ATN' } : { color: '#4ade80', label: 'OK' };
 
                     return (
@@ -281,7 +285,7 @@ const FinanceiroGeral = () => {
               <div className="grid grid-cols-3 gap-6">
                   {[0, 1, 2].map(offset => {
                       const mesRef = addMonths(startOfMonth(hoje), offset);
-                      const parcelasMes = parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: mesRef, end: endOfMonth(mesRef) }));
+                      const parcelasMes = parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: mesRef, end: endOfMonth(mesRef) }));
                       const totalMes = parcelasMes.reduce((s, p) => s + Number(p.valor), 0);
 
                       return (
@@ -292,8 +296,8 @@ const FinanceiroGeral = () => {
                             <div className="space-y-4 min-h-[120px]">
                                 {parcelasMes.map(p => (
                                     <div key={p.id} className="p-3 border-l border-[#8B7355] bg-white/[0.02] cursor-pointer" onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}>
-                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao.split('—')[0]}</div>
-                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao ? p.descricao.split('—')[0] : ''}</div>
+                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
                                     </div>
                                 ))}
                                 {!parcelasMes.length && <div className="text-[#333] italic text-xs py-4">—</div>}
@@ -312,7 +316,7 @@ const FinanceiroGeral = () => {
           <div className="mt-8 p-6 bg-[#141414] border border-white/5 inline-block">
               <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Acumulado Próximos 90 Dias</div>
               <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#8B7355' }}>
-                  R$ {parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
+                  R$ {parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
               </div>
           </div>
 
@@ -344,7 +348,7 @@ const FinanceiroGeral = () => {
                           <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
                           <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
                           <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
-                          <div style={{ fontSize: '12px', color: '#555' }}>{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</div>
+                          <div style={{ fontSize: '12px', color: '#555' }}>{format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}</div>
                           <div>
                               <span className={cn(
                                   "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border",
@@ -364,7 +368,7 @@ const FinanceiroGeral = () => {
                                 </button>
                               )}
                               <button 
-                                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} 
+                                onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')})`)}`, '_blank')} 
                                 className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#8B7355] border border-[#8B7355]/20 hover:bg-[#8B7355]/5"
                               >
                                 COBRAR
@@ -385,7 +389,7 @@ const FinanceiroGeral = () => {
               <div className="grid grid-cols-3 gap-6">
                   {[0, 1, 2].map(offset => {
                       const mesRef = addMonths(startOfMonth(hoje), offset);
-                      const parcelasMes = parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: mesRef, end: endOfMonth(mesRef) }));
+                      const parcelasMes = parcelasSeguras.filter(p => p.status !== 'PAGO' && isWithinInterval(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), { start: mesRef, end: endOfMonth(mesRef) }));
                       const totalMes = parcelasMes.reduce((s, p) => s + Number(p.valor), 0);
 
                       return (
@@ -396,8 +400,8 @@ const FinanceiroGeral = () => {
                             <div className="space-y-4 min-h-[120px]">
                                 {parcelasMes.map(p => (
                                     <div key={p.id} className="p-3 border-l border-[#8B7355] bg-white/[0.02] cursor-pointer" onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}>
-                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao.split('—')[0]}</div>
-                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao ? p.descricao.split('—')[0] : ''}</div>
+                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
                                     </div>
                                 ))}
                                 {!parcelasMes.length && <div className="text-[#333] italic text-xs py-4">—</div>}
@@ -439,7 +443,7 @@ const FinanceiroGeral = () => {
                           <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
                           <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
                           <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
-                          <div style={{ fontSize: '12px', color: '#555' }}>{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</div>
+                          <div style={{ fontSize: '12px', color: '#555' }}>{format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}</div>
                           <div>
                               <span className={cn(
                                   "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border",
@@ -453,7 +457,7 @@ const FinanceiroGeral = () => {
                               {p.status !== 'PAGO' && (
                                 <button onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)} className="p-1 text-[#4ade80] hover:bg-white/5"><DollarSign size={14}/></button>
                               )}
-                              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(parseISO(p.data_vencimento), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
+                              <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(`Lembrete de pagamento: R$ ${p.valor.toLocaleString('pt-BR')} (vence ${format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')})`)}`, '_blank')} className="p-1 text-[#8B7355] hover:bg-white/5"><MessageCircle size={14}/></button>
                               {p.status === 'PAGO' && (
                                 <button className="p-1 text-[#ccc] hover:bg-white/5"><Receipt size={14}/></button>
                               )}
@@ -473,7 +477,7 @@ const FinanceiroGeral = () => {
                     ))}
                 </div>
                 {projetos?.map(projeto => {
-                  const parcelasProjeto = parcelas?.filter(p => p.projeto_id === projeto.id) || [];
+                  const parcelasProjeto = parcelasSeguras.filter(p => p.projeto_id === projeto.id);
                   const receitaTotal = parcelasProjeto.reduce((s, p) => s + Number(p.valor), 0);
                   const recebido = parcelasProjeto.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((s, p) => s + Number(p.valor_recebido || p.valor), 0);
                   const emAberto = receitaTotal - recebido;
