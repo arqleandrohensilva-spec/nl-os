@@ -53,6 +53,7 @@ interface Projeto {
   cidade: string;
   cliente_id?: string;
   valor_total?: number;
+  area_m2?: number;
 }
 
 const ProjetoFinanceiro = () => {
