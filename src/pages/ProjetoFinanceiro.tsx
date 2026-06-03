@@ -64,6 +64,8 @@ const ProjetoFinanceiro = () => {
   const [loading, setLoading] = useState(true);
   const [lead, setLead] = useState<any>(null);
   const [contrato, setContrato] = useState<any>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewParcela, setPreviewParcela] = useState<any>(null);
   
   // Modal state
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -300,7 +302,7 @@ const ProjetoFinanceiro = () => {
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
-  const handleGerarRecibo = async (parcela: any) => {
+  const handleGerarRecibo = async (parcela: any, download = true) => {
     const { data: todasParcelas } = await supabase
       .from('financeiro_parcelas')
       .select('*')
@@ -573,7 +575,18 @@ const ProjetoFinanceiro = () => {
     y += 5;
     doc.text('Este documento comprova o recebimento do valor acima indicado.', col1, y);
 
-    doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
+    if (download) {
+      doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
+    } else {
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      setPreviewUrl(url);
+      setPreviewParcela(parcela);
+    }
+  };
+
+  const handlePreviewRecibo = async (parcela: any) => {
+    await handleGerarRecibo(parcela, false);
   };
 
   const getStatusColor = (status: string) => {
@@ -719,7 +732,7 @@ const ProjetoFinanceiro = () => {
                                   cursor: 'pointer',
                                   borderRadius: '3px',
                                 }}
-                                onClick={() => handleGerarRecibo(p)}
+                                onClick={() => handlePreviewRecibo(p)}
                             >
                                 RECIBO
                             </button>
@@ -767,7 +780,7 @@ const ProjetoFinanceiro = () => {
                                 <Button 
                                     variant="link" 
                                     className="h-auto p-0 text-[10px] text-[#8B7355] uppercase font-bold mt-1"
-                                    onClick={() => handleGerarRecibo(p)}
+                                    onClick={() => handlePreviewRecibo(p)}
                                 >
                                     Ver Recibo
                                 </Button>
@@ -809,7 +822,43 @@ const ProjetoFinanceiro = () => {
                   Pagamento parcial — saldo de R$ {( (selectedParcela?.valor || 0) - parseFloat(confirmData.valor.replace(/\./g, '').replace(',', '.'))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} será criado como nova parcela com vencimento em 15 dias.
                 </p>
               )}
-            </div>
+      {previewUrl && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+          zIndex: 9999, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', gap: '16px'
+        }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Prévia do Recibo
+            </span>
+            <button
+              style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#fff', background: '#8B7355', border: 'none', padding: '6px 14px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+              onClick={async () => {
+                await handleGerarRecibo(previewParcela, true);
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+              }}
+            >
+              BAIXAR PDF
+            </button>
+            <button
+              onClick={() => {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+              }}
+              style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', background: 'none', border: '1px solid #333', padding: '6px 14px', cursor: 'pointer', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+            >
+              FECHAR
+            </button>
+          </div>
+          <iframe
+            src={previewUrl}
+            style={{ width: '600px', height: '80vh', border: 'none', borderRadius: '4px' }}
+          />
+        </div>
+      )}
+    </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsConfirmModalOpen(false)} className="bg-white/5 border-white/10 text-xs">Cancelar</Button>
