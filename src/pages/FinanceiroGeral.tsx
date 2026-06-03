@@ -361,7 +361,9 @@ const FinanceiroGeral = () => {
                                 COBRAR
                               </button>
                               {p.status === 'PAGO' && (
-                                <button className="p-1 text-[#ccc] hover:bg-white/5"><Receipt size={14}/></button>
+                                <button className="px-2 py-1 text-[9px] font-bold uppercase tracking-tighter text-[#ccc] border border-white/10 hover:bg-white/5">
+                                  RECIBO
+                                </button>
                               )}
                           </div>
                       </div>
