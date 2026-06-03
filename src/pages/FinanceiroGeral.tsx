@@ -348,7 +348,7 @@ const FinanceiroGeral = () => {
                           <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
                           <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
                           <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
-                          <div style={{ fontSize: '12px', color: '#555' }}>{format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}</div>
+                          <div style={{ fontSize: '12px', color: '#555' }}>{format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}</div>
                           <div>
                               <span className={cn(
                                   "px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest border",
