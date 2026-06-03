@@ -639,6 +639,51 @@ const ProjetoFinanceiro = () => {
           ))}
         </div>
 
+        {/* Linha do tempo financeira */}
+        <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '20px 24px', marginBottom: '16px' }}>
+          <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>Linha do Tempo</div>
+          
+          <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
+            {/* Linha horizontal de fundo */}
+            <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '1px', background: '#222' }} />
+            
+            {parcelas.map((p, i) => {
+              const isPago = p.status === 'PAGO' || p.status === 'PAGO PARCIAL';
+              const isAtrasado = p.status === 'ATRASADO';
+              const isHoje = p.status === 'VENCE HOJE';
+              const corPonto = isPago ? '#4ade80' : isAtrasado ? '#f87171' : isHoje ? '#fbbf24' : '#8B7355';
+              const corBorda = isPago ? '#4ade80' : isAtrasado ? '#f87171' : isHoje ? '#fbbf24' : '#333';
+              
+              return (
+                <div key={p.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                  {/* Ponto */}
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: isPago ? corPonto : 'transparent', border: `2px solid ${corPonto}`, marginBottom: '8px', boxShadow: isPago ? `0 0 8px ${corPonto}40` : 'none' }} />
+                  
+                  {/* Valor */}
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '11px', color: isPago ? '#4ade80' : '#e8e8e8', textAlign: 'center', marginBottom: '3px' }}>
+                    R$ {Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                  
+                  {/* Data */}
+                  <div style={{ fontFamily: 'Arial', fontSize: '9px', color: '#555', textAlign: 'center', marginBottom: '3px' }}>
+                    {format(parseISO(p.data_vencimento), 'dd/MM/yy')}
+                  </div>
+                  
+                  {/* Status */}
+                  <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: corBorda, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {isPago ? '✓ PAGO' : isAtrasado ? 'ATRASADO' : isHoje ? 'HOJE' : p.status === 'VENCE EM BREVE' ? 'EM BREVE' : 'PENDENTE'}
+                  </div>
+                  
+                  {/* Descrição curta */}
+                  <div style={{ fontFamily: 'Arial', fontSize: '8px', color: '#444', textAlign: 'center', marginTop: '3px', maxWidth: '80px' }}>
+                    {p.descricao?.split('—')[0].trim()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* TABELA DE MARCOS */}
         <div className="bg-[#141414] border border-white/5 rounded-lg overflow-hidden mb-12">
             <div className="grid grid-cols-[0.5fr_2.5fr_1.2fr_1.2fr_1fr_1.2fr] p-4 border-bottom border-white/5 text-[10px] uppercase font-bold tracking-widest text-[#555] font-['Arial'] bg-white/[0.02]">
