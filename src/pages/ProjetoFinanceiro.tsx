@@ -73,6 +73,10 @@ const ProjetoFinanceiro = () => {
     valor: ''
   });
 
+  const [editandoData, setEditandoData] = useState<string | null>(null);
+  const [modalNovaParcela, setModalNovaParcela] = useState(false);
+  const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '' });
+
   const fetchData = async () => {
     if (!id) return;
     try {
@@ -635,6 +639,51 @@ const ProjetoFinanceiro = () => {
           ))}
         </div>
 
+        {/* Linha do tempo financeira */}
+        <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '20px 24px', marginBottom: '16px' }}>
+          <div style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '20px' }}>Linha do Tempo</div>
+          
+          <div style={{ display: 'flex', alignItems: 'flex-start', position: 'relative' }}>
+            {/* Linha horizontal de fundo */}
+            <div style={{ position: 'absolute', top: '12px', left: '0', right: '0', height: '1px', background: '#222' }} />
+            
+            {parcelas.map((p, i) => {
+              const isPago = p.status === 'PAGO' || p.status === 'PAGO PARCIAL';
+              const isAtrasado = p.status === 'ATRASADO';
+              const isHoje = p.status === 'VENCE HOJE';
+              const corPonto = isPago ? '#4ade80' : isAtrasado ? '#f87171' : isHoje ? '#fbbf24' : '#8B7355';
+              const corBorda = isPago ? '#4ade80' : isAtrasado ? '#f87171' : isHoje ? '#fbbf24' : '#333';
+              
+              return (
+                <div key={p.id} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                  {/* Ponto */}
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: isPago ? corPonto : 'transparent', border: `2px solid ${corPonto}`, marginBottom: '8px', boxShadow: isPago ? `0 0 8px ${corPonto}40` : 'none' }} />
+                  
+                  {/* Valor */}
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '11px', color: isPago ? '#4ade80' : '#e8e8e8', textAlign: 'center', marginBottom: '3px' }}>
+                    R$ {Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                  
+                  {/* Data */}
+                  <div style={{ fontFamily: 'Arial', fontSize: '9px', color: '#555', textAlign: 'center', marginBottom: '3px' }}>
+                    {format(parseISO(p.data_vencimento), 'dd/MM/yy')}
+                  </div>
+                  
+                  {/* Status */}
+                  <div style={{ fontFamily: 'Courier New', fontSize: '7px', color: corBorda, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    {isPago ? '✓ PAGO' : isAtrasado ? 'ATRASADO' : isHoje ? 'HOJE' : p.status === 'VENCE EM BREVE' ? 'EM BREVE' : 'PENDENTE'}
+                  </div>
+                  
+                  {/* Descrição curta */}
+                  <div style={{ fontFamily: 'Arial', fontSize: '8px', color: '#444', textAlign: 'center', marginTop: '3px', maxWidth: '80px' }}>
+                    {p.descricao?.split('—')[0].trim()}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* TABELA DE MARCOS */}
         <div className="bg-[#141414] border border-white/5 rounded-lg overflow-hidden mb-12">
             <div className="grid grid-cols-[0.5fr_2.5fr_1.2fr_1.2fr_1fr_1.2fr] p-4 border-bottom border-white/5 text-[10px] uppercase font-bold tracking-widest text-[#555] font-['Arial'] bg-white/[0.02]">
@@ -653,7 +702,27 @@ const ProjetoFinanceiro = () => {
                         R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </div>
                     <div className="font-['Arial'] text-[13px] text-[#555]">
-                        {format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}
+                        {editandoData === p.id ? (
+                          <input
+                            type="date"
+                            defaultValue={p.data_vencimento}
+                            autoFocus
+                            onBlur={async (e) => {
+                              await supabase.from('financeiro_parcelas').update({ data_vencimento: e.target.value }).eq('id', p.id);
+                              setEditandoData(null);
+                              fetchData();
+                            }}
+                            style={{ background: '#1c1c1c', border: '1px solid #8B7355', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Arial', fontSize: '12px', borderRadius: '3px' }}
+                          />
+                        ) : (
+                          <span
+                            onClick={() => p.status !== 'PAGO' && setEditandoData(p.id)}
+                            style={{ cursor: p.status !== 'PAGO' ? 'pointer' : 'default', borderBottom: p.status !== 'PAGO' ? '1px dashed #333' : 'none', paddingBottom: '1px' }}
+                            title={p.status !== 'PAGO' ? 'Clique para editar' : ''}
+                          >
+                            {format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}
+                          </span>
+                        )}
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
@@ -730,6 +799,13 @@ const ProjetoFinanceiro = () => {
             ))}
         </div>
 
+        <button
+          onClick={() => setModalNovaParcela(true)}
+          style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', background: 'none', border: '1px solid #8B7355', padding: '7px 16px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '3px', marginTop: '12px' }}
+        >
+          + ADICIONAR COBRANÇA AVULSA
+        </button>
+
         {parcelas.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px', color: '#555' }}>
             <p style={{ fontFamily: 'Arial', fontSize: '13px', marginBottom: '16px' }}>
@@ -779,6 +855,43 @@ const ProjetoFinanceiro = () => {
                 )}
             </div>
         </section>
+
+        {modalNovaParcela && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '32px', width: '400px' }}>
+              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: '16px', color: '#e8e8e8', marginBottom: '20px' }}>Nova Cobrança Avulsa</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Descrição</label>
+                  <input value={novaParcelaData.descricao} onChange={e => setNovaParcelaData(p => ({ ...p, descricao: e.target.value }))} placeholder="Ex: Taxa de visita técnica" style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Valor (R$)</label>
+                  <input value={novaParcelaData.valor} onChange={e => setNovaParcelaData(p => ({ ...p, valor: e.target.value }))} placeholder="0,00" style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+                <div>
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Data de Vencimento</label>
+                  <input type="date" value={novaParcelaData.data_vencimento} onChange={e => setNovaParcelaData(p => ({ ...p, data_vencimento: e.target.value }))} style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
+                <button
+                  onClick={async () => {
+                    const valor = parseFloat(novaParcelaData.valor.replace(/\./g, '').replace(',', '.'));
+                    if (!novaParcelaData.descricao || !valor || !novaParcelaData.data_vencimento) { toast.error('Preencha todos os campos'); return; }
+                    await supabase.from('financeiro_parcelas').insert({ projeto_id: id, cliente_id: projeto?.cliente_id, cliente_nome: projeto?.nome_cliente, numero_parcela: parcelas.length + 1, total_parcelas: parcelas.length + 1, descricao: novaParcelaData.descricao, valor, data_vencimento: novaParcelaData.data_vencimento, status: 'PENDENTE' });
+                    toast.success('Cobrança adicionada!');
+                    setModalNovaParcela(false);
+                    setNovaParcelaData({ descricao: '', valor: '', data_vencimento: '' });
+                    fetchData();
+                  }}
+                  style={{ flex: 1, background: '#8B7355', color: '#fff', border: 'none', padding: '10px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}
+                >ADICIONAR</button>
+                <button onClick={() => setModalNovaParcela(false)} style={{ flex: 1, background: 'none', color: '#555', border: '1px solid #333', padding: '10px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}>CANCELAR</button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
 
