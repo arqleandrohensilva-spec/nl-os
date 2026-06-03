@@ -299,6 +299,15 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
+          {/* Total acumulado dos 3 meses em destaque */}
+          <div className="mt-8 p-6 bg-[#141414] border border-white/5 inline-block">
+              <div style={{ fontFamily: 'Courier New', fontSize: '10px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Acumulado Próximos 90 Dias</div>
+              <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#8B7355' }}>
+                  R$ {parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: startOfMonth(hoje), end: endOfMonth(addMonths(hoje, 2)) })).reduce((s, p) => s + Number(p.valor), 0).toLocaleString('pt-BR')}
+              </div>
+          </div>
+
+
           {/* ABA 4: PARCELAS */}
           <TabsContent value="parcelas">
               <div className="flex gap-2 mb-6">
