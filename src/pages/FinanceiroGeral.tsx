@@ -180,7 +180,11 @@ const FinanceiroGeral = () => {
                               </div>
                               <div>
                                   <div className="text-[10px] text-[#555] uppercase mb-1">Custo Fixo</div>
-                                  <div className="text-lg text-[#f87171]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
+                                  <div className="text-lg text-[#ccc]">R$ {custoFixoMensal.toLocaleString('pt-BR')}</div>
+                              </div>
+                              <div className="pt-4 col-span-2 border-t border-white/5">
+                                  <div className="text-[10px] text-[#555] uppercase mb-1">Margem Real</div>
+                                  <div className="text-xl" style={{ color: margemMes >= 0 ? '#4ade80' : '#f87171' }}>R$ {margemMes.toLocaleString('pt-BR')}</div>
                               </div>
                           </div>
 
