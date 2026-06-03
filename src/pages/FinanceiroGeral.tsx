@@ -20,7 +20,11 @@ import {
   MessageCircle,
   Clock,
   ExternalLink,
-  Receipt
+  Receipt,
+  Search,
+  Filter,
+  ArrowDownRight,
+  Target
 } from 'lucide-react';
 import { toast } from "sonner";
 
