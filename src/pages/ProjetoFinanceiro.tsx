@@ -702,7 +702,27 @@ const ProjetoFinanceiro = () => {
                         R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </div>
                     <div className="font-['Arial'] text-[13px] text-[#555]">
-                        {format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}
+                        {editandoData === p.id ? (
+                          <input
+                            type="date"
+                            defaultValue={p.data_vencimento}
+                            autoFocus
+                            onBlur={async (e) => {
+                              await supabase.from('financeiro_parcelas').update({ data_vencimento: e.target.value }).eq('id', p.id);
+                              setEditandoData(null);
+                              fetchData();
+                            }}
+                            style={{ background: '#1c1c1c', border: '1px solid #8B7355', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Arial', fontSize: '12px', borderRadius: '3px' }}
+                          />
+                        ) : (
+                          <span
+                            onClick={() => p.status !== 'PAGO' && setEditandoData(p.id)}
+                            style={{ cursor: p.status !== 'PAGO' ? 'pointer' : 'default', borderBottom: p.status !== 'PAGO' ? '1px dashed #333' : 'none', paddingBottom: '1px' }}
+                            title={p.status !== 'PAGO' ? 'Clique para editar' : ''}
+                          >
+                            {format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}
+                          </span>
+                        )}
                     </div>
                     <div>
                         <div className="flex items-center gap-2">
