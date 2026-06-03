@@ -346,6 +346,37 @@ const FinanceiroGeral = () => {
               </div>
           </TabsContent>
 
+          {/* ABA 3: FLUXO DE CAIXA */}
+          <TabsContent value="fluxo">
+              <div className="grid grid-cols-3 gap-6">
+                  {[0, 1, 2].map(offset => {
+                      const mesRef = addMonths(startOfMonth(hoje), offset);
+                      const parcelasMes = parcelas?.filter(p => p.status !== 'PAGO' && isWithinInterval(parseISO(p.data_vencimento), { start: mesRef, end: endOfMonth(mesRef) }));
+                      const totalMes = parcelasMes.reduce((s, p) => s + Number(p.valor), 0);
+
+                      return (
+                        <div key={offset} className="bg-[#141414] border border-white/5 p-6">
+                            <h4 style={{ fontFamily: 'Courier New', fontSize: '12px', color: '#8B7355', letterSpacing: '0.2em', marginBottom: '20px' }}>
+                                {format(mesRef, 'MMMM yyyy', { locale: ptBR }).toUpperCase()}
+                            </h4>
+                            <div className="space-y-4 min-h-[120px]">
+                                {parcelasMes.map(p => (
+                                    <div key={p.id} className="p-3 border-l border-[#8B7355] bg-white/[0.02] cursor-pointer" onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}>
+                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao.split('—')[0]}</div>
+                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                    </div>
+                                ))}
+                                {!parcelasMes.length && <div className="text-[#333] italic text-xs py-4">—</div>}
+                            </div>
+                            <div className="mt-8 pt-4 border-t border-white/5">
+                                <div style={{ fontSize: '9px', color: '#555', textTransform: 'uppercase', marginBottom: '4px' }}>Total Previsto</div>
+                                <div style={{ fontFamily: 'Georgia, serif', fontSize: '18px' }}>R$ {totalMes.toLocaleString('pt-BR')}</div>
+                            </div>
+                        </div>
+                      );
+                  })}
+              </div>
+          </TabsContent>
 
           {/* ABA 5: LUCRATIVIDADE */}
           <TabsContent value="lucratividade">
