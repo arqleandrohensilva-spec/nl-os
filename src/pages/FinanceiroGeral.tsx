@@ -296,8 +296,8 @@ const FinanceiroGeral = () => {
                             <div className="space-y-4 min-h-[120px]">
                                 {parcelasMes.map(p => (
                                     <div key={p.id} className="p-3 border-l border-[#8B7355] bg-white/[0.02] cursor-pointer" onClick={() => navigate(`/projetos/${p.projeto_id}/financeiro`)}>
-                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao.split('—')[0]}</div>
-                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(parseISO(p.data_vencimento), 'dd/MM')}</div>
+                                        <div style={{ fontSize: '12px' }}>{p.cliente_nome} · {p.descricao ? p.descricao.split('—')[0] : ''}</div>
+                                        <div style={{ fontSize: '11px', color: '#555' }}>R$ {p.valor.toLocaleString('pt-BR')} · {format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM')}</div>
                                     </div>
                                 ))}
                                 {!parcelasMes.length && <div className="text-[#333] italic text-xs py-4">—</div>}
