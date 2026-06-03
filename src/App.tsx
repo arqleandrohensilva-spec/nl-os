@@ -16,7 +16,7 @@ import PropostaVisualizacao from "./pages/PropostaVisualizacao.tsx";
 import GestaoProjetos from "./pages/GestaoProjetos.tsx";
 import ProjetoDetalhe from "./pages/ProjetoDetalhe.tsx";
 import ProjetoFinanceiro from "./pages/ProjetoFinanceiro.tsx";
-import FinanceiroProjetos from "./pages/FinanceiroProjetos.tsx";
+import FinanceiroGeral from "./pages/FinanceiroGeral.tsx";
 import DocumentosContratos from "./pages/DocumentosContratos.tsx";
 import DropboxCallback from "./pages/DropboxCallback.tsx";
 import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
@@ -32,7 +32,7 @@ import PropostaCalculadora from "./pages/PropostaCalculadora.tsx";
 import CalculadoraList from "./pages/CalculadoraList.tsx";
 import ClientesLista from "./pages/ClientesLista.tsx";
 import ClienteFicha from "./pages/ClienteFicha.tsx";
-import FinanceiroVisaoGeral from "./pages/FinanceiroVisaoGeral.tsx";
+
 
 const queryClient = new QueryClient();
 
@@ -61,14 +61,14 @@ const App = () => (
           <Route path="/clientes/novo" element={<ClienteFicha />} />
           <Route path="/clientes/:id" element={<ClienteFicha />} />
           <Route path="/pipeline" element={<Index />} />
-          <Route path="/financeiro" element={<FinanceiroVisaoGeral />} />
+          <Route path="/financeiro" element={<FinanceiroGeral />} />
           <Route path="/financeiro/base" element={<BaseFinanceira />} />
           <Route path="/projetos/horas" element={<ControleHoras />} />
           <Route path="/propostas/biblioteca" element={<BibliotecaServicos />} />
           <Route path="/projetos/gestao" element={<GestaoProjetos />} />
           <Route path="/projetos/detalhe/:id" element={<ProjetoDetalhe />} />
           <Route path="/projetos/:id/financeiro" element={<ProjetoFinanceiro />} />
-          <Route path="/financeiro/projetos" element={<FinanceiroProjetos />} />
+          
           <Route path="/propostas/documentos" element={<DocumentosContratos />} />
           <Route path="/propostas/tracking" element={<PropostasTracking />} />
           <Route path="/calculadora" element={<CalculadoraList />} />
