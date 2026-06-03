@@ -732,7 +732,7 @@ const ProjetoFinanceiro = () => {
                                   cursor: 'pointer',
                                   borderRadius: '3px',
                                 }}
-                                onClick={() => handleGerarRecibo(p)}
+                                onClick={() => handlePreviewRecibo(p)}
                             >
                                 RECIBO
                             </button>
