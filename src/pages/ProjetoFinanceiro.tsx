@@ -575,7 +575,18 @@ const ProjetoFinanceiro = () => {
     y += 5;
     doc.text('Este documento comprova o recebimento do valor acima indicado.', col1, y);
 
-    doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
+    if (download) {
+      doc.save(`Recibo_NL_${nroRecibo}_${(parcela.cliente_nome || '').replace(/\s+/g, '_')}.pdf`);
+    } else {
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      setPreviewUrl(url);
+      setPreviewParcela(parcela);
+    }
+  };
+
+  const handlePreviewRecibo = async (parcela: any) => {
+    await handleGerarRecibo(parcela, false);
   };
 
   const getStatusColor = (status: string) => {
