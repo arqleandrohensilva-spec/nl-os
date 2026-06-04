@@ -84,21 +84,49 @@ interface SectionAccordionProps {
   children: React.ReactNode;
   badge?: number;
   isCollapsed?: boolean;
+  onPopoverClick?: (label: string, top: number) => void;
+  isPopoverOpen?: boolean;
 }
 
-const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCollapsed }: SectionAccordionProps) => {
-  const content = (
-    <div className="mb-1">
+const SectionAccordion = ({ 
+  label, 
+  icon, 
+  isOpen, 
+  onToggle, 
+  children, 
+  badge, 
+  isCollapsed,
+  onPopoverClick,
+  isPopoverOpen
+}: SectionAccordionProps) => {
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isCollapsed) {
+      onToggle();
+    } else {
+      e.stopPropagation();
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        onPopoverClick?.(label, rect.top);
+      }
+    }
+  };
+
+  return (
+    <div className="mb-1 relative">
       <button 
-        onClick={!isCollapsed ? onToggle : undefined}
+        ref={buttonRef}
+        onClick={handleClick}
         className={cn(
           "w-full flex items-center transition-colors duration-200",
           isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
-          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
+          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]",
+          isPopoverOpen && isCollapsed && "bg-white/10 text-bronze"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn("transition-colors", isOpen && !isCollapsed ? "text-bronze" : "text-white/60")}>
+          <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60")}>
             {icon}
           </div>
           {!isCollapsed && (
@@ -131,30 +159,19 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
           </div>
         </div>
       )}
-    </div>
-  );
-
-  if (isCollapsed) {
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          {content}
-        </PopoverTrigger>
-        <PopoverContent 
-          side="right" 
-          align="start" 
-          sideOffset={10}
-          className="bg-[#1a1a1a] border-white/10 p-0 overflow-hidden w-48 rounded-[6px]"
+      {isCollapsed && isPopoverOpen && (
+        <div 
+          className="fixed left-[64px] bg-[#1a1a1a] border border-white/10 p-0 overflow-hidden w-48 rounded-[6px] z-[9999]"
+          style={{ top: buttonRef.current?.getBoundingClientRect().top || 0 }}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col py-1">
             {children}
           </div>
-        </PopoverContent>
-      </Popover>
-    );
-  }
-
-  return content;
+        </div>
+      )}
+    </div>
+  );
 };
 
 const Sidebar = ({ user: initialUser }: { user: string }) => {
@@ -162,6 +179,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   const location = useLocation();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [popoverAberto, setPopoverAberto] = useState<string | null>(null);
+  const [popoverPosition, setPopoverPosition] = useState<number>(0);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
@@ -173,6 +192,16 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
     }
     return { 'LEADS': true };
   });
+
+  useEffect(() => {
+    setPopoverAberto(null);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handler = () => setPopoverAberto(null);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   useEffect(() => {
     const getAuthUser = async () => {
@@ -463,6 +492,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'PROJETOS'}
         >
           <NavItem 
             label="Gestão de Projetos" 
@@ -484,6 +515,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'FINANCEIRO'}
         >
           <NavItem 
             label="Financeiro" 
@@ -499,6 +532,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'MARKETING'}
         >
           <NavItem 
             label="Marketing com IA" 
@@ -526,6 +561,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['CONFIGURAÇÕES']}
           onToggle={() => toggleSection('CONFIGURAÇÕES')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'CONFIGURAÇÕES'}
         >
           <NavItem 
             label="Configurações" 
