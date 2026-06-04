@@ -292,12 +292,12 @@ const ProjetoDetalhe = () => {
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white/40">CARREGANDO...</div>;
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
+    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans flex overflow-x-hidden">
       <Sidebar user="Equipe NL" />
-      <main className="lg:pl-[230px] p-4 md:p-8">
+      <main className="flex-1 lg:pl-[230px] p-4 md:p-8 min-w-0 max-w-full overflow-x-hidden">
         
         {/* HEADER */}
-        <header className="mb-12">
+        <header className="mb-12 max-w-full overflow-hidden">
             <Button variant="ghost" onClick={() => navigate('/projetos/gestao')} className="text-[#555] hover:text-white px-0 hover:bg-transparent text-xs uppercase tracking-widest mb-6">
                 <ArrowLeft className="mr-2" size={14} /> Voltar
             </Button>
