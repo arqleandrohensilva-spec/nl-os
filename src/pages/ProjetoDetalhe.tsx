@@ -176,6 +176,17 @@ const ProjetoDetalhe = () => {
   const currentEtapaIdx = ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual?.toUpperCase());
   const pct = currentEtapaIdx === -1 ? 0 : Math.round(((currentEtapaIdx + 1) / 6) * 100);
 
+  const nomeCliente = projeto?.nome_cliente || '';
+  const tipoNome = projeto?.tipo?.includes('Interiores') ? 'Arquitetura + Interiores' : projeto?.tipo?.includes('Comercial') ? 'Comercial' : 'Arquitetura + Interiores';
+  const basePath = `https://www.dropbox.com/home/NL%20Arquitetos/07%20-%20Projetos%20NL%20OS/01%20-%20Clientes/${encodeURIComponent(nomeCliente + ' - ' + tipoNome)}`;
+
+  const docs = [
+    { label: 'Pasta do Cliente', path: basePath },
+    { label: 'Contrato', path: `${basePath}/08%20-%20Documentos/02%20-%20Proposta%20e%20Contrato` },
+    { label: 'Briefing', path: `${basePath}/08%20-%20Documentos/01%20-%20Briefing` },
+    { label: 'Atas e Reuniões', path: `${basePath}/08%20-%20Documentos/04%20-%20Atas%20e%20Reunioes` },
+  ];
+
   return (
     <div className="flex min-h-screen bg-[#0d0d0d]">
       <Sidebar user="Equipe NL" />
@@ -370,7 +381,15 @@ const ProjetoDetalhe = () => {
               </div>
               <div className="bg-[#141414] border border-white/10 p-6 space-y-4">
                   <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Documentos</h3>
-                  {['Pasta', 'Contrato', 'Briefing', 'Atas'].map(d => <div key={d} className="text-xs border-b border-white/5 pb-2 cursor-pointer text-[#ccc]">{d}</div>)}
+                  {docs.map(doc => (
+                    <div 
+                      key={doc.label} 
+                      onClick={() => window.open(doc.path, '_blank')}
+                      className="text-xs border-b border-white/5 pb-2 cursor-pointer text-[#ccc] hover:text-[#8B7355] transition-colors flex justify-between items-center group"
+                    >
+                      <span>{doc.label} →</span>
+                    </div>
+                  ))}
               </div>
           </div>
 
