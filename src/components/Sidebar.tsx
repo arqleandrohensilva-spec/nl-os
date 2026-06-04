@@ -35,12 +35,12 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
         !icon && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-3", isCollapsed ? "justify-center" : "justify-between w-full")}>
-        <div className={cn("flex items-center gap-3", !isCollapsed && "w-full")}>
+      <div className={cn("flex items-center gap-3", (isCollapsed && icon) ? "justify-center" : "justify-between w-full")}>
+        <div className={cn("flex items-center gap-3", (!isCollapsed || !icon) && "w-full")}>
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
             "text-[12px] transition-colors whitespace-nowrap",
-            isCollapsed ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
+            (isCollapsed && icon) ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
             active && !isCollapsed ? "text-white" : "group-hover:text-white/70",
             isCollapsed && "px-0"
           )}>
