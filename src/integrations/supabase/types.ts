@@ -443,6 +443,8 @@ export type Database = {
           criado_em: string
           dados_gerais: Json | null
           data_cancelamento: string | null
+          enviado_dropbox: boolean | null
+          enviado_dropbox_em: string | null
           id: string
           lead_id: string | null
           motivo_cancelamento: string | null
@@ -464,6 +466,8 @@ export type Database = {
           criado_em?: string
           dados_gerais?: Json | null
           data_cancelamento?: string | null
+          enviado_dropbox?: boolean | null
+          enviado_dropbox_em?: string | null
           id?: string
           lead_id?: string | null
           motivo_cancelamento?: string | null
@@ -485,6 +489,8 @@ export type Database = {
           criado_em?: string
           dados_gerais?: Json | null
           data_cancelamento?: string | null
+          enviado_dropbox?: boolean | null
+          enviado_dropbox_em?: string | null
           id?: string
           lead_id?: string | null
           motivo_cancelamento?: string | null
@@ -1919,6 +1925,8 @@ export type Database = {
         Row: {
           cliente_id: string | null
           criado_em: string | null
+          enviado_dropbox: boolean | null
+          enviado_dropbox_em: string | null
           id: string | null
           marco1_valor: string | null
           marco2_valor: string | null
@@ -1930,6 +1938,8 @@ export type Database = {
         Insert: {
           cliente_id?: string | null
           criado_em?: string | null
+          enviado_dropbox?: boolean | null
+          enviado_dropbox_em?: string | null
           id?: string | null
           marco1_valor?: never
           marco2_valor?: never
@@ -1941,6 +1951,8 @@ export type Database = {
         Update: {
           cliente_id?: string | null
           criado_em?: string | null
+          enviado_dropbox?: boolean | null
+          enviado_dropbox_em?: string | null
           id?: string | null
           marco1_valor?: never
           marco2_valor?: never
