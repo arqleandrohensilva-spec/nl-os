@@ -105,6 +105,7 @@ const ProjetoDetalhe = () => {
   const [lead, setLead] = useState<any>(null);
   const [lancandoHoras, setLancandoHoras] = useState<string | null>(null);
   const [editandoEstimadas, setEditandoEstimadas] = useState<string | null>(null);
+  const [horasLog, setHorasLog] = useState<any[]>([]);
   const [horasInput, setHorasInput] = useState('');
 
   const fetchData = async () => {
