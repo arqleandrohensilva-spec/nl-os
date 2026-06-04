@@ -203,7 +203,7 @@ const ProjetoDetalhe = () => {
             </div>
 
             <Button className="bg-emerald-600 text-[10px] uppercase tracking-widest font-bold">
-              WhatsApp · {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
+              WhatsApp · {currentEtapaIdx !== -1 ? ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim() : 'CONTATO'}
             </Button>
           </header>
 
