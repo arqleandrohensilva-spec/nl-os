@@ -9,8 +9,6 @@ import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-
 import { supabase } from '@/integrations/supabase/client';
 
 interface NavItemProps {
@@ -19,34 +17,57 @@ interface NavItemProps {
   active?: boolean;
   disabled?: boolean;
   onClick?: () => void;
+  isCollapsed?: boolean;
 }
 
-const NavItem = ({ label, icon, active, disabled, onClick }: NavItemProps) => (
-  <div 
-    onClick={!disabled ? onClick : undefined}
-    className={cn(
-      "flex flex-col py-2.5 px-10 transition-all duration-200 group relative border-l-2",
-      active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
-      disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
-    )}>
-    <div className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
-        {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
-        <span className={cn(
-          "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
-          active ? "text-white" : "group-hover:text-white/70"
-        )}>
-          {label}
-        </span>
+const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavItemProps) => {
+  const content = (
+    <div 
+      onClick={!disabled ? onClick : undefined}
+      className={cn(
+        "flex flex-col py-2.5 transition-all duration-200 group relative border-l-2",
+        isCollapsed ? "px-0 items-center justify-center border-l-0" : "px-10 border-l-2",
+        active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
+        disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
+      )}>
+      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center" : "justify-between")}>
+        <div className="flex items-center gap-2">
+          {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
+          {!isCollapsed && (
+            <span className={cn(
+              "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
+              active ? "text-white" : "group-hover:text-white/70"
+            )}>
+              {label}
+            </span>
+          )}
+        </div>
+        {!isCollapsed && disabled && (
+          <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
+            em breve
+          </span>
+        )}
       </div>
-      {disabled && (
-        <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
-          em breve
-        </span>
-      )}
     </div>
-  </div>
-);
+  );
+
+  if (isCollapsed) {
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            {content}
+          </TooltipTrigger>
+          <TooltipContent side="right" className="bg-[#1A1A1A] border-white/10 text-[10px] uppercase tracking-widest text-white font-bold rounded-none">
+            {label}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return content;
+};
 
 interface SectionAccordionProps {
   label: string;
@@ -55,54 +76,80 @@ interface SectionAccordionProps {
   onToggle: () => void;
   children: React.ReactNode;
   badge?: number;
+  isCollapsed?: boolean;
 }
 
-const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge }: SectionAccordionProps) => (
-  <div className="mb-1">
-    <button 
-      onClick={onToggle}
-      className={cn(
-        "w-full flex items-center justify-between px-6 py-3 transition-colors duration-200",
-        isOpen ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/60")}>
-          {icon}
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
-            {label}
-          </span>
-          {badge !== undefined && badge > 0 && (
-            <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
-              {badge}
-            </span>
+const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCollapsed }: SectionAccordionProps) => {
+  const content = (
+    <div className="mb-1">
+      <button 
+        onClick={onToggle}
+        className={cn(
+          "w-full flex items-center transition-colors duration-200",
+          isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
+          isOpen ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/60")}>
+            {icon}
+          </div>
+          {!isCollapsed && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-[0.4em] font-bold">
+                {label}
+              </span>
+              {badge !== undefined && badge > 0 && (
+                <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
+                  {badge}
+                </span>
+              )}
+            </div>
           )}
         </div>
-      </div>
-      <ChevronDown 
-        size={10} 
-        className={cn("transition-transform duration-300", isOpen && "rotate-180")} 
-      />
-    </button>
-    <div className={cn(
-      "overflow-hidden transition-all duration-300 ease-in-out",
-      isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-    )}>
-      <div className="py-1">
-        {children}
-      </div>
+        {!isCollapsed && (
+          <ChevronDown 
+            size={10} 
+            className={cn("transition-transform duration-300", isOpen && "rotate-180")} 
+          />
+        )}
+      </button>
+      {!isCollapsed && (
+        <div className={cn(
+          "overflow-hidden transition-all duration-300 ease-in-out",
+          isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+        )}>
+          <div className="py-1">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+
+  if (isCollapsed) {
+    return (
+      <TooltipProvider>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            {content}
+          </TooltipTrigger>
+          <TooltipContent side="right" className="bg-[#1A1A1A] border-white/10 text-[10px] uppercase tracking-widest text-white font-bold rounded-none">
+            {label}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
+  return content;
+};
 
 const Sidebar = ({ user: initialUser }: { user: string }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
@@ -195,7 +242,6 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   const pendingBriefingsCount = pendingBriefings.length;
 
   const checkAndCreateNotifications = async () => {
-
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -321,7 +367,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       "h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300",
       isCollapsed ? "w-[64px]" : "w-[230px]"
     )}>
-      <div className={cn("mb-6 transition-all duration-300", isCollapsed ? "p-4" : "p-8")}>
+      <div className={cn("transition-all duration-300", isCollapsed ? "p-4 mb-4" : "p-8 mb-6")}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)] shrink-0">
@@ -341,29 +387,27 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           
           {!isCollapsed && (
             <div className="relative">
-
-            <button 
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={cn(
-                "p-2 rounded-full transition-colors relative",
-                showNotifications ? "text-bronze" : "text-white/70 hover:text-bronze"
-              )}
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && (
-                <div className="w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center">
-                  {unreadCount}
-                </div>
-              )}
-            </button>
-
-            <NotificationsPanel 
-              isOpen={showNotifications} 
-              onClose={() => setShowNotifications(false)} 
-              className="left-0"
-            />
-
-          </div>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className={cn(
+                  "p-2 rounded-full transition-colors relative",
+                  showNotifications ? "text-bronze" : "text-white/70 hover:text-bronze"
+                )}
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <div className="w-4 h-4 bg-red-500 text-white text-[8px] font-bold rounded-full absolute -top-0.5 -right-0.5 flex items-center justify-center">
+                    {unreadCount}
+                  </div>
+                )}
+              </button>
+              <NotificationsPanel 
+                isOpen={showNotifications} 
+                onClose={() => setShowNotifications(false)} 
+                className="left-0"
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -374,8 +418,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             icon={<Users size={14} />}
             active={location.pathname === '/clientes' || location.pathname.startsWith('/clientes/')} 
             onClick={() => navigate('/clientes')} 
+            isCollapsed={isCollapsed}
           />
-          {pendingBriefingsCount > 0 && (
+          {!isCollapsed && pendingBriefingsCount > 0 && (
             <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
                <span className="bg-bronze text-[#0F0F0F] text-[8px] font-bold px-1.5 py-0.5 rounded-[1px] min-w-[14px] text-center">
                 {pendingBriefingsCount}
@@ -389,6 +434,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<LayoutGrid size={14} />}
           active={location.pathname === '/pipeline'} 
           onClick={() => navigate('/pipeline')} 
+          isCollapsed={isCollapsed}
         />
 
         <SectionAccordion 
@@ -396,6 +442,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<PenTool size={14} />}
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
+          isCollapsed={isCollapsed}
         >
           <NavItem 
             label="Gestão de Projetos" 
@@ -414,6 +461,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<DollarSign size={14} />}
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
+          isCollapsed={isCollapsed}
         >
           <NavItem 
             label="Financeiro" 
@@ -427,6 +475,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<BarChart3 size={14} />}
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
+          isCollapsed={isCollapsed}
         >
           <NavItem 
             label="Marketing com IA" 
@@ -450,6 +499,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           icon={<Settings size={14} />}
           isOpen={!!openSections['CONFIGURAÇÕES']}
           onToggle={() => toggleSection('CONFIGURAÇÕES')}
+          isCollapsed={isCollapsed}
         >
           <NavItem 
             label="Configurações" 
@@ -474,24 +524,39 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
         </SectionAccordion>
       </div>
 
-      <div className="p-6 border-t border-white/5 bg-white/[0.02] mt-auto">
+      <div className={cn("border-t border-white/5 bg-white/[0.02] mt-auto relative", isCollapsed ? "p-3" : "p-6")}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase">
+          <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase shrink-0">
             {initials}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[11px] text-white font-medium truncate capitalize">{displayName}</p>
-            <p className="text-[9px] text-bronze/60 uppercase tracking-widest font-bold">Sócio</p>
-          </div>
-          <button 
-            onClick={async () => {
-              await supabase.auth.signOut();
-            }}
-            className="text-white/20 hover:text-white transition-colors p-1"
-          >
-            <LogOut size={12} />
-          </button>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] text-white font-medium truncate capitalize">{displayName}</p>
+              <p className="text-[9px] text-bronze/60 uppercase tracking-widest font-bold">Sócio</p>
+            </div>
+          )}
+          {!isCollapsed && (
+            <button 
+              onClick={async () => {
+                await supabase.auth.signOut();
+              }}
+              className="text-white/20 hover:text-white transition-colors p-1"
+            >
+              <LogOut size={12} />
+            </button>
+          )}
         </div>
+
+        <button 
+          onClick={toggleSidebar}
+          className={cn(
+            "absolute bottom-4 -right-3 w-6 h-6 bg-bronze text-white flex items-center justify-center border border-white/10 shadow-lg hover:scale-110 transition-all z-[60]",
+            isCollapsed && "right-1/2 translate-x-1/2 bottom-[-12px]"
+          )}
+          style={{ cursor: 'pointer' }}
+        >
+          {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        </button>
       </div>
     </div>
   );
