@@ -528,6 +528,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'MARKETING'}
         >
           <NavItem 
             label="Marketing com IA" 
