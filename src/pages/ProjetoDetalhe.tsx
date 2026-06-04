@@ -101,7 +101,15 @@ const ProjetoDetalhe = () => {
       if (pData) {
         setProjeto(pData);
         if (pData.cliente_id) {
-          const { data: cData } = await supabase.from('contratos_clientes').select('*').eq('cliente_id', pData.cliente_id).maybeSingle();
+          const { data: cData } = await supabase
+            .from('contratos_clientes')
+            .select('numero, valor_total, marco1_valor, marco2_valor, marco3_valor')
+            .eq('cliente_id', pData.cliente_id)
+            .not('status', 'eq', 'Arquivado')
+            .not('status', 'eq', 'Inativo')
+            .order('criado_em', { ascending: false })
+            .limit(1)
+            .maybeSingle();
           if (cData) setContrato(cData);
           const { data: lData } = await supabase.from('leads').select('*').eq('id', pData.cliente_id).maybeSingle();
           if (lData) setLead(lData);
