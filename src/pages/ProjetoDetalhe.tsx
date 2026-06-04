@@ -190,6 +190,7 @@ const ProjetoDetalhe = () => {
     setLancandoHoras(null);
     setHorasInput('');
     fetchData();
+  };
 
   const toggleChecklistItem = async (itemId: string, currentStatus: boolean) => {
     try {
