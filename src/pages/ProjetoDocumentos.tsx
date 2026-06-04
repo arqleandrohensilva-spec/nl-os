@@ -54,6 +54,57 @@ const ProjetoDocumentos = () => {
       setCarregando(false);
     }
   };
+  
+  const listarPastasDestino = async (caminho: string) => {
+    setCarregandoPastas(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'list_folder', path: caminho }
+      });
+      if (error) throw error;
+      const apenasPastas = (data?.entries || []).filter((item: any) => 
+        item['.tag'] === 'folder' && item.path_lower !== itemSelecionado?.path_lower
+      ).sort((a: any, b: any) => a.name.localeCompare(b.name));
+      
+      setPastasDestino(apenasPastas);
+      setCaminhoNavegacaoMover(caminho);
+    } catch (err: any) {
+      console.error('Erro ao listar pastas:', err);
+      toast.error("Erro ao carregar pastas");
+    } finally {
+      setCarregandoPastas(false);
+    }
+  };
+
+  const moverArquivo = async () => {
+    if (!itemSelecionado || !destinoMover) return;
+    
+    setCarregando(true);
+    try {
+      const nomeFinal = itemSelecionado.name;
+      const novoCaminho = `${destinoMover}/${nomeFinal}`;
+      
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { 
+          action: 'move', 
+          from_path: itemSelecionado.path_display, 
+          to_path: novoCaminho 
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success(`${itemSelecionado['.tag'] === 'folder' ? 'Pasta' : 'Arquivo'} movido com sucesso!`);
+      setModalMover(false);
+      setItemSelecionado(null);
+      listarArquivos(pastaAtual);
+    } catch (err: any) {
+      console.error('Erro ao mover:', err);
+      toast.error("Erro ao mover item");
+    } finally {
+      setCarregando(false);
+    }
+  };
 
   const arquivosFiltrados = arquivos.filter(item => 
     item.name.toLowerCase().includes(busca.toLowerCase())
