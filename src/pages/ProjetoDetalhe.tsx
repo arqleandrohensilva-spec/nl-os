@@ -289,7 +289,6 @@ const ProjetoDetalhe = () => {
               ) : null;
             })()}
         </header>
-            
             {/* PROGRESS BAR - 5 POINTS */}
             <div className="mt-10 relative">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
@@ -311,6 +310,7 @@ const ProjetoDetalhe = () => {
                         )
                     })}
                 </div>
+            </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12">
