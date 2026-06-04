@@ -48,6 +48,12 @@ const SatisfacaoDashboard = () => {
   const [surveysFilter, setSurveysFilter] = useState('TODAS');
   const [testimonialsFilter, setTestimonialsFilter] = useState('TODOS');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [selectedSurveyForReferral, setSelectedSurveyForReferral] = useState<any>(null);
+  const [isInternalNoteModalOpen, setIsInternalNoteModalOpen] = useState(false);
+  const [selectedSurveyForInternalNote, setSelectedSurveyForInternalNote] = useState<any>(null);
+  const [internalNote, setInternalNote] = useState('');
+  const [generatingTestimonial, setGeneratingTestimonial] = useState(false);
   
   const [stats, setStats] = useState({
     avg: 0,
