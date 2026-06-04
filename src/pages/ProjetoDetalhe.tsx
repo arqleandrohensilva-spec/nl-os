@@ -117,22 +117,22 @@ const ProjetoDetalhe = () => {
         
         if (pData.cliente_id) {
           const { data: contratoData } = await supabase
-            .from('contratos')
-            .select('valores, numero')
+            .from('contratos_clientes')
+            .select('numero, valor_total, marco1_valor, marco2_valor, marco3_valor')
             .eq('cliente_id', pData.cliente_id)
-            .eq('status', 'assinado')
+            .not('status', 'eq', 'Arquivado')
+            .not('status', 'eq', 'Inativo')
             .order('criado_em', { ascending: false })
             .limit(1)
             .maybeSingle();
 
           if (contratoData) {
-            const vals = (contratoData.valores as any) || {};
             setContrato({
-              valor_total: vals.totalCompleto || vals.totalExecutivo || vals.valor_total,
-              marco1_valor: vals.marco1 || vals.marco1_valor,
-              marco2_valor: vals.marco2 || vals.marco2_valor,
-              marco3_valor: vals.marco3 || vals.marco3_valor,
-              numero: contratoData.numero
+              valor_total: contratoData.valor_total,
+              marco1_valor: contratoData.marco1_valor,
+              marco2_valor: contratoData.marco2_valor,
+              marco3_valor: contratoData.marco3_valor,
+              numero: contratoData.numero,
             });
           }
 
