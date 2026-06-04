@@ -369,10 +369,10 @@ const ProjetoDetalhe = () => {
             </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] xl:grid-cols-[65%_35%] gap-8 md:gap-12 max-w-full">
             
             {/* COLUMN LEFT: ETAPAS */}
-            <section className="space-y-6">
+            <section className="space-y-6 min-w-0">
                 <h2 className="text-[#8B7355] text-[10px] uppercase tracking-[0.4em] font-bold mb-4">Etapas do Projeto</h2>
                 <Accordion type="single" collapsible className="space-y-4">
                     {ETAPAS_CONFIG.map((config, index) => {
