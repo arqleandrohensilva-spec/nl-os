@@ -378,9 +378,6 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
                 <div className="flex items-baseline gap-1">
                   <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
                 </div>
-                <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold whitespace-nowrap">
-                  Módulo Administrativo
-                </p>
               </div>
             )}
           </div>
