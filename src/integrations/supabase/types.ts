@@ -1342,6 +1342,8 @@ export type Database = {
           data_entrega: string | null
           data_inicio: string | null
           etapa: string
+          horas_estimadas: number | null
+          horas_lancadas: number | null
           id: string
           moodboard_url: string | null
           notas: string | null
@@ -1356,6 +1358,8 @@ export type Database = {
           data_entrega?: string | null
           data_inicio?: string | null
           etapa: string
+          horas_estimadas?: number | null
+          horas_lancadas?: number | null
           id?: string
           moodboard_url?: string | null
           notas?: string | null
@@ -1370,6 +1374,8 @@ export type Database = {
           data_entrega?: string | null
           data_inicio?: string | null
           etapa?: string
+          horas_estimadas?: number | null
+          horas_lancadas?: number | null
           id?: string
           moodboard_url?: string | null
           notas?: string | null
@@ -2012,6 +2018,8 @@ export type Database = {
           data_entrega: string | null
           data_inicio: string | null
           etapa: string
+          horas_estimadas: number | null
+          horas_lancadas: number | null
           id: string
           moodboard_url: string | null
           notas: string | null
