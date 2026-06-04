@@ -34,7 +34,10 @@ const ProjetoDocumentos = () => {
         body: { action: 'list_folder', path: caminho }
       });
       if (error) throw error;
-      setArquivos(data?.entries || []);
+      const arquivosOrdenados = (data?.entries || []).sort((a: any, b: any) => 
+        a.name.localeCompare(b.name)
+      );
+      setArquivos(arquivosOrdenados);
       setPastaAtual(caminho);
     } catch (err: any) {
       console.error('Erro ao listar arquivos:', err);
