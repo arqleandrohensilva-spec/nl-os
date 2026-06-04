@@ -554,7 +554,7 @@ const ProjetoDetalhe = () => {
             </section>
 
             {/* COLUMN RIGHT */}
-            <section className="space-y-8">
+            <section className="space-y-8 min-w-0 overflow-hidden">
                 
                 {/* Card Financeiro — resumo */}
                 <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '16px 20px', marginBottom: '12px' }}>
@@ -571,7 +571,7 @@ const ProjetoDetalhe = () => {
                   {/* Valor total */}
                   <div style={{ marginBottom: '14px' }}>
                     <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#555', marginBottom: '4px' }}>VALOR TOTAL DO CONTRATO</div>
-                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8' }}>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8', wordBreak: 'break-word' }}>
                       R$ {contrato?.valor_total || projeto.valor_total || '—'}
                     </div>
                   </div>
@@ -587,7 +587,7 @@ const ProjetoDetalhe = () => {
                         <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#333' }}>{marco.num}</span>
                         <span style={{ fontFamily: 'Arial', fontSize: '12px', color: '#888' }}>{marco.label}</span>
                       </div>
-                      <span style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#ccc' }}>
+                      <span style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#ccc', wordBreak: 'break-word', textAlign: 'right' }}>
                         R$ {marco.valor || '—'}
                       </span>
                     </div>
