@@ -602,14 +602,16 @@ const SatisfacaoDashboard = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.pesquisa?.cliente_nome}</h3>
+                          <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.cliente_nome || dep.pesquisa?.cliente_nome}</h3>
                           {dep.pesquisa?.video_url && (
                             <span className="flex items-center gap-1 text-[9px] px-2 py-0.5 bg-bronze/20 text-bronze font-bold uppercase tracking-widest border border-bronze/30">
                               <FileVideo className="w-3 h-3" /> COM VÍDEO
                             </span>
                           )}
                         </div>
-                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">Nota {dep.pesquisa?.nota_geral} · {(dep.pesquisa?.nota_geral || 0) >= 9 ? 'Promotor' : 'Neutro/Detrator'}</p>
+                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
+                          {dep.pesquisa?.projeto?.nome} · {dep.pesquisa?.projeto?.tipo}
+                        </p>
                       </div>
                       <span className={cn(
                         "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
@@ -620,9 +622,45 @@ const SatisfacaoDashboard = () => {
                         {dep.status === 'PENDENTE' ? 'PENDENTE APROVAÇÃO' : dep.status}
                       </span>
                     </div>
-                    <p className="text-white/70 italic text-lg font-cormorant leading-relaxed">
-                      {dep.texto_formatado || dep.pesquisa?.comentario || "Nenhum comentário preenchido."}
-                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Instagram</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.depoimento_instagram)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="text-white/70 italic text-sm font-cormorant leading-relaxed bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          {dep.depoimento_instagram || dep.texto_formatado || "Não gerado"}
+                        </p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Google</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.depoimento_google)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="text-white/70 italic text-sm font-cormorant leading-relaxed bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          {dep.depoimento_google || "Não gerado"}
+                        </p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Frase Destaque</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.frase_destaque)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-center bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          <p className="text-white font-bold italic text-base font-cormorant leading-relaxed text-center">
+                            {dep.frase_destaque ? `"${dep.frase_destaque}"` : "Não gerada"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
                       {dep.status === 'PENDENTE' && (
                         <>
@@ -633,7 +671,6 @@ const SatisfacaoDashboard = () => {
                       
                       {dep.status === 'APROVADO' && (
                         <>
-                          <Button onClick={() => handleCopyText(dep.texto_formatado)} variant="outline" className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">Copiar Texto</Button>
                           <Button onClick={() => updateTestimonialStatus(dep.id, 'PUBLICADO')} className="bg-green-600 hover:bg-green-700 rounded-none uppercase tracking-widest text-[9px] font-bold">Marcar como Publicado</Button>
                           <Button onClick={() => window.open('https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', '_blank')} variant="ghost" className="text-bronze hover:bg-bronze/5 rounded-none uppercase tracking-widest text-[9px] font-bold">Solicitar Avaliação Google</Button>
                         </>
@@ -644,6 +681,20 @@ const SatisfacaoDashboard = () => {
                           <Check className="w-3 h-3" /> Publicado
                         </div>
                       )}
+                      
+                      {dep.pesquisa?.video_url && (
+                        <>
+                          <Button variant="outline" onClick={() => { setCurrentVideoUrl(dep.pesquisa.video_url); setIsVideoModalOpen(true); }} className="border-bronze/30 bg-bronze/5 text-bronze hover:bg-bronze/10 rounded-none uppercase tracking-widest text-[9px] font-bold">
+                            <FileVideo className="w-3 h-3 mr-2" /> Ver Vídeo
+                          </Button>
+                          <Button variant="ghost" onClick={() => window.open(dep.pesquisa.video_url, '_blank')} className="text-white/40 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
+                            <Download className="w-3 h-3 mr-2" /> Baixar
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))
                       
                       {(dep.status === 'PENDENTE' || dep.status === 'APROVADO') && (
                         <Button variant="outline" onClick={() => handleFormatClick(dep)} className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
