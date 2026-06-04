@@ -151,105 +151,132 @@ const ProjetoDetalhe = () => {
   const pct = Math.round(((currentEtapaIdx + 1) / 6) * 100);
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans p-6 md:p-12">
-      <div className="max-w-7xl mx-auto space-y-10">
-        
-        {/* HEADER */}
-        <header className="space-y-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-[28px] font-['Georgia'] text-white">{projeto.nome_cliente}</h1>
-              <p className="text-[#555] text-xs font-['Courier_New'] mt-1 uppercase tracking-widest">
-                {projeto.tipo} · {projeto.cidade} · {projeto.area_m2}m² · desde {format(parseISO(projeto.data_inicio), 'dd/MM/yyyy')}
-              </p>
+    <div className="flex min-h-screen bg-[#0d0d0d]">
+      <Sidebar user="Equipe NL" />
+      <main className="flex-1 text-[#e8e8e8] font-sans p-6 md:p-12 overflow-x-hidden min-w-0">
+        <div className="max-w-7xl mx-auto space-y-10">
+          
+          {/* HEADER */}
+          <header className="space-y-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-[28px] font-['Georgia'] text-white">{projeto.nome_cliente}</h1>
+                <p className="text-[#555] text-xs font-['Courier_New'] mt-1 uppercase tracking-widest">
+                  {projeto.tipo} · {projeto.cidade} · {projeto.area_m2}m² · desde {projeto.data_inicio ? format(parseISO(projeto.data_inicio), 'dd/MM/yyyy') : '—'}
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button variant="link" className="text-[#8B7355] text-xs uppercase" onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}>VER FICHA →</Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger><MoreVertical className="text-[#555]" /></DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-[#141414] border-white/10">
+                    <DropdownMenuItem onClick={handleDeleteProject} className="text-rose-500">Excluir Projeto</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Button variant="link" className="text-[#8B7355] text-xs uppercase" onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}>VER FICHA →</Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger><MoreVertical className="text-[#555]" /></DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#141414] border-white/10">
-                  <DropdownMenuItem onClick={handleDeleteProject} className="text-rose-500">Excluir Projeto</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+            <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-[#e8e8e8]">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> ATIVO
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-[#e8e8e8]">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full"></span> ATIVO
-          </div>
-
-          <div className="w-full bg-[#141414] h-2 rounded-full overflow-hidden">
-            <div className="bg-[#8B7355] h-full transition-all" style={{ width: `${pct}%` }}></div>
-          </div>
-
-          <Button className="bg-emerald-600 text-[10px] uppercase tracking-widest font-bold">
-            WhatsApp · {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
-          </Button>
-        </header>
-
-        {/* PRÓXIMA AÇÃO */}
-        {currentEtapaIdx < 6 && (
-          <div className="bg-[#8B7355] p-6 text-white flex items-center gap-4">
-            <Zap className="text-white" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] font-bold">PRÓXIMA AÇÃO</p>
-              <p className="text-sm font-['Georgia'] mt-1">{ETAPAS_CONFIG[currentEtapaIdx]?.desc}</p>
+            <div className="w-full bg-[#141414] h-2 rounded-full overflow-hidden">
+              <div className="bg-[#8B7355] h-full transition-all" style={{ width: `${pct}%` }}></div>
             </div>
+
+            <Button className="bg-emerald-600 text-[10px] uppercase tracking-widest font-bold">
+              WhatsApp · {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
+            </Button>
+          </header>
+
+          {/* PRÓXIMA AÇÃO */}
+          {currentEtapaIdx < 6 && (
+            <div className="bg-[#8B7355] p-6 text-white flex items-center gap-4">
+              <Zap className="text-white" />
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">PRÓXIMA AÇÃO</p>
+                <p className="text-sm font-['Georgia'] mt-1">{ETAPAS_CONFIG[currentEtapaIdx]?.desc}</p>
+              </div>
+            </div>
+          )}
+
+          {/* ETAPAS */}
+          <section className="space-y-4">
+            <Accordion type="single" collapsible className="space-y-4">
+              {ETAPAS_CONFIG.map((config) => {
+                const e = etapas.find(et => et.etapa === config.id);
+                return (
+                  <AccordionItem key={config.id} value={config.id} className="bg-[#141414] border border-white/10 px-6">
+                    <AccordionTrigger className="text-xs uppercase tracking-widest font-bold">{config.label}</AccordionTrigger>
+                    <AccordionContent className="space-y-4 pt-4 border-t border-white/5">
+                      <Textarea placeholder="Notas..." defaultValue={e?.notas} onBlur={(x) => saveNotas(e?.id || '', x.target.value)} className="bg-transparent border-white/10 text-xs" />
+                      {checklist.filter(c => c.etapa === config.id).map(item => (
+                        <div key={item.id} className="flex items-center gap-2">
+                          <Checkbox checked={item.concluido} onCheckedChange={() => toggleCheck(item.id, item.concluido)} />
+                          <span className="text-xs text-[#555]">{item.item}</span>
+                        </div>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                );
+              })}
+            </Accordion>
+          </section>
+
+          {/* FINANCEIRO + DOCS */}
+          <div className="grid grid-cols-2 gap-8">
+              <div className="bg-[#141414] border border-white/10 p-6">
+                  <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Financeiro</h3>
+                  <div className="text-3xl font-['Georgia'] mt-4">R$ {contrato?.valor_total || projeto.valor_total || '—'}</div>
+                  
+                  {(contrato?.marco1_valor || contrato?.marco2_valor || contrato?.marco3_valor) && (
+                    <div className="mt-4 space-y-2 border-t border-white/5 pt-4">
+                      {contrato?.marco1_valor && (
+                        <div className="flex justify-between text-[10px] font-['Courier_New']">
+                          <span className="text-[#555]">MARCO 01</span>
+                          <span>R$ {contrato.marco1_valor}</span>
+                        </div>
+                      )}
+                      {contrato?.marco2_valor && (
+                        <div className="flex justify-between text-[10px] font-['Courier_New']">
+                          <span className="text-[#555]">MARCO 02</span>
+                          <span>R$ {contrato.marco2_valor}</span>
+                        </div>
+                      )}
+                      {contrato?.marco3_valor && (
+                        <div className="flex justify-between text-[10px] font-['Courier_New']">
+                          <span className="text-[#555]">MARCO 03</span>
+                          <span>R$ {contrato.marco3_valor}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <Button className="mt-6 w-full text-[10px]" variant="outline">VER FINANCEIRO COMPLETO →</Button>
+              </div>
+              <div className="bg-[#141414] border border-white/10 p-6 space-y-4">
+                  <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Documentos</h3>
+                  {['Pasta', 'Contrato', 'Briefing', 'Atas'].map(d => <div key={d} className="text-xs border-b border-white/5 pb-2 cursor-pointer text-[#ccc]">{d}</div>)}
+              </div>
           </div>
-        )}
 
-        {/* ETAPAS */}
-        <section className="space-y-4">
-          <Accordion type="single" collapsible className="space-y-4">
-            {ETAPAS_CONFIG.map((config) => {
-              const e = etapas.find(et => et.etapa === config.id);
-              return (
-                <AccordionItem key={config.id} value={config.id} className="bg-[#141414] border border-white/10 px-6">
-                  <AccordionTrigger className="text-xs uppercase tracking-widest font-bold">{config.label}</AccordionTrigger>
-                  <AccordionContent className="space-y-4 pt-4 border-t border-white/5">
-                    <Textarea placeholder="Notas..." defaultValue={e?.notas} onBlur={(x) => saveNotas(e?.id || '', x.target.value)} className="bg-transparent border-white/10 text-xs" />
-                    {checklist.filter(c => c.etapa === config.id).map(item => (
-                      <div key={item.id} className="flex items-center gap-2">
-                        <Checkbox checked={item.concluido} onCheckedChange={() => toggleCheck(item.id, item.concluido)} />
-                        <span className="text-xs text-[#555]">{item.item}</span>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
-        </section>
+          {/* NOTAS */}
+          <div className="bg-[#141414] border border-white/10 p-8">
+              <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase mb-4">Notas Internas</h3>
+              <Textarea className="bg-transparent border-white/10 min-h-[150px]" onBlur={(x) => saveProjetoNotas(x.target.value)} />
+          </div>
 
-        {/* FINANCEIRO + DOCS */}
-        <div className="grid grid-cols-2 gap-8">
+          {/* HISTÓRICO */}
+          {horasLog.length > 0 && (
             <div className="bg-[#141414] border border-white/10 p-6">
-                <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Financeiro</h3>
-                <div className="text-3xl font-['Georgia'] mt-4">R$ {contrato?.valor_total || projeto.valor_total || '—'}</div>
-                <Button className="mt-6 w-full text-[10px]" variant="outline">VER FINANCEIRO COMPLETO →</Button>
+              <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase mb-4">Histórico de Horas</h3>
+              <div className="space-y-2">
+                  {horasLog.map(h => <div key={h.id} className="text-xs grid grid-cols-4 border-b border-white/5 pb-2 text-[#555] font-['Courier_New']"><span>{h.etapa_nome}</span><span>{h.horas}h</span><span>{h.usuario}</span><span>{format(parseISO(h.criado_em), 'dd/MM')}</span></div>)}
+              </div>
             </div>
-            <div className="bg-[#141414] border border-white/10 p-6 space-y-4">
-                <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Documentos</h3>
-                {['Pasta', 'Contrato', 'Briefing', 'Atas'].map(d => <div key={d} className="text-xs border-b border-white/5 pb-2 cursor-pointer text-[#ccc]">{d}</div>)}
-            </div>
+          )}
         </div>
-
-        {/* NOTAS */}
-        <div className="bg-[#141414] border border-white/10 p-8">
-            <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase mb-4">Notas Internas</h3>
-            <Textarea className="bg-transparent border-white/10 min-h-[150px]" onBlur={(x) => saveProjetoNotas(x.target.value)} />
-        </div>
-
-        {/* HISTÓRICO */}
-        {horasLog.length > 0 && (
-          <div className="bg-[#141414] border border-white/10 p-6">
-            <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase mb-4">Histórico de Horas</h3>
-            <div className="space-y-2">
-                {horasLog.map(h => <div key={h.id} className="text-xs grid grid-cols-4 border-b border-white/5 pb-2 text-[#555] font-['Courier_New']"><span>{h.etapa_nome}</span><span>{h.horas}h</span><span>{h.usuario}</span><span>{format(parseISO(h.criado_em), 'dd/MM')}</span></div>)}
-            </div>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 };
