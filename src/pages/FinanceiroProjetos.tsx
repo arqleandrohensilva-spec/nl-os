@@ -976,7 +976,7 @@ const FinanceiroProjetos = () => {
     <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Sócio" />
       
-      <main className="flex-1 ml-[230px] p-8">
+      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-8">
         <header className="mb-10 flex justify-between items-start">
           <div>
             <h1 className="text-3xl font-bold tracking-tight mb-2 uppercase font-inter">07 · Financeiro de Projetos</h1>

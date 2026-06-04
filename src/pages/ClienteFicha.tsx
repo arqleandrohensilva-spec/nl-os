@@ -878,7 +878,7 @@ const ClienteFicha = () => {
     <div className="flex min-h-screen bg-[#0D0D0D] text-[#E8E4DF]">
       <Sidebar user="User" />
       
-      <main className="flex-1 ml-[230px] p-12 max-w-6xl mx-auto space-y-12">
+      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12 max-w-6xl mx-auto space-y-12">
         {/* CABEÇALHO EM DESTAQUE */}
         <div className="space-y-4">
           <h1 className="text-6xl font-['Cormorant_Garamond'] italic text-[#E8E4DF] leading-none uppercase tracking-tighter">

@@ -141,7 +141,7 @@ const FinanceiroVisaoGeral = () => {
   return (
     <div className="flex min-h-screen bg-[#0D0D0D]">
       <Sidebar user="Sócio" />
-      <div className="flex-1 ml-[230px] p-8 pb-20">
+      <div className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-8 pb-20">
         <div className="max-w-7xl mx-auto space-y-10">
         <header className="flex justify-between items-end border-b border-white/5 pb-6">
           <div>
