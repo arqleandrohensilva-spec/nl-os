@@ -172,6 +172,7 @@ const ProjetoDetalhe = () => {
     try {
       const updateData: any = { status: newStatus };
       if (newStatus === 'Aprovado') {
+        updateData.data_entrega = new Date().toISOString().split('T')[0];
         updateData.data_aprovacao = new Date().toISOString();
         const { data: { user } } = await supabase.auth.getUser();
         updateData.aprovado_por = user?.email?.includes('leandro') ? 'Leandro' : 'Neandro';
