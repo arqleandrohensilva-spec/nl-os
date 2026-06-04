@@ -162,6 +162,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   const location = useLocation();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [popoverAberto, setPopoverAberto] = useState<string | null>(null);
+  const [popoverPosition, setPopoverPosition] = useState<number>(0);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
@@ -173,6 +175,12 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
     }
     return { 'LEADS': true };
   });
+
+  useEffect(() => {
+    const handler = () => setPopoverAberto(null);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   useEffect(() => {
     const getAuthUser = async () => {
