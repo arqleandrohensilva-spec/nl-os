@@ -2133,6 +2133,22 @@ const ClienteFicha = () => {
                     >
                       <Download size={14} className="mr-2" /> DOWNLOAD DOCX
                     </Button>
+
+                    {cliente?.contrato_assinado && (
+                      <button
+                        onClick={() => handleUploadToDropbox(contrato)}
+                        style={{ 
+                          fontFamily: 'Courier New', fontSize: '9px', 
+                          color: (contrato as any)?.enviado_dropbox ? '#4ade80' : '#8B7355',
+                          background: 'none', 
+                          border: `1px solid ${(contrato as any)?.enviado_dropbox ? '#4ade80' : '#8B7355'}`,
+                          padding: '6px 14px', cursor: 'pointer',
+                          textTransform: 'uppercase', letterSpacing: '0.1em'
+                        }}
+                      >
+                        {(contrato as any)?.enviado_dropbox ? '✅ NO DROPBOX' : 'ENVIAR PARA DROPBOX'}
+                      </button>
+                    )}
                   </div>
 
 
