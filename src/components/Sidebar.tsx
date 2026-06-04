@@ -27,18 +27,20 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
       onClick={!disabled ? onClick : undefined}
       className={cn(
         'flex flex-col transition-all duration-200 group relative',
-        isCollapsed ? 'py-4 px-0 items-center justify-center border-l-0 w-full' : 'py-2.5 px-10 border-l-2',
+        isCollapsed ? (
+          icon ? 'py-4 px-0 items-center justify-center border-l-0 w-full' : 'py-[10px] px-4 items-start justify-start border-l-0 w-full hover:bg-white/10'
+        ) : 'py-2.5 px-10 border-l-2',
         !isCollapsed && active ? 'border-bronze bg-bronze/15 text-white' : 'border-transparent text-white/70',
-        isCollapsed && 'hover:bg-white/10',
-        isCollapsed && active && "text-bronze",
+        isCollapsed && icon && active && "text-bronze",
+        !icon && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center w-full" : "justify-between")}>
-        <div className="flex items-center gap-2 w-full">
+      <div className={cn("flex items-center gap-3", (isCollapsed && icon) ? "justify-center" : "justify-between w-full")}>
+        <div className={cn("flex items-center gap-3", (!isCollapsed || !icon) && "w-full")}>
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
             "text-[12px] transition-colors whitespace-nowrap",
-            isCollapsed ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
+            (isCollapsed && icon) ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
             active && !isCollapsed ? "text-white" : "group-hover:text-white/70",
             isCollapsed && "px-0"
           )}>
@@ -408,9 +410,9 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       "h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300",
       isCollapsed ? "w-[64px]" : "w-[230px]"
     )}>
-      <div className={cn("transition-all duration-300", isCollapsed ? "p-4 mb-4" : "p-8 mb-6")}>
-        <div className="flex items-center justify-between relative">
-          <div className="flex items-center gap-3">
+      <div className={cn("transition-all duration-300", isCollapsed ? "p-3 mb-4" : "p-8 mb-6")}>
+        <div className={cn("flex items-center relative", isCollapsed ? "justify-center" : "justify-between")}>
+          <div className={cn("flex items-center", isCollapsed ? "justify-center" : "gap-3")}>
             <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)] shrink-0">
               NL
             </div>
@@ -592,7 +594,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       </div>
 
       <div className={cn("border-t border-white/5 bg-white/[0.02] mt-auto relative", isCollapsed ? "p-3" : "p-6")}>
-        <div className="flex items-center gap-3">
+        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "gap-3")}>
           <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase shrink-0">
             {initials}
           </div>
