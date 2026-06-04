@@ -587,7 +587,7 @@ const ProjetoDetalhe = () => {
                         <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#333' }}>{marco.num}</span>
                         <span style={{ fontFamily: 'Arial', fontSize: '12px', color: '#888' }}>{marco.label}</span>
                       </div>
-                      <span style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#ccc' }}>
+                      <span style={{ fontFamily: 'Georgia, serif', fontSize: '13px', color: '#ccc', wordBreak: 'break-word', textAlign: 'right' }}>
                         R$ {marco.valor || '—'}
                       </span>
                     </div>
