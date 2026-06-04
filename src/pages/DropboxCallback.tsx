@@ -150,7 +150,7 @@ export default function DropboxCallback() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.2em',
                 fontWeight: 'bold',
-                transition: 'all 0.3s'
+                transition: 'margin 0.3s'
               }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
               onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}

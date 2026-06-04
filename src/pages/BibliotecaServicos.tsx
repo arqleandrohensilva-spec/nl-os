@@ -159,7 +159,7 @@ const BibliotecaServicos = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
-      <main className="transition-all duration-300 ml-[var(--sidebar-width)] p-12">
+      <main className="transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12">
         <header className="mb-12">
           <div className="flex items-center justify-between mb-8">
             <div>

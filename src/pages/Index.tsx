@@ -628,7 +628,7 @@ const Index = () => {
     <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user} />
       
-      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] flex flex-col h-screen overflow-hidden">
         {/* Header Section */}
 
 

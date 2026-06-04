@@ -459,7 +459,7 @@ Retorne APENAS JSON válido:
   return (
     <div className="flex min-h-screen bg-[#0A0A0A] text-white font-sans">
       <Sidebar user="Sócio" />
-      <div className="transition-all duration-300 ml-[var(--sidebar-width)] flex-1 min-h-screen p-8 grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-8">
+      <div className="transition-[margin] duration-300 ml-[var(--sidebar-width)] flex-1 min-h-screen p-8 grid grid-cols-1 lg:grid-cols-[380px,1fr] gap-8">
         {/* COLUNA ESQUERDA */}
         <div className="space-y-6">
           <div className="space-y-2">

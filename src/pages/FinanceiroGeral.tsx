@@ -122,7 +122,7 @@ const FinanceiroGeral = () => {
   return (
     <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8]">
       <Sidebar user="Sócio" />
-      <div className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-8">
+      <div className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-8">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '28px', color: '#e8e8e8', fontWeight: 400 }}>Financeiro</h1>

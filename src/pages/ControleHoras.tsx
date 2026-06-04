@@ -579,7 +579,7 @@ const ControleHoras = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
-      <main className="transition-all duration-300 ml-[var(--sidebar-width)] p-12 pb-24">
+      <main className="transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12 pb-24">
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-[28px] font-cormorant font-bold text-white mb-1">Controle de Horas</h1>

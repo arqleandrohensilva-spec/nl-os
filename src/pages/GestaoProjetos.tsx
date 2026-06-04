@@ -107,7 +107,7 @@ const GestaoProjetos = () => {
     <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
       <Sidebar user="Equipe NL" />
       
-      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-12">
+      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12">
         <header className="mb-12">
           <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">Gestão de Projetos</h1>
           <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>

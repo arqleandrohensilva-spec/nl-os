@@ -596,7 +596,7 @@ const ProjetoFinanceiro = () => {
   return (
     <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
       <Sidebar user="Equipe NL" />
-      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-8">
+      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-8">
         
         {/* HEADER */}
         <header className="mb-12">
