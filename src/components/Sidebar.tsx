@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import NotificationsPanel from './NotificationsPanel';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSidebar } from '@/contexts/SidebarContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 
 import { supabase } from '@/integrations/supabase/client';
 
@@ -97,7 +100,9 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge }: Se
 const Sidebar = ({ user: initialUser }: { user: string }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() => {
     const saved = sessionStorage.getItem('sidebar_sections');
     if (saved) {
@@ -312,24 +317,31 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   }, [location.pathname]);
 
   return (
-    <div className="w-[230px] h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
-      <div className="p-8 mb-6">
+    <div className={cn(
+      "h-screen bg-[#0F0F0F] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50 transition-all duration-300",
+      isCollapsed ? "w-[64px]" : "w-[230px]"
+    )}>
+      <div className={cn("mb-6 transition-all duration-300", isCollapsed ? "p-4" : "p-8")}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)]">
+            <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)] shrink-0">
               NL
             </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline gap-1">
-                <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
+            {!isCollapsed && (
+              <div className="space-y-0.5 overflow-hidden">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-base font-bold text-white tracking-[0.15em] uppercase leading-none">NL OS</span>
+                </div>
+                <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold whitespace-nowrap">
+                  Módulo Administrativo
+                </p>
               </div>
-              <p className="text-[8px] text-bronze uppercase tracking-[0.3em] leading-none font-bold">
-                Módulo Administrativo
-              </p>
-            </div>
+            )}
           </div>
           
-          <div className="relative">
+          {!isCollapsed && (
+            <div className="relative">
+
             <button 
               onClick={() => setShowNotifications(!showNotifications)}
               className={cn(
