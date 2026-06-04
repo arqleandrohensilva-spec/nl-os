@@ -215,6 +215,16 @@ serve(async (req) => {
       endpoint = 'https://content.dropboxapi.com/2/files/download';
       headers['Dropbox-API-Arg'] = JSON.stringify({ path });
       body = null;
+    } else if (action === 'move') {
+      endpoint = 'https://api.dropboxapi.com/2/files/move_v2';
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify({ 
+        from_path: bodyJson.from_path, 
+        to_path: bodyJson.to_path,
+        autorename: bodyJson.autorename || false,
+        allow_shared_folder: true,
+        allow_ownership_transfer: true
+      });
     }
 
     if (!endpoint) {
