@@ -823,6 +823,52 @@ const SatisfacaoDashboard = () => {
           <video src={currentVideoUrl} controls autoPlay className="w-full h-auto aspect-video" />
         </DialogContent>
       </Dialog>
+      <Dialog open={isReferralModalOpen} onOpenChange={setIsReferralModalOpen}>
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
+          <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Pedir Indicação</DialogTitle></DialogHeader>
+          <div className="py-6 space-y-4">
+            <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Mensagem para enviar:</p>
+            <div className="bg-white/5 p-4 border border-white/5 italic text-sm">
+              {selectedSurveyForReferral?.cliente_nome}, que ótimo saber que o processo fez sentido para você! Você conhece alguém que esteja planejando construir ou reformar e que valorize processo técnico antes da obra? Se sim, ficaria feliz em conversar com essa pessoa.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={() => {
+                const text = `${selectedSurveyForReferral?.cliente_nome}, que ótimo saber que o processo fez sentido para você! Você conhece alguém que esteja planejando construir ou reformar e que valorize processo técnico antes da obra? Se sim, ficaria feliz em conversar com essa pessoa.`;
+                navigator.clipboard.writeText(text);
+                toast({ title: "Mensagem copiada!" });
+              }} 
+              className="w-full bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold py-6"
+            >
+              <Copy className="w-4 h-4 mr-2" /> COPIAR MENSAGEM
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isInternalNoteModalOpen} onOpenChange={setIsInternalNoteModalOpen}>
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
+          <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Registrar Contato Interno</DialogTitle></DialogHeader>
+          <div className="py-6 space-y-4">
+            <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Anotações Internas</Label>
+            <Textarea 
+              value={internalNote}
+              onChange={(e) => setInternalNote(e.target.value)}
+              placeholder="Descreva o contato feito com o cliente e as tratativas..."
+              className="bg-white/5 border-white/10 rounded-none min-h-[150px] text-sm focus-visible:ring-bronze"
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={handleSaveInternalNote}
+              className="w-full bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold py-6"
+            >
+              SALVAR NOTA
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
