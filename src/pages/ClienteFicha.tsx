@@ -667,7 +667,7 @@ const ClienteFicha = () => {
         : cliente.tipo_projeto?.includes('Comercial') ? 'Comercial' 
         : 'Arquitetura + Interiores';
 
-      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${cliente.nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/${contract.numero} - ${cliente.nome}.docx`;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${cliente.nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/Contrato/${contract.numero} - ${cliente.nome}.docx`;
 
       const { error: uploadError } = await supabase.functions.invoke('dropbox-proxy', {
         body: { 
