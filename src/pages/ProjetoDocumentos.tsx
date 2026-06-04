@@ -76,7 +76,7 @@ const ProjetoDocumentos = () => {
         const tipoNomeLocal = data.tipo?.includes('Interiores') ? 'Arquitetura + Interiores' 
           : data.tipo?.includes('Comercial') ? 'Comercial' 
           : 'Arquitetura + Interiores';
-        const inicial = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${data.nome_cliente} - ${tipoNomeLocal}/08 - Documentos`;
+        const inicial = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${data.nome_cliente} - ${tipoNomeLocal}`;
         setBreadcrumb([{ nome: 'Documentos', path: inicial }]);
         listarArquivos(inicial);
       }
