@@ -491,7 +491,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
         <NavItem 
           label="PIPELINE" 
-          icon={<LayoutGrid size={14} />}
+          icon={<FileSpreadsheet size={14} />}
           active={location.pathname === '/pipeline'} 
           onClick={() => navigate('/pipeline')} 
           isCollapsed={isCollapsed}
