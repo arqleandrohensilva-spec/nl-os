@@ -292,12 +292,12 @@ const ProjetoDetalhe = () => {
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white/40">CARREGANDO...</div>;
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
+    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans flex overflow-x-hidden">
       <Sidebar user="Equipe NL" />
-      <main className="lg:pl-[230px] p-4 md:p-8">
+      <main className="flex-1 lg:pl-[230px] p-4 md:p-8 min-w-0 max-w-full overflow-x-hidden">
         
         {/* HEADER */}
-        <header className="mb-12">
+        <header className="mb-12 max-w-full overflow-hidden">
             <Button variant="ghost" onClick={() => navigate('/projetos/gestao')} className="text-[#555] hover:text-white px-0 hover:bg-transparent text-xs uppercase tracking-widest mb-6">
                 <ArrowLeft className="mr-2" size={14} /> Voltar
             </Button>
@@ -336,9 +336,9 @@ const ProjetoDetalhe = () => {
               ) : null;
             })()}
             {/* PROGRESS BAR - 6 POINTS */}
-            <div className="mt-10 relative overflow-hidden" style={{ width: '100%' }}>
+            <div className="mt-10 relative overflow-hidden w-full">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
-                <div className="relative grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                <div className="relative grid w-full" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
                     {ETAPAS_CONFIG.map((config, index) => {
                         const etapaData = etapas.find(e => e.etapa === config.id);
                         const isDone = etapaData?.status === 'Aprovado';
@@ -369,10 +369,10 @@ const ProjetoDetalhe = () => {
             </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] xl:grid-cols-[65%_35%] gap-8 md:gap-12 max-w-full">
             
             {/* COLUMN LEFT: ETAPAS */}
-            <section className="space-y-6">
+            <section className="space-y-6 min-w-0">
                 <h2 className="text-[#8B7355] text-[10px] uppercase tracking-[0.4em] font-bold mb-4">Etapas do Projeto</h2>
                 <Accordion type="single" collapsible className="space-y-4">
                     {ETAPAS_CONFIG.map((config, index) => {
@@ -530,8 +530,8 @@ const ProjetoDetalhe = () => {
                     <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' }}>
                       Histórico de Horas Lançadas
                     </div>
-                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px' }}>
+                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto', width: '100%', maxWidth: '100%' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px', maxWidth: '100%' }}>
                         {['Etapa', 'Horas', 'Quem', 'Quando'].map(h => (
                           <span key={h} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
                         ))}
