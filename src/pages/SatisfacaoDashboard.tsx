@@ -694,27 +694,7 @@ const SatisfacaoDashboard = () => {
                       )}
                     </div>
                   </div>
-                ))
-                      
-                      {(dep.status === 'PENDENTE' || dep.status === 'APROVADO') && (
-                        <Button variant="outline" onClick={() => handleFormatClick(dep)} className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
-                          <MessageSquare className="w-3 h-3 mr-2" /> {dep.texto_formatado ? 'Re-formatar' : 'Formatar Depoimento'}
-                        </Button>
-                      )}
-
-                      {dep.pesquisa?.video_url && (
-                        <>
-                          <Button variant="outline" onClick={() => { setCurrentVideoUrl(dep.pesquisa.video_url); setIsVideoModalOpen(true); }} className="border-bronze/30 bg-bronze/5 text-bronze hover:bg-bronze/10 rounded-none uppercase tracking-widest text-[9px] font-bold">
-                            <FileVideo className="w-3 h-3 mr-2" /> Ver Vídeo
-                          </Button>
-                          <Button variant="ghost" onClick={() => window.open(dep.pesquisa.video_url, '_blank')} className="text-white/40 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
-                            <Download className="w-3 h-3 mr-2" /> Baixar
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))
+                )
               )}
             </div>
           </div>
