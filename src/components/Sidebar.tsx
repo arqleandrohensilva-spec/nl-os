@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users, ChevronLeft, ChevronRight, LayoutDashboard, FileSpreadsheet } from 'lucide-react';
 import NotificationsPanel from './NotificationsPanel';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -227,6 +227,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       setOpenSections(prev => ({ ...prev, 'CONFIGURAÇÕES': true }));
     } else if (path === '/marketing/ia' || path === '/marketing/satisfacao' || path === '/scripts-atendimento') {
       setOpenSections(prev => ({ ...prev, 'MARKETING': true }));
+    } else if (path === '/calculadora' || path.startsWith('/calculadora/') || path === '/propostas/tracking') {
+      setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
     }
   }, [location.pathname]);
 
@@ -465,6 +467,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       <div className="flex-1 overflow-y-auto pb-8 scrollbar-hide">
         <div className="relative">
           <NavItem 
+            label="DASHBOARD" 
+            icon={<LayoutDashboard size={14} />}
+            active={location.pathname === '/dashboard'} 
+            onClick={() => navigate('/dashboard')} 
+            isCollapsed={isCollapsed}
+          />
+          <NavItem 
             label="CLIENTES" 
             icon={<Users size={14} />}
             active={location.pathname === '/clientes' || location.pathname.startsWith('/clientes/')} 
@@ -524,6 +533,29 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Financeiro" 
             active={location.pathname === '/financeiro'} 
             onClick={() => navigate('/financeiro')} 
+            isCollapsed={isCollapsed}
+          />
+        </SectionAccordion>
+
+        <SectionAccordion 
+          label="PROPOSTAS" 
+          icon={<Calculator size={14} />}
+          isOpen={!!openSections['PROPOSTAS']}
+          onToggle={() => toggleSection('PROPOSTAS')}
+          isCollapsed={isCollapsed}
+          onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
+          isPopoverOpen={popoverAberto === 'PROPOSTAS'}
+        >
+          <NavItem 
+            label="Calculadora" 
+            active={location.pathname === '/calculadora' || location.pathname.startsWith('/calculadora/')} 
+            onClick={() => navigate('/calculadora')} 
+            isCollapsed={isCollapsed}
+          />
+          <NavItem 
+            label="Tracking" 
+            active={location.pathname === '/propostas/tracking'} 
+            onClick={() => navigate('/propostas/tracking')} 
             isCollapsed={isCollapsed}
           />
         </SectionAccordion>
