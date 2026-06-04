@@ -292,16 +292,16 @@ const ProjetoDetalhe = () => {
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white/40">CARREGANDO...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans overflow-x-hidden">
+    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
       <Sidebar user="Equipe NL" />
-      <main className="flex-1 ml-[230px] p-8 overflow-x-hidden">
+      <main className="lg:pl-[230px] p-4 md:p-8">
         
         {/* HEADER */}
         <header className="mb-12">
             <Button variant="ghost" onClick={() => navigate('/projetos/gestao')} className="text-[#555] hover:text-white px-0 hover:bg-transparent text-xs uppercase tracking-widest mb-6">
                 <ArrowLeft className="mr-2" size={14} /> Voltar
             </Button>
-            <div className="flex items-end justify-between">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="space-y-2">
                     <h1 className="text-[32px] font-['Georgia'] text-white leading-tight">{projeto.nome_cliente}</h1>
                     <div className="flex items-center gap-4 text-[#555] font-['Courier_New'] text-[10px] uppercase">
@@ -324,7 +324,7 @@ const ProjetoDetalhe = () => {
               const pct = totalEstimadas > 0 ? Math.round(totalLancadas / totalEstimadas * 100) : 0;
               
               return totalEstimadas > 0 ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
                   <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     {totalLancadas}h / {totalEstimadas}h estimadas
                   </span>
@@ -476,7 +476,7 @@ const ProjetoDetalhe = () => {
                                   )}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-12">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                                     <div className="space-y-4">
                                         <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold flex items-center gap-2">
                                             <CheckCircle2 size={12} /> Checklist
@@ -530,22 +530,24 @@ const ProjetoDetalhe = () => {
                     <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' }}>
                       Histórico de Horas Lançadas
                     </div>
-                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px' }}>
                         {['Etapa', 'Horas', 'Quem', 'Quando'].map(h => (
                           <span key={h} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
                         ))}
                       </div>
-                      {horasLog.map((log: any) => (
-                        <div key={log.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }}>
-                          <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{log.etapa_nome}</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#8B7355', fontWeight: 'bold' }}>+{log.horas}h</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777' }}>{log.usuario}</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>
-                            {log.criado_em ? new Date(log.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                      <div style={{ minWidth: '400px' }}>
+                        {horasLog.map((log: any) => (
+                          <div key={log.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }}>
+                            <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{log.etapa_nome}</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#8B7355', fontWeight: 'bold' }}>+{log.horas}h</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777' }}>{log.usuario}</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>
+                              {log.criado_em ? new Date(log.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
