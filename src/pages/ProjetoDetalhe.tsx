@@ -105,6 +105,7 @@ const ProjetoDetalhe = () => {
   const [lead, setLead] = useState<any>(null);
   const [lancandoHoras, setLancandoHoras] = useState<string | null>(null);
   const [editandoEstimadas, setEditandoEstimadas] = useState<string | null>(null);
+  const [horasLog, setHorasLog] = useState<any[]>([]);
   const [horasInput, setHorasInput] = useState('');
 
   const fetchData = async () => {
@@ -116,22 +117,22 @@ const ProjetoDetalhe = () => {
         
         if (pData.cliente_id) {
           const { data: contratoData } = await supabase
-            .from('contratos')
-            .select('valores, numero')
+            .from('contratos_clientes')
+            .select('numero, valor_total, marco1_valor, marco2_valor, marco3_valor')
             .eq('cliente_id', pData.cliente_id)
-            .eq('status', 'assinado')
+            .not('status', 'eq', 'Arquivado')
+            .not('status', 'eq', 'Inativo')
             .order('criado_em', { ascending: false })
             .limit(1)
             .maybeSingle();
 
           if (contratoData) {
-            const vals = (contratoData.valores as any) || {};
             setContrato({
-              valor_total: vals.totalCompleto || vals.totalExecutivo || vals.valor_total,
-              marco1_valor: vals.marco1 || vals.marco1_valor,
-              marco2_valor: vals.marco2 || vals.marco2_valor,
-              marco3_valor: vals.marco3 || vals.marco3_valor,
-              numero: contratoData.numero
+              valor_total: contratoData.valor_total,
+              marco1_valor: contratoData.marco1_valor,
+              marco2_valor: contratoData.marco2_valor,
+              marco3_valor: contratoData.marco3_valor,
+              numero: contratoData.numero,
             });
           }
 
@@ -149,6 +150,13 @@ const ProjetoDetalhe = () => {
       if (eData) setEtapas(eData);
       const { data: cData } = await supabase.from('projeto_checklist').select('*').eq('projeto_id', id);
       if (cData) setChecklist(cData);
+
+      const { data: logData } = await supabase
+        .from('projeto_horas_log')
+        .select('*')
+        .eq('projeto_id', id)
+        .order('criado_em', { ascending: false });
+      if (logData) setHorasLog(logData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -164,6 +172,7 @@ const ProjetoDetalhe = () => {
     try {
       const updateData: any = { status: newStatus };
       if (newStatus === 'Aprovado') {
+        updateData.data_entrega = new Date().toISOString().split('T')[0];
         updateData.data_aprovacao = new Date().toISOString();
         const { data: { user } } = await supabase.auth.getUser();
         updateData.aprovado_por = user?.email?.includes('leandro') ? 'Leandro' : 'Neandro';
@@ -179,6 +188,7 @@ const ProjetoDetalhe = () => {
 
   const lancarHoras = async (etapaId: string, horasNovas: number) => {
     const etapa = etapas.find(e => e.id === etapaId);
+    const etapaNome = ETAPAS_CONFIG.find(c => c.id === etapa?.etapa)?.label.split('·')[1].trim();
     const totalAtual = Number(etapa?.horas_lancadas || 0);
     const novoTotal = totalAtual + horasNovas;
     
@@ -187,7 +197,17 @@ const ProjetoDetalhe = () => {
       .update({ horas_lancadas: novoTotal })
       .eq('id', etapaId);
     
-    toast.success(`${horasNovas}h lançadas com sucesso`);
+    const { data: { user } } = await supabase.auth.getUser();
+    const userName = user?.email?.toLowerCase().includes('leandro') ? 'Leandro' : 'Neandro';
+    await supabase.from('projeto_horas_log').insert({
+      projeto_id: id,
+      etapa_id: etapaId,
+      etapa_nome: etapaNome || etapa?.etapa || 'Etapa',
+      horas: horasNovas,
+      usuario: userName,
+    });
+    
+    toast.success(`${horasNovas}h lançadas por ${userName}`);
     setLancandoHoras(null);
     setHorasInput('');
     fetchData();
@@ -491,6 +511,31 @@ const ProjetoDetalhe = () => {
                         );
                     })}
                 </Accordion>
+                
+                {horasLog.length > 0 && (
+                  <div style={{ marginTop: '24px' }}>
+                    <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' }}>
+                      Histórico de Horas Lançadas
+                    </div>
+                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                        {['Etapa', 'Horas', 'Quem', 'Quando'].map(h => (
+                          <span key={h} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
+                        ))}
+                      </div>
+                      {horasLog.map((log: any) => (
+                        <div key={log.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }}>
+                          <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{log.etapa_nome}</div>
+                          <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#8B7355', fontWeight: 'bold' }}>+{log.horas}h</div>
+                          <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777' }}>{log.usuario}</div>
+                          <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>
+                            {log.criado_em ? new Date(log.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
             </section>
 
             {/* COLUMN RIGHT */}

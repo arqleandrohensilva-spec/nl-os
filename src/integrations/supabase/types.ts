@@ -1393,6 +1393,51 @@ export type Database = {
           },
         ]
       }
+      projeto_horas_log: {
+        Row: {
+          criado_em: string | null
+          etapa_id: string | null
+          etapa_nome: string | null
+          horas: number
+          id: string
+          projeto_id: string | null
+          usuario: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          etapa_id?: string | null
+          etapa_nome?: string | null
+          horas: number
+          id?: string
+          projeto_id?: string | null
+          usuario?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          etapa_id?: string | null
+          etapa_nome?: string | null
+          horas?: number
+          id?: string
+          projeto_id?: string | null
+          usuario?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projeto_horas_log_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "projeto_etapas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projeto_horas_log_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projetos: {
         Row: {
           area_m2: number | null
