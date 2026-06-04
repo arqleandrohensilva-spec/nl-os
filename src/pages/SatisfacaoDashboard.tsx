@@ -459,51 +459,94 @@ const SatisfacaoDashboard = () => {
                   <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa encontrada para este filtro.</p>
                 </div>
               ) : (
-                filteredSurveys.map((survey) => (
-                  <div 
-                    key={survey.id} 
-                    className={cn(
-                      "bg-white/[0.03] p-6 border transition-all flex justify-between items-center",
-                      survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
-                      survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
-                      survey.status === 'ARQUIVADA' && "border-white/5 opacity-50"
-                    )}
-                  >
-                    <div>
-                      <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
-                      <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
-                        {survey.cliente_nome} · {survey.tipo || 'Pós-Entrega'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className={cn(
-                        "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
-                        survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : 
-                        survey.status === 'ARQUIVADA' ? "bg-white/10 text-white/40" : "bg-yellow-500/20 text-yellow-400"
-                      )}>
-                        {survey.status}
-                      </span>
-                      <div className="flex gap-2">
+                filteredSurveys.map((survey) => {
+                  const hasTestimonial = testimonials.some(t => t.pesquisa_id === survey.id);
+                  return (
+                    <div 
+                      key={survey.id} 
+                      className={cn(
+                        "bg-white/[0.03] p-6 border transition-all flex justify-between items-center",
+                        survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
+                        survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
+                        survey.status === 'ARQUIVADA' && "border-white/5 opacity-50",
+                        survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && "border-red-500/50"
+                      )}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
+                          {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && (
+                            <span className="bg-red-500/20 text-red-400 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 flex items-center gap-1 border border-red-500/30">
+                              <AlertTriangle className="w-3 h-3" /> Atenção
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
+                          {survey.cliente_nome} · {survey.tipo || 'Pós-Entrega'}
+                        </p>
                         {survey.status === 'RESPONDIDA' && (
-                          <Button 
-                            onClick={() => archivarPesquisa(survey.id)}
-                            variant="outline" 
-                            className="h-8 border-white/10 bg-transparent text-[9px] uppercase font-bold tracking-widest rounded-none hover:bg-white/5"
-                          >
-                            Arquivar
-                          </Button>
+                          <p className="text-white/40 text-[10px] mt-1 uppercase font-medium">Nota: {survey.nota_geral}/10</p>
                         )}
-                        <Button variant="ghost" size="icon" onClick={() => {
-                          const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
-                          navigator.clipboard.writeText(link);
-                          toast({ title: "Link copiado!" });
-                        }} className="text-white/40 hover:text-white">
-                          <Copy className="w-4 h-4" />
-                        </Button>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={cn(
+                          "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
+                          survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : 
+                          survey.status === 'ARQUIVADA' ? "bg-white/10 text-white/40" : "bg-yellow-500/20 text-yellow-400"
+                        )}>
+                          {survey.status}
+                        </span>
+                        <div className="flex flex-col gap-2 min-w-[200px]">
+                          <div className="flex gap-2 justify-end">
+                            {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) >= 9 && (
+                              <Button 
+                                onClick={() => handleGenerateTestimonial(survey)}
+                                disabled={generatingTestimonial}
+                                className="h-8 bg-bronze hover:bg-bronze/90 text-[9px] uppercase font-bold tracking-widest rounded-none px-4"
+                              >
+                                {generatingTestimonial ? "Gerando..." : "Gerar Depoimento"}
+                              </Button>
+                            )}
+                            {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && (
+                              <Button 
+                                onClick={() => openInternalNoteModal(survey)}
+                                variant="outline"
+                                className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 text-[9px] uppercase font-bold tracking-widest rounded-none px-4"
+                              >
+                                Registrar Contato
+                              </Button>
+                            )}
+                            {survey.status === 'RESPONDIDA' && (
+                              <Button 
+                                onClick={() => archivarPesquisa(survey.id)}
+                                variant="outline" 
+                                className="h-8 border-white/10 bg-transparent text-[9px] uppercase font-bold tracking-widest rounded-none hover:bg-white/5"
+                              >
+                                Arquivar
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => {
+                              const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
+                              navigator.clipboard.writeText(link);
+                              toast({ title: "Link copiado!" });
+                            }} className="text-white/40 hover:text-white">
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) >= 9 && !hasTestimonial && (
+                            <Button 
+                              onClick={() => openReferralModal(survey)}
+                              variant="outline"
+                              className="h-8 border-bronze/30 text-bronze hover:bg-bronze/5 text-[9px] uppercase font-bold tracking-widest rounded-none w-full"
+                            >
+                              <UserPlus className="w-3 h-3 mr-2" /> Pedir Indicação
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </TabsContent>
