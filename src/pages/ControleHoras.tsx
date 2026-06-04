@@ -3,6 +3,37 @@ import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { parseISO } from 'date-fns';
+
+// Types for tests
+export interface Sessao {
+  id: string;
+  projeto_id: string;
+  etapa: string;
+  responsavel: string;
+  inicio: string;
+  fim: string | null;
+  duracao_minutos: number | null;
+  observacao: string | null;
+  is_manual?: boolean;
+}
+
+// Logic for tests
+export const calculateProjectRhythm = (projetoSessoes: Sessao[]) => {
+  const last7DaysSessoes = projetoSessoes.filter(s => {
+    const d = parseISO(s.inicio);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d > weekAgo;
+  });
+  
+  const totalMinutosSemana = last7DaysSessoes.reduce((acc, s) => acc + (s.duracao_minutos || 0), 0);
+  return (totalMinutosSemana / 60) / 7;
+};
+
+export const shouldRunAIPrediction = (projetoSessoes: Sessao[], ritmoSemana: number) => {
+  return !(projetoSessoes.length < 3 || ritmoSemana <= 0);
+};
 
 const ControleHoras = () => {
   const navigate = useNavigate();
@@ -12,15 +43,21 @@ const ControleHoras = () => {
   const [etapas, setEtapas] = useState<any[]>([]);
   const [baseFinanceira, setBaseFinanceira] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email || null);
+    });
+
     const fetchData = async () => {
       try {
         const [logsRes, projetosRes, etapasRes, baseRes] = await Promise.all([
           supabase.from('projeto_horas_log').select('*').order('criado_em', { ascending: false }),
           supabase.from('projetos').select('*').eq('status_geral', 'ativo'),
           supabase.from('projeto_etapas').select('*'),
-          supabase.from('base_financeira').select('valor_mensal, categoria')
+          // Using cast to any because the table might not be in the generated types yet
+          supabase.from('base_financeira' as any).select('valor_mensal, categoria')
         ]);
 
         setLogs(logsRes.data || []);
@@ -35,6 +72,13 @@ const ControleHoras = () => {
     };
     fetchData();
   }, []);
+
+  const getDisplayName = () => {
+    if (!userEmail) return 'Sócio';
+    if (userEmail.toLowerCase() === 'leandro@nlarquitetos.com.br') return 'Leandro';
+    if (userEmail.toLowerCase() === 'neandro@nlarquitetos.com.br') return 'Neandro';
+    return userEmail.split('@')[0];
+  };
 
   // Custo/hora
   const custoFixoTotal = (baseFinanceira || []).reduce((s, i) => s + Number(i.valor_mensal || 0), 0);
@@ -75,7 +119,7 @@ const ControleHoras = () => {
 
   return (
     <div className="flex min-h-screen bg-[#0d0d0d] text-white overflow-x-hidden">
-      <Sidebar />
+      <Sidebar user={getDisplayName()} />
       
       <main 
         className="flex-1 transition-all duration-300 ease-in-out p-8"
