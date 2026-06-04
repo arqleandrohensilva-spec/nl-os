@@ -476,7 +476,7 @@ const ProjetoDetalhe = () => {
                                   )}
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-12">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                                     <div className="space-y-4">
                                         <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold flex items-center gap-2">
                                             <CheckCircle2 size={12} /> Checklist
