@@ -387,7 +387,9 @@ const ProjetoDetalhe = () => {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-[10px] font-mono text-[#555]">
-                                            {etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'dd/MM/yyyy') : '--/--/----'}
+                                            {etapaData?.status === 'Aprovado' 
+                                              ? `Aprovado em ${format(parseISO(etapaData.data_aprovacao || etapaData.data_entrega), 'dd/MM/yyyy')} por ${etapaData.aprovado_por || '—'}`
+                                              : etapaData?.data_entrega ? format(parseISO(etapaData.data_entrega), 'dd/MM/yyyy') : '--/--/----'}
                                         </p>
                                     </div>
                                 </div>
