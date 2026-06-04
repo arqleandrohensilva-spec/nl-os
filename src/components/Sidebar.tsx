@@ -33,8 +33,8 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
         isCollapsed && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center w-full" : "justify-between")}>
-        <div className="flex items-center gap-2 w-full">
+      <div className={cn("flex items-center gap-3", isCollapsed ? "justify-center" : "justify-between w-full")}>
+        <div className={cn("flex items-center gap-3", !isCollapsed && "w-full")}>
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
             "text-[12px] transition-colors whitespace-nowrap",
