@@ -546,10 +546,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
 
         <button 
           onClick={toggleSidebar}
-          className={cn(
-            "absolute bottom-4 -right-3 w-6 h-6 bg-bronze text-white flex items-center justify-center border border-white/10 shadow-lg hover:scale-110 transition-all z-[60]",
-            isCollapsed && "right-1/2 translate-x-1/2 bottom-[-12px]"
-          )}
+          className="absolute bottom-4 -right-3 w-6 h-6 bg-bronze text-white flex items-center justify-center border border-white/10 shadow-lg hover:scale-110 transition-all z-[60]"
           style={{ cursor: 'pointer' }}
         >
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
