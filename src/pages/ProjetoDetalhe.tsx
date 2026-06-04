@@ -205,6 +205,7 @@ const ProjetoDetalhe = () => {
       etapa_nome: etapaNome || etapa?.etapa || 'Etapa',
       horas: horasNovas,
       usuario: userName,
+      criado_em: new Date().toISOString(),
     });
     
     toast.success(`${horasNovas}h lançadas por ${userName}`);
