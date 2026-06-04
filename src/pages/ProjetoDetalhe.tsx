@@ -70,6 +70,8 @@ interface Etapa {
   aprovado_por: string;
   notas: string;
   moodboard_url?: string;
+  horas_estimadas?: number;
+  horas_lancadas?: number;
 }
 
 interface ChecklistItem {
@@ -101,6 +103,8 @@ const ProjetoDetalhe = () => {
   const [whatsappCliente, setWhatsappCliente] = useState<string>('');
   const [contrato, setContrato] = useState<any>(null);
   const [lead, setLead] = useState<any>(null);
+  const [lancandoHoras, setLancandoHoras] = useState<string | null>(null);
+  const [horasInput, setHorasInput] = useState('');
 
   const fetchData = async () => {
     try {
@@ -171,6 +175,21 @@ const ProjetoDetalhe = () => {
       toast.error('Erro ao atualizar status');
     }
   };
+
+  const lancarHoras = async (etapaId: string, horasNovas: number) => {
+    const etapa = etapas.find(e => e.id === etapaId);
+    const totalAtual = Number(etapa?.horas_lancadas || 0);
+    const novoTotal = totalAtual + horasNovas;
+    
+    await supabase
+      .from('projeto_etapas')
+      .update({ horas_lancadas: novoTotal })
+      .eq('id', etapaId);
+    
+    toast.success(`${horasNovas}h lançadas com sucesso`);
+    setLancandoHoras(null);
+    setHorasInput('');
+    fetchData();
 
   const toggleChecklistItem = async (itemId: string, currentStatus: boolean) => {
     try {
@@ -248,6 +267,25 @@ const ProjetoDetalhe = () => {
                         <span className={cn("w-2 h-2 rounded-full", projeto.status_geral === 'Ativo' ? 'bg-emerald-500' : 'bg-[#555]')}></span>
                         {projeto.status_geral}
                     </div>
+                    </div>
+                    {/* Resumo de horas */}
+                    {(() => {
+                      const totalEstimadas = etapas.reduce((s, e) => s + Number(e.horas_estimadas || 0), 0);
+                      const totalLancadas = etapas.reduce((s, e) => s + Number(e.horas_lancadas || 0), 0);
+                      const pct = totalEstimadas > 0 ? Math.round(totalLancadas / totalEstimadas * 100) : 0;
+                      
+                      return totalEstimadas > 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                            {totalLancadas}h / {totalEstimadas}h estimadas
+                          </span>
+                          <div style={{ width: '80px', height: '3px', background: '#222', borderRadius: '2px' }}>
+                            <div style={{ height: '3px', background: pct > 100 ? '#f87171' : '#8B7355', borderRadius: '2px', width: `${Math.min(pct, 100)}%` }} />
+                          </div>
+                          <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: pct > 100 ? '#f87171' : '#8B7355' }}>{pct}%</span>
+                        </div>
+                      ) : null;
+                    })()}
                 </div>
             </div>
             
@@ -307,6 +345,53 @@ const ProjetoDetalhe = () => {
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent className="pt-6 pb-8 border-t border-white/5 space-y-8">
+                                {/* Linha de horas */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 0', borderTop: '1px solid rgba(255,255,255,0.04)', marginTop: '8px' }}>
+                                  <div style={{ display: 'flex', gap: '16px', flex: 1 }}>
+                                    <div>
+                                      <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Estimadas</span>
+                                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#777', marginTop: '2px' }}>
+                                        {etapaData?.horas_estimadas || 0}h
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Lançadas</span>
+                                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#8B7355', marginTop: '2px' }}>
+                                        {etapaData?.horas_lancadas || 0}h
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {lancandoHoras === etapaData?.id ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <input
+                                        type="number"
+                                        value={horasInput}
+                                        onChange={e => setHorasInput(e.target.value)}
+                                        placeholder="0"
+                                        autoFocus
+                                        style={{ width: '60px', background: '#0d0d0d', border: '1px solid #8B7355', color: '#e8e8e8', padding: '4px 8px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '3px', textAlign: 'center' }}
+                                      />
+                                      <span style={{ fontFamily: 'Arial', fontSize: '12px', color: '#555' }}>h</span>
+                                      <button
+                                        onClick={() => lancarHoras(etapaData.id, parseFloat(horasInput) || 0)}
+                                        style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#fff', background: '#8B7355', border: 'none', padding: '5px 10px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: '3px' }}
+                                      >OK</button>
+                                      <button
+                                        onClick={() => { setLancandoHoras(null); setHorasInput(''); }}
+                                        style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', background: 'none', border: '1px solid #333', padding: '5px 10px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: '3px' }}
+                                      >✕</button>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setLancandoHoras(etapaData?.id || null)}
+                                      style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', background: 'none', border: '1px solid rgba(139,115,85,0.3)', padding: '5px 12px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: '3px' }}
+                                    >
+                                      + LANÇAR HORAS
+                                    </button>
+                                  )}
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-12">
                                     <div className="space-y-4">
                                         <h4 className="text-[9px] uppercase tracking-widest text-[#8B7355] font-bold flex items-center gap-2">
