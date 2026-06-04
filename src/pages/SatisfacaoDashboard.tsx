@@ -264,6 +264,89 @@ const SatisfacaoDashboard = () => {
     toast({ title: "Texto copiado para a área de transferência" });
   };
 
+  const handleGenerateTestimonial = async (survey: any) => {
+    setGeneratingTestimonial(true);
+    try {
+      const { data: aiResponse, error } = await supabase.functions.invoke('ai-advisor', {
+        body: {
+          prompt: `Você é o assistente da NL Arquitetos. Com base nas respostas abaixo de uma pesquisa de satisfação, gere um depoimento formatado para uso em Instagram e Google Meu Negócio. Tom: autêntico, técnico, sem exageros.
+          
+          Cliente: ${survey.cliente_nome}
+          Projeto: ${survey.projeto?.nome} · ${survey.projeto?.tipo}
+          Nota geral: ${survey.nota_geral}/10
+          Resposta livre: ${survey.comentario || 'Não informado'}
+          
+          Retorne APENAS JSON:
+          {
+            "depoimento_instagram": "texto curto, até 3 linhas, sem hashtags",
+            "depoimento_google": "texto um pouco mais longo, até 5 linhas, em primeira pessoa",
+            "frase_destaque": "frase de impacto de até 12 palavras para usar como quote visual"
+          }`,
+          systemPrompt: "Você é um assistente da NL Arquitetos especializado em feedback de clientes.",
+          model: 'anthropic/claude-3-5-sonnet-20241022'
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = aiResponse.choices?.[0]?.message?.content || "";
+      const cleanedJson = content.replace(/```json|```/g, '').trim();
+      const parsedData = JSON.parse(cleanedJson);
+
+      const { error: insertError } = await supabase
+        .from('depoimentos')
+        .insert({
+          pesquisa_id: survey.id,
+          cliente_nome: survey.cliente_nome,
+          projeto_id: survey.projeto_id,
+          depoimento_instagram: parsedData.depoimento_instagram,
+          depoimento_google: parsedData.depoimento_google,
+          frase_destaque: parsedData.frase_destaque,
+          status: 'PENDENTE'
+        });
+
+      if (insertError) throw insertError;
+
+      toast({ title: "Depoimento gerado — aguardando aprovação" });
+      fetchData();
+    } catch (error: any) {
+      console.error('Error generating testimonial:', error);
+      toast({ variant: "destructive", title: "Erro ao gerar depoimento", description: error.message });
+    } finally {
+      setGeneratingTestimonial(false);
+    }
+  };
+
+  const handleSaveInternalNote = async () => {
+    if (!selectedSurveyForInternalNote) return;
+    try {
+      const { error } = await supabase
+        .from('pesquisas_satisfacao')
+        .update({ notas_internas: internalNote })
+        .eq('id', selectedSurveyForInternalNote.id);
+
+      if (error) throw error;
+
+      toast({ title: "Nota interna salva" });
+      setIsInternalNoteModalOpen(false);
+      setInternalNote('');
+      fetchData();
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Erro ao salvar nota", description: error.message });
+    }
+  };
+
+  const openReferralModal = (survey: any) => {
+    setSelectedSurveyForReferral(survey);
+    setIsReferralModalOpen(true);
+  };
+
+  const openInternalNoteModal = (survey: any) => {
+    setSelectedSurveyForInternalNote(survey);
+    setInternalNote(survey.notas_internas || '');
+    setIsInternalNoteModalOpen(true);
+  };
+
   const filteredSurveys = surveys.filter(s => {
     const matchesFilter = 
       surveysFilter === 'TODAS' || 
