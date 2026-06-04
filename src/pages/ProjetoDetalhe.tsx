@@ -208,13 +208,29 @@ const ProjetoDetalhe = () => {
           </header>
 
           {/* PRÓXIMA AÇÃO */}
-          {currentEtapaIdx < 6 && (
-            <div className="bg-[#8B7355] p-6 text-white flex items-center gap-4">
-              <Zap className="text-white" />
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] font-bold">PRÓXIMA AÇÃO</p>
-                <p className="text-sm font-['Georgia'] mt-1">{ETAPAS_CONFIG[currentEtapaIdx]?.desc}</p>
+          {currentEtapaIdx !== -1 && currentEtapaIdx < 6 && (
+            <div className="bg-[#8B7355] p-8 text-white flex items-center justify-between group">
+              <div className="flex items-center gap-6">
+                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                  <Zap className="text-white w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-70">PRÓXIMA AÇÃO</p>
+                  <p className="text-2xl font-['Georgia'] italic mt-1">
+                    Aguardando aprovação do {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
+                  </p>
+                </div>
               </div>
+              <Button 
+                className="bg-white text-[#8B7355] hover:bg-white/90 font-mono text-xs tracking-widest px-8"
+                onClick={() => {
+                  const label = ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim();
+                  const msg = `Olá! Gostaria de falar sobre a etapa de ${label} do projeto ${projeto.nome}.`;
+                  window.open(`https://wa.me/${lead?.telefone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(msg)}`, '_blank');
+                }}
+              >
+                WHATSAPP
+              </Button>
             </div>
           )}
 
@@ -225,15 +241,74 @@ const ProjetoDetalhe = () => {
                 const e = etapas.find(et => et.etapa === config.id);
                 return (
                   <AccordionItem key={config.id} value={config.id} className="bg-[#141414] border border-white/10 px-6">
-                    <AccordionTrigger className="text-xs uppercase tracking-widest font-bold">{config.label}</AccordionTrigger>
-                    <AccordionContent className="space-y-4 pt-4 border-t border-white/5">
-                      <Textarea placeholder="Notas..." defaultValue={e?.notas} onBlur={(x) => saveNotas(e?.id || '', x.target.value)} className="bg-transparent border-white/10 text-xs" />
-                      {checklist.filter(c => c.etapa === config.id).map(item => (
-                        <div key={item.id} className="flex items-center gap-2">
-                          <Checkbox checked={item.concluido} onCheckedChange={() => toggleCheck(item.id, item.concluido)} />
-                          <span className="text-xs text-[#555]">{item.item}</span>
+                    <AccordionTrigger className="text-xs uppercase tracking-widest font-bold hover:no-underline py-6">{config.label}</AccordionTrigger>
+                    <AccordionContent className="space-y-6 pt-2 pb-8 border-t border-white/5">
+                      {/* Checklist */}
+                      <div className="space-y-3 mt-4">
+                        <p className="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4 font-mono">Checklist de Entrega</p>
+                        {checklist.filter(c => c.etapa === config.id).length > 0 ? (
+                          checklist.filter(c => c.etapa === config.id).map(item => (
+                            <div key={item.id} className="flex items-center gap-3 py-1">
+                              <Checkbox 
+                                id={item.id}
+                                checked={item.concluido} 
+                                onCheckedChange={() => toggleCheck(item.id, item.concluido)} 
+                                className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]"
+                              />
+                              <label htmlFor={item.id} className={cn("text-xs transition-colors", item.concluido ? "text-[#555] line-through italic" : "text-[#ccc]")}>
+                                {item.item}
+                              </label>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-[10px] text-[#444] italic">Nenhum item cadastrado para esta etapa.</p>
+                        )}
+                      </div>
+
+                      {/* Notas */}
+                      <div className="space-y-3 pt-2">
+                        <p className="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest font-mono">Notas Técnicas</p>
+                        <Textarea 
+                          placeholder="Observações técnicas ou decisões de projeto..." 
+                          defaultValue={e?.notas} 
+                          onBlur={(x) => saveNotas(e?.id || '', x.target.value)} 
+                          className="bg-white/5 border-white/10 text-xs min-h-[120px] focus:border-[#8B7355]/50 transition-all text-white/80 leading-relaxed font-sans" 
+                        />
+                      </div>
+
+                      {/* Horas e Ações */}
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-white/5">
+                        <div className="flex items-center gap-8">
+                          <div className="space-y-1">
+                            <p className="text-[10px] text-[#555] uppercase font-mono tracking-tighter">Horas Estimadas</p>
+                            <p className="text-xl text-white font-serif italic">{e?.horas_estimadas || 0}h</p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[10px] text-[#555] uppercase font-mono tracking-tighter">Horas Lançadas</p>
+                            <p className="text-xl text-white font-serif italic">{e?.horas_lancadas || 0}h</p>
+                          </div>
                         </div>
-                      ))}
+                        
+                        <div className="flex gap-4">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-[10px] uppercase font-mono border-white/10 hover:bg-white/5 tracking-widest px-6"
+                            onClick={() => handleLancarHoras(config.id)}
+                          >
+                            Lançar Horas
+                          </Button>
+                          {e?.status !== 'CONCLUIDO' && (
+                            <Button 
+                              size="sm" 
+                              className="text-[10px] uppercase font-mono bg-[#8B7355] hover:bg-[#8B7355]/80 tracking-widest px-6"
+                              onClick={() => updateEtapaStatus(e?.id || '', 'CONCLUIDO')}
+                            >
+                              Aprovar Etapa
+                            </Button>
+                          )}
+                        </div>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 );
