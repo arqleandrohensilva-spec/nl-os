@@ -368,7 +368,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       isCollapsed ? "w-[64px]" : "w-[230px]"
     )}>
       <div className={cn("transition-all duration-300", isCollapsed ? "p-4 mb-4" : "p-8 mb-6")}>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-bronze flex items-center justify-center text-white font-cormorant text-xl shadow-[0_4px_20px_rgba(139,115,85,0.3)] shrink-0">
               NL
@@ -381,6 +381,17 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
               </div>
             )}
           </div>
+
+          <button 
+            onClick={toggleSidebar}
+            className={cn(
+              "absolute w-6 h-6 bg-bronze text-white flex items-center justify-center border border-white/10 shadow-lg hover:scale-110 transition-all z-[60]",
+              isCollapsed ? "left-1/2 -translate-x-1/2 top-14" : "-right-11 top-2"
+            )}
+            style={{ cursor: 'pointer' }}
+          >
+            {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
           
           {!isCollapsed && (
             <div className="relative">
