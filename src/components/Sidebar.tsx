@@ -28,16 +28,16 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
       className={cn(
         'flex flex-col transition-all duration-200 group relative',
         isCollapsed ? (
-          icon ? 'py-4 px-0 items-center justify-center border-l-0 w-full' : 'py-[10px] px-4 items-start justify-start border-l-0 w-full hover:bg-white/10'
+          icon ? 'py-4 px-0 items-center justify-center border-l-0 w-full mb-1' : 'py-[10px] px-4 items-start justify-start border-l-0 w-full hover:bg-white/10'
         ) : 'py-2.5 px-10 border-l-2',
         !isCollapsed && active ? 'border-bronze bg-bronze/15 text-white' : 'border-transparent text-white/70',
         isCollapsed && icon && active && "text-bronze",
         !icon && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-3", (isCollapsed && icon) ? "justify-center" : "justify-between w-full")}>
-        <div className={cn("flex items-center gap-3", (!isCollapsed || !icon) && "w-full")}>
-          {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
+      <div className={cn("flex items-center", (isCollapsed && icon) ? "justify-center" : "justify-between w-full gap-3")}>
+        <div className={cn("flex items-center", (!isCollapsed || !icon) ? "w-full gap-3" : "")}>
+          {icon && <div className={cn("transition-colors flex-shrink-0", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
             "text-[12px] transition-colors whitespace-nowrap",
             (isCollapsed && icon) ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
@@ -127,7 +127,7 @@ const SectionAccordion = ({
           isPopoverOpen && isCollapsed && "bg-white/10"
         )}
       >
-        <div className="flex items-center gap-3">
+        <div className={cn("flex items-center", isCollapsed ? "" : "gap-3")}>
           <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>
             {icon}
           </div>
