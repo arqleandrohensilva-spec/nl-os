@@ -174,13 +174,35 @@ serve(async (req) => {
       endpoint = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
       headers['Content-Type'] = 'application/json';
       body = JSON.stringify({ path, settings: { requested_visibility: 'public' } });
-    } else if (action === 'upload') {
+    } else if (action === 'upload' || action === 'upload_file') {
       endpoint = 'https://content.dropboxapi.com/2/files/upload';
-      const dropboxArg = req.headers.get('dropbox-api-arg');
-      if (!dropboxArg) throw new Error('Missing dropbox-api-arg header for upload');
-      headers['Dropbox-API-Arg'] = dropboxArg;
-      headers['Content-Type'] = 'application/octet-stream';
-      body = req.body; 
+      const fileData = bodyJson.file || bodyJson.content;
+      
+      if (fileData) {
+        // Handle base64 upload from JSON body
+        // Decode base64 to binary
+        const binaryString = atob(fileData);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        headers['Dropbox-API-Arg'] = JSON.stringify({
+          path: bodyJson.path || path,
+          mode: 'overwrite',
+          autorename: false,
+          mute: false
+        });
+        headers['Content-Type'] = 'application/octet-stream';
+        body = bytes;
+      } else {
+        // Handle standard binary upload with Dropbox-API-Arg header
+        const dropboxArg = req.headers.get('dropbox-api-arg');
+        if (!dropboxArg) throw new Error('Missing dropbox-api-arg header or file content for upload');
+        headers['Dropbox-API-Arg'] = dropboxArg;
+        headers['Content-Type'] = 'application/octet-stream';
+        body = req.body; 
+      }
     } else if (action === 'delete') {
       endpoint = 'https://api.dropboxapi.com/2/files/delete_v2';
       headers['Content-Type'] = 'application/json';
@@ -261,7 +283,7 @@ serve(async (req) => {
         if (newToken) {
           headers['Authorization'] = `Bearer ${newToken}`;
           // For uploads, we can't easily retry because body is a stream
-          if (action !== 'upload') {
+          if (action !== 'upload' && action !== 'upload_file') {
             const retryResponse = await fetch(endpoint, {
               method: 'POST',
               headers,
