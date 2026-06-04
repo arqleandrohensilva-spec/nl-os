@@ -489,6 +489,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Financeiro" 
             active={location.pathname === '/financeiro'} 
             onClick={() => navigate('/financeiro')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
 
@@ -503,16 +504,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Marketing com IA" 
             active={location.pathname === '/marketing/ia'} 
             onClick={() => navigate('/marketing/ia')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Pesquisa de Satisfação" 
             active={location.pathname === '/marketing/satisfacao'} 
             onClick={() => navigate('/marketing/satisfacao')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Scripts" 
             active={location.pathname === '/scripts-atendimento'} 
             onClick={() => navigate('/scripts-atendimento')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
 
@@ -527,21 +531,25 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Configurações" 
             active={location.pathname === '/sistema/configuracoes'} 
             onClick={() => navigate('/sistema/configuracoes')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Base Financeira" 
             active={location.pathname === '/financeiro/base'} 
             onClick={() => navigate('/financeiro/base')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Biblioteca" 
             active={location.pathname === '/propostas/biblioteca'} 
             onClick={() => navigate('/propostas/biblioteca')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Documentos" 
             active={location.pathname === '/propostas/documentos'} 
             onClick={() => navigate('/propostas/documentos')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
       </div>
