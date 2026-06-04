@@ -554,7 +554,7 @@ const ProjetoDetalhe = () => {
             </section>
 
             {/* COLUMN RIGHT */}
-            <section className="space-y-8">
+            <section className="space-y-8 min-w-0 overflow-hidden">
                 
                 {/* Card Financeiro — resumo */}
                 <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '16px 20px', marginBottom: '12px' }}>
