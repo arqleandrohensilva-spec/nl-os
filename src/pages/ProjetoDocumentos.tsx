@@ -267,7 +267,7 @@ const ProjetoDocumentos = () => {
                       }
                     }}
                     style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}
-                    className="hover:bg-white/[0.02] transition-colors"
+                    className="hover:bg-white/[0.02] transition-colors group/row"
                   >
                     <span style={{ fontSize: '16px' }}>{item['.tag'] === 'folder' ? '📁' : '📄'}</span>
                     <div style={{ flex: 1 }}>
@@ -276,21 +276,39 @@ const ProjetoDocumentos = () => {
                       </div>
                       {item.size && <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>{(item.size / 1024).toFixed(0)} KB</div>}
                     </div>
-                    {item['.tag'] === 'file' && (
+                    <div className="flex items-center gap-2 opacity-0 group-hover/row:opacity-100 transition-opacity">
                       <button
-                        onClick={async (e) => {
+                        onClick={(e) => {
                           e.stopPropagation();
-                          const { data } = await supabase.functions.invoke('dropbox-proxy', {
-                            body: { action: 'get_temporary_link', path: item.path_display }
-                          });
-                          if (data?.link) window.open(data.link, '_blank');
+                          setItemSelecionado(item);
+                          setDestinoMover('');
+                          const base = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${projeto?.nome_cliente} - ${tipoNome}`;
+                          setCaminhoNavegacaoMover(base);
+                          setBreadcrumbMover([{ nome: 'RAIZ DO CLIENTE', path: base }]);
+                          listarPastasDestino(base);
+                          setModalMover(true);
                         }}
                         style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', background: 'none', border: '1px solid rgba(139,115,85,0.3)', padding: '4px 10px', cursor: 'pointer', borderRadius: '3px' }}
                         className="hover:bg-[#8B7355] hover:text-white transition-all"
                       >
-                        ↓ BAIXAR
+                        MOVER
                       </button>
-                    )}
+                      {item['.tag'] === 'file' && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            const { data } = await supabase.functions.invoke('dropbox-proxy', {
+                              body: { action: 'get_temporary_link', path: item.path_display }
+                            });
+                            if (data?.link) window.open(data.link, '_blank');
+                          }}
+                          style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', background: 'none', border: '1px solid rgba(139,115,85,0.3)', padding: '4px 10px', cursor: 'pointer', borderRadius: '3px' }}
+                          className="hover:bg-[#8B7355] hover:text-white transition-all"
+                        >
+                          ↓ BAIXAR
+                        </button>
+                      )}
+                    </div>
                     {item['.tag'] === 'folder' && <span style={{ color: '#555', fontSize: '12px' }}>→</span>}
                   </div>
                 ))
