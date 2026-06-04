@@ -159,6 +159,17 @@ const SectionAccordion = ({
           </div>
         </div>
       )}
+      {isCollapsed && isPopoverOpen && (
+        <div 
+          className="fixed left-[64px] bg-[#1a1a1a] border border-white/10 p-0 overflow-hidden w-48 rounded-[6px] z-[9999]"
+          style={{ top: buttonRef.current?.getBoundingClientRect().top || 0 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex flex-col py-1">
+            {children}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
