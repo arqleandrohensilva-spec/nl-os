@@ -54,7 +54,11 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
     </div>
   );
 
-  if (isCollapsed) {
+  if (isCollapsed && !icon) { // This means it's an item inside a popover
+    return content;
+  }
+
+  if (isCollapsed && icon) { // Items in main sidebar (Clientes, Pipeline)
     return (
       <TooltipProvider>
         <Tooltip delayDuration={0}>
