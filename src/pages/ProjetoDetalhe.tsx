@@ -150,6 +150,13 @@ const ProjetoDetalhe = () => {
       if (eData) setEtapas(eData);
       const { data: cData } = await supabase.from('projeto_checklist').select('*').eq('projeto_id', id);
       if (cData) setChecklist(cData);
+
+      const { data: logData } = await supabase
+        .from('projeto_horas_log')
+        .select('*')
+        .eq('projeto_id', id)
+        .order('criado_em', { ascending: false });
+      if (logData) setHorasLog(logData);
     } catch (e) {
       console.error(e);
     } finally {
