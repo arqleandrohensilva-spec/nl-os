@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { toast } from "sonner";
 import Sidebar from '@/components/Sidebar';
 
@@ -13,6 +13,7 @@ const ProjetoDocumentos = () => {
   const [pastaAtual, setPastaAtual] = useState('');
   const [breadcrumb, setBreadcrumb] = useState<{nome: string, path: string}[]>([]);
   const [carregando, setCarregando] = useState(false);
+  const [busca, setBusca] = useState('');
 
   const tipoNome = projeto?.tipo?.includes('Interiores') ? 'Arquitetura + Interiores' 
     : projeto?.tipo?.includes('Comercial') ? 'Comercial' 
@@ -46,6 +47,10 @@ const ProjetoDocumentos = () => {
       setCarregando(false);
     }
   };
+
+  const arquivosFiltrados = arquivos.filter(item => 
+    item.name.toLowerCase().includes(busca.toLowerCase())
+  );
 
   useEffect(() => {
     const fetchProjeto = async () => {
@@ -97,6 +102,18 @@ const ProjetoDocumentos = () => {
                 <p className="text-[10px] font-mono uppercase tracking-wider text-white/70 group-hover:text-[#8B7355]">{atalho.label}</p>
               </div>
             ))}
+          </div>
+
+          {/* BARRA DE BUSCA */}
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={14} />
+            <input 
+              type="text"
+              placeholder="BUSCAR PASTA OU ARQUIVO..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="w-full bg-[#141414] border border-white/5 p-4 pl-12 text-[10px] font-mono uppercase tracking-widest text-white focus:outline-none focus:border-[#8B7355]/50 transition-colors"
+            />
           </div>
 
           {/* EXPLORADOR */}
@@ -161,12 +178,12 @@ const ProjetoDocumentos = () => {
                 <div className="flex items-center justify-center h-[400px] text-[10px] font-mono text-[#555] uppercase tracking-widest">
                   Carregando arquivos...
                 </div>
-              ) : arquivos.length === 0 ? (
+              ) : arquivosFiltrados.length === 0 ? (
                 <div className="flex items-center justify-center h-[400px] text-[10px] font-mono text-[#444] uppercase tracking-widest">
-                  Pasta vazia
+                  {busca ? 'Nenhum resultado encontrado' : 'Pasta vazia'}
                 </div>
               ) : (
-                arquivos.map(item => (
+                arquivosFiltrados.map(item => (
                   <div
                     key={item.path_lower}
                     onClick={() => {
