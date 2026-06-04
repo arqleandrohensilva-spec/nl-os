@@ -369,7 +369,7 @@ const ProjetoDetalhe = () => {
             </div>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] xl:grid-cols-[65%_35%] gap-8 md:gap-12 max-w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] xl:grid-cols-[62%_38%] gap-8 md:gap-12 max-w-full">
             
             {/* COLUMN LEFT: ETAPAS */}
             <section className="space-y-6 min-w-0">
