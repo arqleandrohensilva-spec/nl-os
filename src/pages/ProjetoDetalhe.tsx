@@ -292,9 +292,9 @@ const ProjetoDetalhe = () => {
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white/40">CARREGANDO...</div>;
 
   return (
-    <div className="flex min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
+    <div className="min-h-screen bg-[#0d0d0d] text-[#e8e8e8] font-sans">
       <Sidebar user="Equipe NL" />
-      <main className="flex-1 lg:ml-[230px] p-4 md:p-8 w-full max-w-full overflow-hidden">
+      <main className="lg:pl-[230px] p-4 md:p-8">
         
         {/* HEADER */}
         <header className="mb-12">
