@@ -571,7 +571,7 @@ const ProjetoDetalhe = () => {
                   {/* Valor total */}
                   <div style={{ marginBottom: '14px' }}>
                     <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#555', marginBottom: '4px' }}>VALOR TOTAL DO CONTRATO</div>
-                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8' }}>
+                    <div style={{ fontFamily: 'Georgia, serif', fontSize: '24px', color: '#e8e8e8', wordBreak: 'break-word' }}>
                       R$ {contrato?.valor_total || projeto.valor_total || '—'}
                     </div>
                   </div>
