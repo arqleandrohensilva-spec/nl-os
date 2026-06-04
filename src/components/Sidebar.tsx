@@ -38,7 +38,7 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
             "text-[12px] transition-colors whitespace-nowrap",
-            isCollapsed ? "font-sans normal-case text-[#ccc] group-hover:text-bronze" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
+            isCollapsed ? "hidden" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
             active && !isCollapsed ? "text-white" : "group-hover:text-white/70",
             isCollapsed && "px-0"
           )}>
