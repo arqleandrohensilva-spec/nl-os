@@ -344,7 +344,7 @@ const ProjetoDetalhe = () => {
                         const isDone = etapaData?.status === 'Aprovado';
                         const isCurrent = projeto.etapa_atual === config.id;
                         return (
-                            <div key={config.id} className="flex flex-col items-center gap-2 bg-[#0d0d0d] z-10 min-w-0">
+                            <div key={config.id} className="flex flex-col items-center gap-1 bg-[#0d0d0d] z-10 min-w-0">
                                 <div className={cn(
                                     "w-3 h-3 rounded-full border transition-all duration-500 flex-shrink-0",
                                     isDone ? "bg-[#8B7355] border-[#8B7355]" : isCurrent ? "bg-[#8B7355] border-[#8B7355] shadow-[0_0_10px_rgba(139,115,85,0.5)]" : "bg-[#0d0d0d] border-white/10"
