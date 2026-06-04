@@ -193,6 +193,30 @@ const ProjetoDetalhe = () => {
     fetchData();
   };
 
+  const handleLancarHoras = async (configId: string, etapaData: any) => {
+    if (!etapaData) {
+      // Criar etapa no banco se não existe
+      const { data: novaEtapa } = await supabase
+        .from('projeto_etapas')
+        .insert({
+          projeto_id: id,
+          etapa: configId,
+          status: 'Pendente',
+          horas_estimadas: 0,
+          horas_lancadas: 0,
+        })
+        .select()
+        .single();
+      
+      if (novaEtapa) {
+        await fetchData();
+        setLancandoHoras(novaEtapa.id);
+      }
+    } else {
+      setLancandoHoras(etapaData.id);
+    }
+  };
+
   const toggleChecklistItem = async (itemId: string, currentStatus: boolean) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -411,7 +435,7 @@ const ProjetoDetalhe = () => {
                                     </div>
                                   ) : (
                                     <button
-                                      onClick={() => setLancandoHoras(etapaData?.id || null)}
+                                      onClick={() => handleLancarHoras(config.id, etapaData)}
                                       style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', background: 'none', border: '1px solid rgba(139,115,85,0.3)', padding: '5px 12px', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em', borderRadius: '3px' }}
                                     >
                                       + LANÇAR HORAS
