@@ -511,6 +511,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'FINANCEIRO'}
         >
           <NavItem 
             label="Financeiro" 
