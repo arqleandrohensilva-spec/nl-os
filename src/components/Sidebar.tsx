@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { supabase } from '@/integrations/supabase/client';
 
 interface NavItemProps {
@@ -25,22 +26,24 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
     <div 
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        "flex flex-col py-2.5 transition-all duration-200 group relative border-l-2",
+        "flex flex-col py-2.5 transition-all duration-200 group relative",
         isCollapsed ? "px-0 items-center justify-center border-l-0" : "px-10 border-l-2",
-        active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
+        !isCollapsed && active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
+        isCollapsed && "hover:bg-white/10 px-4 py-2.5",
+        isCollapsed && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center" : "justify-between")}>
-        <div className="flex items-center gap-2">
+      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-start w-full" : "justify-between")}>
+        <div className="flex items-center gap-2 w-full">
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
-          {!isCollapsed && (
-            <span className={cn(
-              "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
-              active ? "text-white" : "group-hover:text-white/70"
-            )}>
-              {label}
-            </span>
-          )}
+          <span className={cn(
+            "text-[12px] transition-colors whitespace-nowrap",
+            isCollapsed ? "font-sans normal-case text-[#ccc] group-hover:text-bronze" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
+            active && !isCollapsed ? "text-white" : "group-hover:text-white/70",
+            isCollapsed && "px-0"
+          )}>
+            {label}
+          </span>
         </div>
         {!isCollapsed && disabled && (
           <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
@@ -51,7 +54,11 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
     </div>
   );
 
-  if (isCollapsed) {
+  if (isCollapsed && !icon) { // This means it's an item inside a popover
+    return content;
+  }
+
+  if (isCollapsed && icon) { // Items in main sidebar (Clientes, Pipeline)
     return (
       <TooltipProvider>
         <Tooltip delayDuration={0}>
@@ -83,15 +90,15 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
   const content = (
     <div className="mb-1">
       <button 
-        onClick={onToggle}
+        onClick={!isCollapsed ? onToggle : undefined}
         className={cn(
           "w-full flex items-center transition-colors duration-200",
           isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
-          isOpen ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
+          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/60")}>
+          <div className={cn("transition-colors", isOpen && !isCollapsed ? "text-bronze" : "text-white/60")}>
             {icon}
           </div>
           {!isCollapsed && (
@@ -129,16 +136,21 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
 
   if (isCollapsed) {
     return (
-      <TooltipProvider>
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            {content}
-          </TooltipTrigger>
-          <TooltipContent side="right" className="bg-[#1A1A1A] border-white/10 text-[10px] uppercase tracking-widest text-white font-bold rounded-none">
-            {label}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Popover>
+        <PopoverTrigger asChild>
+          {content}
+        </PopoverTrigger>
+        <PopoverContent 
+          side="right" 
+          align="start" 
+          sideOffset={10}
+          className="bg-[#1a1a1a] border-white/10 p-0 overflow-hidden w-48 rounded-[6px]"
+        >
+          <div className="flex flex-col py-1">
+            {children}
+          </div>
+        </PopoverContent>
+      </Popover>
     );
   }
 
@@ -456,11 +468,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Gestão de Projetos" 
             active={location.pathname === '/projetos/gestao'} 
             onClick={() => navigate('/projetos/gestao')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Controle de Horas" 
             active={location.pathname === '/projetos/horas'} 
             onClick={() => navigate('/projetos/horas')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
 
@@ -475,6 +489,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Financeiro" 
             active={location.pathname === '/financeiro'} 
             onClick={() => navigate('/financeiro')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
 
@@ -489,16 +504,19 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Marketing com IA" 
             active={location.pathname === '/marketing/ia'} 
             onClick={() => navigate('/marketing/ia')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Pesquisa de Satisfação" 
             active={location.pathname === '/marketing/satisfacao'} 
             onClick={() => navigate('/marketing/satisfacao')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Scripts" 
             active={location.pathname === '/scripts-atendimento'} 
             onClick={() => navigate('/scripts-atendimento')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
 
@@ -513,21 +531,25 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
             label="Configurações" 
             active={location.pathname === '/sistema/configuracoes'} 
             onClick={() => navigate('/sistema/configuracoes')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Base Financeira" 
             active={location.pathname === '/financeiro/base'} 
             onClick={() => navigate('/financeiro/base')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Biblioteca" 
             active={location.pathname === '/propostas/biblioteca'} 
             onClick={() => navigate('/propostas/biblioteca')} 
+            isCollapsed={isCollapsed}
           />
           <NavItem 
             label="Documentos" 
             active={location.pathname === '/propostas/documentos'} 
             onClick={() => navigate('/propostas/documentos')} 
+            isCollapsed={isCollapsed}
           />
         </SectionAccordion>
       </div>
