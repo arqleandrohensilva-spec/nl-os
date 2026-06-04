@@ -530,22 +530,24 @@ const ProjetoDetalhe = () => {
                     <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' }}>
                       Histórico de Horas Lançadas
                     </div>
-                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px' }}>
                         {['Etapa', 'Horas', 'Quem', 'Quando'].map(h => (
                           <span key={h} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
                         ))}
                       </div>
-                      {horasLog.map((log: any) => (
-                        <div key={log.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.6fr 0.6fr 1fr', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }}>
-                          <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{log.etapa_nome}</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#8B7355', fontWeight: 'bold' }}>+{log.horas}h</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777' }}>{log.usuario}</div>
-                          <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>
-                            {log.criado_em ? new Date(log.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                      <div style={{ minWidth: '400px' }}>
+                        {horasLog.map((log: any) => (
+                          <div key={log.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', alignItems: 'center' }}>
+                            <div style={{ fontFamily: 'Arial', fontSize: '12px', color: '#ccc' }}>{log.etapa_nome}</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#8B7355', fontWeight: 'bold' }}>+{log.horas}h</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777' }}>{log.usuario}</div>
+                            <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>
+                              {log.criado_em ? new Date(log.criado_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
