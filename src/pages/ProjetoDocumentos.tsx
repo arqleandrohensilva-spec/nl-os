@@ -22,10 +22,10 @@ const ProjetoDocumentos = () => {
   const pastaDocumentos = `${pastaBase}/08 - Documentos`;
 
   const atalhos = [
-    { label: 'Proposta e Contrato', path: `${pastaDocumentos}/02 - Proposta e Contrato`, icon: '📋' },
     { label: 'Briefing', path: `${pastaDocumentos}/01 - Briefing`, icon: '📝' },
+    { label: 'Proposta e Contrato', path: `${pastaDocumentos}/02 - Proposta e Contrato`, icon: '📋' },
     { label: 'Atas e Reuniões', path: `${pastaDocumentos}/04 - Atas e Reunioes`, icon: '📅' },
-    { label: 'Pasta Completa', path: pastaBase, icon: '📁' },
+    { label: 'Decisões e Aprovações', path: `${pastaDocumentos}/05 - Decisoes e Aprovacoes`, icon: '✅' },
   ];
 
   const listarArquivos = async (caminho: string) => {
