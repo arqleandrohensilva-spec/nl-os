@@ -84,15 +84,15 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
   const content = (
     <div className="mb-1">
       <button 
-        onClick={onToggle}
+        onClick={!isCollapsed ? onToggle : undefined}
         className={cn(
           "w-full flex items-center transition-colors duration-200",
           isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
-          isOpen ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
+          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn("transition-colors", isOpen ? "text-bronze" : "text-white/60")}>
+          <div className={cn("transition-colors", isOpen && !isCollapsed ? "text-bronze" : "text-white/60")}>
             {icon}
           </div>
           {!isCollapsed && (
@@ -130,16 +130,21 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
 
   if (isCollapsed) {
     return (
-      <TooltipProvider>
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>
-            {content}
-          </TooltipTrigger>
-          <TooltipContent side="right" className="bg-[#1A1A1A] border-white/10 text-[10px] uppercase tracking-widest text-white font-bold rounded-none">
-            {label}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Popover>
+        <PopoverTrigger asChild>
+          {content}
+        </PopoverTrigger>
+        <PopoverContent 
+          side="right" 
+          align="start" 
+          sideOffset={10}
+          className="bg-[#1a1a1a] border-white/10 p-0 overflow-hidden w-48 rounded-[6px]"
+        >
+          <div className="flex flex-col py-1">
+            {children}
+          </div>
+        </PopoverContent>
+      </Popover>
     );
   }
 
