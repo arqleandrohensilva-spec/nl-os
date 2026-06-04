@@ -694,7 +694,7 @@ const SatisfacaoDashboard = () => {
                       )}
                     </div>
                   </div>
-                )
+                ))
               )}
             </div>
           </div>
