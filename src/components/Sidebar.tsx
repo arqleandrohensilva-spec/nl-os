@@ -194,6 +194,10 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
   });
 
   useEffect(() => {
+    setPopoverAberto(null);
+  }, [location.pathname]);
+
+  useEffect(() => {
     const handler = () => setPopoverAberto(null);
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
