@@ -14,6 +14,13 @@ const ProjetoDocumentos = () => {
   const [breadcrumb, setBreadcrumb] = useState<{nome: string, path: string}[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [busca, setBusca] = useState('');
+  const [itemSelecionado, setItemSelecionado] = useState<any>(null);
+  const [modalMover, setModalMover] = useState(false);
+  const [destinoMover, setDestinoMover] = useState<string>('');
+  const [pastasDestino, setPastasDestino] = useState<any[]>([]);
+  const [carregandoPastas, setCarregandoPastas] = useState(false);
+  const [caminhoNavegacaoMover, setCaminhoNavegacaoMover] = useState<string>('');
+  const [breadcrumbMover, setBreadcrumbMover] = useState<{nome: string, path: string}[]>([]);
 
   const tipoNome = projeto?.tipo?.includes('Interiores') ? 'Arquitetura + Interiores' 
     : projeto?.tipo?.includes('Comercial') ? 'Comercial' 
