@@ -311,7 +311,6 @@ const ProjetoDetalhe = () => {
                         )
                     })}
                 </div>
-            </div>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-12">
