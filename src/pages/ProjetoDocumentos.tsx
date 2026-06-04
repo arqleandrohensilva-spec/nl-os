@@ -52,6 +52,22 @@ const ProjetoDocumentos = () => {
     item.name.toLowerCase().includes(busca.toLowerCase())
   );
 
+  const realcarTexto = (texto: string, destaque: string) => {
+    if (!destaque.trim()) return texto;
+    const partes = texto.split(new RegExp(`(${destaque})`, 'gi'));
+    return (
+      <>
+        {partes.map((parte, i) => 
+          parte.toLowerCase() === destaque.toLowerCase() ? (
+            <span key={i} className="bg-[#8B7355]/30 text-[#8B7355] font-bold">{parte}</span>
+          ) : (
+            parte
+          )
+        )}
+      </>
+    );
+  };
+
   useEffect(() => {
     const fetchProjeto = async () => {
       const { data } = await supabase.from('projetos').select('nome_cliente, tipo').eq('id', id).single();
@@ -197,7 +213,9 @@ const ProjetoDocumentos = () => {
                   >
                     <span style={{ fontSize: '16px' }}>{item['.tag'] === 'folder' ? '📁' : '📄'}</span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#ccc' }}>{item.name}</div>
+                      <div style={{ fontFamily: 'Arial', fontSize: '13px', color: '#ccc' }}>
+                        {realcarTexto(item.name, busca)}
+                      </div>
                       {item.size && <div style={{ fontFamily: 'Arial', fontSize: '10px', color: '#555' }}>{(item.size / 1024).toFixed(0)} KB</div>}
                     </div>
                     {item['.tag'] === 'file' && (
