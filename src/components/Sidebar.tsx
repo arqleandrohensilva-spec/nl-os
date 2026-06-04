@@ -122,11 +122,11 @@ const SectionAccordion = ({
           "w-full flex items-center transition-colors duration-200",
           isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
           isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]",
-          isPopoverOpen && isCollapsed && "bg-white/10 text-bronze"
+          isPopoverOpen && isCollapsed && "bg-white/10"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60")}>
+          <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>
             {icon}
           </div>
           {!isCollapsed && (
