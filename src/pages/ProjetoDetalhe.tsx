@@ -288,7 +288,7 @@ const ProjetoDetalhe = () => {
                 </div>
               ) : null;
             })()}
-            </div>
+        </header>
             
             {/* PROGRESS BAR - 5 POINTS */}
             <div className="mt-10 relative">
