@@ -616,6 +616,82 @@ const ClienteFicha = () => {
       toast.error("Erro ao baixar contrato");
     }
   };
+  
+  const handleUploadToDropbox = async (contract: any) => {
+    if (!cliente) return;
+    try {
+      toast.info("Preparando arquivo para o Dropbox...");
+      
+      const blobToBase64 = (blob: Blob): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64String = (reader.result as string).split(',')[1];
+            resolve(base64String);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+      const dadosGerais = contract.dados_gerais as any;
+      const contractData: ContractData = {
+        numero: contract.numero,
+        cliente: dadosGerais,
+        projeto: {
+          tipo: contract.tipo,
+          plano: contract.plano,
+          endereco: dadosGerais?.endereco || '',
+          tipoImovel: 'Residência',
+          areaTerreno: '',
+          areaConstruida: '',
+          matricula: '',
+          cartorio: ''
+        },
+        prazos: contract.prazos as any,
+        honorarios: contract.valores as any,
+        nl: {
+          cauLeandro: 'A203598-7',
+          cauNeandro: 'A203599-5',
+          cpfNeandro: '000.000.000-00'
+        },
+        dataAssinatura: contract.data_assinatura || format(new Date(), 'dd/MM/yyyy')
+      };
+      
+      const blob = await generateContractDocx(contractData);
+      if (!blob) throw new Error("Erro ao gerar DOCX");
+
+      const base64File = await blobToBase64(blob);
+
+      const tipoNome = cliente.tipo_projeto?.includes('Interiores') ? 'Arquitetura + Interiores' 
+        : cliente.tipo_projeto?.includes('Comercial') ? 'Comercial' 
+        : 'Arquitetura + Interiores';
+
+      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${cliente.nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/${contract.numero} - ${cliente.nome}.docx`;
+
+      const { error: uploadError } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { 
+          action: 'upload', 
+          path, 
+          content: base64File 
+        }
+      });
+
+      if (uploadError) throw uploadError;
+
+      await supabase.from('contratos_clientes').update({ 
+        enviado_dropbox: true, 
+        enviado_dropbox_em: new Date().toISOString() 
+      } as any).eq('id', contract.id);
+
+      toast.success("Contrato enviado para o Dropbox!");
+      queryClient.invalidateQueries({ queryKey: ['contratos_cliente', id] });
+      
+    } catch (error) {
+      console.error('Erro ao enviar para Dropbox:', error);
+      toast.error("Erro ao enviar contrato para o Dropbox");
+    }
+  };
 
   const handleGenerateContract = async () => {
 
