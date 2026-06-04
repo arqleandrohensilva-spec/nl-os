@@ -136,7 +136,25 @@ const ProjetoDetalhe = () => {
   };
 
   const saveProjetoNotas = async (notas: string) => {
-      // Logic for generic notes if needed
+    // Logic for generic notes if needed
+  };
+
+  const handleLancarHoras = async (etapaId: string) => {
+    const horas = prompt("Quantas horas deseja lançar?");
+    if (horas && !isNaN(Number(horas))) {
+      const config = ETAPAS_CONFIG.find(c => c.id === etapaId);
+      const { error } = await supabase.from('projeto_horas_log').insert({
+        projeto_id: id,
+        etapa_nome: config?.label.split('·')[1].trim(),
+        horas: Number(horas),
+        usuario: 'Equipe NL'
+      });
+      
+      if (!error) {
+        toast.success("Horas lançadas com sucesso");
+        fetchData();
+      }
+    }
   };
 
   const handleDeleteProject = async () => {
@@ -147,8 +165,8 @@ const ProjetoDetalhe = () => {
 
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white">CARREGANDO...</div>;
 
-  const currentEtapaIdx = ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual);
-  const pct = Math.round(((currentEtapaIdx + 1) / 6) * 100);
+  const currentEtapaIdx = ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual?.toUpperCase());
+  const pct = currentEtapaIdx === -1 ? 0 : Math.round(((currentEtapaIdx + 1) / 6) * 100);
 
   return (
     <div className="flex min-h-screen bg-[#0d0d0d]">
