@@ -530,8 +530,8 @@ const ProjetoDetalhe = () => {
                     <div style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '12px' }}>
                       Histórico de Horas Lançadas
                     </div>
-                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px' }}>
+                    <div style={{ background: '#141414', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', overflowX: 'auto', width: '100%', maxWidth: '100%' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1.5fr) minmax(60px, 0.6fr) minmax(60px, 0.6fr) minmax(100px, 1fr)', padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)', minWidth: '400px', maxWidth: '100%' }}>
                         {['Etapa', 'Horas', 'Quem', 'Quando'].map(h => (
                           <span key={h} style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{h}</span>
                         ))}
