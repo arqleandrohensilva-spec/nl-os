@@ -301,7 +301,7 @@ const ProjetoDetalhe = () => {
             <Button variant="ghost" onClick={() => navigate('/projetos/gestao')} className="text-[#555] hover:text-white px-0 hover:bg-transparent text-xs uppercase tracking-widest mb-6">
                 <ArrowLeft className="mr-2" size={14} /> Voltar
             </Button>
-            <div className="flex items-end justify-between">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div className="space-y-2">
                     <h1 className="text-[32px] font-['Georgia'] text-white leading-tight">{projeto.nome_cliente}</h1>
                     <div className="flex items-center gap-4 text-[#555] font-['Courier_New'] text-[10px] uppercase">
