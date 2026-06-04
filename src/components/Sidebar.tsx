@@ -84,21 +84,49 @@ interface SectionAccordionProps {
   children: React.ReactNode;
   badge?: number;
   isCollapsed?: boolean;
+  onPopoverClick?: (label: string, top: number) => void;
+  isPopoverOpen?: boolean;
 }
 
-const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCollapsed }: SectionAccordionProps) => {
-  const content = (
-    <div className="mb-1">
+const SectionAccordion = ({ 
+  label, 
+  icon, 
+  isOpen, 
+  onToggle, 
+  children, 
+  badge, 
+  isCollapsed,
+  onPopoverClick,
+  isPopoverOpen
+}: SectionAccordionProps) => {
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isCollapsed) {
+      onToggle();
+    } else {
+      e.stopPropagation();
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        onPopoverClick?.(label, rect.top);
+      }
+    }
+  };
+
+  return (
+    <div className="mb-1 relative">
       <button 
-        onClick={!isCollapsed ? onToggle : undefined}
+        ref={buttonRef}
+        onClick={handleClick}
         className={cn(
           "w-full flex items-center transition-colors duration-200",
           isCollapsed ? "justify-center py-4 px-0" : "justify-between px-6 py-3",
-          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]"
+          isOpen && !isCollapsed ? "bg-white/10 text-white" : "text-white/70 hover:text-white/90 hover:bg-white/[0.05]",
+          isPopoverOpen && isCollapsed && "bg-white/10 text-bronze"
         )}
       >
         <div className="flex items-center gap-3">
-          <div className={cn("transition-colors", isOpen && !isCollapsed ? "text-bronze" : "text-white/60")}>
+          <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60")}>
             {icon}
           </div>
           {!isCollapsed && (
@@ -133,28 +161,6 @@ const SectionAccordion = ({ label, icon, isOpen, onToggle, children, badge, isCo
       )}
     </div>
   );
-
-  if (isCollapsed) {
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          {content}
-        </PopoverTrigger>
-        <PopoverContent 
-          side="right" 
-          align="start" 
-          sideOffset={10}
-          className="bg-[#1a1a1a] border-white/10 p-0 overflow-hidden w-48 rounded-[6px]"
-        >
-          <div className="flex flex-col py-1">
-            {children}
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
-  }
-
-  return content;
 };
 
 const Sidebar = ({ user: initialUser }: { user: string }) => {
