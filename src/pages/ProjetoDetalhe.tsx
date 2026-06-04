@@ -282,5 +282,3 @@ const ProjetoDetalhe = () => {
 };
 
 export default ProjetoDetalhe;
-
-export default ProjetoDetalhe;
