@@ -336,9 +336,9 @@ const ProjetoDetalhe = () => {
               ) : null;
             })()}
             {/* PROGRESS BAR - 6 POINTS */}
-            <div className="mt-10 relative overflow-hidden" style={{ width: '100%' }}>
+            <div className="mt-10 relative overflow-hidden w-full">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
-                <div className="relative grid" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+                <div className="relative grid w-full" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
                     {ETAPAS_CONFIG.map((config, index) => {
                         const etapaData = etapas.find(e => e.etapa === config.id);
                         const isDone = etapaData?.status === 'Aprovado';
