@@ -127,7 +127,7 @@ const SectionAccordion = ({
           isPopoverOpen && isCollapsed && "bg-white/10"
         )}
       >
-        <div className="flex items-center gap-3">
+        <div className={cn("flex items-center", isCollapsed ? "" : "gap-3")}>
           <div className={cn("transition-colors", (isOpen && !isCollapsed) || (isPopoverOpen && isCollapsed) ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>
             {icon}
           </div>
