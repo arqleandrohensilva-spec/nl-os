@@ -594,7 +594,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       </div>
 
       <div className={cn("border-t border-white/5 bg-white/[0.02] mt-auto relative", isCollapsed ? "p-3" : "p-6")}>
-        <div className="flex items-center gap-3">
+        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "gap-3")}>
           <div className="w-9 h-9 border border-bronze/40 flex items-center justify-center text-bronze text-[11px] font-bold bg-bronze/5 uppercase shrink-0">
             {initials}
           </div>
