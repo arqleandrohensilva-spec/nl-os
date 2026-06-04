@@ -27,13 +27,13 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
       onClick={!disabled ? onClick : undefined}
       className={cn(
         "flex flex-col py-2.5 transition-all duration-200 group relative",
-        isCollapsed ? "px-0 items-center justify-center border-l-0" : "px-10 border-l-2",
+        isCollapsed ? "px-0 py-4 items-center justify-center border-l-0" : "px-10 border-l-2",
         !isCollapsed && active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
-        isCollapsed && "hover:bg-white/10 px-4 py-2.5",
+        isCollapsed && "hover:bg-white/10 px-0 py-4",
         isCollapsed && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-start w-full" : "justify-between")}>
+      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center w-full" : "justify-between")}>
         <div className="flex items-center gap-2 w-full">
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
           <span className={cn(
@@ -162,7 +162,7 @@ const SectionAccordion = ({
       {isCollapsed && isPopoverOpen && (
         <div 
           className="fixed left-[64px] bg-[#1a1a1a] border border-white/10 p-0 overflow-hidden w-48 rounded-[6px] z-[9999]"
-          style={{ top: buttonRef.current?.getBoundingClientRect().top || 0 }}
+          style={{ top: buttonRef.current?.getBoundingClientRect().top || 100 }}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col py-1">
@@ -492,7 +492,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
           isCollapsed={isCollapsed}
-          onPopoverClick={(label) => setPopoverAberto(label)}
+          onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'PROJETOS'}
         >
           <NavItem 
@@ -515,7 +515,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['FINANCEIRO']}
           onToggle={() => toggleSection('FINANCEIRO')}
           isCollapsed={isCollapsed}
-          onPopoverClick={(label) => setPopoverAberto(label)}
+          onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'FINANCEIRO'}
         >
           <NavItem 
@@ -532,7 +532,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['MARKETING']}
           onToggle={() => toggleSection('MARKETING')}
           isCollapsed={isCollapsed}
-          onPopoverClick={(label) => setPopoverAberto(label)}
+          onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'MARKETING'}
         >
           <NavItem 
@@ -561,7 +561,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['CONFIGURAÇÕES']}
           onToggle={() => toggleSection('CONFIGURAÇÕES')}
           isCollapsed={isCollapsed}
-          onPopoverClick={(label) => setPopoverAberto(label)}
+          onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'CONFIGURAÇÕES'}
         >
           <NavItem 
