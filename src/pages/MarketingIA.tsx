@@ -828,7 +828,7 @@ Gere o artigo completo com título, subtítulos e meta description.`;
   return (
     <div className="flex min-h-screen bg-[#0A0A0A]">
       <Sidebar user="Sócio" />
-      <main className="flex-1 ml-[230px] p-8">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-8">
         <header className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-cormorant font-bold text-white mb-1">Marketing com IA</h1>

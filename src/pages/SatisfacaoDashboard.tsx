@@ -306,7 +306,7 @@ const SatisfacaoDashboard = () => {
   return (
     <div className="flex min-h-screen bg-[#0A0A0A] text-white font-inter">
       <Sidebar user="Equipe NL" />
-      <main className="flex-1 ml-[230px] p-12">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-12">
         <div className="mb-10">
           <h1 className="text-3xl font-bold uppercase tracking-[0.2em] font-cormorant">Pesquisa de Satisfação</h1>
           <p className="text-bronze uppercase tracking-widest text-[10px] font-bold mt-1">PÓS-ENTREGA · DEPOIMENTOS · PAINEL NPS</p>

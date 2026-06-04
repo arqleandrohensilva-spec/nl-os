@@ -593,7 +593,7 @@ Retorne APENAS JSON:
     <div className="flex min-h-screen bg-[#0A0A0A] font-sans text-white">
       <Sidebar user={getDisplayName()} />
       
-      <main className="flex-1 ml-[230px] p-20 max-w-[1600px] mx-auto w-full">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-20 max-w-[1600px] mx-auto w-full">
         {/* Header */}
         <header className="mb-16 flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div>

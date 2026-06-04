@@ -179,7 +179,7 @@ const ClientesLista = () => {
     <div className="flex min-h-screen bg-[#0A0A0A] text-[#E8E4DF]">
       <Sidebar user="User" />
       
-      <main className="flex-1 ml-[230px] p-10">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-10">
         <div className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-['Courier_New'] font-bold text-[#8B7355] tracking-tighter uppercase">CLIENTES</h1>

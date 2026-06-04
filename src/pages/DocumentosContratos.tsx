@@ -977,7 +977,7 @@ const DocumentosContratos = () => {
     <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user="Sócio" />
       
-      <main className="flex-1 ml-[230px] p-10">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] p-10">
         <header className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-white mb-1">Documentos e Contratos</h1>
           <p className="text-[#8B7355] text-[11px] uppercase tracking-[0.2em] font-bold">BRIEFING · CONTRATOS · ARQUIVOS</p>

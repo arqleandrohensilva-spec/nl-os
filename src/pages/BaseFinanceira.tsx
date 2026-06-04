@@ -528,7 +528,7 @@ Máximo 3 linhas. Sem markdown. Em português.
     <div className="flex min-h-screen bg-[#0A0A0A] text-white">
       <Sidebar user={user || ''} />
       
-      <main className="flex-1 ml-[230px] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
+      <main className="flex-1 transition-all duration-300 ml-[var(--sidebar-width)] flex flex-col h-screen overflow-hidden" id="base-financeira-content">
         {/* Header Section */}
         <div className="flex-shrink-0 bg-[#0A0A0A] z-10">
           <div className="px-10 py-6 border-b border-white/10">
