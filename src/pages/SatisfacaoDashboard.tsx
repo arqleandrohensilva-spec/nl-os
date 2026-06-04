@@ -5,7 +5,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink, FileVideo, Download, Search } from 'lucide-react';
+import { Plus, Send, MessageSquare, Trophy, TrendingUp, TrendingDown, Users, Copy, Check, Clock, ExternalLink, FileVideo, Download, Search, AlertTriangle, UserPlus, Share2 } from 'lucide-react';
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -47,6 +48,12 @@ const SatisfacaoDashboard = () => {
   const [surveysFilter, setSurveysFilter] = useState('TODAS');
   const [testimonialsFilter, setTestimonialsFilter] = useState('TODOS');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [selectedSurveyForReferral, setSelectedSurveyForReferral] = useState<any>(null);
+  const [isInternalNoteModalOpen, setIsInternalNoteModalOpen] = useState(false);
+  const [selectedSurveyForInternalNote, setSelectedSurveyForInternalNote] = useState<any>(null);
+  const [internalNote, setInternalNote] = useState('');
+  const [generatingTestimonial, setGeneratingTestimonial] = useState(false);
   
   const [stats, setStats] = useState({
     avg: 0,
@@ -257,6 +264,90 @@ const SatisfacaoDashboard = () => {
     toast({ title: "Texto copiado para a área de transferência" });
   };
 
+  const handleGenerateTestimonial = async (survey: any) => {
+    setGeneratingTestimonial(true);
+    try {
+      const { data: aiResponse, error } = await supabase.functions.invoke('ai-advisor', {
+        body: {
+          prompt: `Você é o assistente da NL Arquitetos. Com base nas respostas abaixo de uma pesquisa de satisfação, gere um depoimento formatado para uso em Instagram e Google Meu Negócio. Tom: autêntico, técnico, sem exageros.
+          
+          Cliente: ${survey.cliente_nome}
+          Projeto: ${survey.projeto?.nome} · ${survey.projeto?.tipo}
+          Nota geral: ${survey.nota_geral}/10
+          Resposta livre: ${survey.comentario || 'Não informado'}
+          
+          Retorne APENAS JSON:
+          {
+            "depoimento_instagram": "texto curto, até 3 linhas, sem hashtags",
+            "depoimento_google": "texto um pouco mais longo, até 5 linhas, em primeira pessoa",
+            "frase_destaque": "frase de impacto de até 12 palavras para usar como quote visual"
+          }`,
+          systemPrompt: "Você é um assistente da NL Arquitetos especializado em feedback de clientes.",
+          model: 'anthropic/claude-3-5-sonnet-20241022'
+        }
+      });
+
+      if (error) throw error;
+      
+      const content = aiResponse.choices?.[0]?.message?.content || "";
+      const cleanedJson = content.replace(/```json|```/g, '').trim();
+      const parsedData = JSON.parse(cleanedJson);
+
+      const { error: insertError } = await supabase
+        .from('depoimentos')
+        .insert({
+          pesquisa_id: survey.id,
+          cliente_nome: survey.cliente_nome,
+          projeto_id: survey.projeto_id,
+          depoimento_instagram: parsedData.depoimento_instagram,
+          depoimento_google: parsedData.depoimento_google,
+          frase_destaque: parsedData.frase_destaque,
+          texto_formatado: parsedData.depoimento_google,
+          status: 'PENDENTE'
+        });
+
+      if (insertError) throw insertError;
+
+      toast({ title: "Depoimento gerado — aguardando aprovação" });
+      fetchData();
+    } catch (error: any) {
+      console.error('Error generating testimonial:', error);
+      toast({ variant: "destructive", title: "Erro ao gerar depoimento", description: error.message });
+    } finally {
+      setGeneratingTestimonial(false);
+    }
+  };
+
+  const handleSaveInternalNote = async () => {
+    if (!selectedSurveyForInternalNote) return;
+    try {
+      const { error } = await supabase
+        .from('pesquisas_satisfacao')
+        .update({ notas_internas: internalNote })
+        .eq('id', selectedSurveyForInternalNote.id);
+
+      if (error) throw error;
+
+      toast({ title: "Nota interna salva" });
+      setIsInternalNoteModalOpen(false);
+      setInternalNote('');
+      fetchData();
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Erro ao salvar nota", description: error.message });
+    }
+  };
+
+  const openReferralModal = (survey: any) => {
+    setSelectedSurveyForReferral(survey);
+    setIsReferralModalOpen(true);
+  };
+
+  const openInternalNoteModal = (survey: any) => {
+    setSelectedSurveyForInternalNote(survey);
+    setInternalNote(survey.notas_internas || '');
+    setIsInternalNoteModalOpen(true);
+  };
+
   const filteredSurveys = surveys.filter(s => {
     const matchesFilter = 
       surveysFilter === 'TODAS' || 
@@ -368,51 +459,94 @@ const SatisfacaoDashboard = () => {
                   <p className="text-white/40 uppercase tracking-widest text-[10px] font-bold">Nenhuma pesquisa encontrada para este filtro.</p>
                 </div>
               ) : (
-                filteredSurveys.map((survey) => (
-                  <div 
-                    key={survey.id} 
-                    className={cn(
-                      "bg-white/[0.03] p-6 border transition-all flex justify-between items-center",
-                      survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
-                      survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
-                      survey.status === 'ARQUIVADA' && "border-white/5 opacity-50"
-                    )}
-                  >
-                    <div>
-                      <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
-                      <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
-                        {survey.cliente_nome} · {survey.tipo || 'Pós-Entrega'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className={cn(
-                        "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
-                        survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : 
-                        survey.status === 'ARQUIVADA' ? "bg-white/10 text-white/40" : "bg-yellow-500/20 text-yellow-400"
-                      )}>
-                        {survey.status}
-                      </span>
-                      <div className="flex gap-2">
+                filteredSurveys.map((survey) => {
+                  const hasTestimonial = testimonials.some(t => t.pesquisa_id === survey.id);
+                  return (
+                    <div 
+                      key={survey.id} 
+                      className={cn(
+                        "bg-white/[0.03] p-6 border transition-all flex justify-between items-center",
+                        survey.status === 'PENDENTE' && "border-amber-500/30 opacity-80",
+                        survey.status === 'RESPONDIDA' && "border-bronze shadow-[0_0_15px_rgba(184,134,11,0.1)]",
+                        survey.status === 'ARQUIVADA' && "border-white/5 opacity-50",
+                        survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && "border-red-500/50"
+                      )}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-lg font-bold font-cormorant uppercase tracking-wider">{survey.projeto?.nome || 'Sem Projeto'}</h3>
+                          {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && (
+                            <span className="bg-red-500/20 text-red-400 text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 flex items-center gap-1 border border-red-500/30">
+                              <AlertTriangle className="w-3 h-3" /> Atenção
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
+                          {survey.cliente_nome} · {survey.tipo || 'Pós-Entrega'}
+                        </p>
                         {survey.status === 'RESPONDIDA' && (
-                          <Button 
-                            onClick={() => archivarPesquisa(survey.id)}
-                            variant="outline" 
-                            className="h-8 border-white/10 bg-transparent text-[9px] uppercase font-bold tracking-widest rounded-none hover:bg-white/5"
-                          >
-                            Arquivar
-                          </Button>
+                          <p className="text-white/40 text-[10px] mt-1 uppercase font-medium">Nota: {survey.nota_geral}/10</p>
                         )}
-                        <Button variant="ghost" size="icon" onClick={() => {
-                          const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
-                          navigator.clipboard.writeText(link);
-                          toast({ title: "Link copiado!" });
-                        }} className="text-white/40 hover:text-white">
-                          <Copy className="w-4 h-4" />
-                        </Button>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className={cn(
+                          "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
+                          survey.status === 'RESPONDIDA' ? "bg-green-500/20 text-green-400" : 
+                          survey.status === 'ARQUIVADA' ? "bg-white/10 text-white/40" : "bg-yellow-500/20 text-yellow-400"
+                        )}>
+                          {survey.status}
+                        </span>
+                        <div className="flex flex-col gap-2 min-w-[200px]">
+                          <div className="flex gap-2 justify-end">
+                            {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) >= 9 && (
+                              <Button 
+                                onClick={() => handleGenerateTestimonial(survey)}
+                                disabled={generatingTestimonial}
+                                className="h-8 bg-bronze hover:bg-bronze/90 text-[9px] uppercase font-bold tracking-widest rounded-none px-4"
+                              >
+                                {generatingTestimonial ? "Gerando..." : "Gerar Depoimento"}
+                              </Button>
+                            )}
+                            {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) <= 6 && (
+                              <Button 
+                                onClick={() => openInternalNoteModal(survey)}
+                                variant="outline"
+                                className="h-8 border-red-500/30 text-red-400 hover:bg-red-500/10 text-[9px] uppercase font-bold tracking-widest rounded-none px-4"
+                              >
+                                Registrar Contato
+                              </Button>
+                            )}
+                            {survey.status === 'RESPONDIDA' && (
+                              <Button 
+                                onClick={() => archivarPesquisa(survey.id)}
+                                variant="outline" 
+                                className="h-8 border-white/10 bg-transparent text-[9px] uppercase font-bold tracking-widest rounded-none hover:bg-white/5"
+                              >
+                                Arquivar
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => {
+                              const link = `https://app.nl.arq.br/satisfacao/${survey.token}`;
+                              navigator.clipboard.writeText(link);
+                              toast({ title: "Link copiado!" });
+                            }} className="text-white/40 hover:text-white">
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          {survey.status === 'RESPONDIDA' && (survey.nota_geral || 0) >= 9 && !hasTestimonial && (
+                            <Button 
+                              onClick={() => openReferralModal(survey)}
+                              variant="outline"
+                              className="h-8 border-bronze/30 text-bronze hover:bg-bronze/5 text-[9px] uppercase font-bold tracking-widest rounded-none w-full"
+                            >
+                              <UserPlus className="w-3 h-3 mr-2" /> Pedir Indicação
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </TabsContent>
@@ -468,14 +602,16 @@ const SatisfacaoDashboard = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-3">
-                          <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.pesquisa?.cliente_nome}</h3>
+                          <h3 className="text-xl font-bold font-cormorant uppercase tracking-wider">{dep.cliente_nome || dep.pesquisa?.cliente_nome}</h3>
                           {dep.pesquisa?.video_url && (
                             <span className="flex items-center gap-1 text-[9px] px-2 py-0.5 bg-bronze/20 text-bronze font-bold uppercase tracking-widest border border-bronze/30">
                               <FileVideo className="w-3 h-3" /> COM VÍDEO
                             </span>
                           )}
                         </div>
-                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">Nota {dep.pesquisa?.nota_geral} · {(dep.pesquisa?.nota_geral || 0) >= 9 ? 'Promotor' : 'Neutro/Detrator'}</p>
+                        <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">
+                          {dep.pesquisa?.projeto?.nome} · {dep.pesquisa?.projeto?.tipo}
+                        </p>
                       </div>
                       <span className={cn(
                         "text-[9px] px-3 py-1 font-bold uppercase tracking-widest",
@@ -486,9 +622,45 @@ const SatisfacaoDashboard = () => {
                         {dep.status === 'PENDENTE' ? 'PENDENTE APROVAÇÃO' : dep.status}
                       </span>
                     </div>
-                    <p className="text-white/70 italic text-lg font-cormorant leading-relaxed">
-                      {dep.texto_formatado || dep.pesquisa?.comentario || "Nenhum comentário preenchido."}
-                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Instagram</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.depoimento_instagram)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="text-white/70 italic text-sm font-cormorant leading-relaxed bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          {dep.depoimento_instagram || dep.texto_formatado || "Não gerado"}
+                        </p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Google</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.depoimento_google)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <p className="text-white/70 italic text-sm font-cormorant leading-relaxed bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          {dep.depoimento_google || "Não gerado"}
+                        </p>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Frase Destaque</Label>
+                          <Button variant="ghost" size="icon" onClick={() => handleCopyText(dep.frase_destaque)} className="h-6 w-6 text-white/40 hover:text-white">
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        <div className="flex items-center justify-center bg-white/5 p-4 border border-white/5 min-h-[100px]">
+                          <p className="text-white font-bold italic text-base font-cormorant leading-relaxed text-center">
+                            {dep.frase_destaque ? `"${dep.frase_destaque}"` : "Não gerada"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex flex-wrap gap-3 pt-4 border-t border-white/5">
                       {dep.status === 'PENDENTE' && (
                         <>
@@ -499,7 +671,6 @@ const SatisfacaoDashboard = () => {
                       
                       {dep.status === 'APROVADO' && (
                         <>
-                          <Button onClick={() => handleCopyText(dep.texto_formatado)} variant="outline" className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">Copiar Texto</Button>
                           <Button onClick={() => updateTestimonialStatus(dep.id, 'PUBLICADO')} className="bg-green-600 hover:bg-green-700 rounded-none uppercase tracking-widest text-[9px] font-bold">Marcar como Publicado</Button>
                           <Button onClick={() => window.open('https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID', '_blank')} variant="ghost" className="text-bronze hover:bg-bronze/5 rounded-none uppercase tracking-widest text-[9px] font-bold">Solicitar Avaliação Google</Button>
                         </>
@@ -511,12 +682,6 @@ const SatisfacaoDashboard = () => {
                         </div>
                       )}
                       
-                      {(dep.status === 'PENDENTE' || dep.status === 'APROVADO') && (
-                        <Button variant="outline" onClick={() => handleFormatClick(dep)} className="border-white/10 bg-transparent text-white/60 hover:text-white rounded-none uppercase tracking-widest text-[9px] font-bold">
-                          <MessageSquare className="w-3 h-3 mr-2" /> {dep.texto_formatado ? 'Re-formatar' : 'Formatar Depoimento'}
-                        </Button>
-                      )}
-
                       {dep.pesquisa?.video_url && (
                         <>
                           <Button variant="outline" onClick={() => { setCurrentVideoUrl(dep.pesquisa.video_url); setIsVideoModalOpen(true); }} className="border-bronze/30 bg-bronze/5 text-bronze hover:bg-bronze/10 rounded-none uppercase tracking-widest text-[9px] font-bold">
@@ -656,6 +821,52 @@ const SatisfacaoDashboard = () => {
       <Dialog open={isVideoModalOpen} onOpenChange={setIsVideoModalOpen}>
         <DialogContent className="bg-black border-white/10 text-white rounded-none max-w-3xl p-0 overflow-hidden">
           <video src={currentVideoUrl} controls autoPlay className="w-full h-auto aspect-video" />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isReferralModalOpen} onOpenChange={setIsReferralModalOpen}>
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
+          <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Pedir Indicação</DialogTitle></DialogHeader>
+          <div className="py-6 space-y-4">
+            <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Mensagem para enviar:</p>
+            <div className="bg-white/5 p-4 border border-white/5 italic text-sm">
+              {selectedSurveyForReferral?.cliente_nome}, que ótimo saber que o processo fez sentido para você! Você conhece alguém que esteja planejando construir ou reformar e que valorize processo técnico antes da obra? Se sim, ficaria feliz em conversar com essa pessoa.
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={() => {
+                const text = `${selectedSurveyForReferral?.cliente_nome}, que ótimo saber que o processo fez sentido para você! Você conhece alguém que esteja planejando construir ou reformar e que valorize processo técnico antes da obra? Se sim, ficaria feliz em conversar com essa pessoa.`;
+                navigator.clipboard.writeText(text);
+                toast({ title: "Mensagem copiada!" });
+              }} 
+              className="w-full bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold py-6"
+            >
+              <Copy className="w-4 h-4 mr-2" /> COPIAR MENSAGEM
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isInternalNoteModalOpen} onOpenChange={setIsInternalNoteModalOpen}>
+        <DialogContent className="bg-white/[0.03] border-white/10 text-white rounded-none">
+          <DialogHeader><DialogTitle className="uppercase tracking-widest font-cormorant text-2xl">Registrar Contato Interno</DialogTitle></DialogHeader>
+          <div className="py-6 space-y-4">
+            <Label className="text-[10px] uppercase tracking-widest font-bold text-white/40">Anotações Internas</Label>
+            <Textarea 
+              value={internalNote}
+              onChange={(e) => setInternalNote(e.target.value)}
+              placeholder="Descreva o contato feito com o cliente e as tratativas..."
+              className="bg-white/5 border-white/10 rounded-none min-h-[150px] text-sm focus-visible:ring-bronze"
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={handleSaveInternalNote}
+              className="w-full bg-bronze hover:bg-bronze/90 rounded-none uppercase tracking-widest text-[10px] font-bold py-6"
+            >
+              SALVAR NOTA
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
