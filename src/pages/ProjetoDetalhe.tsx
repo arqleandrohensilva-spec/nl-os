@@ -335,7 +335,7 @@ const ProjetoDetalhe = () => {
               ) : null;
             })()}
             {/* PROGRESS BAR - 5 POINTS */}
-            <div className="mt-10 relative">
+            <div className="mt-10 relative overflow-hidden">
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
                 <div className="relative flex justify-between">
                     {ETAPAS_CONFIG.map((config, index) => {
