@@ -335,7 +335,7 @@ const ProjetoDetalhe = () => {
               ) : null;
             })()}
             {/* PROGRESS BAR - 5 POINTS */}
-            <div className="mt-10 relative overflow-hidden">
+            <div className="mt-10 relative overflow-hidden" style={{ width: '100%' }}>
                 <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/5 -translate-y-1/2" />
                 <div className="relative flex justify-between">
                     {ETAPAS_CONFIG.map((config, index) => {
@@ -343,12 +343,15 @@ const ProjetoDetalhe = () => {
                         const isDone = etapaData?.status === 'Aprovado';
                         const isCurrent = projeto.etapa_atual === config.id;
                         return (
-                            <div key={config.id} className="flex flex-col items-center gap-3 bg-[#0d0d0d] px-2 z-10">
+                            <div key={config.id} className="flex flex-col items-center gap-3 bg-[#0d0d0d] px-2 z-10" style={{ maxWidth: '80px' }}>
                                 <div className={cn(
                                     "w-3 h-3 rounded-full border transition-all duration-500",
                                     isDone ? "bg-[#8B7355] border-[#8B7355]" : isCurrent ? "bg-[#8B7355] border-[#8B7355] shadow-[0_0_10px_rgba(139,115,85,0.5)]" : "bg-[#0d0d0d] border-white/10"
                                 )}></div>
-                                <span className={cn("text-[8px] uppercase tracking-[0.2em] font-bold", isCurrent || isDone ? "text-[#8B7355]" : "text-[#555]")}>
+                                <span 
+                                    className={cn("text-[8px] uppercase tracking-[0.2em] font-bold", isCurrent || isDone ? "text-[#8B7355]" : "text-[#555]")}
+                                    style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%', textAlign: 'center' }}
+                                >
                                     {config.label.split('·')[1].trim().split(' ')[0]}
                                 </span>
                             </div>
