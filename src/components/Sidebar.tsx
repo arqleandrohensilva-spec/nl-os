@@ -557,6 +557,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['CONFIGURAÇÕES']}
           onToggle={() => toggleSection('CONFIGURAÇÕES')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'CONFIGURAÇÕES'}
         >
           <NavItem 
             label="Configurações" 
