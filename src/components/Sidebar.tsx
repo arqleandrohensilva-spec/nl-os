@@ -26,10 +26,10 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
     <div 
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        "flex flex-col py-2.5 transition-all duration-200 group relative",
-        isCollapsed ? "px-0 py-4 items-center justify-center border-l-0" : "px-10 border-l-2",
-        !isCollapsed && active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
-        isCollapsed && "hover:bg-white/10 px-0 py-4",
+        'flex flex-col transition-all duration-200 group relative',
+        isCollapsed ? 'py-4 px-0 items-center justify-center border-l-0 w-full' : 'py-2.5 px-10 border-l-2',
+        !isCollapsed && active ? 'border-bronze bg-bronze/15 text-white' : 'border-transparent text-white/70',
+        isCollapsed && 'hover:bg-white/10',
         isCollapsed && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
