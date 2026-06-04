@@ -390,7 +390,14 @@ const ProjetoDetalhe = () => {
                       <span>{doc.label} →</span>
                     </div>
                   ))}
+                  <button
+                    onClick={() => navigate(`/projetos/${id}/documentos`)}
+                    style={{ width: '100%', marginTop: '12px', padding: '8px', background: 'transparent', border: '1px solid #8B7355', color: '#8B7355', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: 'pointer' }}
+                  >
+                    VER TODOS OS DOCUMENTOS →
+                  </button>
               </div>
+
           </div>
 
           {/* NOTAS */}
