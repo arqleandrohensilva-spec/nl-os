@@ -302,6 +302,7 @@ const SatisfacaoDashboard = () => {
           depoimento_instagram: parsedData.depoimento_instagram,
           depoimento_google: parsedData.depoimento_google,
           frase_destaque: parsedData.frase_destaque,
+          texto_formatado: parsedData.depoimento_google,
           status: 'PENDENTE'
         });
 
