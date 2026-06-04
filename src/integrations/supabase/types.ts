@@ -606,9 +606,14 @@ export type Database = {
       depoimentos: {
         Row: {
           aprovado_em: string | null
+          cliente_nome: string | null
           criado_em: string
+          depoimento_google: string | null
+          depoimento_instagram: string | null
+          frase_destaque: string | null
           id: string
           pesquisa_id: string | null
+          projeto_id: string | null
           publicado_em: string | null
           status: string
           texto_formatado: string
@@ -616,9 +621,14 @@ export type Database = {
         }
         Insert: {
           aprovado_em?: string | null
+          cliente_nome?: string | null
           criado_em?: string
+          depoimento_google?: string | null
+          depoimento_instagram?: string | null
+          frase_destaque?: string | null
           id?: string
           pesquisa_id?: string | null
+          projeto_id?: string | null
           publicado_em?: string | null
           status?: string
           texto_formatado: string
@@ -626,9 +636,14 @@ export type Database = {
         }
         Update: {
           aprovado_em?: string | null
+          cliente_nome?: string | null
           criado_em?: string
+          depoimento_google?: string | null
+          depoimento_instagram?: string | null
+          frase_destaque?: string | null
           id?: string
           pesquisa_id?: string | null
+          projeto_id?: string | null
           publicado_em?: string | null
           status?: string
           texto_formatado?: string
@@ -640,6 +655,13 @@ export type Database = {
             columns: ["pesquisa_id"]
             isOneToOne: false
             referencedRelation: "pesquisas_satisfacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "depoimentos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
             referencedColumns: ["id"]
           },
         ]
@@ -1246,6 +1268,7 @@ export type Database = {
           criado_em: string
           id: string
           nota_geral: number | null
+          notas_internas: string | null
           projeto_id: string | null
           respondida_em: string | null
           status: string
@@ -1263,6 +1286,7 @@ export type Database = {
           criado_em?: string
           id?: string
           nota_geral?: number | null
+          notas_internas?: string | null
           projeto_id?: string | null
           respondida_em?: string | null
           status?: string
@@ -1280,6 +1304,7 @@ export type Database = {
           criado_em?: string
           id?: string
           nota_geral?: number | null
+          notas_internas?: string | null
           projeto_id?: string | null
           respondida_em?: string | null
           status?: string
@@ -2127,6 +2152,7 @@ export type Database = {
           criado_em: string
           id: string
           nota_geral: number | null
+          notas_internas: string | null
           projeto_id: string | null
           respondida_em: string | null
           status: string
