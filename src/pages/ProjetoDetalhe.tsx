@@ -351,13 +351,39 @@ const ProjetoDetalhe = () => {
                                   <div style={{ display: 'flex', gap: '16px', flex: 1 }}>
                                     <div>
                                       <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Estimadas</span>
-                                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#777', marginTop: '2px' }}>
-                                        {etapaData?.horas_estimadas || 0}h
+                                      <div style={{ marginTop: '2px' }}>
+                                        {editandoEstimadas === etapaData?.id ? (
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <input
+                                              type="number"
+                                              defaultValue={etapaData?.horas_estimadas || 0}
+                                              autoFocus
+                                              onBlur={async (e) => {
+                                                await supabase
+                                                  .from('projeto_etapas')
+                                                  .update({ horas_estimadas: parseFloat(e.target.value) || 0 })
+                                                  .eq('id', etapaData.id);
+                                                setEditandoEstimadas(null);
+                                                fetchData();
+                                              }}
+                                              style={{ width: '50px', background: '#0d0d0d', border: '1px solid #555', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '3px', textAlign: 'center' }}
+                                            />
+                                            <span style={{ fontFamily: 'Arial', fontSize: '12px', color: '#555' }}>h</span>
+                                          </div>
+                                        ) : (
+                                          <div
+                                            onClick={() => setEditandoEstimadas(etapaData?.id || null)}
+                                            style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#777', cursor: 'pointer', borderBottom: '1px dashed #333' }}
+                                            title="Clique para editar"
+                                          >
+                                            {etapaData?.horas_estimadas || 0}h
+                                          </div>
+                                        )}
                                       </div>
                                     </div>
                                     <div>
                                       <span style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Lançadas</span>
-                                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px', color: '#8B7355', marginTop: '2px' }}>
+                                      <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#8B7355', marginTop: '2px' }}>
                                         {etapaData?.horas_lancadas || 0}h
                                       </div>
                                     </div>
