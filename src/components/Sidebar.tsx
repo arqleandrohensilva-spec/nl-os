@@ -488,6 +488,8 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isOpen={!!openSections['PROJETOS']}
           onToggle={() => toggleSection('PROJETOS')}
           isCollapsed={isCollapsed}
+          onPopoverClick={(label) => setPopoverAberto(label)}
+          isPopoverOpen={popoverAberto === 'PROJETOS'}
         >
           <NavItem 
             label="Gestão de Projetos" 
