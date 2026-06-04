@@ -209,27 +209,23 @@ const ProjetoDetalhe = () => {
 
           {/* PRÓXIMA AÇÃO */}
           {currentEtapaIdx !== -1 && currentEtapaIdx < 6 && (
-            <div className="bg-[#8B7355] p-8 text-white flex items-center justify-between group">
-              <div className="flex items-center gap-6">
-                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
-                  <Zap className="text-white w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-70">PRÓXIMA AÇÃO</p>
-                  <p className="text-2xl font-['Georgia'] italic mt-1">
-                    Aguardando aprovação do {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
-                  </p>
-                </div>
+            <div className="bg-[#8B7355] h-[48px] px-5 text-white flex items-center justify-between group">
+              <div className="flex items-center gap-3">
+                <Zap className="text-white w-4 h-4 shrink-0" />
+                <p className="text-[13px] leading-none">
+                  Aguardando aprovação do {ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim()}
+                </p>
               </div>
               <Button 
-                className="bg-white text-[#8B7355] hover:bg-white/90 font-mono text-xs tracking-widest px-8"
+                variant="ghost"
+                className="text-white hover:bg-white/10 p-0 h-auto text-[9px] font-mono tracking-widest uppercase"
                 onClick={() => {
                   const label = ETAPAS_CONFIG[currentEtapaIdx]?.label.split('·')[1].trim();
                   const msg = `Olá! Gostaria de falar sobre a etapa de ${label} do projeto ${projeto.nome}.`;
                   window.open(`https://wa.me/${lead?.telefone?.replace(/\D/g, '') || ''}?text=${encodeURIComponent(msg)}`, '_blank');
                 }}
               >
-                WHATSAPP
+                WHATSAPP →
               </Button>
             </div>
           )}
