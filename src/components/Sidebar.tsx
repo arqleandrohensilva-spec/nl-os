@@ -26,22 +26,24 @@ const NavItem = ({ label, icon, active, disabled, onClick, isCollapsed }: NavIte
     <div 
       onClick={!disabled ? onClick : undefined}
       className={cn(
-        "flex flex-col py-2.5 transition-all duration-200 group relative border-l-2",
+        "flex flex-col py-2.5 transition-all duration-200 group relative",
         isCollapsed ? "px-0 items-center justify-center border-l-0" : "px-10 border-l-2",
-        active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
+        !isCollapsed && active ? "border-bronze bg-bronze/15 text-white" : "border-transparent text-white/70",
+        isCollapsed && "hover:bg-white/10 px-4 py-2.5",
+        isCollapsed && active && "text-bronze",
         disabled ? "opacity-35 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"
       )}>
-      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-center" : "justify-between")}>
-        <div className="flex items-center gap-2">
+      <div className={cn("flex items-center gap-2", isCollapsed ? "justify-start w-full" : "justify-between")}>
+        <div className="flex items-center gap-2 w-full">
           {icon && <div className={cn("transition-colors", active ? "text-bronze" : "text-white/60 group-hover:text-white/80")}>{icon}</div>}
-          {!isCollapsed && (
-            <span className={cn(
-              "text-[10px] tracking-[0.05em] font-medium transition-colors uppercase opacity-90",
-              active ? "text-white" : "group-hover:text-white/70"
-            )}>
-              {label}
-            </span>
-          )}
+          <span className={cn(
+            "text-[12px] transition-colors whitespace-nowrap",
+            isCollapsed ? "font-sans normal-case text-[#ccc] group-hover:text-bronze" : "text-[10px] tracking-[0.05em] font-medium uppercase opacity-90",
+            active && !isCollapsed ? "text-white" : "group-hover:text-white/70",
+            isCollapsed && "px-0"
+          )}>
+            {label}
+          </span>
         </div>
         {!isCollapsed && disabled && (
           <span className="text-[7px] border border-bronze/30 text-bronze px-1 py-0.5 rounded-[1px] tracking-tighter shrink-0">
