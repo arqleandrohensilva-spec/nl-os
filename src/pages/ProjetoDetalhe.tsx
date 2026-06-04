@@ -324,7 +324,7 @@ const ProjetoDetalhe = () => {
               const pct = totalEstimadas > 0 ? Math.round(totalLancadas / totalEstimadas * 100) : 0;
               
               return totalEstimadas > 0 ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', flexWrap: 'wrap' }}>
                   <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                     {totalLancadas}h / {totalEstimadas}h estimadas
                   </span>
