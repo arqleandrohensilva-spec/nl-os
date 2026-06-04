@@ -188,6 +188,7 @@ const ProjetoDetalhe = () => {
 
   const lancarHoras = async (etapaId: string, horasNovas: number) => {
     const etapa = etapas.find(e => e.id === etapaId);
+    const etapaNome = ETAPAS_CONFIG.find(c => c.id === etapa?.etapa)?.label.split('·')[1].trim();
     const totalAtual = Number(etapa?.horas_lancadas || 0);
     const novoTotal = totalAtual + horasNovas;
     
@@ -196,7 +197,17 @@ const ProjetoDetalhe = () => {
       .update({ horas_lancadas: novoTotal })
       .eq('id', etapaId);
     
-    toast.success(`${horasNovas}h lançadas com sucesso`);
+    const { data: { user } } = await supabase.auth.getUser();
+    const userName = user?.email?.toLowerCase().includes('leandro') ? 'Leandro' : 'Neandro';
+    await supabase.from('projeto_horas_log').insert({
+      projeto_id: id,
+      etapa_id: etapaId,
+      etapa_nome: etapaNome || etapa?.etapa || 'Etapa',
+      horas: horasNovas,
+      usuario: userName,
+    });
+    
+    toast.success(`${horasNovas}h lançadas por ${userName}`);
     setLancandoHoras(null);
     setHorasInput('');
     fetchData();
