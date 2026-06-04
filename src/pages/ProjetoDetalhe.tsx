@@ -267,26 +267,27 @@ const ProjetoDetalhe = () => {
                         <span className={cn("w-2 h-2 rounded-full", projeto.status_geral === 'Ativo' ? 'bg-emerald-500' : 'bg-[#555]')}></span>
                         {projeto.status_geral}
                     </div>
-                    </div>
-                    {/* Resumo de horas */}
-                    {(() => {
-                      const totalEstimadas = etapas.reduce((s, e) => s + Number(e.horas_estimadas || 0), 0);
-                      const totalLancadas = etapas.reduce((s, e) => s + Number(e.horas_lancadas || 0), 0);
-                      const pct = totalEstimadas > 0 ? Math.round(totalLancadas / totalEstimadas * 100) : 0;
-                      
-                      return totalEstimadas > 0 ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                            {totalLancadas}h / {totalEstimadas}h estimadas
-                          </span>
-                          <div style={{ width: '80px', height: '3px', background: '#222', borderRadius: '2px' }}>
-                            <div style={{ height: '3px', background: pct > 100 ? '#f87171' : '#8B7355', borderRadius: '2px', width: `${Math.min(pct, 100)}%` }} />
-                          </div>
-                          <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: pct > 100 ? '#f87171' : '#8B7355' }}>{pct}%</span>
-                        </div>
-                      ) : null;
-                    })()}
                 </div>
+            </div>
+            
+            {/* Resumo de horas */}
+            {(() => {
+              const totalEstimadas = etapas.reduce((s, e) => s + Number(e.horas_estimadas || 0), 0);
+              const totalLancadas = etapas.reduce((s, e) => s + Number(e.horas_lancadas || 0), 0);
+              const pct = totalEstimadas > 0 ? Math.round(totalLancadas / totalEstimadas * 100) : 0;
+              
+              return totalEstimadas > 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
+                  <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: '#555', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                    {totalLancadas}h / {totalEstimadas}h estimadas
+                  </span>
+                  <div style={{ width: '80px', height: '3px', background: '#222', borderRadius: '2px' }}>
+                    <div style={{ height: '3px', background: pct > 100 ? '#f87171' : '#8B7355', borderRadius: '2px', width: `${Math.min(pct, 100)}%` }} />
+                  </div>
+                  <span style={{ fontFamily: 'Courier New', fontSize: '9px', color: pct > 100 ? '#f87171' : '#8B7355' }}>{pct}%</span>
+                </div>
+              ) : null;
+            })()}
             </div>
             
             {/* PROGRESS BAR - 5 POINTS */}
