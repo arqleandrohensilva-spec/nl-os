@@ -349,7 +349,24 @@ const ProjetoDetalhe = () => {
                     </div>
                   )}
 
-                  <Button className="mt-6 w-full text-[10px]" variant="outline">VER FINANCEIRO COMPLETO →</Button>
+                  <button
+                    onClick={() => navigate(`/projetos/${id}/financeiro`)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '10px', 
+                      marginTop: '16px',
+                      background: 'transparent', 
+                      border: '1px solid #8B7355', 
+                      color: '#8B7355', 
+                      fontFamily: 'Courier New', 
+                      fontSize: '9px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.1em', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    VER FINANCEIRO COMPLETO →
+                  </button>
               </div>
               <div className="bg-[#141414] border border-white/10 p-6 space-y-4">
                   <h3 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase">Documentos</h3>
