@@ -17,7 +17,10 @@ interface LeadCardProps {
 }
 
 const LeadCard = ({ lead, onClick }: LeadCardProps) => {
-  const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
+  const daysInStage = Math.floor(
+    (new Date().getTime() - new Date(lead.etapa_desde || lead.created_at).getTime()) 
+    / (1000 * 60 * 60 * 24)
+  );
   
   const formatCurrency = (val: number) => {
     if (lead.isBriefingVirtual && (lead as any).orcamentoVirtual) {
@@ -44,7 +47,11 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
   };
 
   // Cores baseadas nos dias na etapa
-  const daysColor = daysInStage > 14 ? "text-red-500" : daysInStage >= 7 ? "text-amber-500" : "text-white/40";
+  const daysColor = daysInStage > 14 
+    ? 'text-red-400' 
+    : daysInStage >= 7 
+    ? 'text-amber-400' 
+    : 'text-white/30';
   
   // Buscar próxima ação (último log do tipo 'A' - Ação ou nota que indique agendamento)
   // Como o sistema não tem um campo explícito de 'próxima ação' agendada ainda,
@@ -82,8 +89,8 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
       </div>
 
       <div className="mt-2 flex items-center justify-between">
-        <div className={cn("flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest", daysColor)}>
-          <span className={cn("w-1.5 h-1.5 rounded-full", daysInStage > 14 ? "bg-red-500" : daysInStage >= 7 ? "bg-amber-500" : "bg-white/20")} />
+        <div className={cn("flex items-center gap-1.5 text-[9px] font-medium uppercase tracking-widest", daysColor)}>
+          <span className={cn("w-1.5 h-1.5 rounded-full", daysInStage > 14 ? "bg-red-400" : daysInStage >= 7 ? "bg-amber-400" : "bg-white/10")} />
           {daysInStage} {daysInStage === 1 ? 'dia' : 'dias'} na etapa
         </div>
 
