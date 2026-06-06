@@ -187,7 +187,7 @@ const Dashboard = () => {
   const { data: satisfacao = [] } = useQuery({
     queryKey: ['satisfacao-dashboard'],
     queryFn: async () => {
-      const { data } = await supabase.from('pesquisas_satisfacao').select('nota_geral');
+      const { data } = await supabase.from('pesquisas_satisfacao').select('nota_geral, status');
       return data || [];
     }
   });
