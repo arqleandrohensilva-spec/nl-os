@@ -773,7 +773,7 @@ const Index = () => {
                     key={stage}
                     stage={stage}
                     leads={filteredLeads.filter(l => l.stage === stage)}
-                    onLeadClick={(lead) => setSelectedLeadId(lead.id)}
+                    onLeadClick={(lead) => navigate(`/clientes/${lead.cliente_id}`)}
                     onUpdateStatus={handleUpdateStage}
                           onQuickNote={handleQuickNote}
                           onViewFicha={(clienteId) => navigate(`/clientes/${clienteId}`)}
