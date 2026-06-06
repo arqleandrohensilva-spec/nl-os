@@ -658,46 +658,96 @@ const Dashboard = () => {
           <div className="space-y-12">
             
             {/* Bloco: NÚMEROS DO DIA */}
-            <section className="grid grid-cols-4 gap-4">
-              {[
-                { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido').length, link: '/pipeline' },
-                { 
-                  label: 'PROJETOS', 
-                  value: projetos.filter(p => 
-                    p.status_geral === 'em_andamento' || 
-                    p.status_geral === 'ativo' || 
-                    p.status_geral === 'Em andamento' || 
-                    p.status_geral === 'Ativo'
-                  ).length, 
-                  link: '/projetos' 
-                },
-                { 
-                  label: 'RECEBIDO MÊS', 
-                  value: `R$ ${parcelas.filter(p => {
-                    if (!p.data_recebimento) return false;
-                    const d = new Date(p.data_recebimento);
-                    return (p.status === 'pago' || p.status === 'recebido') && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
-                  }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
-                  link: '/financeiro/base' 
-                },
-                { 
-                  label: 'HORAS ESTA SEMANA', 
-                  value: `${(() => {
-                    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-                    const totalMin = sessoesHoras
-                      .filter(s => s.inicio && new Date(s.inicio) >= start)
-                      .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0);
-                    return Math.round(totalMin / 60);
-                  })()}h`, 
-                  link: '/projetos' 
-                }
+            <section className="space-y-4">
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido').length, link: '/pipeline' },
+                  { 
+                    label: 'PROJETOS', 
+                    value: projetos.filter(p => 
+                      p.status_geral === 'em_andamento' || 
+                      p.status_geral === 'ativo' || 
+                      p.status_geral === 'Em andamento' || 
+                      p.status_geral === 'Ativo'
+                    ).length, 
+                    link: '/projetos' 
+                  },
+                  { 
+                    label: 'RECEBIDO MÊS', 
+                    value: `R$ ${parcelas.filter(p => {
+                      if (!p.data_recebimento) return false;
+                      const d = new Date(p.data_recebimento);
+                      return (p.status === 'pago' || p.status === 'recebido') && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                    }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                    link: '/financeiro/base' 
+                  },
+                  { 
+                    label: 'HORAS ESTA SEMANA', 
+                    value: `${(() => {
+                      const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+                      const totalMin = sessoesHoras
+                        .filter(s => s.inicio && new Date(s.inicio) >= start)
+                        .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0);
+                      return Math.round(totalMin / 60);
+                    })()}h`, 
+                    link: '/projetos' 
+                  }
+                ].map((stat, i) => (
+                  <button key={i} onClick={() => navigate(stat.link)} className="bg-white/[0.02] border border-white/5 px-6 py-4 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors">
+                    <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
+                    <span className="text-xl font-bold text-white">{stat.value}</span>
+                  </button>
+                ))}
+              </div>
 
-              ].map((stat, i) => (
-                <button key={i} onClick={() => navigate(stat.link)} className="bg-white/[0.02] border border-white/5 px-6 py-4 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors">
-                  <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
-                  <span className="text-xl font-bold text-white">{stat.value}</span>
-                </button>
-              ))}
+              {/* Segunda Linha */}
+              <div className="grid grid-cols-4 gap-4">
+                {[
+                  { 
+                    label: 'PROPOSTAS ENVIADAS', 
+                    value: leads.filter(l => l.stage === 'PROPOSTA ENVIADA' || l.stage === 'Proposta Enviada').length, 
+                    subtext: 'aguardando resposta',
+                    link: '/pipeline',
+                    className: 'border-l-2 border-l-bronze'
+                  },
+                  { 
+                    label: 'PREVISTO MÊS', 
+                    value: `R$ ${parcelas.filter(p => {
+                      const d = new Date(p.data_vencimento);
+                      const status = (p.status || '').toLowerCase();
+                      return status === 'pendente' && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                    }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                    subtext: 'a vencer este mês',
+                    link: '/financeiro' 
+                  },
+                  { 
+                    label: 'TOTAL A RECEBER', 
+                    value: `R$ ${parcelas.filter(p => {
+                      const status = (p.status || '').toLowerCase();
+                      return status !== 'pago' && status !== 'recebido' && status !== 'pago parcial';
+                    }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                    subtext: 'em aberto · todos projetos',
+                    link: '/financeiro' 
+                  },
+                  { 
+                    label: 'FECHADOS NO MÊS', 
+                    value: leads.filter(l => {
+                      const isFechado = l.stage === 'FECHADO' || l.stage === 'Fechado';
+                      if (!isFechado || !l.updated_at) return false;
+                      const d = new Date(l.updated_at);
+                      return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                    }).length, 
+                    subtext: 'este mês',
+                    link: '/pipeline' 
+                  }
+                ].map((stat, i) => (
+                  <button key={i} onClick={() => navigate(stat.link)} className={cn("bg-white/[0.02] border border-white/5 px-6 py-5 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors text-left", stat.className)}>
+                    <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
+                    <span className="text-xl font-bold text-white">{stat.value}</span>
+                    <span className="text-[10px] text-white/20 italic">{stat.subtext}</span>
+                  </button>
+                ))}
+              </div>
             </section>
 
             {/* Bloco: Ações do Dia */}
