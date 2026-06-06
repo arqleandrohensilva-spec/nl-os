@@ -157,37 +157,53 @@ const ConfiguracoesSistema = () => {
   const [originalVendorPath, setOriginalVendorPath] = useState('');
   const [templateStatus, setTemplateStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
   const [vendorStatus, setVendorStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
+  const [monthlyGoal, setMonthlyGoal] = useState('15000');
+  const [originalGoal, setOriginalGoal] = useState('15000');
+  const [isSavingGoal, setIsSavingGoal] = useState(false);
 
-  const fetchDropboxStatus = async () => {
+  const fetchConfigData = async () => {
     setDropboxStatus('loading');
     try {
-      const { data, error } = await supabase
+      // Fetch Dropbox Settings
+      const { data: dropboxData, error: dropboxError } = await supabase
         .from('dropbox_settings')
         .select('*')
         .eq('id', '00000000-0000-0000-0000-000000000001')
         .single();
 
-      if (error || !data || !data.refresh_token) {
-        setDropboxStatus('disconnected');
-      } else {
+      if (!dropboxError && dropboxData && dropboxData.refresh_token) {
         setDropboxStatus('connected');
-        setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
-        const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
-        const vPath = (data as any).vendor_template_path || '';
+        setLastSync(new Date(dropboxData.updated_at).toLocaleString('pt-BR'));
+        const path = (dropboxData as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        const vPath = (dropboxData as any).vendor_template_path || '';
         setContractTemplatePath(path);
         setOriginalTemplatePath(path);
         setVendorTemplatePath(vPath);
         setOriginalVendorPath(vPath);
         checkTemplateExists(path, 'client');
         if (vPath) checkTemplateExists(vPath, 'vendor');
+      } else {
+        setDropboxStatus('disconnected');
+      }
+
+      // Fetch Monthly Goal
+      const { data: configData, error: configError } = await supabase
+        .from('configuracoes')
+        .select('value')
+        .eq('key', 'meta_mensal_receita')
+        .maybeSingle();
+      
+      if (!configError && configData) {
+        setMonthlyGoal(String(configData.value));
+        setOriginalGoal(String(configData.value));
       }
     } catch (err) {
-      setDropboxStatus('disconnected');
+      console.error("Erro ao carregar configurações:", err);
     }
   };
 
   useEffect(() => {
-    fetchDropboxStatus();
+    fetchConfigData();
   }, []);
 
   const checkTemplateExists = async (path: string, type: 'client' | 'vendor') => {
