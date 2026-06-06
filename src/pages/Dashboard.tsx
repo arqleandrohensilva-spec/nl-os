@@ -370,26 +370,9 @@ const Dashboard = () => {
         .map(p => `${p.nome} (Etapa: ${p.etapa_atual})`)
         .join(', ');
 
-      const financeiroResumo = pulse[2].subtext;
-      const satisfacaoResumo = pulse[3].subtext;
+      const financeiroResumo = `Confirmado R$ ${parcelas.filter(p => p.status === 'pago').reduce((a, b) => a + Number(b.valor || 0), 0)}`;
+      const satisfacaoResumo = `Média ${satisfacao.length > 0 ? (satisfacao.reduce((a, b) => a + (b.nota_geral || 0), 0) / satisfacao.length).toFixed(1) : '0'}`;
 
-      try {
-        // Insight
-        const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
-        Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
-        
-        DADOS:
-        Leads ativos: ${leadsResumo}
-        Projetos: ${projetosResumo}
-        Financeiro: ${financeiroResumo}
-        Satisfação: ${satisfacaoResumo}
-        
-        Retorne APENAS um JSON:
-        {
-          "insight": "texto do insight",
-          "acao": "o que fazer agora em 1 frase",
-          "modulo": "pipeline | projetos | financeiro | marketing"
-        }`;
 
         // Health Score
         const healthPrompt = `Você é o analista estratégico da NL Arquitetos. Analise os dados abaixo e gere um score de saúde do negócio de 0 a 100.
