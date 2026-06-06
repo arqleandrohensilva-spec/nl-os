@@ -730,9 +730,12 @@ const Index = () => {
 
             <div className="flex items-center gap-6">
               <div className="flex flex-col items-end mr-4">
-                <span className="text-[10px] font-bold text-white uppercase tracking-widest bg-white/5 px-3 py-1 border border-white/10">
+                <button 
+                  onClick={() => navigate('/clientes')}
+                  className="text-white/30 hover:text-bronze text-[9px] uppercase tracking-widest cursor-pointer transition-colors font-bold bg-white/5 px-3 py-1 border border-white/10"
+                >
                   CRIAÇÃO VIA MÓDULO CLIENTES
-                </span>
+                </button>
               </div>
 
               <div className="flex items-center gap-1">
