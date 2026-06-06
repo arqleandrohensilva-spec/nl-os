@@ -135,28 +135,28 @@ const GestaoProjetos = () => {
 
     const today = startOfDay(new Date());
 
-    // CRÍTICO: Parcela atrasada ou entrega vencida há mais de 5 dias
-    const hasAtrasada = pParcelas.some(p => p.status?.toLowerCase() === 'atrasado');
-    const hasVencidaCritica = pEtapas.some(e => {
-      if (!e.data_entrega || e.status === 'CONCLUIDO' || e.status === 'aprovado') return false;
-      return differenceInDays(today, parseISO(e.data_entrega)) > 5;
+    // 1. Parcela com status === 'ATRASADO' vinculada ao projeto
+    const hasAtrasada = pParcelas.some(p => p.status?.toUpperCase() === 'ATRASADO');
+
+    // 2. Etapa com data_entrega preenchida e essa data já passou
+    const hasEtapaVencida = pEtapas.some(e => {
+      if (!e.data_entrega || e.status?.toLowerCase() === 'concluido' || e.status?.toLowerCase() === 'aprovado') return false;
+      return isBefore(parseISO(e.data_entrega), today);
     });
 
-    if (hasAtrasada || hasVencidaCritica) return { label: 'CRÍTICO', color: '#f87171', bg: 'bg-red-500/10' };
-
-    // ATENÇÃO: Checklist pendente há mais de 3 dias ou entrega vencendo em menos de 3 dias
-    const hasChecklistPendente = pChecklists.some(c => {
+    // 3. Checklist com concluido === false e data de criação há mais de 7 dias
+    // (Utilizando criado_em como referência de tempo já que updated_at não está disponível)
+    const hasChecklistPendenteLonga = pChecklists.some(c => {
       if (c.concluido) return false;
-      return differenceInDays(today, parseISO(c.criado_em)) > 3;
-    });
-    const hasEntregaProxima = pEtapas.some(e => {
-      if (!e.data_entrega || e.status === 'CONCLUIDO' || e.status === 'aprovado') return false;
-      const diff = differenceInDays(parseISO(e.data_entrega), today);
-      return diff >= 0 && diff < 3;
+      if (!c.criado_em) return false;
+      return differenceInDays(today, parseISO(c.criado_em)) > 7;
     });
 
-    if (hasChecklistPendente || hasEntregaProxima) return { label: 'ATENÇÃO', color: '#fbbf24', bg: 'bg-amber-500/10' };
+    if (hasAtrasada || hasEtapaVencida || hasChecklistPendenteLonga) {
+      return { label: 'ATENÇÃO', color: '#fbbf24', bg: 'bg-amber-500/10' };
+    }
 
+    // Sem data = sem risco calculável = OK por padrão
     return { label: 'OK', color: '#4ade80', bg: 'bg-green-500/10' };
   };
 
