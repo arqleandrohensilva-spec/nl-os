@@ -724,69 +724,48 @@ const Index = () => {
           {/* MetricsBar and OriginBreakdown removed as per request - now in Command Center */}
 
           <div className="px-10 py-4 border-b border-white/10 flex items-center justify-between bg-[#0A0A0A] shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative">
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={showMockToast}
-                className="p-2 border border-white/10 rounded-[2px] text-white/40 hover:text-bronze transition-colors"
-                title="Simular proposta aberta"
-              >
-                <Settings2 size={14} />
-              </button>
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
                 {(['Todos', 'Arq+Int', 'Interiores', 'Comercial'] as const).map(type => (
                   <button key={type} onClick={() => setFilterType(type)} className={cn("px-5 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", filterType === type ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white")}>{type}</button>
                 ))}
               </div>
-              <div className="h-6 w-[1px] bg-white/10 mx-2" />
-              <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
-                <button 
-                  onClick={() => setViewMode('kanban')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'kanban' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
-                >
-                  <LayoutGrid size={12} /> KANBAN
-                </button>
-                <button 
-                  onClick={() => setViewMode('lista')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'lista' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
-                >
-                  <List size={12} /> LISTA
-                </button>
-                <button 
-                  onClick={() => setViewMode('foco')} 
-                  className={cn("flex items-center gap-2 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px]", viewMode === 'foco' ? "bg-bronze text-white" : "text-white/40 hover:text-white")}
-                >
-                  <Zap size={12} /> FOCO
-                </button>
+              <div className="h-6 w-[1px] bg-white/10" />
+              <div className="relative group">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-bronze transition-colors" />
+                <Input 
+                  placeholder="BUSCAR..." 
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-48 h-9 pl-9 bg-white/5 border-transparent focus:border-bronze focus:ring-0 rounded-[2px] text-[9px] tracking-widest uppercase"
+                />
               </div>
             </div>
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Responsável:</span>
-                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-[2px]">
-                  {(['Todos', 'Leandro', 'Neandro'] as const).map(resp => (
-                    <button 
-                      key={resp} 
-                      onClick={() => setFilterResponsavel(resp)} 
-                      className={cn(
-                        "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 rounded-[1px] flex items-center gap-2", 
-                        filterResponsavel === resp ? "bg-bronze text-white shadow-sm" : "text-white/40 hover:text-white"
-                      )}
-                    >
-                      {resp === 'Todos' ? <Users size={10} /> : <span className="w-1.5 h-1.5 rounded-full bg-bronze" />}
-                      {resp}
-                    </button>
-                  ))}
-                </div>
+
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-1">
+                {(['kanban', 'lista', 'foco'] as const).map(mode => (
+                  <button 
+                    key={mode}
+                    onClick={() => setViewMode(mode)} 
+                    className={cn(
+                      "p-2 rounded-[2px] transition-colors",
+                      viewMode === mode ? "text-bronze" : "text-white/20 hover:text-white"
+                    )}
+                    title={mode.toUpperCase()}
+                  >
+                    {mode === 'kanban' && <LayoutGrid size={14} />}
+                    {mode === 'lista' && <List size={14} />}
+                    {mode === 'foco' && <Zap size={14} />}
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Prioridade:</span>
-                <div className="flex items-center gap-2">
-                  {(['Quente', 'Morno', 'Frio'] as Temp[]).map(temp => (
-                    <button key={temp} onClick={() => toggleTempFilter(temp)} className={cn("flex items-center gap-2.5 px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border rounded-[1px]", filterTemp.includes(temp) ? "border-bronze text-white bg-bronze" : "border-white/10 text-white/40 hover:text-white hover:border-white/20")}><div className={cn("w-1.5 h-1.5 rounded-full", temp === 'Quente' ? "bg-red" : temp === 'Morno' ? "bg-amber" : "bg-white/40")} />{temp}</button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-white/40 hover:text-white cursor-pointer transition-colors"><span className="text-[9px] font-bold uppercase tracking-widest">Ordenar: Score ↓</span><ChevronDown size={14} /></div>
+              <button 
+                onClick={() => navigate('/clientes')} 
+                className="h-9 px-6 bg-bronze hover:bg-bronze/90 text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-[2px] flex items-center gap-2"
+              >
+                <Plus size={14} /> NOVO LEAD
+              </button>
             </div>
           </div>
         </div>
