@@ -15,9 +15,10 @@ interface LeadCardProps {
   onUpdateStatus?: (leadId: string, newStage: string) => void;
   onQuickNote?: (leadId: string, note: string) => void;
   onViewFicha?: (clienteId: string) => void;
+  onConvertProject?: (lead: Lead) => void;
 }
 
-const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps) => {
+const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus, onConvertProject }: LeadCardProps) => {
   const daysInStage = differenceInDays(new Date(), parseISO(lead.etapa_desde));
   const { score } = calculateLeadScore(lead);
   
@@ -229,6 +230,18 @@ const LeadCard = ({ lead, onClick, onViewFicha, onUpdateStatus }: LeadCardProps)
               className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
             >
               VER FICHA
+            </button>
+          )}
+          
+          {lead.stage === 'Fechado' && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onConvertProject?.(lead);
+              }}
+              className="h-7 px-3 bg-[#2E7D52] hover:bg-[#256643] text-white text-[9px] font-bold uppercase tracking-widest transition-colors rounded-[2px]"
+            >
+              CONVERTER EM PROJETO
             </button>
           )}
         </div>

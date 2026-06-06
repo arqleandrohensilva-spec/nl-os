@@ -10,7 +10,7 @@ import {
   AlertCircle, 
   Clock 
 } from 'lucide-react';
-import { format, isSameWeek, parseISO, differenceInDays } from 'date-fns';
+import { format, isSameWeek, parseISO, differenceInDays, isBefore, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,10 +36,23 @@ interface EtapaInfo {
   data_inicio?: string;
 }
 
+interface ParcelaInfo {
+  status: string;
+  data_vencimento: string;
+}
+
+interface ChecklistInfo {
+  etapa: string;
+  concluido: boolean;
+  criado_em: string;
+}
+
 const GestaoProjetos = () => {
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [etapas, setEtapas] = useState<Record<string, EtapaInfo[]>>({});
+  const [parcelas, setParcelas] = useState<Record<string, ParcelaInfo[]>>({});
+  const [checklists, setChecklists] = useState<Record<string, ChecklistInfo[]>>({});
   const [loading, setLoading] = useState(true);
   const [totalHorasMes, setTotalHorasMes] = useState(0);
 
@@ -57,17 +70,38 @@ const GestaoProjetos = () => {
       if (pData) {
         setProjetos(pData);
         
-        const { data: eData } = await supabase
-          .from('projeto_etapas')
-          .select('projeto_id, etapa, status, data_entrega, data_inicio');
+        // Parallel data fetching for all projects
+        const [eRes, fRes, cRes] = await Promise.all([
+          supabase.from('projeto_etapas').select('projeto_id, etapa, status, data_entrega, data_inicio'),
+          supabase.from('financeiro_parcelas').select('projeto_id, status, data_vencimento'),
+          supabase.from('projeto_checklist').select('projeto_id, etapa, concluido, criado_em')
+        ]);
         
-        if (eData) {
-          const grouped = eData.reduce((acc: any, curr) => {
+        if (eRes.data) {
+          const grouped = eRes.data.reduce((acc: any, curr) => {
             if (!acc[curr.projeto_id]) acc[curr.projeto_id] = [];
             acc[curr.projeto_id].push(curr);
             return acc;
           }, {});
           setEtapas(grouped);
+        }
+
+        if (fRes.data) {
+          const grouped = fRes.data.reduce((acc: any, curr) => {
+            if (!acc[curr.projeto_id]) acc[curr.projeto_id] = [];
+            acc[curr.projeto_id].push(curr);
+            return acc;
+          }, {});
+          setParcelas(grouped);
+        }
+
+        if (cRes.data) {
+          const grouped = cRes.data.reduce((acc: any, curr) => {
+            if (!acc[curr.projeto_id]) acc[curr.projeto_id] = [];
+            acc[curr.projeto_id].push(curr);
+            return acc;
+          }, {});
+          setChecklists(grouped);
         }
       }
 
@@ -92,6 +126,38 @@ const GestaoProjetos = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getHealthScore = (projetoId: string) => {
+    const pEtapas = etapas[projetoId] || [];
+    const pParcelas = parcelas[projetoId] || [];
+    const pChecklists = checklists[projetoId] || [];
+
+    const today = startOfDay(new Date());
+
+    // CRÍTICO: Parcela atrasada ou entrega vencida há mais de 5 dias
+    const hasAtrasada = pParcelas.some(p => p.status?.toLowerCase() === 'atrasado');
+    const hasVencidaCritica = pEtapas.some(e => {
+      if (!e.data_entrega || e.status === 'CONCLUIDO' || e.status === 'aprovado') return false;
+      return differenceInDays(today, parseISO(e.data_entrega)) > 5;
+    });
+
+    if (hasAtrasada || hasVencidaCritica) return { label: 'CRÍTICO', color: '#f87171', bg: 'bg-red-500/10' };
+
+    // ATENÇÃO: Checklist pendente há mais de 3 dias ou entrega vencendo em menos de 3 dias
+    const hasChecklistPendente = pChecklists.some(c => {
+      if (c.concluido) return false;
+      return differenceInDays(today, parseISO(c.criado_em)) > 3;
+    });
+    const hasEntregaProxima = pEtapas.some(e => {
+      if (!e.data_entrega || e.status === 'CONCLUIDO' || e.status === 'aprovado') return false;
+      const diff = differenceInDays(parseISO(e.data_entrega), today);
+      return diff >= 0 && diff < 3;
+    });
+
+    if (hasChecklistPendente || hasEntregaProxima) return { label: 'ATENÇÃO', color: '#fbbf24', bg: 'bg-amber-500/10' };
+
+    return { label: 'OK', color: '#4ade80', bg: 'bg-green-500/10' };
   };
 
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'ativo' || p.status_geral === 'Em andamento' || p.status_geral === 'Ativo').length;
@@ -132,21 +198,62 @@ const GestaoProjetos = () => {
 
           {projetos.map(projeto => {
             const projetoEtapas = etapas[projeto.id] || [];
+            
+            // Get next delivery: first etapa not approved/concluded
+            const nextDelivery = projetoEtapas.find(e => e.status !== 'CONCLUIDO' && e.status !== 'aprovado' && e.status !== 'Aprovado');
+            const allApproved = projetoEtapas.length > 0 && projetoEtapas.every(e => e.status === 'CONCLUIDO' || e.status === 'aprovado' || e.status === 'Aprovado');
+            
             const emAndamento = projetoEtapas.find(e => e.status === 'em_andamento' || e.status === 'Em andamento');
             const etapaTexto = emAndamento?.etapa || projeto.etapa_atual;
+            
+            const health = getHealthScore(projeto.id);
 
             return (
               <div
                 key={projeto.id}
                 onClick={() => navigate(`/projetos/detalhe/${projeto.id}`)}
-                style={{ display: 'grid', gridTemplateColumns: '1.8fr 0.5fr 1.2fr 1.2fr 0.6fr', gap: 0, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
+                style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1.8fr 0.5fr 1.2fr 1.2fr 0.6fr', gap: 0, padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', alignItems: 'center', transition: 'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
+                {/* Health Indicator Badge */}
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '12px', 
+                  right: '12px', 
+                  fontSize: '8px', 
+                  fontWeight: 'bold', 
+                  color: health.color, 
+                  padding: '2px 6px', 
+                  borderRadius: '2px', 
+                  border: `1px solid ${health.color}30`,
+                  background: `${health.color}10`
+                }}>
+                  {health.label}
+                </div>
+
                 {/* Cliente */}
                 <div>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '15px', color: '#ffffff', fontWeight: 500 }}>{projeto.nome_cliente}</div>
-                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '12px', color: '#555', marginTop: '1px' }}>
+                  
+                  {/* Próxima Entrega Em Destaque */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                    <span style={{ fontSize: '9px', fontWeight: 'bold', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      PRÓXIMA ENTREGA · 
+                    </span>
+                    <span style={{ 
+                      fontSize: '9px', 
+                      color: allApproved ? '#CD7F32' : (nextDelivery && differenceInDays(parseISO(nextDelivery.data_entrega), new Date()) < 0 ? '#f87171' : '#ccc'),
+                      textTransform: 'uppercase'
+                    }}>
+                      {allApproved ? 'CONCLUÍDO' : (nextDelivery ? `${nextDelivery.etapa} · ${(() => {
+                        const diff = differenceInDays(parseISO(nextDelivery.data_entrega), new Date());
+                        return diff < 0 ? `Vencido ${Math.abs(diff)}d` : `${diff}d`;
+                      })()}` : '—')}
+                    </span>
+                  </div>
+
+                  <div style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#555', marginTop: '4px' }}>
                     {projeto.cidade} · {projeto.area_m2 ? `${projeto.area_m2}m²` : 'N/A'} · desde {projeto.data_inicio ? new Date(projeto.data_inicio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : '—'}
                   </div>
                 </div>
