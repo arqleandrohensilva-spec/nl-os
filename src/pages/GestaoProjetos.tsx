@@ -44,7 +44,7 @@ interface ParcelaInfo {
 interface ChecklistInfo {
   etapa: string;
   concluido: boolean;
-  updated_at: string;
+  criado_em: string;
 }
 
 const GestaoProjetos = () => {
@@ -74,7 +74,7 @@ const GestaoProjetos = () => {
         const [eRes, fRes, cRes] = await Promise.all([
           supabase.from('projeto_etapas').select('projeto_id, etapa, status, data_entrega, data_inicio'),
           supabase.from('financeiro_parcelas').select('projeto_id, status, data_vencimento'),
-          supabase.from('projeto_checklist').select('projeto_id, etapa, concluido, updated_at')
+          supabase.from('projeto_checklist').select('projeto_id, etapa, concluido, criado_em')
         ]);
         
         if (eRes.data) {
@@ -147,7 +147,7 @@ const GestaoProjetos = () => {
     // ATENÇÃO: Checklist pendente há mais de 3 dias ou entrega vencendo em menos de 3 dias
     const hasChecklistPendente = pChecklists.some(c => {
       if (c.concluido) return false;
-      return differenceInDays(today, parseISO(c.updated_at)) > 3;
+      return differenceInDays(today, parseISO(c.criado_em)) > 3;
     });
     const hasEntregaProxima = pEtapas.some(e => {
       if (!e.data_entrega || e.status === 'CONCLUIDO' || e.status === 'aprovado') return false;
