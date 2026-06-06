@@ -175,6 +175,13 @@ const ProjetoDetalhe = () => {
     if (!projeto) return;
     
     try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Usuário não autenticado");
+        return;
+      }
+
       // Find next delivery
       const nextDeliveryEtapa = etapas.find(e => e.status !== 'CONCLUIDO' && e.status !== 'aprovado' && e.status !== 'Aprovado');
       
@@ -185,7 +192,8 @@ const ProjetoDetalhe = () => {
           tipo: projeto.tipo,
           etapa_atual: projeto.etapa_atual,
           status: projeto.status_geral,
-          proxima_entrega: nextDeliveryEtapa ? nextDeliveryEtapa.etapa : 'Concluído'
+          proxima_entrega: nextDeliveryEtapa ? nextDeliveryEtapa.etapa : 'Concluído',
+          user_id: session.user.id
         });
 
       if (error) throw error;
