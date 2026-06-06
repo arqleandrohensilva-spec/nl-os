@@ -759,28 +759,169 @@ Retorne APENAS JSON:
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
               <div className="space-y-4">
-                {projetos.filter(p => p.status_geral === 'em_andamento').map(proj => {
-                  const horasLancadas = 0; // Precisa de lógica complexa de sessoes_horas
-                  const valorTotal = 0; // Precisa de lógica de financeiro_parcelas
-                  const custoHora = 80;
-                  const feeBurn = valorTotal > 0 ? ((horasLancadas * custoHora) / valorTotal) * 100 : 0;
-                  const isAtencao = feeBurn > 80;
-                  const isCritico = feeBurn > 95;
+                {(() => {
+                  const ativos = projetos.filter(p => p.status_geral === 'em_andamento');
+                  if (ativos.length === 0) return <p className="text-white/20 text-sm italic">Nenhum projeto em andamento.</p>;
                   
-                  return (
-                    <button key={proj.id} onClick={() => navigate(`/projetos/detalhe/${proj.id}`)} className="w-full p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm font-bold">{proj.nome}</span>
-                        <span className={cn("text-[10px] font-bold", isCritico ? "text-red-500" : isAtencao ? "text-amber-500" : "text-bronze")}>{feeBurn.toFixed(0)}% do fee</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-white/5 overflow-hidden">
-                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(feeBurn, 100)}%` }} className={cn("h-full", isCritico ? "bg-red-500" : isAtencao ? "bg-amber-500" : "bg-bronze")} />
-                      </div>
-                    </button>
-                  );
-                })}
+                  return ativos.map(proj => {
+                    const horasLancadas = sessoesHoras
+                      .filter(s => s.projeto_id === proj.id)
+                      .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0) / 60;
+                    
+                    const valorTotal = parcelas
+                      .filter(p => p.projeto_id === proj.id)
+                      .reduce((acc, p) => acc + Number(p.valor || 0), 0);
+                    
+                    const custoHora = Number(configEscritorio?.custo_hora || 80);
+                    const feeBurn = valorTotal > 0 ? ((horasLancadas * custoHora) / valorTotal) * 100 : 0;
+                    
+                    const etapasProjeto = projetoEtapas.filter(e => e.projeto_id === proj.id);
+                    const aprovadas = etapasProjeto.filter(e => e.status === 'aprovado').length;
+                    const totalEtapas = etapasProjeto.length;
+                    
+                    const isAtencao = feeBurn > 80 && aprovadas < totalEtapas;
+                    const isCritico = feeBurn > 95;
+                    
+                    const diffDias = proj.prazo_final ? Math.floor((new Date(proj.prazo_final).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+
+                    return (
+                      <button 
+                        key={proj.id} 
+                        onClick={() => navigate(`/projetos/detalhe/${proj.id}`)} 
+                        className="w-full p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all text-left"
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <div>
+                            <span className="text-sm font-bold uppercase tracking-tight">{proj.nome}</span>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                              {proj.cliente} · {proj.tipo} · etapa {aprovadas}/{totalEtapas} {diffDias !== null && `· prazo em ${diffDias} dias`}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={cn("text-[10px] font-bold", isCritico ? "text-red-500" : isAtencao ? "text-amber-500" : "text-bronze")}>
+                              {feeBurn.toFixed(0)}% do fee
+                            </span>
+                            {isCritico ? (
+                              <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[8px] font-bold uppercase tracking-wider">CRÍTICO</span>
+                            ) : isAtencao ? (
+                              <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase tracking-wider">ATENÇÃO</span>
+                            ) : null}
+                          </div>
+                        </div>
+                        
+                        {horasLancadas === 0 ? (
+                          <p className="text-[10px] text-white/20 italic mt-2">— sem horas registradas</p>
+                        ) : (
+                          <div className="h-1.5 w-full bg-white/5 mt-3 overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }} 
+                              animate={{ width: `${Math.min(feeBurn, 100)}%` }} 
+                              className={cn(
+                                "h-full transition-colors", 
+                                feeBurn >= 90 ? "bg-red-500" : feeBurn >= 70 ? "bg-amber-500" : "bg-bronze"
+                              )} 
+                            />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             </section>
+
+            {/* Bloco: HONORÁRIO A FATURAR */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">HONORÁRIO A FATURAR</span>
+                <div className="h-[1px] flex-1 bg-white/5" />
+              </div>
+              <div className="p-6 bg-white/[0.02] border border-white/5">
+                {(() => {
+                  const ativosIds = projetos.filter(p => p.status_geral === 'em_andamento').map(p => p.id);
+                  const hoje = new Date();
+                  hoje.setHours(23, 59, 59, 999);
+                  
+                  const parcelasPendentes = parcelas.filter(p => 
+                    ativosIds.includes(p.projeto_id) && 
+                    p.status === 'pendente' && 
+                    new Date(p.data_vencimento) <= new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0)
+                  );
+                  
+                  const totalFaturar = parcelasPendentes.reduce((acc, p) => acc + Number(p.valor || 0), 0);
+                  
+                  if (totalFaturar === 0) {
+                    return <p className="text-green-500/40 text-sm italic uppercase tracking-widest">Tudo em dia — nenhuma parcela pendente</p>;
+                  }
+                  
+                  return (
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div>
+                        <p className="text-2xl font-bold text-white mb-1">R$ {totalFaturar.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest">
+                          {parcelasPendentes.length} parcelas em aberto · vencidas ou vencendo este mês
+                        </p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/financeiro')}
+                        className="bg-white/5 border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 rounded-none h-9 px-6"
+                      >
+                        VER PARCELAS
+                      </Button>
+                    </div>
+                  );
+                })()}
+              </div>
+            </section>
+
+            {/* Bloco: PRÓXIMAS ENTREGAS */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PRÓXIMAS ENTREGAS · 14 DIAS</span>
+                <div className="h-[1px] flex-1 bg-white/5" />
+              </div>
+              <div className="space-y-4">
+                {(() => {
+                  const hoje = new Date();
+                  hoje.setHours(0,0,0,0);
+                  const limite = new Date();
+                  limite.setDate(hoje.getDate() + 14);
+                  limite.setHours(23,59,59,999);
+                  
+                  const proximas = projetoEtapas
+                    .filter(e => {
+                      if (e.status === 'aprovado' || !e.data_entrega) return false;
+                      const d = new Date(e.data_entrega);
+                      return d >= hoje && d <= limite;
+                    })
+                    .sort((a, b) => new Date(a.data_entrega!).getTime() - new Date(b.data_entrega!).getTime());
+                  
+                  if (proximas.length === 0) {
+                    return <p className="text-white/20 text-sm italic">Nenhuma entrega programada nos próximos 14 dias. <span className="opacity-50 italic">Cadastre prazos nos projetos para ver aqui.</span></p>;
+                  }
+                  
+                  return proximas.map(etapa => {
+                    const proj = projetos.find(p => p.id === etapa.projeto_id);
+                    const diff = Math.floor((new Date(etapa.data_entrega!).getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+                    const colorClass = diff < 3 ? "text-red-500" : diff <= 7 ? "text-amber-500" : "text-green-500";
+                    
+                    return (
+                      <div key={etapa.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-all">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold uppercase tracking-tight">{proj?.nome || 'Projeto'} · <span className="text-white/40">{etapa.etapa}</span></span>
+                        </div>
+                        <span className={cn("text-[10px] font-bold uppercase tracking-widest", colorClass)}>
+                          em {diff === 0 ? 'hoje' : diff === 1 ? '1 dia' : `${diff} dias`}
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </section>
+
 
           </div>
 
