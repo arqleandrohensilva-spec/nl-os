@@ -712,10 +712,25 @@ Retorne APENAS JSON:
                 { label: 'PROJETOS', value: projetos.filter(p => p.status_geral === 'em_andamento').length, link: '/projetos' },
                 { 
                   label: 'RECEBIDO MÊS', 
-                  value: `R$ ${parcelas.filter(p => (p.status === 'pago' || p.status === 'recebido') && p.data_recebimento && new Date(p.data_recebimento).getMonth() === new Date().getMonth()).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                  value: `R$ ${parcelas.filter(p => {
+                    if (!p.data_recebimento) return false;
+                    const d = new Date(p.data_recebimento);
+                    return (p.status === 'pago' || p.status === 'recebido') && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                  }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
                   link: '/financeiro/base' 
                 },
-                { label: 'HORAS ESTA SEMANA', value: '0h', link: '/projetos' } // Placeholder para lógica de horas
+                { 
+                  label: 'HORAS ESTA SEMANA', 
+                  value: `${(() => {
+                    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+                    const totalMin = sessoesHoras
+                      .filter(s => s.inicio && new Date(s.inicio) >= start)
+                      .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0);
+                    return Math.round(totalMin / 60);
+                  })()}h`, 
+                  link: '/projetos' 
+                }
+
               ].map((stat, i) => (
                 <button key={i} onClick={() => navigate(stat.link)} className="bg-white/[0.02] border border-white/5 px-6 py-4 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors">
                   <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
