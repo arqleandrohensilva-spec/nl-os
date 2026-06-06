@@ -223,6 +223,31 @@ const Dashboard = () => {
 
   const metaMensal = Number(metaConfig?.value || 15000);
 
+      const { data } = await supabase
+        .from('notificacoes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      return data || [];
+    }
+  });
+
+  const unreadCount = notifications.filter(n => !n.lida).length;
+
+  const { data: metaConfig } = useQuery({
+    queryKey: ['meta-mensal'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('configuracoes')
+        .select('value')
+        .eq('key', 'meta_mensal_receita')
+        .maybeSingle();
+      return data;
+    }
+  });
+
+  const metaMensal = Number(metaConfig?.value || 15000);
+
   // Process Ações do Dia
 
 
