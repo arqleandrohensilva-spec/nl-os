@@ -991,7 +991,7 @@ const Index = () => {
                                 <span className="text-white/30 text-[10px] uppercase tracking-widest">{lead.stage}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <button onClick={() => setSelectedLeadId(lead.id)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
+                                <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
                               </div>
                             </div>
                           ))}
