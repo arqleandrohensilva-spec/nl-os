@@ -264,34 +264,32 @@ const SatisfacaoDashboard = () => {
     toast({ title: "Texto copiado para a área de transferência" });
   };
 
+  const gerarDepoimentoLocal = (survey: any) => {
+    const nome = survey.cliente_nome || 'Cliente';
+    const projeto = survey.projeto?.nome || 'Projeto';
+    const tipo = survey.projeto?.tipo || '';
+    const nota = survey.nota_geral || 10;
+    const resposta = survey.comentario || '';
+
+    const depoimento_instagram = resposta
+      ? `"${resposta.substring(0, 180)}${resposta.length > 180 ? '...' : ''}" — ${nome}`
+      : `"O processo da NL foi exatamente o que eu precisava. Cada etapa foi clara e o resultado correspondeu ao que foi planejado." — ${nome}`;
+
+    const depoimento_google = resposta
+      ? `${resposta}\n\nProjeto: ${projeto}${tipo ? ' · ' + tipo : ''}. Recomendo o trabalho da NL Arquitetos — processo técnico sério, comunicação clara em todas as etapas.`
+      : `Contratei a NL Arquitetos para o projeto ${projeto} e fiquei muito satisfeito com o processo. A equipe conduziu cada etapa com clareza, as decisões foram tomadas antes da obra começar e o resultado foi exatamente o esperado. Nota ${nota}/10.`;
+
+    const frase_destaque = resposta && resposta.length > 20
+      ? `"${resposta.substring(0, 80).split('.')[0]}"`
+      : `"Processo claro, resultado previsível — exatamente o que eu precisava."`;
+
+    return { depoimento_instagram, depoimento_google, frase_destaque };
+  };
+
   const handleGenerateTestimonial = async (survey: any) => {
     setGeneratingTestimonial(true);
     try {
-      const { data: aiResponse, error } = await supabase.functions.invoke('ai-advisor', {
-        body: {
-          prompt: `Você é o assistente da NL Arquitetos. Com base nas respostas abaixo de uma pesquisa de satisfação, gere um depoimento formatado para uso em Instagram e Google Meu Negócio. Tom: autêntico, técnico, sem exageros.
-          
-          Cliente: ${survey.cliente_nome}
-          Projeto: ${survey.projeto?.nome} · ${survey.projeto?.tipo}
-          Nota geral: ${survey.nota_geral}/10
-          Resposta livre: ${survey.comentario || 'Não informado'}
-          
-          Retorne APENAS JSON:
-          {
-            "depoimento_instagram": "texto curto, até 3 linhas, sem hashtags",
-            "depoimento_google": "texto um pouco mais longo, até 5 linhas, em primeira pessoa",
-            "frase_destaque": "frase de impacto de até 12 palavras para usar como quote visual"
-          }`,
-          systemPrompt: "Você é um assistente da NL Arquitetos especializado em feedback de clientes.",
-          model: 'anthropic/claude-3-5-sonnet-20241022'
-        }
-      });
-
-      if (error) throw error;
-      
-      const content = aiResponse.choices?.[0]?.message?.content || "";
-      const cleanedJson = content.replace(/```json|```/g, '').trim();
-      const parsedData = JSON.parse(cleanedJson);
+      const parsedData = gerarDepoimentoLocal(survey);
 
       const { error: insertError } = await supabase
         .from('depoimentos')
