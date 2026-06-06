@@ -965,7 +965,7 @@ const ClienteFicha = () => {
                   <Button 
                     onClick={async () => {
                       try {
-                        const { data, error } = await supabase.from('clientes').insert({
+                        const { data: novoCliente, error } = await supabase.from('clientes').insert({
                           nome: formData.nome,
                           whatsapp: formData.whatsapp,
                           email: formData.email,
@@ -978,8 +978,32 @@ const ClienteFicha = () => {
                         
                         if (error) throw error;
                         
+                        // Criar lead vinculado automaticamente se não existir
+                        if (novoCliente) {
+                          const { data: existingLead } = await supabase
+                            .from('leads')
+                            .select('id')
+                            .eq('cliente_id', novoCliente.id)
+                            .maybeSingle();
+
+                          if (!existingLead) {
+                            await supabase.from('leads').insert({
+                              nome: formData.nome,
+                              whats: formData.whatsapp || '',
+                              cidade: formData.cidade || '',
+                              tipo: formData.tipo_projeto || 'ARQ+INT',
+                              area: Number(formData.area_m2) || 0,
+                              orcamento: Number(String(formData.orcamento || '0').replace(/\D/g, '')) || 0,
+                              origem: formData.origem || 'Outro',
+                              stage: 'Novo Lead',
+                              etapa_desde: new Date().toISOString(),
+                              cliente_id: novoCliente.id
+                            });
+                          }
+                        }
+                        
                         toast.success("Cliente criado com sucesso!");
-                        navigate(`/clientes/${data.id}`);
+                        navigate(`/clientes/${novoCliente.id}`);
                       } catch (err) {
                         toast.error("Erro ao criar cliente");
                       }
