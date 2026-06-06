@@ -160,6 +160,30 @@ const Dashboard = () => {
     }
   });
 
+  const { data: sessoesHoras = [] } = useQuery({
+    queryKey: ['sessoes-horas-dashboard'],
+    queryFn: async () => {
+      const { data } = await supabase.from('sessoes_horas').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: projetoEtapas = [] } = useQuery({
+    queryKey: ['projeto-etapas-dashboard'],
+    queryFn: async () => {
+      const { data } = await supabase.from('projeto_etapas').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: configEscritorio } = useQuery({
+    queryKey: ['config-escritorio'],
+    queryFn: async () => {
+      const { data } = await supabase.from('config_escritorio').select('*').maybeSingle();
+      return data;
+    }
+  });
+
   const { data: satisfacao = [] } = useQuery({
     queryKey: ['satisfacao-dashboard'],
     queryFn: async () => {
@@ -167,6 +191,7 @@ const Dashboard = () => {
       return data || [];
     }
   });
+
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notificacoes'],
