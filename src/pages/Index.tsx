@@ -59,6 +59,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -67,6 +68,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const STAGES: Stage[] = [
   'Novo Lead', 
@@ -106,6 +108,59 @@ const Index = () => {
     detalhamento: 60,
     acompanhamento: 40
   });
+  const [conversionData, setConversionData] = useState({
+    nome: '',
+    cliente: '',
+    tipo: '',
+    cidade: '',
+    area: 0,
+    valor: 0
+  });
+
+  useEffect(() => {
+    if (conversionLead) {
+      setConversionData({
+        nome: conversionLead.nome || '',
+        cliente: conversionLead.nome || '',
+        tipo: conversionLead.tipo || '',
+        cidade: conversionLead.cidade || '',
+        area: conversionLead.area || 0,
+        valor: conversionLead.orcamento || 0
+      });
+    }
+  }, [conversionLead]);
+
+  const handleCreateProject = async () => {
+    if (!conversionLead) return;
+    
+    try {
+      const { data: project, error } = await supabase
+        .from('projetos')
+        .insert({
+          nome: conversionData.nome,
+          nome_cliente: conversionData.cliente,
+          tipo: conversionData.tipo,
+          cidade: conversionData.cidade,
+          area_m2: conversionData.area,
+          valor_total: conversionData.valor,
+          status_geral: 'em_andamento',
+          cliente_id: conversionLead.id,
+          data_inicio: new Date().toISOString().split('T')[0],
+          etapa_atual: 'Briefing'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast.success("Projeto criado a partir do lead.");
+      setShowProjectConversion(false);
+      navigate(`/projetos/detalhe/${project.id}`);
+    } catch (error: any) {
+      console.error('Error creating project:', error);
+      toast.error('Erro ao criar projeto: ' + error.message);
+    }
+  };
   const criarPastasDropbox = async (nomeCliente: string, tipo: string) => {
     const pastaBase = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipo}`;
     
@@ -1135,6 +1190,93 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Project Conversion Dialog */}
+      <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
+        <DialogContent className="bg-[#111] border-white/10 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-cormorant text-2xl italic">Converter em Projeto</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="nome" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Nome do Projeto</Label>
+              <Input 
+                id="nome" 
+                value={conversionData.nome} 
+                onChange={(e) => setConversionData(prev => ({ ...prev, nome: e.target.value }))}
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="cliente" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Cliente</Label>
+              <Input 
+                id="cliente" 
+                value={conversionData.cliente} 
+                onChange={(e) => setConversionData(prev => ({ ...prev, cliente: e.target.value }))}
+                className="bg-white/5 border-white/10"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="tipo" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Tipo</Label>
+                <Input 
+                  id="tipo" 
+                  value={conversionData.tipo} 
+                  onChange={(e) => setConversionData(prev => ({ ...prev, tipo: e.target.value }))}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="cidade" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Cidade</Label>
+                <Input 
+                  id="cidade" 
+                  value={conversionData.cidade} 
+                  onChange={(e) => setConversionData(prev => ({ ...prev, cidade: e.target.value }))}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="area" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Área m²</Label>
+                <Input 
+                  id="area" 
+                  type="number"
+                  value={conversionData.area} 
+                  onChange={(e) => setConversionData(prev => ({ ...prev, area: Number(e.target.value) }))}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="valor" className="text-[10px] uppercase tracking-widest text-[#8B7355]">Valor Total</Label>
+                <Input 
+                  id="valor" 
+                  type="number"
+                  value={conversionData.valor} 
+                  onChange={(e) => setConversionData(prev => ({ ...prev, valor: Number(e.target.value) }))}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowProjectConversion(false)}
+              className="border-white/10 hover:bg-white/5 text-[10px] uppercase tracking-widest"
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleCreateProject}
+              className="bg-[#8B7355] hover:bg-[#7a654a] text-[10px] uppercase tracking-widest"
+            >
+              CRIAR PROJETO
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

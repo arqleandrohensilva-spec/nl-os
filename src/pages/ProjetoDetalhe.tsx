@@ -171,6 +171,33 @@ const ProjetoDetalhe = () => {
     navigate('/projetos/gestao');
   };
 
+  const handleUseInMarketingIA = async () => {
+    if (!projeto) return;
+    
+    try {
+      // Find next delivery
+      const nextDeliveryEtapa = etapas.find(e => e.status !== 'CONCLUIDO' && e.status !== 'aprovado' && e.status !== 'Aprovado');
+      
+      const { error } = await supabase
+        .from('contexto_marketing_ativo')
+        .insert({
+          cliente: projeto.nome_cliente,
+          tipo: projeto.tipo,
+          etapa_atual: projeto.etapa_atual,
+          status: projeto.status_geral,
+          proxima_entrega: nextDeliveryEtapa ? nextDeliveryEtapa.etapa : 'Concluído'
+        });
+
+      if (error) throw error;
+
+      toast.success("Contexto enviado para o Marketing IA");
+      navigate('/marketing/ia?tab=captions');
+    } catch (error: any) {
+      console.error('Error sending to marketing IA:', error);
+      toast.error('Erro ao enviar contexto: ' + error.message);
+    }
+  };
+
   if (loading || !projeto) return <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center text-white">CARREGANDO...</div>;
 
   const currentEtapaIdx = ETAPAS_CONFIG.findIndex(e => e.id === projeto.etapa_atual?.toUpperCase());
@@ -204,6 +231,13 @@ const ProjetoDetalhe = () => {
               </div>
               <div className="flex items-center gap-4">
                 <Button variant="link" className="text-[#8B7355] text-xs uppercase" onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}>VER FICHA →</Button>
+                <Button 
+                  onClick={handleUseInMarketingIA}
+                  className="bg-bronze/10 text-bronze hover:bg-bronze/20 text-[10px] uppercase tracking-widest font-bold h-8 border border-bronze/20"
+                >
+                  <Zap size={14} className="mr-2" />
+                  USAR NO MARKETING IA
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger><MoreVertical className="text-[#555]" /></DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-[#141414] border-white/10">
