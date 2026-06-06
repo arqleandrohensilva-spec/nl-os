@@ -970,7 +970,7 @@ const Index = () => {
                           <div className="flex items-center gap-2">
                             <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">ABRIR SCRIPT</button>
                             <button onClick={() => handleQuickNote(lead.id, "Contato registrado via modo foco")} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">REGISTRAR CONTATO</button>
-                            <button onClick={() => setSelectedLeadId(lead.id)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
+                            <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
                           </div>
                         </div>
                       ))}
