@@ -897,7 +897,7 @@ const Index = () => {
                           <td className="px-4">
                             <div className="flex items-center gap-3 text-white/40">
                               <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="hover:text-bronze transition-colors"><FileText size={14} /></button>
-                              <button onClick={() => setSelectedLeadId(lead.id)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
+                              <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
                               <button onClick={() => handleQuickNote(lead.id, "Ação rápida registrada via lista")} className="hover:text-bronze transition-colors"><Zap size={14} /></button>
                             </div>
                           </td>
