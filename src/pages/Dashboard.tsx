@@ -336,64 +336,9 @@ const Dashboard = () => {
       ? satisfacao.reduce((acc, curr) => acc + (curr.nota_geral || 0), 0) / satisfacao.length 
       : 0;
 
-    return [
-      {
-        label: 'CAPTAÇÃO',
-        value: activeLeads,
-        max: 5,
-        subtext: `${activeLeads}/5 leads ativos`
-      },
-      {
-        label: 'EXECUÇÃO',
-        value: activeProjects,
-        max: Math.max(activeProjects, 5),
-        subtext: `${activeProjects} projetos em andamento`
-      },
-      {
-        label: 'FINANCEIRO',
-        value: confirmed,
-        max: Math.max(totalPrevisto, 1),
-        subtext: `R$ ${confirmed.toLocaleString('pt-BR')} de R$ ${totalPrevisto.toLocaleString('pt-BR')}`
-      },
-      {
-        label: 'SATISFAÇÃO',
-        value: avgSatisfacao,
-        max: 10,
-        subtext: `${avgSatisfacao.toFixed(1)} média · ${satisfacao.length} avaliações`
-      }
-    ];
-  }, [leads, projetos, parcelas, satisfacao]);
+    return [];
+  }, []);
 
-  // Timeline
-  const timelineDays = React.useMemo(() => {
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start, end });
-    
-    return days.map(day => {
-      const events: TimelineEvent[] = [];
-      
-      leads.forEach(l => {
-        if (l.proxima_acao_data && isSameDay(new Date(l.proxima_acao_data), day)) {
-          events.push({ id: l.id, date: day, title: l.nome, type: 'lead', link: '/pipeline' });
-        }
-      });
-
-      projetos.forEach(p => {
-        if (p.prazo_final && isSameDay(new Date(p.prazo_final), day)) {
-          events.push({ id: p.id, date: day, title: p.nome, type: 'projeto', link: `/projetos/detalhe/${p.id}` });
-        }
-      });
-
-      parcelas.forEach(p => {
-        if (p.data_vencimento && isSameDay(new Date(p.data_vencimento), day)) {
-          events.push({ id: p.id, date: day, title: p.cliente_nome, type: 'financeiro', link: '/financeiro/base' });
-        }
-      });
-
-      return { day, events };
-    });
-  }, [leads, projetos, parcelas]);
 
   const aiGreeting = React.useMemo(() => {
     const urgentItems = actions.filter(a => a.type === 'urgent').length;
