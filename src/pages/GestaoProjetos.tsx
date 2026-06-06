@@ -13,6 +13,12 @@ import {
 import { format, isSameWeek, parseISO, differenceInDays, isBefore, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Projeto {
   id: string;
@@ -134,30 +140,49 @@ const GestaoProjetos = () => {
     const pChecklists = checklists[projetoId] || [];
 
     const today = startOfDay(new Date());
+    const alerts: string[] = [];
 
     // 1. Parcela com status === 'ATRASADO' vinculada ao projeto
-    const hasAtrasada = pParcelas.some(p => p.status?.toUpperCase() === 'ATRASADO');
+    const parcelasAtrasadas = pParcelas.filter(p => p.status?.toUpperCase() === 'ATRASADO');
+    if (parcelasAtrasadas.length > 0) {
+      alerts.push(`${parcelasAtrasadas.length} parcela(s) com pagamento atrasado.`);
+    }
 
     // 2. Etapa com data_entrega preenchida e essa data já passou
-    const hasEtapaVencida = pEtapas.some(e => {
+    const etapasVencidas = pEtapas.filter(e => {
       if (!e.data_entrega || e.status?.toLowerCase() === 'concluido' || e.status?.toLowerCase() === 'aprovado') return false;
       return isBefore(parseISO(e.data_entrega), today);
     });
+    if (etapasVencidas.length > 0) {
+      alerts.push(`${etapasVencidas.length} etapa(s) com prazo de entrega vencido.`);
+    }
 
     // 3. Checklist com concluido === false e data de criação há mais de 7 dias
-    // (Utilizando criado_em como referência de tempo já que updated_at não está disponível)
-    const hasChecklistPendenteLonga = pChecklists.some(c => {
+    const checklistPendentes = pChecklists.filter(c => {
       if (c.concluido) return false;
       if (!c.criado_em) return false;
       return differenceInDays(today, parseISO(c.criado_em)) > 7;
     });
+    if (checklistPendentes.length > 0) {
+      alerts.push(`${checklistPendentes.length} item(ns) de checklist pendentes há mais de 7 dias.`);
+    }
 
-    if (hasAtrasada || hasEtapaVencida || hasChecklistPendenteLonga) {
-      return { label: 'ATENÇÃO', color: '#fbbf24', bg: 'bg-amber-500/10' };
+    if (alerts.length > 0) {
+      return { 
+        label: 'ATENÇÃO', 
+        color: '#fbbf24', 
+        bg: 'bg-amber-500/10',
+        reasons: alerts 
+      };
     }
 
     // Sem data = sem risco calculável = OK por padrão
-    return { label: 'OK', color: '#4ade80', bg: 'bg-green-500/10' };
+    return { 
+      label: 'OK', 
+      color: '#4ade80', 
+      bg: 'bg-green-500/10',
+      reasons: ['Nenhuma pendência crítica identificada (financeiro, prazos ou checklist).']
+    };
   };
 
   const activeProjectsCount = projetos.filter(p => p.status_geral === 'ativo' || p.status_geral === 'Em andamento' || p.status_geral === 'Ativo').length;
@@ -170,14 +195,15 @@ const GestaoProjetos = () => {
   const pendingApprovals = Object.values(etapas).flat().filter(e => e.status === 'Aguardando aprovação').length;
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
-      <Sidebar user="Equipe NL" />
-      
-      <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12">
-        <header className="mb-12">
-          <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">Gestão de Projetos</h1>
-          <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
-        </header>
+    <TooltipProvider>
+      <div className="flex min-h-screen bg-[#0A0A0A] text-white font-mono">
+        <Sidebar user="Equipe NL" />
+        
+        <main className="flex-1 transition-[margin] duration-300 ml-[var(--sidebar-width)] p-12">
+          <header className="mb-12">
+            <h1 className="text-5xl font-cormorant font-light tracking-tight mb-2 italic">Gestão de Projetos</h1>
+            <p className="text-[10px] tracking-[0.5em] text-[#8B7355] font-bold uppercase">PROJETOS ATIVOS · ETAPAS E ENTREGAS</p>
+          </header>
 
         {/* Metric Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
@@ -216,21 +242,36 @@ const GestaoProjetos = () => {
                 onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.025)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
-                {/* Health Indicator Badge */}
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '12px', 
-                  right: '12px', 
-                  fontSize: '8px', 
-                  fontWeight: 'bold', 
-                  color: health.color, 
-                  padding: '2px 6px', 
-                  borderRadius: '2px', 
-                  border: `1px solid ${health.color}30`,
-                  background: `${health.color}10`
-                }}>
-                  {health.label}
-                </div>
+                {/* Health Indicator Badge with Tooltip */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div style={{ 
+                      position: 'absolute', 
+                      top: '12px', 
+                      right: '12px', 
+                      fontSize: '8px', 
+                      fontWeight: 'bold', 
+                      color: health.color, 
+                      padding: '2px 6px', 
+                      borderRadius: '2px', 
+                      border: `1px solid ${health.color}30`,
+                      background: `${health.color}10`,
+                      cursor: 'help'
+                    }}>
+                      {health.label}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="bg-[#1a1a1a] border-[#333] text-white p-3 max-w-[250px]">
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#8B7355]">Saúde do Projeto</p>
+                      <ul className="text-xs space-y-1 list-disc pl-4">
+                        {health.reasons.map((reason, i) => (
+                          <li key={i}>{reason}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
 
                 {/* Cliente */}
                 <div>
@@ -334,8 +375,9 @@ const GestaoProjetos = () => {
             </div>
           )}
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </TooltipProvider>
   );
 };
 
