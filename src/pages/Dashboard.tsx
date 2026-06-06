@@ -184,7 +184,22 @@ const Dashboard = () => {
 
   const unreadCount = notifications.filter(n => !n.lida).length;
 
+  const { data: metaConfig } = useQuery({
+    queryKey: ['meta-mensal'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('configuracoes')
+        .select('valor')
+        .eq('chave', 'meta_mensal_receita')
+        .maybeSingle();
+      return data;
+    }
+  });
+
+  const metaMensal = Number(metaConfig?.valor || 15000);
+
   // Process Ações do Dia
+
 
   const actions: ActionItem[] = React.useMemo(() => {
     const items: ActionItem[] = [];
