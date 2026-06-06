@@ -3,7 +3,7 @@ import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/
 import Sidebar from '@/components/Sidebar';
 
 import KanbanColumn from '@/components/KanbanColumn';
-import LeadDetailPanel from '@/components/LeadDetailPanel';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
