@@ -978,7 +978,7 @@ const ClienteFicha = () => {
                         
                         if (error) throw error;
                         
-                        // Criar lead vinculado automaticamente se não existir
+                        // Criar lead vinculado automaticamente
                         if (novoCliente) {
                           const { data: existingLead } = await supabase
                             .from('leads')
