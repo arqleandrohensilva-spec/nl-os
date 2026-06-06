@@ -90,7 +90,7 @@ const Index = () => {
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
-  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'foco'>('kanban');
   const [smartFilter, setSmartFilter] = useState<'all' | 'ghosting' | 'score8' | 'premium' | 'high-ticket'>('all');
