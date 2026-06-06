@@ -494,7 +494,7 @@ const Index = () => {
       if (error) throw error;
       
       setLeads(prev => prev.filter(l => l.id !== leadId));
-      setSelectedLeadId(null);
+      
       toast.success("Lead excluído com sucesso");
     } catch (err) {
       console.error('Error deleting lead:', err);
