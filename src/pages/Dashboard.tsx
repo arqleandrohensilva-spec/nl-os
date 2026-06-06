@@ -187,7 +187,7 @@ const Dashboard = () => {
   const { data: satisfacao = [] } = useQuery({
     queryKey: ['satisfacao-dashboard'],
     queryFn: async () => {
-      const { data } = await supabase.from('pesquisas_satisfacao').select('nota_geral');
+      const { data } = await supabase.from('pesquisas_satisfacao').select('nota_geral, status');
       return data || [];
     }
   });
@@ -701,7 +701,7 @@ const Dashboard = () => {
               </div>
 
               {/* Segunda Linha */}
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-5 gap-4">
                 {[
                   { 
                     label: 'PROPOSTAS ENVIADAS', 
@@ -728,6 +728,17 @@ const Dashboard = () => {
                     }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
                     subtext: 'em aberto · todos projetos',
                     link: '/financeiro' 
+                  },
+                  { 
+                    label: 'SATISFAÇÃO MÉDIA', 
+                    value: (() => {
+                      const avaliacoes = satisfacao.filter(s => s.status === 'RESPONDIDA' || s.status === 'Respondida');
+                      if (avaliacoes.length === 0) return '— ★';
+                      const media = avaliacoes.reduce((acc, curr) => acc + (curr.nota_geral || 0), 0) / avaliacoes.length;
+                      return `${media.toFixed(1)} ★`;
+                    })(),
+                    subtext: `${satisfacao.filter(s => s.status === 'RESPONDIDA' || s.status === 'Respondida').length} avaliações`,
+                    link: '/marketing/satisfacao' 
                   },
                   { 
                     label: 'FECHADOS NO MÊS', 
