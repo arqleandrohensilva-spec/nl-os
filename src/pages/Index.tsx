@@ -1006,15 +1006,6 @@ const Index = () => {
         </div>
       </main>
 
-      {selectedLead && (
-        <LeadDetailPanel 
-          lead={selectedLead}
-          onClose={() => setSelectedLeadId(null)}
-          onUpdateStage={handleUpdateStage}
-          onDelete={handleDeleteLead}
-          onAddLog={handleAddLog}
-        />
-      )}
 
       {/* Project Conversion Modal */}
       <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
