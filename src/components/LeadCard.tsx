@@ -17,10 +17,10 @@ interface LeadCardProps {
 }
 
 const LeadCard = ({ lead, onClick }: LeadCardProps) => {
-  const daysInStage = Math.floor(
-    (new Date().getTime() - new Date(lead.etapa_desde || lead.criado).getTime()) 
-    / (1000 * 60 * 60 * 24)
-  );
+  const dataRef = lead.etapa_desde || (lead as any).updated_at || lead.created_at || (lead as any).criado_em;
+  const daysInStage = dataRef 
+    ? Math.floor((new Date().getTime() - new Date(dataRef).getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
   
   const formatCurrency = (val: number) => {
     if (lead.isBriefingVirtual && (lead as any).orcamentoVirtual) {
