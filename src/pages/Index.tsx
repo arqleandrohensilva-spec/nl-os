@@ -696,28 +696,16 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-6">
-              <div className="relative group">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-bronze transition-colors" />
-                <Input 
-                  placeholder="BUSCAR LEAD..." 
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-72 h-10 pl-10 bg-[#0A0A0A] border-white/10 focus:border-bronze focus:ring-0 rounded-[2px] text-[10px] tracking-widest uppercase"
-                />
+              <div className="h-10 px-8 flex items-center gap-3 text-white/20 text-[9px] font-bold uppercase tracking-[0.2em] border border-white/5">
+                CRIAÇÃO VIA MÓDULO CLIENTES
               </div>
-              <div className="h-8 w-[1px] bg-white/10" />
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={exportToPDF}
-                  className="p-2 text-white/40 hover:text-bronze transition-colors"
-                  title="Exportar Pipeline"
-                >
-                  <Download size={18} />
-                </button>
-                <div className="h-10 px-8 flex items-center gap-3 text-white/20 text-[9px] font-bold uppercase tracking-[0.2em] border border-white/5">
-                  CRIAÇÃO VIA MÓDULO CLIENTES
-                </div>
-              </div>
+              <button 
+                onClick={exportToPDF}
+                className="p-2 text-white/40 hover:text-bronze transition-colors"
+                title="Exportar Pipeline"
+              >
+                <Download size={18} />
+              </button>
             </div>
           </div>
 
