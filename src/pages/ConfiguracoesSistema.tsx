@@ -237,7 +237,7 @@ const ConfiguracoesSistema = () => {
     } else {
       toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
       setDropboxStatus('loading');
-      setTimeout(fetchDropboxStatus, 15000);
+      setTimeout(fetchConfigData, 15000);
     }
   };
 
