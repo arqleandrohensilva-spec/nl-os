@@ -160,6 +160,30 @@ const Dashboard = () => {
     }
   });
 
+  const { data: sessoesHoras = [] } = useQuery({
+    queryKey: ['sessoes-horas-dashboard'],
+    queryFn: async () => {
+      const { data } = await supabase.from('sessoes_horas').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: projetoEtapas = [] } = useQuery({
+    queryKey: ['projeto-etapas-dashboard'],
+    queryFn: async () => {
+      const { data } = await supabase.from('projeto_etapas').select('*');
+      return data || [];
+    }
+  });
+
+  const { data: configEscritorio } = useQuery({
+    queryKey: ['config-escritorio'],
+    queryFn: async () => {
+      const { data } = await supabase.from('config_escritorio').select('*').maybeSingle();
+      return data;
+    }
+  });
+
   const { data: satisfacao = [] } = useQuery({
     queryKey: ['satisfacao-dashboard'],
     queryFn: async () => {
@@ -167,6 +191,7 @@ const Dashboard = () => {
       return data || [];
     }
   });
+
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notificacoes'],
@@ -197,6 +222,7 @@ const Dashboard = () => {
   });
 
   const metaMensal = Number(metaConfig?.value || 15000);
+
 
   // Process Ações do Dia
 
@@ -311,64 +337,9 @@ const Dashboard = () => {
       ? satisfacao.reduce((acc, curr) => acc + (curr.nota_geral || 0), 0) / satisfacao.length 
       : 0;
 
-    return [
-      {
-        label: 'CAPTAÇÃO',
-        value: activeLeads,
-        max: 5,
-        subtext: `${activeLeads}/5 leads ativos`
-      },
-      {
-        label: 'EXECUÇÃO',
-        value: activeProjects,
-        max: Math.max(activeProjects, 5),
-        subtext: `${activeProjects} projetos em andamento`
-      },
-      {
-        label: 'FINANCEIRO',
-        value: confirmed,
-        max: Math.max(totalPrevisto, 1),
-        subtext: `R$ ${confirmed.toLocaleString('pt-BR')} de R$ ${totalPrevisto.toLocaleString('pt-BR')}`
-      },
-      {
-        label: 'SATISFAÇÃO',
-        value: avgSatisfacao,
-        max: 10,
-        subtext: `${avgSatisfacao.toFixed(1)} média · ${satisfacao.length} avaliações`
-      }
-    ];
-  }, [leads, projetos, parcelas, satisfacao]);
+    return [];
+  }, []);
 
-  // Timeline
-  const timelineDays = React.useMemo(() => {
-    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const end = endOfWeek(new Date(), { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start, end });
-    
-    return days.map(day => {
-      const events: TimelineEvent[] = [];
-      
-      leads.forEach(l => {
-        if (l.proxima_acao_data && isSameDay(new Date(l.proxima_acao_data), day)) {
-          events.push({ id: l.id, date: day, title: l.nome, type: 'lead', link: '/pipeline' });
-        }
-      });
-
-      projetos.forEach(p => {
-        if (p.prazo_final && isSameDay(new Date(p.prazo_final), day)) {
-          events.push({ id: p.id, date: day, title: p.nome, type: 'projeto', link: `/projetos/detalhe/${p.id}` });
-        }
-      });
-
-      parcelas.forEach(p => {
-        if (p.data_vencimento && isSameDay(new Date(p.data_vencimento), day)) {
-          events.push({ id: p.id, date: day, title: p.cliente_nome, type: 'financeiro', link: '/financeiro/base' });
-        }
-      });
-
-      return { day, events };
-    });
-  }, [leads, projetos, parcelas]);
 
   const aiGreeting = React.useMemo(() => {
     const urgentItems = actions.filter(a => a.type === 'urgent').length;
@@ -400,11 +371,11 @@ const Dashboard = () => {
         .map(p => `${p.nome} (Etapa: ${p.etapa_atual})`)
         .join(', ');
 
-      const financeiroResumo = pulse[2].subtext;
-      const satisfacaoResumo = pulse[3].subtext;
+      const financeiroResumo = `Confirmado R$ ${parcelas.filter(p => p.status === 'pago').reduce((a, b) => a + Number(b.valor || 0), 0)}`;
+      const satisfacaoResumo = `Média ${satisfacao.length > 0 ? (satisfacao.reduce((a, b) => a + (b.nota_geral || 0), 0) / satisfacao.length).toFixed(1) : '0'}`;
+
 
       try {
-        // Insight
         const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
         Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
         
@@ -421,41 +392,29 @@ const Dashboard = () => {
           "modulo": "pipeline | projetos | financeiro | marketing"
         }`;
 
-        // Health Score
         const healthPrompt = `Você é o analista estratégico da NL Arquitetos. Analise os dados abaixo e gere um score de saúde do negócio de 0 a 100.
-
-CRITÉRIOS DE AVALIAÇÃO:
-- Pipeline (25pts): leads ativos, taxa de conversão, tempo nas etapas
-- Projetos (25pts): projetos em andamento, entregas no prazo, checklists pendentes
-- Financeiro (25pts): parcelas em dia, receita prevista vs meta, inadimplência
-- Satisfação (25pts): nota média, número de avaliações, tendência
-
-DADOS:
-Leads: ${leadsResumo}
-Projetos: ${projetosResumo}
-Financeiro: ${financeiroResumo}
-Satisfação: ${satisfacaoResumo}
-
-Retorne APENAS JSON:
-{
-  "score": 87,
-  "diagnostico": "frase de diagnóstico em 2 linhas máximo",
-  "pipeline": "ok | atencao | critico",
-  "projetos": "ok | atencao | critico",
-  "financeiro": "ok | atencao | critico",
-  "satisfacao": "ok | atencao | critico"
-}`;
+        DADOS:
+        Leads: ${leadsResumo}
+        Projetos: ${projetosResumo}
+        Financeiro: ${financeiroResumo}
+        Satisfação: ${satisfacaoResumo}
+        
+        Retorne APENAS JSON:
+        {
+          "score": 87,
+          "diagnostico": "diagnóstico curto",
+          "pipeline": "ok | atencao | critico",
+          "projetos": "ok | atencao | critico",
+          "financeiro": "ok | atencao | critico",
+          "satisfacao": "ok | atencao | critico"
+        }`;
 
         const [insightRes, healthRes] = await Promise.all([
           supabase.functions.invoke('ai-advisor', {
-            body: { prompt: insightPrompt, systemPrompt: "Você é um consultor estratégico de negócios. Responda apenas com JSON." }
+            body: { prompt: insightPrompt, systemPrompt: "Você é um assistente estratégico." }
           }),
           supabase.functions.invoke('ai-advisor', {
-            body: { 
-              prompt: healthPrompt, 
-              systemPrompt: "Você é um analista estratégico. Responda apenas com JSON.",
-              model: "claude-sonnet-4-20250514"
-            }
+            body: { prompt: healthPrompt, systemPrompt: "Você é um analista estratégico." }
           })
         ]);
         
@@ -479,7 +438,8 @@ Retorne APENAS JSON:
     };
 
     generateAIContent();
-  }, [leads.length, projetos.length, pulse]);
+  }, [leads.length, projetos.length]);
+
 
   const forecast = React.useMemo(() => {
     const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido');
@@ -680,8 +640,41 @@ Retorne APENAS JSON:
           {/* Column Left */}
           <div className="space-y-12">
             
-            
-            {/* Bloco 1: Ações do Dia */}
+            {/* Bloco: NÚMEROS DO DIA */}
+            <section className="grid grid-cols-4 gap-4">
+              {[
+                { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO').length, link: '/pipeline' },
+                { label: 'PROJETOS', value: projetos.filter(p => p.status_geral === 'em_andamento').length, link: '/projetos' },
+                { 
+                  label: 'RECEBIDO MÊS', 
+                  value: `R$ ${parcelas.filter(p => {
+                    if (!p.data_recebimento) return false;
+                    const d = new Date(p.data_recebimento);
+                    return (p.status === 'pago' || p.status === 'recebido') && d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear();
+                  }).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                  link: '/financeiro/base' 
+                },
+                { 
+                  label: 'HORAS ESTA SEMANA', 
+                  value: `${(() => {
+                    const start = startOfWeek(new Date(), { weekStartsOn: 1 });
+                    const totalMin = sessoesHoras
+                      .filter(s => s.inicio && new Date(s.inicio) >= start)
+                      .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0);
+                    return Math.round(totalMin / 60);
+                  })()}h`, 
+                  link: '/projetos' 
+                }
+
+              ].map((stat, i) => (
+                <button key={i} onClick={() => navigate(stat.link)} className="bg-white/[0.02] border border-white/5 px-6 py-4 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors">
+                  <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
+                  <span className="text-xl font-bold text-white">{stat.value}</span>
+                </button>
+              ))}
+            </section>
+
+            {/* Bloco: Ações do Dia */}
             <section>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">AÇÕES DO DIA</span>
@@ -690,153 +683,196 @@ Retorne APENAS JSON:
 
               <div className="space-y-4">
                 {actions.length === 0 ? (
-                  <p className="text-white/20 text-sm italic">Nenhuma ação pendente. Bom trabalho.</p>
+                  <p className="text-white/20 text-sm italic">Nenhuma ação pendente.</p>
                 ) : (
-                  <>
-                    {/* Urgent */}
-                    {actions.filter(a => a.type === 'urgent').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-red-500/70 group hover:bg-white/[0.04] transition-all">
-                        <div className="flex items-center gap-4">
-                          <div className="px-2 py-0.5 bg-red-500/10 text-red-500 text-[9px] font-bold uppercase tracking-wider">⚡ URGENTE</div>
-                          <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
-                            <p className="text-[10px] text-red-400/60 uppercase font-bold tracking-tighter">Atrasado há {action.days} dias</p>
-                          </div>
+                  actions.map(action => (
+                    <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className={cn("px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider", action.type === 'urgent' ? "bg-red-500/10 text-red-500" : "bg-bronze/10 text-bronze")}>
+                          {action.type === 'urgent' ? '⚡ URGENTE' : '📋 HOJE'}
                         </div>
-                        <button 
-                          onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
-                        >
-                          AGIR <ArrowRight size={12} />
-                        </button>
-                      </div>
-                    ))}
-
-                    {/* Today */}
-                    {actions.filter(a => a.type === 'today').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-bronze group hover:bg-white/[0.04] transition-all">
-                        <div className="flex items-center gap-4">
-                          <div className="px-2 py-0.5 bg-bronze/10 text-bronze text-[9px] font-bold uppercase tracking-wider">📋 HOJE</div>
-                          <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
-                          </div>
+                        <div>
+                          <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
                         </div>
-                        <button 
-                          onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
-                        >
-                          VER <ArrowRight size={12} />
-                        </button>
                       </div>
-                    ))}
-                  </>
+                      <button onClick={() => navigate(action.link)} className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white">AGIR <ArrowRight size={12} /></button>
+                    </div>
+                  ))
                 )}
               </div>
             </section>
 
-
-            {/* Bloco 3: Pulso da Empresa */}
+            {/* Bloco: FEE BURN */}
             <section>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PULSO DA EMPRESA</span>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">FEE BURN · PROJETOS ATIVOS</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
+              <div className="space-y-4">
+                {(() => {
+                  const ativos = projetos.filter(p => p.status_geral === 'em_andamento');
+                  if (ativos.length === 0) return <p className="text-white/20 text-sm italic">Nenhum projeto em andamento.</p>;
+                  
+                  return ativos.map(proj => {
+                    const horasLancadas = sessoesHoras
+                      .filter(s => s.projeto_id === proj.id)
+                      .reduce((acc, s) => acc + Number(s.duracao_minutos || 0), 0) / 60;
+                    
+                    const valorTotal = parcelas
+                      .filter(p => p.projeto_id === proj.id)
+                      .reduce((acc, p) => acc + Number(p.valor || 0), 0);
+                    
+                    const custoHora = Number(configEscritorio?.custo_hora || 80);
+                    const feeBurn = valorTotal > 0 ? ((horasLancadas * custoHora) / valorTotal) * 100 : 0;
+                    
+                    const etapasProjeto = projetoEtapas.filter(e => e.projeto_id === proj.id);
+                    const aprovadas = etapasProjeto.filter(e => e.status === 'aprovado').length;
+                    const totalEtapas = etapasProjeto.length;
+                    
+                    const isAtencao = feeBurn > 80 && aprovadas < totalEtapas;
+                    const isCritico = feeBurn > 95;
+                    
+                    const diffDias = proj.prazo_final ? Math.floor((new Date(proj.prazo_final).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                {pulse.map(item => {
-                  const percentage = Math.round((item.value / item.max) * 100);
-                  const isCaptação = item.label === 'CAPTAÇÃO';
-                  const isMetaSuperada = isCaptação && item.value > item.max;
-                  const isEmpty = (item.label === 'FINANCEIRO' || item.label === 'EXECUÇÃO') && item.value === 0;
-
-                  return (
-                    <div key={item.label} className="space-y-3">
-                      <div className="flex justify-between items-end">
-                        <span className="text-[11px] font-bold tracking-widest text-white/60">{item.label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-bronze">
-                            {Math.min(percentage, 100)}%
-                          </span>
-                          {isMetaSuperada && (
-                            <span className="px-1.5 py-0.5 bg-green-500/10 text-green-500 text-[8px] font-bold uppercase tracking-wider">
-                              META SUPERADA
+                    return (
+                      <button 
+                        key={proj.id} 
+                        onClick={() => navigate(`/projetos/detalhe/${proj.id}`)} 
+                        className="w-full p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all text-left"
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <div>
+                            <span className="text-sm font-bold uppercase tracking-tight">{proj.nome}</span>
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                              {proj.nome_cliente} · {proj.tipo} · etapa {aprovadas}/{totalEtapas} {diffDias !== null && `· prazo em ${diffDias} dias`}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className={cn("text-[10px] font-bold", isCritico ? "text-red-500" : isAtencao ? "text-amber-500" : "text-bronze")}>
+                              {feeBurn.toFixed(0)}% do fee
                             </span>
-                          )}
+                            {isCritico ? (
+                              <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[8px] font-bold uppercase tracking-wider">CRÍTICO</span>
+                            ) : isAtencao ? (
+                              <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[8px] font-bold uppercase tracking-wider">ATENÇÃO</span>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                      
-                      {isEmpty ? (
-                        <div className="h-2 flex items-center">
-                          <p className="text-[10px] text-white/20 italic">— Sem dados este mês</p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="h-2 w-full bg-white/5 overflow-hidden">
+                        
+                        {horasLancadas === 0 ? (
+                          <p className="text-[10px] text-white/20 italic mt-2">— sem horas registradas</p>
+                        ) : (
+                          <div className="h-1.5 w-full bg-white/5 mt-3 overflow-hidden">
                             <motion.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-bronze"
+                              initial={{ width: 0 }} 
+                              animate={{ width: `${Math.min(feeBurn, 100)}%` }} 
+                              className={cn(
+                                "h-full transition-colors", 
+                                feeBurn >= 90 ? "bg-red-500" : feeBurn >= 70 ? "bg-amber-500" : "bg-bronze"
+                              )} 
                             />
                           </div>
-                          <p className="text-[10px] text-white/30 uppercase tracking-wider font-medium">{item.subtext}</p>
-                        </>
-                      )}
-                    </div>
-                  );
-                })}
+                        )}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             </section>
 
-            {/* Bloco 3: Linha do Tempo */}
+            {/* Bloco: HONORÁRIO A FATURAR */}
             <section>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">ESTA SEMANA</span>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">HONORÁRIO A FATURAR</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
-
-              <div className="grid grid-cols-7 gap-4">
-                {timelineDays.map(({ day, events }) => {
-                  const isCurrent = isToday(day);
+              <div className="p-6 bg-white/[0.02] border border-white/5">
+                {(() => {
+                  const ativosIds = projetos.filter(p => p.status_geral === 'em_andamento').map(p => p.id);
+                  const hoje = new Date();
+                  hoje.setHours(23, 59, 59, 999);
+                  
+                  const parcelasPendentes = parcelas.filter(p => 
+                    ativosIds.includes(p.projeto_id) && 
+                    p.status === 'pendente' && 
+                    new Date(p.data_vencimento) <= new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0)
+                  );
+                  
+                  const totalFaturar = parcelasPendentes.reduce((acc, p) => acc + Number(p.valor || 0), 0);
+                  
+                  if (totalFaturar === 0) {
+                    return <p className="text-green-500/40 text-sm italic uppercase tracking-widest">Tudo em dia — nenhuma parcela pendente</p>;
+                  }
+                  
                   return (
-                    <div key={day.toString()} className="space-y-4">
-                      <div className={cn(
-                        "text-center py-2 border-b transition-colors",
-                        isCurrent ? "border-bronze text-bronze" : "border-white/5 text-white/20"
-                      )}>
-                        <p className="text-[10px] font-bold uppercase mb-1">{format(day, 'EEE', { locale: ptBR })}</p>
-                        <p className="text-xs font-mono">{format(day, 'dd')}</p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div>
+                        <p className="text-2xl font-bold text-white mb-1">R$ {totalFaturar.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest">
+                          {parcelasPendentes.length} parcelas em aberto · vencidas ou vencendo este mês
+                        </p>
                       </div>
-                      
-                      <div className="space-y-2 min-h-[80px] flex flex-col items-center justify-center">
-                        {events.length === 0 ? (
-                          <span className="text-white/10 text-lg flex items-center justify-center h-full">—</span>
-                        ) : (
-                          events.map(event => (
-                            <button 
-                              key={event.id}
-                              onClick={() => navigate(event.link)}
-                              className="w-full text-left group"
-                            >
-                              <div className="flex items-start gap-1.5">
-                                <div className={cn(
-                                  "w-1.5 h-1.5 rounded-full mt-1 shrink-0",
-                                  event.type === 'lead' ? "bg-blue-400" : 
-                                  event.type === 'projeto' ? "bg-bronze" : "bg-green-400"
-                                )} />
-                                <p className="text-[9px] text-white/40 leading-tight group-hover:text-white transition-colors truncate">
-                                  {event.title}
-                                </p>
-                              </div>
-                            </button>
-                          ))
-                        )}
-                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/financeiro')}
+                        className="bg-white/5 border-white/10 text-bronze text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 rounded-none h-9 px-6"
+                      >
+                        VER PARCELAS
+                      </Button>
                     </div>
                   );
-                })}
+                })()}
               </div>
             </section>
+
+            {/* Bloco: PRÓXIMAS ENTREGAS */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PRÓXIMAS ENTREGAS · 14 DIAS</span>
+                <div className="h-[1px] flex-1 bg-white/5" />
+              </div>
+              <div className="space-y-4">
+                {(() => {
+                  const hoje = new Date();
+                  hoje.setHours(0,0,0,0);
+                  const limite = new Date();
+                  limite.setDate(hoje.getDate() + 14);
+                  limite.setHours(23,59,59,999);
+                  
+                  const proximas = projetoEtapas
+                    .filter(e => {
+                      if (e.status === 'aprovado' || !e.data_entrega) return false;
+                      const d = new Date(e.data_entrega);
+                      return d >= hoje && d <= limite;
+                    })
+                    .sort((a, b) => new Date(a.data_entrega!).getTime() - new Date(b.data_entrega!).getTime());
+                  
+                  if (proximas.length === 0) {
+                    return <p className="text-white/20 text-sm italic">Nenhuma entrega programada nos próximos 14 dias. <span className="opacity-50 italic">Cadastre prazos nos projetos para ver aqui.</span></p>;
+                  }
+                  
+                  return proximas.map(etapa => {
+                    const proj = projetos.find(p => p.id === etapa.projeto_id);
+                    const diff = Math.floor((new Date(etapa.data_entrega!).getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+                    const colorClass = diff < 3 ? "text-red-500" : diff <= 7 ? "text-amber-500" : "text-green-500";
+                    
+                    return (
+                      <div key={etapa.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-all">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold uppercase tracking-tight">{proj?.nome || 'Projeto'} · <span className="text-white/40">{etapa.etapa}</span></span>
+                        </div>
+                        <span className={cn("text-[10px] font-bold uppercase tracking-widest", colorClass)}>
+                          em {diff === 0 ? 'hoje' : diff === 1 ? '1 dia' : `${diff} dias`}
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+            </section>
+
+
           </div>
 
           {/* Column Right */}
@@ -976,155 +1012,8 @@ Retorne APENAS JSON:
               </div>
             </section>
 
-            {/* Separator */}
-            <div className="border-t border-white/5" />
-
-            {/* Bloco: Saúde do Negócio */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">SAÚDE DO NEGÓCIO</span>
-              </div>
-
-              <div className="p-6 bg-white/[0.02] border border-white/5 space-y-6">
-                {loadingHealth ? (
-                  <div className="space-y-4">
-                    <div className="h-8 bg-white/5 animate-pulse w-24" />
-                    <div className="h-2 bg-white/5 animate-pulse w-full" />
-                    <div className="h-12 bg-white/5 animate-pulse w-full" />
-                  </div>
-                ) : businessHealth ? (
-                  <>
-                    <div className="space-y-2">
-                      <div className="flex items-baseline gap-2">
-                        <span className={cn(
-                          "text-3xl font-mono font-bold",
-                          businessHealth.score >= 80 ? "text-bronze" : 
-                          businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]"
-                        )}>
-                          {businessHealth.score}
-                        </span>
-                        <span className="text-white/20 text-sm font-mono">/ 100</span>
-                      </div>
-                      <div className="flex gap-1">
-                        {[...Array(10)].map((_, i) => (
-                          <span 
-                            key={i} 
-                            className={cn(
-                              "text-sm leading-none transition-colors duration-500",
-                              i < Math.round(businessHealth.score / 10) 
-                                ? (businessHealth.score >= 80 ? "text-bronze" : businessHealth.score >= 60 ? "text-amber-500" : "text-[#7A4A3A]")
-                                : "text-white/10"
-                            )}
-                          >
-                            ●
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <p className="text-sm text-white/80 leading-relaxed italic">
-                      "{businessHealth.diagnostico}"
-                    </p>
-
-                    <div className="grid grid-cols-4 gap-2 pt-4 border-t border-white/5">
-                      {[
-                        { label: 'PIPELINE', status: businessHealth.pipeline },
-                        { label: 'PROJETOS', status: businessHealth.projetos },
-                        { label: 'FINANCEIRO', status: businessHealth.financeiro },
-                        { label: 'SATISFAÇÃO', status: businessHealth.satisfacao }
-                      ].map(item => (
-                        <div key={item.label} className="text-center space-y-2">
-                          <div className="flex justify-center mb-1">
-                            {item.status === 'ok' ? (
-                              <span className="text-green-500 text-sm font-bold">✓</span>
-                            ) : item.status === 'atencao' ? (
-                              <span className="text-amber-500 text-sm font-bold">⚠</span>
-                            ) : (
-                              <span className="text-red-500/70 text-sm font-bold">●</span>
-                            )}
-                          </div>
-                          <p className="text-[9px] font-bold tracking-widest text-white/40 uppercase">{item.label}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-xs text-white/20 italic">Analisando indicadores...</p>
-                )}
-              </div>
-            </section>
-
-            {/* Bloco: Velocidade do Pipeline */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">VELOCIDADE DO PIPELINE</span>
-              </div>
-
-              <div className="p-6 bg-white/[0.02] border border-white/5">
-                {!velocity.some(v => v.hasData) && leadLogs.length > 0 ? (
-                  <p className="text-xs text-white/20 italic">Dados insuficientes — disponível após 30 dias de uso.</p>
-                ) : (
-                  <div className="space-y-5">
-                    {velocity.map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <p className="text-[10px] text-white/60 uppercase tracking-wider">{item.label}</p>
-                          <p className="text-sm font-bold text-white font-mono">{item.days} {item.days === 1 ? 'dia' : 'dias'}</p>
-                        </div>
-                        <div className={cn(
-                          "px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest",
-                          item.status === 'normal' ? "bg-green-500/10 text-green-500" :
-                          item.status === 'atencao' ? "bg-amber-500/10 text-amber-500" : "bg-red-500/10 text-red-500"
-                        )}>
-                          {item.status === 'normal' ? '✅ normal' : item.status === 'atencao' ? '⚠️ atenção' : '🔴 crítico'}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Bloco 5: Resumo Rápido */}
-            <section>
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">RESUMO</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { label: 'LEADS ATIVOS', val: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO').length, link: '/pipeline' },
-                  { label: 'PROJETOS', val: projetos.filter(p => p.status_geral === 'em_andamento').length, link: '/projetos/gestao' },
-                  { 
-                    label: 'RECEITA MÊS', 
-                    val: `R$ ${parcelas.filter(p => {
-                      const d = new Date(p.data_vencimento);
-                      return d.getMonth() === new Date().getMonth() && p.status === 'pago';
-                    }).reduce((acc, curr) => acc + Number(curr.valor || 0), 0).toLocaleString('pt-BR')}`, 
-                    link: '/financeiro/base' 
-                  },
-                  { label: 'FOLLOW-UPS', val: `${actions.filter(a => a.module === 'pipeline').length} pendentes`, link: '/pipeline' },
-                  { label: 'PARCELAS', val: `${parcelas.filter(p => p.status !== 'pago' && isPast(new Date(p.data_vencimento))).length} vencendo`, link: '/financeiro/base' },
-                  { 
-                    label: 'SATISFAÇÃO', 
-                    val: `${satisfacao.length > 0 ? (satisfacao.reduce((acc, curr) => acc + (curr.nota_geral || 0), 0) / satisfacao.length).toFixed(1) : '0.0'} ★`, 
-                    link: '/marketing/satisfacao' 
-                  }
-                ].map(card => (
-                  <button 
-                    key={card.label}
-                    onClick={() => navigate(card.link)}
-                    className="p-5 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-bronze/30 transition-all text-left"
-                  >
-                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-2">{card.label}</p>
-                    <p className="text-base font-bold text-white">{card.val}</p>
-                  </button>
-                ))}
-              </div>
-            </section>
-
           </div>
+
         </div>
       </main>
     </div>
