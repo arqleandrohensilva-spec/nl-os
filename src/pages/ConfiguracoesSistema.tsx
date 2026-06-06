@@ -18,7 +18,8 @@ import {
   Link2,
   Layout,
   FileText,
-  Save
+  Save,
+  DollarSign
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -157,37 +158,53 @@ const ConfiguracoesSistema = () => {
   const [originalVendorPath, setOriginalVendorPath] = useState('');
   const [templateStatus, setTemplateStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
   const [vendorStatus, setVendorStatus] = useState<'found' | 'not_found' | 'checking' | 'idle'>('idle');
+  const [monthlyGoal, setMonthlyGoal] = useState('15000');
+  const [originalGoal, setOriginalGoal] = useState('15000');
+  const [isSavingGoal, setIsSavingGoal] = useState(false);
 
-  const fetchDropboxStatus = async () => {
+  const fetchConfigData = async () => {
     setDropboxStatus('loading');
     try {
-      const { data, error } = await supabase
+      // Fetch Dropbox Settings
+      const { data: dropboxData, error: dropboxError } = await supabase
         .from('dropbox_settings')
         .select('*')
         .eq('id', '00000000-0000-0000-0000-000000000001')
         .single();
 
-      if (error || !data || !data.refresh_token) {
-        setDropboxStatus('disconnected');
-      } else {
+      if (!dropboxError && dropboxData && dropboxData.refresh_token) {
         setDropboxStatus('connected');
-        setLastSync(new Date(data.updated_at).toLocaleString('pt-BR'));
-        const path = (data as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
-        const vPath = (data as any).vendor_template_path || '';
+        setLastSync(new Date(dropboxData.updated_at).toLocaleString('pt-BR'));
+        const path = (dropboxData as any).contract_template_path || '/NL Arquitetos/07 - Projetos NL OS/00 - Templates/NL_Contrato_Final.docx';
+        const vPath = (dropboxData as any).vendor_template_path || '';
         setContractTemplatePath(path);
         setOriginalTemplatePath(path);
         setVendorTemplatePath(vPath);
         setOriginalVendorPath(vPath);
         checkTemplateExists(path, 'client');
         if (vPath) checkTemplateExists(vPath, 'vendor');
+      } else {
+        setDropboxStatus('disconnected');
+      }
+
+      // Fetch Monthly Goal
+      const { data: configData, error: configError } = await supabase
+        .from('configuracoes')
+        .select('value')
+        .eq('key', 'meta_mensal_receita')
+        .maybeSingle();
+      
+      if (!configError && configData) {
+        setMonthlyGoal(String(configData.value));
+        setOriginalGoal(String(configData.value));
       }
     } catch (err) {
-      setDropboxStatus('disconnected');
+      console.error("Erro ao carregar configurações:", err);
     }
   };
 
   useEffect(() => {
-    fetchDropboxStatus();
+    fetchConfigData();
   }, []);
 
   const checkTemplateExists = async (path: string, type: 'client' | 'vendor') => {
@@ -221,7 +238,7 @@ const ConfiguracoesSistema = () => {
     } else {
       toast.info("Uma nova aba foi aberta para autorização do Dropbox.");
       setDropboxStatus('loading');
-      setTimeout(fetchDropboxStatus, 15000);
+      setTimeout(fetchConfigData, 15000);
     }
   };
 
@@ -256,6 +273,31 @@ const ConfiguracoesSistema = () => {
     }
   };
 
+  const handleSaveGoal = async () => {
+    if (monthlyGoal === originalGoal) return;
+    setIsSavingGoal(true);
+    try {
+      // Use upsert to create or update the configuration
+      const { error } = await supabase
+        .from('configuracoes')
+        .upsert({ 
+          key: 'meta_mensal_receita', 
+          value: monthlyGoal,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+
+      if (error) throw error;
+      
+      setOriginalGoal(monthlyGoal);
+      toast.success("Meta mensal atualizada com sucesso!");
+    } catch (err) {
+      console.error("Erro ao salvar meta:", err);
+      toast.error("Erro ao salvar a meta mensal");
+    } finally {
+      setIsSavingGoal(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
@@ -270,7 +312,47 @@ const ConfiguracoesSistema = () => {
             </div>
             <h1 className="text-4xl font-cormorant italic text-white">Configurações do Sistema</h1>
           </header>
-          <UsefulLinks />
+            <UsefulLinks />
+
+            {/* Seção Meta Mensal */}
+            <section className="mb-12 bg-white/[0.03] border border-white/5 p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <DollarSign size={80} className="text-white" />
+              </div>
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 bg-bronze/10 flex items-center justify-center rounded-[1px]">
+                    <DollarSign size={20} className="text-bronze" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase">Meta Mensal</h3>
+                    <p className="text-[10px] text-white/40 uppercase tracking-widest">Definição de objetivos de faturamento</p>
+                  </div>
+                </div>
+                
+                <div className="max-w-xs space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-[9px] uppercase tracking-widest text-white/40">Valor da Meta (R$)</Label>
+                    <Input 
+                      type="number"
+                      value={monthlyGoal}
+                      onChange={(e) => setMonthlyGoal(e.target.value)}
+                      placeholder="15000"
+                      className="bg-black/40 border-white/10 rounded-[1px] text-[11px] text-white focus:ring-bronze h-11"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleSaveGoal}
+                    disabled={isSavingGoal || monthlyGoal === originalGoal}
+                    className="w-full h-11 rounded-[2px] bg-bronze hover:bg-bronze/80 text-white text-[10px] uppercase tracking-[0.2em] font-bold transition-all"
+                  >
+                    {isSavingGoal ? <RefreshCcw size={14} className="mr-2 animate-spin" /> : <Save size={14} className="mr-2" />}
+                    Salvar Meta
+                  </Button>
+                </div>
+              </div>
+            </section>
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Dropbox Card */}
