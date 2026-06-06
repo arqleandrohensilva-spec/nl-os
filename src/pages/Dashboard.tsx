@@ -842,7 +842,93 @@ Retorne APENAS JSON:
           {/* Column Right */}
           <div className="space-y-12">
             
+            {/* Bloco: Meta do Mês */}
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">META DO MÊS</span>
+              </div>
+              
+              {(() => {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                const monthlyParcelas = parcelas.filter(p => {
+                  const d = new Date(p.data_vencimento);
+                  return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+                });
+                
+                const confirmado = monthlyParcelas
+                  .filter(p => p.status === 'pago' || p.status === 'recebido')
+                  .reduce((acc, curr) => acc + Number(curr.valor || 0), 0);
+                  
+                const previsto = monthlyParcelas
+                  .reduce((acc, curr) => acc + Number(curr.valor || 0), 0);
+                  
+                const percConfirmado = Math.round((confirmado / metaMensal) * 100);
+                const percPrevisto = Math.round((previsto / metaMensal) * 100);
+                
+                let borderColor = "border-white/5";
+                if (percConfirmado >= 80) borderColor = "border-bronze";
+                else if (percConfirmado >= 50) borderColor = "border-amber-500/50";
+                else borderColor = "border-red-500/30";
+
+                return (
+                  <div className={cn(
+                    "p-6 bg-white/[0.02] border transition-colors",
+                    borderColor
+                  )}>
+                    <div className="flex justify-between items-end mb-6">
+                      <div>
+                        <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">META MENSAL</p>
+                        <p className="text-xl font-bold tracking-tight">R$ {metaMensal.toLocaleString('pt-BR')}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-mono text-bronze font-bold">{percConfirmado}%</p>
+                        <p className="text-[9px] text-white/40 uppercase font-bold tracking-tighter">CONFIRMADO</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="h-2 w-full bg-white/5 relative overflow-hidden">
+                        {/* Barra Previsto (Tracejada/Opaca) */}
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(percPrevisto, 100)}%` }}
+                          className="absolute inset-y-0 left-0 bg-bronze/20 border-r border-bronze/30"
+                          style={{ backgroundImage: 'linear-gradient(45deg, rgba(184, 134, 11, 0.1) 25%, transparent 25%, transparent 50%, rgba(184, 134, 11, 0.1) 50%, rgba(184, 134, 11, 0.1) 75%, transparent 75%, transparent)', backgroundSize: '10px 10px' }}
+                        />
+                        {/* Barra Confirmado (Sólida) */}
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(percConfirmado, 100)}%` }}
+                          className="absolute inset-y-0 left-0 bg-bronze shadow-[0_0_15px_rgba(184,134,11,0.3)]"
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center text-[10px] font-medium tracking-wider">
+                        <p className="text-white/60">
+                          <span className="text-bronze font-bold">R$ {confirmado.toLocaleString('pt-BR')}</span> CONFIRMADO
+                        </p>
+                        <p className="text-white/30 italic">
+                          R$ {previsto.toLocaleString('pt-BR')} PREVISTO
+                        </p>
+                      </div>
+                    </div>
+
+                    <button 
+                      onClick={() => navigate('/financeiro/base')}
+                      className="w-full py-3 border border-white/5 hover:bg-white/5 text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-bronze transition-all flex items-center justify-center gap-2 group"
+                    >
+                      VER DETALHES <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                );
+              })()}
+            </section>
+
             {/* Bloco 4: Insight IA */}
+
             <section>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase flex items-center gap-2">
