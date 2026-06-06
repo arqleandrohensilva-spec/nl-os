@@ -680,8 +680,26 @@ Retorne APENAS JSON:
           {/* Column Left */}
           <div className="space-y-12">
             
-            
-            {/* Bloco 1: Ações do Dia */}
+            {/* Bloco: NÚMEROS DO DIA */}
+            <section className="grid grid-cols-4 gap-4">
+              {[
+                { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO').length, link: '/pipeline' },
+                { label: 'PROJETOS', value: projetos.filter(p => p.status_geral === 'em_andamento').length, link: '/projetos' },
+                { 
+                  label: 'RECEBIDO MÊS', 
+                  value: `R$ ${parcelas.filter(p => (p.status === 'pago' || p.status === 'recebido') && p.data_recebimento && new Date(p.data_recebimento).getMonth() === new Date().getMonth()).reduce((a, b) => a + Number(b.valor || 0), 0).toLocaleString('pt-BR', { minimumFractionDigits: 0 })}`, 
+                  link: '/financeiro/base' 
+                },
+                { label: 'HORAS ESTA SEMANA', value: '0h', link: '/projetos' } // Placeholder para lógica de horas
+              ].map((stat, i) => (
+                <button key={i} onClick={() => navigate(stat.link)} className="bg-white/[0.02] border border-white/5 px-6 py-4 flex flex-col gap-1 hover:bg-white/[0.04] transition-colors">
+                  <span className="text-[9px] text-white/40 uppercase tracking-widest">{stat.label}</span>
+                  <span className="text-xl font-bold text-white">{stat.value}</span>
+                </button>
+              ))}
+            </section>
+
+            {/* Bloco: Ações do Dia */}
             <section>
               <div className="flex items-center gap-3 mb-6">
                 <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">AÇÕES DO DIA</span>
@@ -690,153 +708,55 @@ Retorne APENAS JSON:
 
               <div className="space-y-4">
                 {actions.length === 0 ? (
-                  <p className="text-white/20 text-sm italic">Nenhuma ação pendente. Bom trabalho.</p>
+                  <p className="text-white/20 text-sm italic">Nenhuma ação pendente.</p>
                 ) : (
-                  <>
-                    {/* Urgent */}
-                    {actions.filter(a => a.type === 'urgent').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-red-500/70 group hover:bg-white/[0.04] transition-all">
-                        <div className="flex items-center gap-4">
-                          <div className="px-2 py-0.5 bg-red-500/10 text-red-500 text-[9px] font-bold uppercase tracking-wider">⚡ URGENTE</div>
-                          <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
-                            <p className="text-[10px] text-red-400/60 uppercase font-bold tracking-tighter">Atrasado há {action.days} dias</p>
-                          </div>
+                  actions.map(action => (
+                    <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 group hover:bg-white/[0.04] transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className={cn("px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider", action.type === 'urgent' ? "bg-red-500/10 text-red-500" : "bg-bronze/10 text-bronze")}>
+                          {action.type === 'urgent' ? '⚡ URGENTE' : '📋 HOJE'}
                         </div>
-                        <button 
-                          onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
-                        >
-                          AGIR <ArrowRight size={12} />
-                        </button>
-                      </div>
-                    ))}
-
-                    {/* Today */}
-                    {actions.filter(a => a.type === 'today').map(action => (
-                      <div key={action.id} className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 border-l-4 border-l-bronze group hover:bg-white/[0.04] transition-all">
-                        <div className="flex items-center gap-4">
-                          <div className="px-2 py-0.5 bg-bronze/10 text-bronze text-[9px] font-bold uppercase tracking-wider">📋 HOJE</div>
-                          <div>
-                            <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
-                          </div>
+                        <div>
+                          <p className="text-sm font-medium">{action.title} · <span className="text-white/40">{action.reason}</span></p>
                         </div>
-                        <button 
-                          onClick={() => navigate(action.link)}
-                          className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white transition-colors group-hover:translate-x-1"
-                        >
-                          VER <ArrowRight size={12} />
-                        </button>
                       </div>
-                    ))}
-                  </>
+                      <button onClick={() => navigate(action.link)} className="flex items-center gap-2 text-[10px] font-bold text-white/40 hover:text-white">AGIR <ArrowRight size={12} /></button>
+                    </div>
+                  ))
                 )}
               </div>
             </section>
 
-
-            {/* Bloco 3: Pulso da Empresa */}
+            {/* Bloco: FEE BURN */}
             <section>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">PULSO DA EMPRESA</span>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">FEE BURN · PROJETOS ATIVOS</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                {pulse.map(item => {
-                  const percentage = Math.round((item.value / item.max) * 100);
-                  const isCaptação = item.label === 'CAPTAÇÃO';
-                  const isMetaSuperada = isCaptação && item.value > item.max;
-                  const isEmpty = (item.label === 'FINANCEIRO' || item.label === 'EXECUÇÃO') && item.value === 0;
-
+              <div className="space-y-4">
+                {projetos.filter(p => p.status_geral === 'em_andamento').map(proj => {
+                  const horasLancadas = 0; // Precisa de lógica complexa de sessoes_horas
+                  const valorTotal = 0; // Precisa de lógica de financeiro_parcelas
+                  const custoHora = 80;
+                  const feeBurn = valorTotal > 0 ? ((horasLancadas * custoHora) / valorTotal) * 100 : 0;
+                  const isAtencao = feeBurn > 80;
+                  const isCritico = feeBurn > 95;
+                  
                   return (
-                    <div key={item.label} className="space-y-3">
-                      <div className="flex justify-between items-end">
-                        <span className="text-[11px] font-bold tracking-widest text-white/60">{item.label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono text-bronze">
-                            {Math.min(percentage, 100)}%
-                          </span>
-                          {isMetaSuperada && (
-                            <span className="px-1.5 py-0.5 bg-green-500/10 text-green-500 text-[8px] font-bold uppercase tracking-wider">
-                              META SUPERADA
-                            </span>
-                          )}
-                        </div>
+                    <button key={proj.id} onClick={() => navigate(`/projetos/detalhe/${proj.id}`)} className="w-full p-4 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-bold">{proj.nome}</span>
+                        <span className={cn("text-[10px] font-bold", isCritico ? "text-red-500" : isAtencao ? "text-amber-500" : "text-bronze")}>{feeBurn.toFixed(0)}% do fee</span>
                       </div>
-                      
-                      {isEmpty ? (
-                        <div className="h-2 flex items-center">
-                          <p className="text-[10px] text-white/20 italic">— Sem dados este mês</p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="h-2 w-full bg-white/5 overflow-hidden">
-                            <motion.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${Math.min((item.value / item.max) * 100, 100)}%` }}
-                              transition={{ duration: 1, ease: "easeOut" }}
-                              className="h-full bg-bronze"
-                            />
-                          </div>
-                          <p className="text-[10px] text-white/30 uppercase tracking-wider font-medium">{item.subtext}</p>
-                        </>
-                      )}
-                    </div>
+                      <div className="h-1.5 w-full bg-white/5 overflow-hidden">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(feeBurn, 100)}%` }} className={cn("h-full", isCritico ? "bg-red-500" : isAtencao ? "bg-amber-500" : "bg-bronze")} />
+                      </div>
+                    </button>
                   );
                 })}
               </div>
             </section>
 
-            {/* Bloco 3: Linha do Tempo */}
-            <section>
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-[10px] font-bold tracking-[0.3em] text-bronze uppercase">ESTA SEMANA</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
-              </div>
-
-              <div className="grid grid-cols-7 gap-4">
-                {timelineDays.map(({ day, events }) => {
-                  const isCurrent = isToday(day);
-                  return (
-                    <div key={day.toString()} className="space-y-4">
-                      <div className={cn(
-                        "text-center py-2 border-b transition-colors",
-                        isCurrent ? "border-bronze text-bronze" : "border-white/5 text-white/20"
-                      )}>
-                        <p className="text-[10px] font-bold uppercase mb-1">{format(day, 'EEE', { locale: ptBR })}</p>
-                        <p className="text-xs font-mono">{format(day, 'dd')}</p>
-                      </div>
-                      
-                      <div className="space-y-2 min-h-[80px] flex flex-col items-center justify-center">
-                        {events.length === 0 ? (
-                          <span className="text-white/10 text-lg flex items-center justify-center h-full">—</span>
-                        ) : (
-                          events.map(event => (
-                            <button 
-                              key={event.id}
-                              onClick={() => navigate(event.link)}
-                              className="w-full text-left group"
-                            >
-                              <div className="flex items-start gap-1.5">
-                                <div className={cn(
-                                  "w-1.5 h-1.5 rounded-full mt-1 shrink-0",
-                                  event.type === 'lead' ? "bg-blue-400" : 
-                                  event.type === 'projeto' ? "bg-bronze" : "bg-green-400"
-                                )} />
-                                <p className="text-[9px] text-white/40 leading-tight group-hover:text-white transition-colors truncate">
-                                  {event.title}
-                                </p>
-                              </div>
-                            </button>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
           </div>
 
           {/* Column Right */}
