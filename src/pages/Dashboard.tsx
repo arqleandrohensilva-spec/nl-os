@@ -189,16 +189,17 @@ const Dashboard = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from('configuracoes')
-        .select('valor')
-        .eq('chave', 'meta_mensal_receita')
+        .select('value')
+        .eq('key', 'meta_mensal_receita')
         .maybeSingle();
       return data;
     }
   });
 
-  const metaMensal = Number(metaConfig?.valor || 15000);
+  const metaMensal = Number(metaConfig?.value || 15000);
 
   // Process Ações do Dia
+
 
 
   const actions: ActionItem[] = React.useMemo(() => {
