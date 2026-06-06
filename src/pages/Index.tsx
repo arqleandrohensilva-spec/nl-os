@@ -696,9 +696,7 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-6">
-              <div className="h-10 px-8 flex items-center gap-3 text-white/20 text-[9px] font-bold uppercase tracking-[0.2em] border border-white/5">
-                CRIAÇÃO VIA MÓDULO CLIENTES
-              </div>
+
               <button 
                 onClick={exportToPDF}
                 className="p-2 text-white/40 hover:text-bronze transition-colors"
