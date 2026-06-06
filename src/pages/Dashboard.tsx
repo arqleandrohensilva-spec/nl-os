@@ -320,8 +320,13 @@ const Dashboard = () => {
 
   // Pulse data
   const pulse: PulseItem[] = React.useMemo(() => {
-    const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO').length;
-    const activeProjects = projetos.filter(p => p.status_geral === 'em_andamento').length;
+    const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido').length;
+    const activeProjects = projetos.filter(p => 
+      p.status_geral === 'em_andamento' || 
+      p.status_geral === 'ativo' || 
+      p.status_geral === 'Em andamento' || 
+      p.status_geral === 'Ativo'
+    ).length;
     
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -361,13 +366,25 @@ const Dashboard = () => {
       setLoadingAI(true);
       setLoadingHealth(true);
 
-      const leadsResumo = leads
-        .filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO')
+      const leadsAtivos = leads.filter(l => 
+        l.stage !== 'FECHADO' && 
+        l.stage !== 'PERDIDO' && 
+        l.stage !== 'Fechado' && 
+        l.stage !== 'Perdido'
+      );
+
+      const projetosAtivos = projetos.filter(p =>
+        p.status_geral === 'em_andamento' || 
+        p.status_geral === 'ativo' ||
+        p.status_geral === 'Em andamento' ||
+        p.status_geral === 'Ativo'
+      );
+
+      const leadsResumo = leadsAtivos
         .map(l => `${l.nome} (${l.stage}, Score: ${l.score})`)
         .join(', ');
       
-      const projetosResumo = projetos
-        .filter(p => p.status_geral === 'em_andamento')
+      const projetosResumo = projetosAtivos
         .map(p => `${p.nome} (Etapa: ${p.etapa_atual})`)
         .join(', ');
 
@@ -380,8 +397,8 @@ const Dashboard = () => {
         Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
         
         DADOS:
-        Leads ativos: ${leadsResumo}
-        Projetos: ${projetosResumo}
+        Leads ativos: ${leadsAtivos.length} leads (${leadsResumo || 'nenhum com nome'})
+        Projetos ativos: ${projetosAtivos.length} projetos (${projetosResumo || 'nenhum em andamento'})
         Financeiro: ${financeiroResumo}
         Satisfação: ${satisfacaoResumo}
         
@@ -394,8 +411,8 @@ const Dashboard = () => {
 
         const healthPrompt = `Você é o analista estratégico da NL Arquitetos. Analise os dados abaixo e gere um score de saúde do negócio de 0 a 100.
         DADOS:
-        Leads: ${leadsResumo}
-        Projetos: ${projetosResumo}
+        Leads: ${leadsAtivos.length} ativos (${leadsResumo})
+        Projetos: ${projetosAtivos.length} ativos (${projetosResumo})
         Financeiro: ${financeiroResumo}
         Satisfação: ${satisfacaoResumo}
         
@@ -643,8 +660,17 @@ const Dashboard = () => {
             {/* Bloco: NÚMEROS DO DIA */}
             <section className="grid grid-cols-4 gap-4">
               {[
-                { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO').length, link: '/pipeline' },
-                { label: 'PROJETOS', value: projetos.filter(p => p.status_geral === 'em_andamento').length, link: '/projetos' },
+                { label: 'LEADS ATIVOS', value: leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido').length, link: '/pipeline' },
+                { 
+                  label: 'PROJETOS', 
+                  value: projetos.filter(p => 
+                    p.status_geral === 'em_andamento' || 
+                    p.status_geral === 'ativo' || 
+                    p.status_geral === 'Em andamento' || 
+                    p.status_geral === 'Ativo'
+                  ).length, 
+                  link: '/projetos' 
+                },
                 { 
                   label: 'RECEBIDO MÊS', 
                   value: `R$ ${parcelas.filter(p => {
@@ -710,7 +736,12 @@ const Dashboard = () => {
               </div>
               <div className="space-y-4">
                 {(() => {
-                  const ativos = projetos.filter(p => p.status_geral === 'em_andamento');
+                  const ativos = projetos.filter(p => 
+                    p.status_geral === 'em_andamento' || 
+                    p.status_geral === 'ativo' || 
+                    p.status_geral === 'Em andamento' || 
+                    p.status_geral === 'Ativo'
+                  );
                   if (ativos.length === 0) return <p className="text-white/20 text-sm italic">Nenhum projeto em andamento.</p>;
                   
                   return ativos.map(proj => {
@@ -788,7 +819,12 @@ const Dashboard = () => {
               </div>
               <div className="p-6 bg-white/[0.02] border border-white/5">
                 {(() => {
-                  const ativosIds = projetos.filter(p => p.status_geral === 'em_andamento').map(p => p.id);
+                  const ativosIds = projetos.filter(p => 
+                    p.status_geral === 'em_andamento' || 
+                    p.status_geral === 'ativo' || 
+                    p.status_geral === 'Em andamento' || 
+                    p.status_geral === 'Ativo'
+                  ).map(p => p.id);
                   const hoje = new Date();
                   hoje.setHours(23, 59, 59, 999);
                   
@@ -843,6 +879,17 @@ const Dashboard = () => {
                   const proximas = projetoEtapas
                     .filter(e => {
                       if (e.status === 'aprovado' || !e.data_entrega) return false;
+                      const proj = projetos.find(p => p.id === e.projeto_id);
+                      if (!proj) return false;
+                      
+                      const isAtivo = 
+                        proj.status_geral === 'em_andamento' || 
+                        proj.status_geral === 'ativo' || 
+                        proj.status_geral === 'Em andamento' || 
+                        proj.status_geral === 'Ativo';
+                        
+                      if (!isAtivo) return false;
+
                       const d = new Date(e.data_entrega);
                       return d >= hoje && d <= limite;
                     })
