@@ -430,7 +430,7 @@ const Index = () => {
         </div>
         <button 
           onClick={() => {
-            setSelectedLeadId(randomLead.id);
+            navigate(`/clientes/${randomLead.cliente_id}`);
             toast.dismiss(t);
           }}
           className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
