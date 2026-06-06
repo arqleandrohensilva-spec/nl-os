@@ -374,41 +374,46 @@ const Dashboard = () => {
       const satisfacaoResumo = `Média ${satisfacao.length > 0 ? (satisfacao.reduce((a, b) => a + (b.nota_geral || 0), 0) / satisfacao.length).toFixed(1) : '0'}`;
 
 
-        // Health Score
+      try {
+        const insightPrompt = `Você é o assistente estratégico da NL Arquitetos. Analise os dados abaixo e gere 1 insight acionável.
+        Seja específico: cite nomes, valores e prazos reais. Máximo 3 linhas. Tom direto, sem enrolação.
+        
+        DADOS:
+        Leads ativos: ${leadsResumo}
+        Projetos: ${projetosResumo}
+        Financeiro: ${financeiroResumo}
+        Satisfação: ${satisfacaoResumo}
+        
+        Retorne APENAS um JSON:
+        {
+          "insight": "texto do insight",
+          "acao": "o que fazer agora em 1 frase",
+          "modulo": "pipeline | projetos | financeiro | marketing"
+        }`;
+
         const healthPrompt = `Você é o analista estratégico da NL Arquitetos. Analise os dados abaixo e gere um score de saúde do negócio de 0 a 100.
-
-CRITÉRIOS DE AVALIAÇÃO:
-- Pipeline (25pts): leads ativos, taxa de conversão, tempo nas etapas
-- Projetos (25pts): projetos em andamento, entregas no prazo, checklists pendentes
-- Financeiro (25pts): parcelas em dia, receita prevista vs meta, inadimplência
-- Satisfação (25pts): nota média, número de avaliações, tendência
-
-DADOS:
-Leads: ${leadsResumo}
-Projetos: ${projetosResumo}
-Financeiro: ${financeiroResumo}
-Satisfação: ${satisfacaoResumo}
-
-Retorne APENAS JSON:
-{
-  "score": 87,
-  "diagnostico": "frase de diagnóstico em 2 linhas máximo",
-  "pipeline": "ok | atencao | critico",
-  "projetos": "ok | atencao | critico",
-  "financeiro": "ok | atencao | critico",
-  "satisfacao": "ok | atencao | critico"
-}`;
+        DADOS:
+        Leads: ${leadsResumo}
+        Projetos: ${projetosResumo}
+        Financeiro: ${financeiroResumo}
+        Satisfação: ${satisfacaoResumo}
+        
+        Retorne APENAS JSON:
+        {
+          "score": 87,
+          "diagnostico": "diagnóstico curto",
+          "pipeline": "ok | atencao | critico",
+          "projetos": "ok | atencao | critico",
+          "financeiro": "ok | atencao | critico",
+          "satisfacao": "ok | atencao | critico"
+        }`;
 
         const [insightRes, healthRes] = await Promise.all([
           supabase.functions.invoke('ai-advisor', {
-            body: { prompt: insightPrompt, systemPrompt: "Você é um consultor estratégico de negócios. Responda apenas com JSON." }
+            body: { prompt: insightPrompt, systemPrompt: "Você é um assistente estratégico." }
           }),
           supabase.functions.invoke('ai-advisor', {
-            body: { 
-              prompt: healthPrompt, 
-              systemPrompt: "Você é um analista estratégico. Responda apenas com JSON.",
-              model: "claude-sonnet-4-20250514"
-            }
+            body: { prompt: healthPrompt, systemPrompt: "Você é um analista estratégico." }
           })
         ]);
         
@@ -432,7 +437,8 @@ Retorne APENAS JSON:
     };
 
     generateAIContent();
-  }, [leads.length, projetos.length, pulse]);
+  }, [leads.length, projetos.length]);
+
 
   const forecast = React.useMemo(() => {
     const activeLeads = leads.filter(l => l.stage !== 'FECHADO' && l.stage !== 'PERDIDO' && l.stage !== 'Fechado' && l.stage !== 'Perdido');
