@@ -855,7 +855,7 @@ const Index = () => {
                       const isAtiva = !['Fechado', 'Perdido'].includes(lead.stage);
                       return (
                         <tr key={lead.id} className="border-b border-white/5 hover:bg-white/[0.02] h-14 transition-colors">
-                          <td onClick={() => setSelectedLeadId(lead.id)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
+                          <td onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
                           <td className="px-4">
                             <span className={cn(
                               "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-[2px]",
