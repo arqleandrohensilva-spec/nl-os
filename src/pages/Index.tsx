@@ -731,6 +731,12 @@ const Index = () => {
             </div>
 
             <div className="flex items-center gap-6">
+              <div className="flex flex-col items-end mr-4">
+                <span className="text-[10px] font-bold text-white uppercase tracking-widest bg-white/5 px-3 py-1 border border-white/10">
+                  CRIAÇÃO VIA MÓDULO CLIENTES
+                </span>
+              </div>
+
               <div className="flex items-center gap-1">
                 {(['kanban', 'lista', 'foco'] as const).map(mode => (
                   <button 
@@ -748,12 +754,6 @@ const Index = () => {
                   </button>
                 ))}
               </div>
-              <button 
-                onClick={() => navigate('/clientes')} 
-                className="h-9 px-6 bg-bronze hover:bg-bronze/90 text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-[2px] flex items-center gap-2"
-              >
-                <Plus size={14} /> NOVO LEAD
-              </button>
             </div>
           </div>
         </div>

@@ -381,6 +381,15 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                   {isConverting ? "Convertendo..." : "Converter em Projeto"}
                 </Button>
               )}
+
+              {lead.cliente_id && (
+                <button
+                  onClick={() => navigate(`/clientes/${lead.cliente_id}`)}
+                  className="w-full py-3 border border-white/5 text-[9px] font-bold uppercase tracking-widest text-white/40 hover:text-bronze hover:border-bronze/30 transition-all"
+                >
+                  VER FICHA COMPLETA →
+                </button>
+              )}
             </div>
           </section>
 
