@@ -3,7 +3,7 @@ import { Lead, Stage, Temp, TipoProjeto, ConfigEscritorio, Origem } from '@/lib/
 import Sidebar from '@/components/Sidebar';
 
 import KanbanColumn from '@/components/KanbanColumn';
-import LeadDetailPanel from '@/components/LeadDetailPanel';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -90,7 +90,7 @@ const Index = () => {
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<TipoProjeto | 'Todos'>('Todos');
   const [filterTemp, setFilterTemp] = useState<Temp[]>([]);
-  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  
   const [filterResponsavel, setFilterResponsavel] = useState<'Todos' | 'Leandro' | 'Neandro'>('Todos');
   const [viewMode, setViewMode] = useState<'kanban' | 'lista' | 'foco'>('kanban');
   const [smartFilter, setSmartFilter] = useState<'all' | 'ghosting' | 'score8' | 'premium' | 'high-ticket'>('all');
@@ -214,7 +214,7 @@ const Index = () => {
     })
   );
 
-  const selectedLead = leads.find(l => l.id === selectedLeadId) || null;
+  
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -430,7 +430,7 @@ const Index = () => {
         </div>
         <button 
           onClick={() => {
-            setSelectedLeadId(randomLead.id);
+            navigate(`/clientes/${randomLead.cliente_id}`);
             toast.dismiss(t);
           }}
           className="text-[9px] font-bold text-bronze uppercase tracking-widest hover:text-white transition-colors"
@@ -494,7 +494,7 @@ const Index = () => {
       if (error) throw error;
       
       setLeads(prev => prev.filter(l => l.id !== leadId));
-      setSelectedLeadId(null);
+      
       toast.success("Lead excluído com sucesso");
     } catch (err) {
       console.error('Error deleting lead:', err);
@@ -773,7 +773,7 @@ const Index = () => {
                     key={stage}
                     stage={stage}
                     leads={filteredLeads.filter(l => l.stage === stage)}
-                    onLeadClick={(lead) => setSelectedLeadId(lead.id)}
+                    onLeadClick={(lead) => navigate(`/clientes/${lead.cliente_id}`)}
                     onUpdateStatus={handleUpdateStage}
                           onQuickNote={handleQuickNote}
                           onViewFicha={(clienteId) => navigate(`/clientes/${clienteId}`)}
@@ -855,7 +855,7 @@ const Index = () => {
                       const isAtiva = !['Fechado', 'Perdido'].includes(lead.stage);
                       return (
                         <tr key={lead.id} className="border-b border-white/5 hover:bg-white/[0.02] h-14 transition-colors">
-                          <td onClick={() => setSelectedLeadId(lead.id)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
+                          <td onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="px-4 text-white text-sm font-medium cursor-pointer hover:text-bronze">{lead.nome}</td>
                           <td className="px-4">
                             <span className={cn(
                               "px-2 py-1 text-[8px] font-bold uppercase tracking-widest rounded-[2px]",
@@ -897,7 +897,7 @@ const Index = () => {
                           <td className="px-4">
                             <div className="flex items-center gap-3 text-white/40">
                               <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="hover:text-bronze transition-colors"><FileText size={14} /></button>
-                              <button onClick={() => setSelectedLeadId(lead.id)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
+                              <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="hover:text-bronze transition-colors"><ArrowUpRight size={14} /></button>
                               <button onClick={() => handleQuickNote(lead.id, "Ação rápida registrada via lista")} className="hover:text-bronze transition-colors"><Zap size={14} /></button>
                             </div>
                           </td>
@@ -970,7 +970,7 @@ const Index = () => {
                           <div className="flex items-center gap-2">
                             <button onClick={() => navigate('/scripts-atendimento', { state: { leadId: lead.id, leadNome: lead.nome } })} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">ABRIR SCRIPT</button>
                             <button onClick={() => handleQuickNote(lead.id, "Contato registrado via modo foco")} className="h-9 px-4 bg-white/5 hover:bg-bronze text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">REGISTRAR CONTATO</button>
-                            <button onClick={() => setSelectedLeadId(lead.id)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
+                            <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="h-9 px-4 border border-white/10 hover:border-white text-white/60 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all rounded-none">VER LEAD</button>
                           </div>
                         </div>
                       ))}
@@ -991,7 +991,7 @@ const Index = () => {
                                 <span className="text-white/30 text-[10px] uppercase tracking-widest">{lead.stage}</span>
                               </div>
                               <div className="flex items-center gap-2">
-                                <button onClick={() => setSelectedLeadId(lead.id)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
+                                <button onClick={() => navigate(`/clientes/${lead.cliente_id}`)} className="text-[9px] font-bold text-white/40 hover:text-bronze uppercase tracking-widest transition-colors">VER DETALHES</button>
                               </div>
                             </div>
                           ))}
@@ -1006,15 +1006,6 @@ const Index = () => {
         </div>
       </main>
 
-      {selectedLead && (
-        <LeadDetailPanel 
-          lead={selectedLead}
-          onClose={() => setSelectedLeadId(null)}
-          onUpdateStage={handleUpdateStage}
-          onDelete={handleDeleteLead}
-          onAddLog={handleAddLog}
-        />
-      )}
 
       {/* Project Conversion Modal */}
       <Dialog open={showProjectConversion} onOpenChange={setShowProjectConversion}>
