@@ -18,7 +18,7 @@ interface LeadCardProps {
 
 const LeadCard = ({ lead, onClick }: LeadCardProps) => {
   const daysInStage = Math.floor(
-    (new Date().getTime() - new Date(lead.etapa_desde || lead.created_at).getTime()) 
+    (new Date().getTime() - new Date(lead.etapa_desde || lead.criado).getTime()) 
     / (1000 * 60 * 60 * 24)
   );
   
