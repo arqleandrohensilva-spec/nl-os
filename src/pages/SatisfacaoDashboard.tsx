@@ -153,7 +153,7 @@ const SatisfacaoDashboard = () => {
 
   const handleFormatClick = async (dep: any) => {
     const survey = dep.pesquisa;
-    const wordCount = survey.comentario?.split(/\s+/).length || 0;
+    const wordCount = survey.comentario?.split(/\s+/)?.length || 0;
 
     if (wordCount < 20) {
       setSelectedSurveyForFollowUp(survey);
@@ -279,7 +279,7 @@ const SatisfacaoDashboard = () => {
       ? `${resposta}\n\nProjeto: ${projeto}${tipo ? ' · ' + tipo : ''}. Recomendo o trabalho da NL Arquitetos — processo técnico sério, comunicação clara em todas as etapas.`
       : `Contratei a NL Arquitetos para o projeto ${projeto} e fiquei muito satisfeito com o processo. A equipe conduziu cada etapa com clareza, as decisões foram tomadas antes da obra começar e o resultado foi exatamente o esperado. Nota ${nota}/10.`;
 
-    const frase_destaque = resposta && resposta.length > 20
+    const frase_destaque = (resposta && resposta.length > 20)
       ? `"${resposta.substring(0, 80).split('.')[0]}"`
       : `"Processo claro, resultado previsível — exatamente o que eu precisava."`;
 

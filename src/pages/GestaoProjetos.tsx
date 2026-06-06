@@ -243,10 +243,11 @@ const GestaoProjetos = () => {
                     </span>
                     <span style={{ 
                       fontSize: '9px', 
-                      color: allApproved ? '#CD7F32' : (nextDelivery && differenceInDays(parseISO(nextDelivery.data_entrega), new Date()) < 0 ? '#f87171' : '#ccc'),
+                      color: allApproved ? '#CD7F32' : (nextDelivery && nextDelivery.data_entrega && differenceInDays(parseISO(nextDelivery.data_entrega), new Date()) < 0 ? '#f87171' : '#ccc'),
                       textTransform: 'uppercase'
                     }}>
                       {allApproved ? 'CONCLUÍDO' : (nextDelivery ? `${nextDelivery.etapa} · ${(() => {
+                        if (!nextDelivery.data_entrega) return 'Sem prazo';
                         const diff = differenceInDays(parseISO(nextDelivery.data_entrega), new Date());
                         return diff < 0 ? `Vencido ${Math.abs(diff)}d` : `${diff}d`;
                       })()}` : '—')}

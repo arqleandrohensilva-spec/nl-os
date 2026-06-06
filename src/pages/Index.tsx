@@ -231,7 +231,7 @@ const Index = () => {
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         if (session?.user) {
-          const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
+          const name = session.user.user_metadata?.full_name || session.user.email?.split('@')?.[0] || 'User';
           setUser(name.charAt(0).toUpperCase() + name.slice(1));
           sessionStorage.setItem('nl_user', name.charAt(0).toUpperCase() + name.slice(1));
         }
@@ -246,7 +246,7 @@ const Index = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       if (session?.user) {
-        const name = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'User';
+        const name = session.user.user_metadata?.full_name || session.user.email?.split('@')?.[0] || 'User';
         const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
         setUser(formattedName);
         sessionStorage.setItem('nl_user', formattedName);
