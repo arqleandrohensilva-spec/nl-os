@@ -794,7 +794,7 @@ Retorne APENAS JSON:
                           <div>
                             <span className="text-sm font-bold uppercase tracking-tight">{proj.nome}</span>
                             <p className="text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
-                              {proj.cliente} · {proj.tipo} · etapa {aprovadas}/{totalEtapas} {diffDias !== null && `· prazo em ${diffDias} dias`}
+                              {proj.nome_cliente} · {proj.tipo} · etapa {aprovadas}/{totalEtapas} {diffDias !== null && `· prazo em ${diffDias} dias`}
                             </p>
                           </div>
                           <div className="flex flex-col items-end gap-1">
