@@ -101,6 +101,7 @@ const BaseFinanceira = () => {
     const saved = localStorage.getItem('diagnostico_financeiro_collapsed');
     return saved ? JSON.parse(saved) : true;
   });
+  const [aiHistory, setAiHistory] = useState<any[]>([]);
   const [snapshots, setSnapshots] = useState<any[]>([]);
   const lastCustoHoraRef = useRef<number>(0);
 
@@ -357,6 +358,16 @@ Responda em português.
     }
   };
 
+  const fetchAiHistory = async () => {
+    const { data } = await supabase
+      .from('diagnosticos_ia')
+      .select('*')
+      .order('criado_em', { ascending: false })
+      .limit(5);
+    
+    if (data) setAiHistory(data);
+  };
+
   const fetchSnapshots = async () => {
     const { data } = await supabase
       .from('snapshots_financeiros')
@@ -378,6 +389,7 @@ Responda em português.
 
   useEffect(() => {
     fetchSnapshots();
+    fetchAiHistory();
   }, []);
 
   const getSimulatorAnalysis = async () => {
