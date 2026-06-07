@@ -386,21 +386,22 @@ const GestaoProjetos = () => {
                     </div>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <div style={{ 
-                    width: '5px', 
-                    height: '5px', 
-                    borderRadius: '50%', 
-                    background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
-                  }} />
-                  <span style={{ 
-                    fontFamily: 'Arial, sans-serif', 
-                    fontSize: '12px', 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.08em', 
-                    color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
-                  }}>
-                    {projeto.status_geral}
-                  </span>
+                    <div style={{ 
+                      width: '5px', 
+                      height: '5px', 
+                      borderRadius: '50%', 
+                      background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
+                    }} />
+                    <span style={{ 
+                      fontFamily: 'Arial, sans-serif', 
+                      fontSize: '12px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.08em', 
+                      color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
+                    }}>
+                      {projeto.status_geral}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
