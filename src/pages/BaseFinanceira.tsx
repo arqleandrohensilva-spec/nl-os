@@ -643,14 +643,12 @@ Máximo 3 linhas. Sem markdown. Em português.
                 <p className="text-[10px] text-white/40 uppercase tracking-[0.2em] font-medium">Módulo 02 · Fundação da precificação</p>
               </div>
               <Button 
-                variant="outline" 
-                size="sm" 
                 onClick={exportReport}
                 disabled={isExporting}
-                className="h-8 border-white/10 text-[9px] uppercase tracking-widest text-white hover:bg-white/[0.05] flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 bg-white/[0.04] border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all text-[9px] font-bold uppercase tracking-widest"
               >
                 {isExporting ? <Loader2 size={12} className="animate-spin" /> : <FileText size={12} />}
-                Exportar Relatório
+                {isExporting ? 'EXPORTANDO...' : 'EXPORTAR RELATÓRIO'}
               </Button>
             </div>
 
