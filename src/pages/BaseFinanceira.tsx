@@ -1226,6 +1226,16 @@ Máximo 3 linhas. Sem markdown. Em português.
                   className="[&_[role=slider]]:bg-bronze [&_[role=slider]]:border-bronze"
                 />
               </div>
+              {(config?.margem_lucro || 0) > 80 && (
+                <p className="text-[9px] text-amber-400/70 mt-2">
+                  ⚠ Margem acima de 80% — mercado premium opera entre 50–80%. Verifique se está correto.
+                </p>
+              )}
+              {(config?.margem_lucro || 0) < 30 && (
+                <p className="text-[9px] text-red-400/70 mt-2">
+                  ⚠ Margem abaixo de 30% — risco de operar no prejuízo em meses com menos projetos.
+                </p>
+              )}
             </div>
           </div>
 
