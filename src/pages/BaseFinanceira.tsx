@@ -114,10 +114,6 @@ const BaseFinanceira = () => {
 
     // 1. Calculate base monthly costs (excluding percentual taxes for now)
     let baseMonthlyCosts = costs.reduce((acc, cost) => {
-      if (cost.frequencia === 'percentual' || (cost.categoria === 'softwares' && CATEGORIES.every(cat => cat.id !== 'softwares'))) {
-        // Softwares should be counted in variavel if we migrated it, but wait, the query counts all costs.
-        // Let's just make sure we don't skip anything that is marked active.
-      }
       if (cost.frequencia === 'percentual') return acc;
       const value = cost.frequencia === 'anual' ? cost.valor / 12 : cost.valor;
       return acc + value;
