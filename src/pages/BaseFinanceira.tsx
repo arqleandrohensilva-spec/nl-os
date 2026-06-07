@@ -495,14 +495,14 @@ Máximo 3 linhas. Sem markdown. Em português.
         supabase.from('financeiro_parcelas').select('valor_recebido')
           .in('status', ['pago', 'PAGO', 'Pago', 'recebido', 'RECEBIDO'])
           .gte('data_recebimento', firstDayOfMonth),
-        supabase.from('configuracoes').select('valor').eq('chave', 'meta_mensal_receita').maybeSingle()
+        supabase.from('configuracoes').select('value').eq('key', 'meta_mensal_receita').maybeSingle()
       ]);
 
       const horasEmUso = (sessoesRes.data?.reduce((acc, s) => acc + (Number(s.duracao_minutos) || 0), 0) || 0) / 60;
       const horasFaturáveis = horasEmUso; // Simplificação por enquanto
       const fluxo3meses = parcelasPendentesRes.data?.reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
       const recebidoMes = parcelasPagasRes.data?.reduce((acc, p) => acc + (Number(p.valor_recebido) || 0), 0) || 0;
-      const metaMensal = Number(metaRes.data?.valor) || 0;
+      const metaMensal = Number(metaRes.data?.value) || 0;
 
       // Fluxo detalhado por mês
       const meses = ['Este mês', 'Próximo mês', 'Mês seguinte'];
