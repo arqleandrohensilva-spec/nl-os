@@ -101,7 +101,7 @@ const BaseFinanceira = () => {
     const saved = localStorage.getItem('diagnostico_financeiro_collapsed');
     return saved ? JSON.parse(saved) : true;
   });
-  const [aiHistory, setAiHistory] = useState<any[]>([]);
+  const [snapshots, setSnapshots] = useState<any[]>([]);
   const lastCustoHoraRef = useRef<number>(0);
 
   // Simulator State
@@ -357,18 +357,27 @@ Responda em português.
     }
   };
 
-  const fetchAiHistory = async () => {
+  const fetchSnapshots = async () => {
     const { data } = await supabase
-      .from('diagnosticos_ia')
+      .from('snapshots_financeiros')
       .select('*')
-      .order('criado_em', { ascending: false })
-      .limit(5);
+      .order('mes_referencia', { ascending: true });
     
-    if (data) setAiHistory(data);
+    if (data) setSnapshots(data);
+  };
+
+  const handleGerarSnapshot = async () => {
+    const { error } = await supabase.functions.invoke('snapshot-mensal');
+    if (error) {
+      toast.error('Erro ao gerar snapshot');
+    } else {
+      toast.success('Snapshot gerado com sucesso');
+      fetchSnapshots();
+    }
   };
 
   useEffect(() => {
-    fetchAiHistory();
+    fetchSnapshots();
   }, []);
 
   const getSimulatorAnalysis = async () => {
@@ -1269,12 +1278,12 @@ Máximo 3 linhas. Sem markdown. Em português.
                   <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px] flex flex-col justify-between">
                     <div>
                       <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">EVOLUÇÃO · CUSTO/HORA</p>
-                      {aiHistory.length >= 2 ? (
+                      {snapshots.length >= 2 ? (
                         <div className="flex items-center gap-2">
                           <p className="font-cormorant text-2xl text-white">
                             {(() => {
-                              const first = aiHistory[aiHistory.length - 1].custo_hora_momento;
-                              const current = aiHistory[0].custo_hora_momento;
+                              const first = snapshots[0].custo_hora;
+                              const current = snapshots[snapshots.length - 1].custo_hora;
                               const diff = ((current / first) - 1) * 100;
                               return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%`;
                             })()}
@@ -1298,17 +1307,16 @@ Máximo 3 linhas. Sem markdown. Em português.
                   
                   <div className="space-y-8">
                     <div className="h-[300px] w-full bg-white/[0.02] p-4 rounded border border-white/5">
-                      {aiHistory.length < 2 ? (
+                      {snapshots.length < 2 ? (
                         <div className="h-full flex items-center justify-center text-[10px] font-dm-mono text-white/30 uppercase tracking-widest text-center px-8">
-                          Histórico disponível após o segundo diagnóstico salvo. Comece atualizando seu diagnóstico IA.
+                          Histórico disponível após o segundo snapshot mensal.
                         </div>
                       ) : (
                         <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={[...aiHistory].reverse()}>
+                          <LineChart data={snapshots}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                             <XAxis 
-                              dataKey="criado_em" 
-                              tickFormatter={(val) => new Date(val).toLocaleDateString('pt-BR', { month: 'short' })}
+                              dataKey="mes_referencia" 
                               tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: 'DM Mono' }}
                               axisLine={false}
                               tickLine={false}
@@ -1328,11 +1336,10 @@ Máximo 3 linhas. Sem markdown. Em português.
                                 fontFamily: 'DM Mono'
                               }}
                               itemStyle={{ color: '#8B7355' }}
-                              labelFormatter={(val) => new Date(val).toLocaleDateString('pt-BR')}
                             />
                             <Line 
                               type="monotone" 
-                              dataKey="custo_hora_momento" 
+                              dataKey="custo_hora" 
                               stroke="#8B7355" 
                               strokeWidth={2}
                               dot={{ r: 3, fill: '#8B7355', strokeWidth: 0 }}
@@ -1345,12 +1352,22 @@ Máximo 3 linhas. Sem markdown. Em português.
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Registros Anteriores</h4>
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Registros Anteriores</h4>
+                        <Button 
+                          onClick={handleGerarSnapshot}
+                          variant="outline"
+                          size="sm"
+                          className="text-[9px] uppercase tracking-widest h-7 border-white/10 hover:bg-white/5"
+                        >
+                          GERAR SNAPSHOT AGORA
+                        </Button>
+                      </div>
                       <div className="space-y-2">
-                        {aiHistory.slice(0, 5).map((h, i) => (
+                        {[...snapshots].reverse().slice(0, 5).map((h, i) => (
                           <div key={i} className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded text-[11px] font-dm-mono">
-                            <span className="text-white/40">{new Date(h.criado_em).toLocaleDateString('pt-BR')}</span>
-                            <span className="text-white font-bold text-bronze">R$ {Number(h.custo_hora_momento).toFixed(2)}/h</span>
+                            <span className="text-white/40">{h.mes_referencia}</span>
+                            <span className="text-white font-bold text-bronze">R$ {Number(h.custo_hora).toFixed(2)}/h</span>
                           </div>
                         ))}
                       </div>
