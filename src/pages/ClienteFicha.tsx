@@ -180,6 +180,20 @@ const ClienteFicha = () => {
   });
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projetoVinculado, setProjetoVinculado] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProjetoVinculado = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from('projetos')
+        .select('id, token_cliente')
+        .eq('cliente_id', id)
+        .maybeSingle();
+      setProjetoVinculado(data);
+    };
+    fetchProjetoVinculado();
+  }, [id]);
   const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
