@@ -650,151 +650,6 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
 
 
-            {/* AI Diagnostic Card */}
-          <div 
-            className="p-6 border border-white/5 rounded-[4px] space-y-6 transition-all duration-300 cursor-pointer"
-            onClick={() => {
-              const newState = !isDiagnosticCollapsed;
-              setIsDiagnosticCollapsed(newState);
-              localStorage.setItem('diagnostico_financeiro_collapsed', JSON.stringify(newState));
-            }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-dm-mono flex items-center gap-2">
-                    <Sparkles size={12} className="text-bronze" />
-                    DIAGNÓSTICO FINANCEIRO · IA
-                  </span>
-                </div>
-                
-                <span className={cn(
-                  "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest",
-                  aiStatus === 'critico' ? "bg-red-500/20 text-red-400" :
-                  aiStatus === 'atencao' ? "bg-amber-500/20 text-amber-400" :
-                  "bg-green-500/20 text-green-400"
-                )}>
-                  {aiStatus === 'critico' ? 'Crítico' : aiStatus === 'atencao' ? 'Atenção' : 'Saudável'}
-                </span>
-
-                {lastAiAnalysis && (
-                  <p className="text-[9px] text-white/40 font-dm-mono italic">
-                    Última análise: {lastAiAnalysis.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    getAIDiagnostic();
-                  }}
-                  disabled={isAiLoading}
-                  className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-bronze flex items-center gap-2 transition-colors"
-                >
-                  <RotateCcw size={10} className={cn(isAiLoading && "animate-spin")} /> {isAiLoading ? "Analisando..." : "Atualizar"}
-                </Button>
-                <div className="text-white/40 hover:text-white transition-colors">
-                  {isDiagnosticCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
-                </div>
-              </div>
-            </div>
-
-            {!isDiagnosticCollapsed && (
-              <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-6">
-                {isAiLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="flex flex-col items-center gap-3">
-                      <Loader2 size={24} className="animate-spin text-bronze/50" />
-                      <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Processando dados financeiros...</span>
-                    </div>
-                  </div>
-                ) : aiDiagnostic ? (
-                  <div className="grid grid-cols-1 gap-3">
-                    {(() => {
-                      const paragraphs = aiDiagnostic.split('\n\n').filter(p => p.trim() !== '');
-                      return (
-                        <>
-                          {/* SITUAÇÃO ATUAL */}
-                          <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
-                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">SITUAÇÃO ATUAL</label>
-                            <p className="text-[11px] text-white/70 leading-relaxed">
-                              {paragraphs[0]}
-                            </p>
-                          </div>
-
-                          {/* OPORTUNIDADE */}
-                          <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
-                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">OPORTUNIDADE</label>
-                            <p className="text-[11px] text-white/70 leading-relaxed">
-                              {paragraphs[1]}
-                            </p>
-                          </div>
-
-                          {/* AÇÃO DESTA SEMANA */}
-                          <div className="bg-white/[0.02] border border-white/5 border-l-2 border-l-bronze rounded p-4 space-y-2">
-                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-bronze block">→ AÇÃO DESTA SEMANA</label>
-                            <p className="text-[11px] text-white/70 leading-relaxed">
-                              {paragraphs[2]}
-                            </p>
-                          </div>
-                        </>
-                      );
-                    })()}
-
-                    {/* Histórico colapsado */}
-                    <div className="pt-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsHistoryExpanded(!isHistoryExpanded);
-                        }}
-                        className="flex items-center gap-2 text-[9px] text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors"
-                      >
-                        VER HISTÓRICO DE ANÁLISES ({aiHistory.length}) {isHistoryExpanded ? <ChevronUp size={10} /> : <ChevronRight size={10} />}
-                      </button>
-
-                      {isHistoryExpanded && (
-                        <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                          {aiHistory.map((item) => (
-                            <div key={item.id} className="bg-white/[0.03] p-3 border border-white/10 rounded-[2px] space-y-2">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <span className="text-[9px] font-dm-mono text-white/40">
-                                    {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
-                                  <span className={cn(
-                                    "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
-                                    item.status === 'critico' ? "bg-red-500/20 border-red-500/30 text-red-400" :
-                                    item.status === 'atencao' ? "bg-amber-500/20 border-amber-500/30 text-amber-400" :
-                                    "bg-green-500/20 border-green-500/30 text-green-400"
-                                  )}>
-                                    {item.status}
-                                  </span>
-                                </div>
-                                <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
-                              </div>
-                              <p className="text-[10px] font-dm-mono text-white/70 truncate">
-                                {item.conteudo}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-8 text-center border border-dashed border-white/5 rounded">
-                    <p className="text-[10px] text-white/30 uppercase tracking-widest">Clique em atualizar para gerar o diagnóstico financeiro</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
           </div>
         </div>
 
@@ -805,7 +660,144 @@ Máximo 3 linhas. Sem markdown. Em português.
               <Brain size={12} className="text-bronze" /> INTELIGÊNCIA FINANCEIRA
             </h3>
             
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+              {/* Card 0: DIAGNÓSTICO · IA */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px] flex flex-col justify-between">
+                    <div>
+                      <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">DIAGNÓSTICO · IA</p>
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest",
+                          aiStatus === 'critico' ? "bg-red-500/20 text-red-400" :
+                          aiStatus === 'atencao' ? "bg-amber-500/20 text-amber-400" :
+                          "bg-green-500/20 text-green-400"
+                        )}>
+                          {aiStatus === 'critico' ? 'Crítico' : aiStatus === 'atencao' ? 'Atenção' : 'Saudável'}
+                        </span>
+                      </div>
+                      {lastAiAnalysis && (
+                        <p className="text-[9px] text-white/30 mt-2 font-dm-mono italic">
+                          última análise: {lastAiAnalysis.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                      <div className="flex items-center gap-3">
+                        <SheetTitle className="text-xl font-cormorant text-white">DIAGNÓSTICO FINANCEIRO · IA</SheetTitle>
+                        <span className={cn(
+                          "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest",
+                          aiStatus === 'critico' ? "bg-red-500/20 text-red-400" :
+                          aiStatus === 'atencao' ? "bg-amber-500/20 text-amber-400" :
+                          "bg-green-500/20 text-green-400"
+                        )}>
+                          {aiStatus}
+                        </span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => getAIDiagnostic()}
+                        disabled={isAiLoading}
+                        className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-bronze flex items-center gap-2 transition-colors"
+                      >
+                        <RotateCcw size={10} className={cn(isAiLoading && "animate-spin")} /> {isAiLoading ? "Analisando..." : "Atualizar"}
+                      </Button>
+                    </div>
+                  </SheetHeader>
+
+                  <div className="space-y-6">
+                    {isAiLoading ? (
+                      <div className="flex items-center justify-center py-12">
+                        <div className="flex flex-col items-center gap-3">
+                          <Loader2 size={24} className="animate-spin text-bronze/50" />
+                          <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Processando dados financeiros...</span>
+                        </div>
+                      </div>
+                    ) : aiDiagnostic ? (
+                      <div className="grid grid-cols-1 gap-4">
+                        {(() => {
+                          const paragraphs = aiDiagnostic.split('\n\n').filter(p => p.trim() !== '');
+                          return (
+                            <>
+                              <div className="bg-white/[0.03] p-6 border border-white/5 rounded space-y-3">
+                                <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">SITUAÇÃO ATUAL</label>
+                                <p className="text-[12px] text-white/70 leading-relaxed">
+                                  {paragraphs[0]}
+                                </p>
+                              </div>
+
+                              <div className="bg-white/[0.03] p-6 border border-white/5 rounded space-y-3">
+                                <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">OPORTUNIDADE</label>
+                                <p className="text-[12px] text-white/70 leading-relaxed">
+                                  {paragraphs[1]}
+                                </p>
+                              </div>
+
+                              <div className="bg-white/[0.03] p-6 border border-white/5 border-l-2 border-l-bronze rounded space-y-3">
+                                <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-bronze block">→ AÇÃO DESTA SEMANA</label>
+                                <p className="text-[12px] text-white/70 leading-relaxed">
+                                  {paragraphs[2]}
+                                </p>
+                              </div>
+                            </>
+                          );
+                        })()}
+
+                        <div className="pt-4 border-t border-white/5">
+                          <button 
+                            onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                            className="flex items-center gap-2 text-[9px] text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors w-full"
+                          >
+                            VER HISTÓRICO DE ANÁLISES ({aiHistory.length}) {isHistoryExpanded ? <ChevronUp size={10} /> : <ChevronRight size={10} />}
+                          </button>
+
+                          {isHistoryExpanded && (
+                            <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                              {aiHistory.map((item) => (
+                                <div key={item.id} className="bg-white/[0.03] p-4 border border-white/10 rounded-[2px] space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-[9px] font-dm-mono text-white/40">
+                                        {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                      </span>
+                                      <span className={cn(
+                                        "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
+                                        item.status === 'critico' ? "bg-red-500/20 border-red-500/30 text-red-400" :
+                                        item.status === 'atencao' ? "bg-amber-500/20 border-amber-500/30 text-amber-400" :
+                                        "bg-green-500/20 border-green-500/30 text-green-400"
+                                      )}>
+                                        {item.status}
+                                      </span>
+                                    </div>
+                                    <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
+                                  </div>
+                                  <p className="text-[11px] font-dm-mono text-white/60 line-clamp-2">
+                                    {item.conteudo}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="py-12 text-center border border-dashed border-white/5 rounded">
+                        <p className="text-[10px] text-white/30 uppercase tracking-widest">Clique em atualizar para gerar o diagnóstico financeiro</p>
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+
               {/* Card 1: PONTO DE EQUILÍBRIO */}
               <Sheet>
                 <SheetTrigger asChild>
