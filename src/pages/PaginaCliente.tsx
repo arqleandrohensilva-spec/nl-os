@@ -75,7 +75,7 @@ export default function PaginaCliente() {
       const [etapasRes, arquivosRes, parcelasRes] = await Promise.all([
         supabase.rpc('get_project_stages_by_token', { p_val: param }),
         supabase.rpc('get_project_files_by_token', { p_val: param }),
-        supabase.from('financeiro_parcelas').select('*').eq('projeto_id', proj.id)
+        supabase.rpc('get_project_parcelas_by_token', { p_val: param })
       ]);
       
       console.log('Etapas carregadas:', etapasRes.data?.length);
@@ -126,13 +126,17 @@ export default function PaginaCliente() {
         .eq('id', selectedEtapa.id);
 
       if (updateError) throw updateError;
-
-      await (supabase.from('notificacoes') as any).insert({
-        tipo: 'projeto',
-        modulo: 'Projetos',
-        titulo: '✅ Aprovação recebida',
-        descricao: `${nomeAprovador} aprovou ${selectedEtapa.etapa} · ${projeto.nome_cliente}`
-      });
+      
+      try {
+        await (supabase.from('notificacoes') as any).insert({
+          tipo: 'projeto',
+          modulo: 'Projetos',
+          titulo: '✅ Aprovação recebida',
+          descricao: `${nomeAprovador} aprovou ${selectedEtapa.etapa} · ${projeto.nome_cliente}`
+        });
+      } catch (notifError) {
+        console.warn('Notificação não enviada:', notifError);
+      }
 
       toast.success('Aprovação registrada com sucesso.');
       setShowAprovarModal(false);
@@ -156,13 +160,17 @@ export default function PaginaCliente() {
         mensagem: textoAjuste,
         tipo: 'ajuste'
       });
-
-      await (supabase.from('notificacoes') as any).insert({
-        tipo: 'projeto',
-        modulo: 'Projetos',
-        titulo: '⚠️ Solicitação de ajuste',
-        descricao: `${projeto.nome_cliente} solicitou ajuste em ${selectedEtapa.etapa}`
-      });
+      
+      try {
+        await (supabase.from('notificacoes') as any).insert({
+          tipo: 'projeto',
+          modulo: 'Projetos',
+          titulo: '⚠️ Solicitação de ajuste',
+          descricao: `${projeto.nome_cliente} solicitou ajuste em ${selectedEtapa.etapa}`
+        });
+      } catch (notifError) {
+        console.warn('Notificação não enviada:', notifError);
+      }
 
       toast.success('Solicitação enviada.');
       setShowAjusteModal(false);
@@ -185,13 +193,17 @@ export default function PaginaCliente() {
         mensagem: textoMensagem,
         tipo: 'mensagem'
       });
-
-      await (supabase.from('notificacoes') as any).insert({
-        tipo: 'projeto',
-        modulo: 'Projetos',
-        titulo: '💬 Nova mensagem do cliente',
-        descricao: `${projeto.nome_cliente} · ${projeto.nome_cliente}`
-      });
+      
+      try {
+        await (supabase.from('notificacoes') as any).insert({
+          tipo: 'projeto',
+          modulo: 'Projetos',
+          titulo: '💬 Nova mensagem do cliente',
+          descricao: `${projeto.nome_cliente} · ${projeto.nome_cliente}`
+        });
+      } catch (notifError) {
+        console.warn('Notificação não enviada:', notifError);
+      }
 
       toast.success('Mensagem enviada. A NL retornará em breve.');
       setTextoMensagem('');
