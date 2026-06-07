@@ -55,10 +55,13 @@ export default function PaginaCliente() {
   async function fetchProjeto() {
     try {
       setLoading(true);
+      console.log('Buscando projeto com param:', param);
       
       const { data: proj, error: projError } = await supabase
         .rpc('get_project_by_token_or_slug', { p_val: param })
         .maybeSingle();
+
+      console.log('Resultado:', proj, 'Erro:', projError);
 
       if (projError || !proj) {
         console.error("Erro ao buscar projeto:", projError);
@@ -74,6 +77,9 @@ export default function PaginaCliente() {
         supabase.rpc('get_project_files_by_token', { p_val: param }),
         supabase.from('financeiro_parcelas').select('*').eq('projeto_id', proj.id)
       ]);
+      
+      console.log('Etapas carregadas:', etapasRes.data?.length);
+      console.log('Arquivos carregados:', arquivosRes.data?.length);
       
       setEtapas(etapasRes.data || []);
       setArquivos(arquivosRes.data || []);
