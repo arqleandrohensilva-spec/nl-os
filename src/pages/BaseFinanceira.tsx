@@ -212,6 +212,39 @@ const BaseFinanceira = () => {
     }
   }, [calculations.costPerHour, config?.id]);
 
+  useEffect(() => {
+    if (calculations.costPerHour > 0 && sliderPrice === 0) {
+      setSliderPrice(Math.round(calculations.suggestedPrice));
+    }
+  }, [calculations.suggestedPrice]);
+
+  const formatK = (value: number) => {
+    if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+    return value.toString();
+  };
+
+  const intelMetrics = useMemo(() => {
+    const horasEquilibrio = Math.ceil(calculations.monthlyCosts / calculations.costPerHour) || 0;
+    const projetosEquilibrio = Math.ceil(horasEquilibrio / 80) || 0;
+    
+    const horasDisponiveis = (config?.horas_dia || 0) * (config?.dias_mes || 0) * ((config?.percentual_produtivo || 0) / 100) * (config?.num_arquitetos || 0);
+    const capacidade = horasDisponiveis > 0 ? Math.round((intelData.horasEmUso / horasDisponiveis) * 100) : 0;
+    const eficiencia = horasDisponiveis > 0 ? Math.round((intelData.horasFaturáveis / horasDisponiveis) * 100) : 0;
+    const pctMeta = intelData.metaMensal > 0 ? Math.round((intelData.recebidoMes / intelData.metaMensal) * 100) : 0;
+
+    const horasParaSlider = sliderPrice > 0 ? Math.ceil(calculations.monthlyCosts / sliderPrice) : 0;
+
+    return {
+      horasEquilibrio,
+      projetosEquilibrio,
+      horasDisponiveis,
+      capacidade,
+      eficiencia,
+      pctMeta,
+      horasParaSlider
+    };
+  }, [calculations, config, intelData, sliderPrice]);
+
 
   const getAIDiagnostic = async () => {
     if (isAiLoading) return;
