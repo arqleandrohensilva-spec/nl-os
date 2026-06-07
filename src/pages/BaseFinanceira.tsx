@@ -236,7 +236,6 @@ DADOS ATUAIS:
 BREAKDOWN DE CUSTOS:
 - Custo Fixo: R$ ${totalFixo.toFixed(2)} (${((totalFixo/totalMensal)*100).toFixed(1)}% do total)
 - Pró-labore: R$ ${totalProlabore.toFixed(2)} (${((totalProlabore/totalMensal)*100).toFixed(1)}% do total)
-- Softwares: R$ ${totalSoftwares.toFixed(2)} (${((totalSoftwares/totalMensal)*100).toFixed(1)}% do total)
 - Custo Variável: R$ ${totalVariavel.toFixed(2)} (${((totalVariavel/totalMensal)*100).toFixed(1)}% do total)
 - Impostos: ${impostos}%
 - Reservas: R$ ${totalReservas.toFixed(2)}
