@@ -548,7 +548,7 @@ export default function PaginaCliente() {
                 <div 
                   key={imagem.id} 
                   className="aspect-square bg-white/5 border border-white/5 cursor-pointer overflow-hidden group"
-                  onClick={() => setSelectedImage(imagem.dropbox_path)}
+                  onClick={() => handleOpenLightbox(imagem)}
                 >
                   {/* Since we need actual image URLs, and these are Dropbox paths, we'd normally proxy them. 
                       For now, using a placeholder or assuming the handleDownload logic can be adapted for preview if needed.
