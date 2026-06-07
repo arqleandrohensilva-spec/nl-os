@@ -114,6 +114,10 @@ const BaseFinanceira = () => {
 
     // 1. Calculate base monthly costs (excluding percentual taxes for now)
     let baseMonthlyCosts = costs.reduce((acc, cost) => {
+      if (cost.frequencia === 'percentual' || (cost.categoria === 'softwares' && CATEGORIES.every(cat => cat.id !== 'softwares'))) {
+        // Softwares should be counted in variavel if we migrated it, but wait, the query counts all costs.
+        // Let's just make sure we don't skip anything that is marked active.
+      }
       if (cost.frequencia === 'percentual') return acc;
       const value = cost.frequencia === 'anual' ? cost.valor / 12 : cost.valor;
       return acc + value;
@@ -212,8 +216,7 @@ const BaseFinanceira = () => {
       const totalMensal = calculations.monthlyCosts;
       const totalFixo = costs.filter(c => c.categoria === 'fixo').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
       const totalProlabore = costs.filter(c => c.categoria === 'prolabore').reduce((acc, c) => acc + c.valor, 0);
-      const totalSoftwares = costs.filter(c => c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
-      const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
+      const totalVariavel = costs.filter(c => c.categoria === 'variavel' || c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
       const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
       const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
       const mercados = config?.mercados?.length ? config.mercados.join(', ') : 'São José dos Campos';
