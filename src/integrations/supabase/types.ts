@@ -1914,6 +1914,42 @@ export type Database = {
           },
         ]
       }
+      snapshots_financeiros: {
+        Row: {
+          criado_em: string | null
+          custo_hora: number
+          horas_faturadas: number
+          id: string
+          margem_real: number
+          mes_referencia: string
+          num_projetos_ativos: number
+          receita_total: number
+          total_custos: number
+        }
+        Insert: {
+          criado_em?: string | null
+          custo_hora?: number
+          horas_faturadas?: number
+          id?: string
+          margem_real?: number
+          mes_referencia: string
+          num_projetos_ativos?: number
+          receita_total?: number
+          total_custos?: number
+        }
+        Update: {
+          criado_em?: string | null
+          custo_hora?: number
+          horas_faturadas?: number
+          id?: string
+          margem_real?: number
+          mes_referencia?: string
+          num_projetos_ativos?: number
+          receita_total?: number
+          total_custos?: number
+        }
+        Relationships: []
+      }
       templates_escopo: {
         Row: {
           ajuste_area: boolean | null
