@@ -285,10 +285,28 @@ export default function PaginaCliente() {
     (a.tipo === 'imagem' || /\.(jpg|jpeg|png|webp)$/i.test(a.nome_arquivo || ''))
   );
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<any>(null);
 
   const ultimaEtapa = etapas.find(e => e.etapa?.toUpperCase() === 'OBRA' || e.etapa?.toUpperCase() === 'DETALHAMENTO');
   const dataFinal = ultimaEtapa?.data_entrega;
+
+  const handleOpenLightbox = async (img: any) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: {
+          action: 'get_link',
+          path: img.dropbox_path
+        }
+      });
+
+      if (error) throw error;
+      setSelectedImage({ ...img, direct_link: data.link });
+    } catch (err) {
+      console.error(err);
+      toast.error('Erro ao abrir imagem.');
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
@@ -742,23 +760,44 @@ export default function PaginaCliente() {
 
       {/* LIGHTBOX SIMPLES */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="bg-black/95 border-none p-0 max-w-[95vw] max-h-[95vh] flex items-center justify-center overflow-hidden">
-          <div className="relative w-full h-full flex items-center justify-center p-4">
+        <DialogContent className="bg-black/95 border-none p-0 max-w-[95vw] max-h-[95vh] flex flex-col items-center justify-center overflow-hidden">
+          <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
              <button 
                onClick={() => setSelectedImage(null)}
-               className="absolute top-4 right-4 text-white/40 hover:text-white z-50"
+               className="absolute top-4 right-4 text-white/40 hover:text-white z-50 p-2"
              >
                FECHAR
              </button>
-             <p className="text-white/40 font-cormorant text-xl italic">
-               Visualizando arquivo da galeria...
-             </p>
-             {/* Note: Normally we'd fetch a direct link here similar to handleDownload 
-                 but for the sake of this UI rewrite we're focusing on the structure.
-             */}
+             
+             {selectedImage?.direct_link ? (
+               <img 
+                 src={selectedImage.direct_link} 
+                 alt={selectedImage.nome_arquivo}
+                 className="max-w-full max-h-[80vh] object-contain shadow-2xl"
+               />
+             ) : (
+               <div className="flex flex-col items-center gap-4">
+                 <Loader2 className="w-8 h-8 text-bronze animate-spin" />
+                 <p className="text-white/40 font-cormorant text-xl italic">
+                   Carregando imagem...
+                 </p>
+               </div>
+             )}
+             
+             {selectedImage && (
+               <div className="mt-6 text-center">
+                 <p className="text-white/80 font-cormorant text-2xl italic">
+                   {selectedImage.nome_arquivo}
+                 </p>
+                 <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] mt-2">
+                   {selectedImage.etapa || 'Galeria'}
+                 </p>
+               </div>
+             )}
           </div>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
