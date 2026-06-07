@@ -553,31 +553,21 @@ Máximo 3 linhas. Sem markdown. Em português.
             />
 
             {/* AI Diagnostic Card */}
-          <div className={cn(
-            "p-6 border rounded-[4px] space-y-4 transition-all duration-300 overflow-hidden cursor-pointer",
-            aiStatus === 'critico' ? "bg-red-50 border-red-200" :
-            aiStatus === 'atencao' ? "bg-amber-50 border-amber-200" :
-            "bg-green-50 border-green-200"
-          )}
-          onClick={() => !isAiExpanded && setIsAiExpanded(true)}
-          >
+          <div className="p-6 border border-white/5 rounded-[4px] space-y-6 transition-all duration-300">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={cn(
-                  "flex items-center gap-2",
-                  aiStatus === 'critico' ? "text-red-700" :
-                  aiStatus === 'atencao' ? "text-amber-700" :
-                  "text-green-700"
-                )}>
-                  <Brain size={16} />
-                  <span className="text-[10px] font-bold uppercase tracking-widest font-dm-mono">DIAGNÓSTICO FINANCEIRO · IA</span>
+                <div className="flex items-center gap-2 text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] font-dm-mono flex items-center gap-2">
+                    <Sparkles size={12} className="text-bronze" />
+                    DIAGNÓSTICO FINANCEIRO · IA
+                  </span>
                 </div>
                 
                 <span className={cn(
-                  "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest border",
-                  aiStatus === 'critico' ? "bg-red-100 border-red-300 text-red-800" :
-                  aiStatus === 'atencao' ? "bg-amber-100 border-amber-300 text-amber-800" :
-                  "bg-green-100 border-green-300 text-green-800"
+                  "px-2 py-0.5 rounded-[2px] text-[8px] font-bold uppercase tracking-widest",
+                  aiStatus === 'critico' ? "bg-red-500/20 text-red-400" :
+                  aiStatus === 'atencao' ? "bg-amber-500/20 text-amber-400" :
+                  "bg-green-500/20 text-green-400"
                 )}>
                   {aiStatus === 'critico' ? 'Crítico' : aiStatus === 'atencao' ? 'Atenção' : 'Saudável'}
                 </span>
@@ -586,56 +576,75 @@ Máximo 3 linhas. Sem markdown. Em português.
               <div className="flex items-center gap-4">
                 {lastAiAnalysis && (
                   <p className="text-[9px] text-white/40 font-dm-mono italic">
-                    Última análise: {lastAiAnalysis.toLocaleTimeString()}
+                    Última análise: {lastAiAnalysis.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 )}
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      getAIDiagnostic();
-                    }}
-                    className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-bronze flex items-center gap-2"
-                  >
-                    <RotateCcw size={10} /> Atualizar
-                  </Button>
-                  {isAiExpanded && (
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsAiExpanded(false);
-                      }}
-                      className="p-1 text-white/40 hover:text-white transition-colors"
-                    >
-                      <ChevronUp size={16} />
-                    </button>
-                  )}
-                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    getAIDiagnostic();
+                  }}
+                  disabled={isAiLoading}
+                  className="h-8 text-[9px] uppercase tracking-widest text-white/40 hover:text-bronze flex items-center gap-2 transition-colors"
+                >
+                  <RotateCcw size={10} className={cn(isAiLoading && "animate-spin")} /> {isAiLoading ? "Analisando..." : "Atualizar"}
+                </Button>
               </div>
             </div>
 
-            <div className={cn(
-              "transition-all duration-300 ease-in-out",
-              isAiExpanded ? "max-h-[2000px] opacity-100 mt-4" : "max-h-0 opacity-0"
-            )}>
-              {isAiLoading ? (
-                <div className="flex items-center gap-2 text-white/40 text-xs font-dm-mono py-4">
-                  <Loader2 size={14} className="animate-spin" /> Analisando dados...
+            {isAiLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 size={24} className="animate-spin text-bronze/50" />
+                  <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Processando dados financeiros...</span>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <p className="text-xs font-dm-mono text-white leading-relaxed whitespace-pre-line border-b border-black/5 pb-6">
-                    {aiDiagnostic || "Clique em atualizar para gerar o diagnóstico financeiro baseado nos seus dados."}
-                  </p>
+              </div>
+            ) : aiDiagnostic ? (
+              <div className="grid grid-cols-1 gap-3">
+                {(() => {
+                  const paragraphs = aiDiagnostic.split('\n\n').filter(p => p.trim() !== '');
+                  return (
+                    <>
+                      {/* SITUAÇÃO ATUAL */}
+                      <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
+                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">SITUAÇÃO ATUAL</label>
+                        <p className="text-[11px] text-white/70 leading-relaxed">
+                          {paragraphs[0]}
+                        </p>
+                      </div>
 
-                  {/* History Section */}
-                  <div className="space-y-4">
-                    <h4 className="text-[9px] font-bold text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
-                      <Target size={12} /> Histórico de Análises
-                    </h4>
-                    <div className="space-y-2">
+                      {/* OPORTUNIDADE */}
+                      <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
+                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">OPORTUNIDADE</label>
+                        <p className="text-[11px] text-white/70 leading-relaxed">
+                          {paragraphs[1]}
+                        </p>
+                      </div>
+
+                      {/* AÇÃO DESTA SEMANA */}
+                      <div className="bg-white/[0.02] border border-white/5 border-l-2 border-l-bronze rounded p-4 space-y-2">
+                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-bronze block">→ AÇÃO DESTA SEMANA</label>
+                        <p className="text-[11px] text-white/70 leading-relaxed">
+                          {paragraphs[2]}
+                        </p>
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {/* Histórico colapsado */}
+                <div className="pt-2">
+                  <button 
+                    onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
+                    className="flex items-center gap-2 text-[9px] text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors"
+                  >
+                    VER HISTÓRICO DE ANÁLISES ({aiHistory.length}) {isHistoryExpanded ? <ChevronUp size={10} /> : <ChevronRight size={10} />}
+                  </button>
+
+                  {isHistoryExpanded && (
+                    <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
                       {aiHistory.map((item) => (
                         <div key={item.id} className="bg-white/[0.03] p-3 border border-white/10 rounded-[2px] space-y-2">
                           <div className="flex items-center justify-between">
@@ -645,25 +654,29 @@ Máximo 3 linhas. Sem markdown. Em português.
                               </span>
                               <span className={cn(
                                 "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
-                                item.status === 'critico' ? "bg-red-50 border-red-200 text-red-700" :
-                                item.status === 'atencao' ? "bg-amber-50 border-amber-200 text-amber-700" :
-                                "bg-green-50 border-green-200 text-green-700"
+                                item.status === 'critico' ? "bg-red-500/20 border-red-500/30 text-red-400" :
+                                item.status === 'atencao' ? "bg-amber-500/20 border-amber-500/30 text-amber-400" :
+                                "bg-green-500/20 border-green-500/30 text-green-400"
                               )}>
                                 {item.status}
                               </span>
                             </div>
                             <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
                           </div>
-                          <p className="text-[10px] font-dm-mono text-white/70 line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+                          <p className="text-[10px] font-dm-mono text-white/70 truncate">
                             {item.conteudo}
                           </p>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="py-8 text-center border border-dashed border-white/5 rounded">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest">Clique em atualizar para gerar o diagnóstico financeiro</p>
+              </div>
+            )}
           </div>
 
           </div>
