@@ -52,7 +52,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import FinancialHealthBar from '@/components/financeiro/FinancialHealthBar';
+
 import CountUp from '@/components/financeiro/CountUp';
 import DonutChartSection from '@/components/financeiro/DonutChartSection';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
@@ -550,11 +550,6 @@ Máximo 3 linhas. Sem markdown. Em português.
               </Button>
             </div>
 
-            <FinancialHealthBar 
-              costPerHour={calculations.costPerHour}
-              benchmark={120}
-              marketName={config?.mercados?.[0] || 'SJC'}
-            />
 
             {/* AI Diagnostic Card */}
           <div 
