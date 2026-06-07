@@ -840,7 +840,9 @@ Máximo 3 linhas. Sem markdown. Em português.
           <div className="grid grid-cols-3 gap-8">
             <div className="col-span-2 space-y-4">
               {CATEGORIES.map((cat) => {
-                const catCosts = costs.filter(c => c.categoria === cat.id);
+                const catCosts = costs.filter(c => 
+                  c.categoria === cat.id || (cat.id === 'variavel' && c.categoria === 'softwares')
+                );
                 const totalCat = catCosts.reduce((acc, c) => {
                   if (c.frequencia === 'percentual') return acc;
                   return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
@@ -1025,7 +1027,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                   el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
                 data={CATEGORIES.map(cat => {
-                  const catCosts = costs.filter(c => c.categoria === cat.id);
+                  const catCosts = costs.filter(c => 
+                    c.categoria === cat.id || (cat.id === 'variavel' && c.categoria === 'softwares')
+                  );
                   const total = catCosts.reduce((acc, c) => {
                     if (c.frequencia === 'percentual') return acc;
                     return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
