@@ -663,7 +663,7 @@ Máximo 3 linhas. Sem markdown. Em português.
               <Brain size={12} className="text-bronze" /> INTELIGÊNCIA FINANCEIRA
             </h3>
             
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Card 0: DIAGNÓSTICO · IA */}
               <Sheet>
                 <SheetTrigger asChild>
@@ -1162,6 +1162,202 @@ Máximo 3 linhas. Sem markdown. Em português.
                   </div>
                 </SheetContent>
               </Sheet>
+              {/* Card 6: SIMULADOR DE RECEITA */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px] flex flex-col justify-between">
+                    <div>
+                      <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">SIMULADOR DE RECEITA</p>
+                      <p className="font-cormorant text-2xl text-white">R$ {formatK(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice)}</p>
+                      <p className="text-[9px] text-white/30 mt-1">{simNumProjetos} proj × {simHorasPorProjeto}h</p>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4 uppercase tracking-widest">SIMULADOR DE RECEITA</SheetTitle>
+                    <SheetDescription>Simule cenários de fechamento e analise a viabilidade financeira.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8 animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-3 text-xs font-dm-mono text-white/60">
+                        <span>Se fechar</span>
+                        <Input 
+                          type="number" 
+                          value={simNumProjetos}
+                          onChange={(e) => setSimNumProjetos(parseInt(e.target.value) || 0)}
+                          className="w-16 h-8 text-center border-white/10 focus:border-bronze bg-white/5"
+                        />
+                        <span>projetos de</span>
+                        <Input 
+                          type="number" 
+                          value={simHorasPorProjeto}
+                          onChange={(e) => setSimHorasPorProjeto(parseInt(e.target.value) || 0)}
+                          className="w-20 h-8 text-center border-white/10 focus:border-bronze bg-white/5"
+                        />
+                        <span>horas este mês:</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="bg-white/[0.03] p-6 border border-white/5 rounded space-y-4">
+                        <div className="flex justify-between items-center text-xs font-dm-mono">
+                          <span className="text-white/40 uppercase tracking-widest text-[10px]">Receita bruta estimada</span>
+                          <span className="font-bold text-white">
+                            R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-dm-mono border-t border-white/5 pt-4">
+                          <span className="text-white/40 uppercase tracking-widest text-[10px]">(-) Custos mensais</span>
+                          <span className="text-red-400/70">
+                            R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs font-dm-mono border-t border-white/5 pt-4">
+                          <span className="text-white/40 uppercase tracking-widest text-[10px]">(-) Impostos estimados</span>
+                          <span className="text-red-400/70">
+                            R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice * (costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0) / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="pt-6 border-t border-bronze/20 flex flex-col gap-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-bronze">(=) Lucro líquido estimado</span>
+                            <span className={cn(
+                              "text-3xl font-cormorant font-bold",
+                              (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) >= 0 ? "text-bronze" : "text-red-500"
+                            )}>
+                              R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-white/40 font-dm-mono uppercase tracking-tighter text-right">
+                            MARGEM LÍQUIDA: {(( (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) / (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice || 1) ) * 100).toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="bg-bronze/5 p-6 rounded-[2px] border border-bronze/10 space-y-4">
+                        <div className="flex items-center gap-2 text-bronze">
+                          <Sparkles size={14} />
+                          <span className="text-[9px] font-bold uppercase tracking-widest font-dm-mono">Análise de Viabilidade IA</span>
+                        </div>
+                        <p className="text-[11px] font-dm-mono text-white/80 leading-relaxed italic">
+                          {simAnalysis || "Configure seu cenário acima e clique em analisar para uma avaliação estratégica da IA."}
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={getSimulatorAnalysis}
+                          disabled={isSimLoading}
+                          className="w-full mt-2 border-bronze/30 text-bronze hover:bg-bronze hover:text-white text-[9px] uppercase tracking-widest font-bold h-10 transition-all"
+                        >
+                          {isSimLoading ? <Loader2 size={12} className="animate-spin mr-2" /> : <Target size={12} className="mr-2" />}
+                          {isSimLoading ? "ANALISANDO..." : "ANALISAR CENÁRIO COM IA"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Card 7: EVOLUÇÃO · CUSTO/HORA */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px] flex flex-col justify-between">
+                    <div>
+                      <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">EVOLUÇÃO · CUSTO/HORA</p>
+                      {aiHistory.length >= 2 ? (
+                        <div className="flex items-center gap-2">
+                          <p className="font-cormorant text-2xl text-white">
+                            {(() => {
+                              const first = aiHistory[aiHistory.length - 1].custo_hora_momento;
+                              const current = aiHistory[0].custo_hora_momento;
+                              const diff = ((current / first) - 1) * 100;
+                              return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}%`;
+                            })()}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="font-cormorant text-2xl text-white">—</p>
+                      )}
+                      <p className="text-[9px] text-white/30 mt-1">histórico mensal</p>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4 uppercase tracking-widest">EVOLUÇÃO DO CUSTO/HORA</SheetTitle>
+                    <SheetDescription>Acompanhe a variação do seu custo operacional ao longo do tempo.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8">
+                    <div className="h-[300px] w-full bg-white/[0.02] p-4 rounded border border-white/5">
+                      {aiHistory.length < 2 ? (
+                        <div className="h-full flex items-center justify-center text-[10px] font-dm-mono text-white/30 uppercase tracking-widest text-center px-8">
+                          Histórico disponível após o segundo diagnóstico salvo. Comece atualizando seu diagnóstico IA.
+                        </div>
+                      ) : (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart data={[...aiHistory].reverse()}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                            <XAxis 
+                              dataKey="criado_em" 
+                              tickFormatter={(val) => new Date(val).toLocaleDateString('pt-BR', { month: 'short' })}
+                              tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: 'DM Mono' }}
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <YAxis 
+                              tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)', fontFamily: 'DM Mono' }}
+                              axisLine={false}
+                              tickLine={false}
+                              tickFormatter={(val) => `R$${val}`}
+                            />
+                            <RechartsTooltip 
+                              contentStyle={{ 
+                                backgroundColor: '#1A1A1A', 
+                                border: '1px solid rgba(255,255,255,0.1)', 
+                                borderRadius: '2px',
+                                fontSize: '10px',
+                                fontFamily: 'DM Mono'
+                              }}
+                              itemStyle={{ color: '#8B7355' }}
+                              labelFormatter={(val) => new Date(val).toLocaleDateString('pt-BR')}
+                            />
+                            <Line 
+                              type="monotone" 
+                              dataKey="custo_hora_momento" 
+                              stroke="#8B7355" 
+                              strokeWidth={2}
+                              dot={{ r: 3, fill: '#8B7355', strokeWidth: 0 }}
+                              activeDot={{ r: 5, fill: '#fff', stroke: '#8B7355', strokeWidth: 2 }}
+                              name="Custo/Hora"
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Registros Anteriores</h4>
+                      <div className="space-y-2">
+                        {aiHistory.slice(0, 5).map((h, i) => (
+                          <div key={i} className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5 rounded text-[11px] font-dm-mono">
+                            <span className="text-white/40">{new Date(h.criado_em).toLocaleDateString('pt-BR')}</span>
+                            <span className="text-white font-bold text-bronze">R$ {Number(h.custo_hora_momento).toFixed(2)}/h</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
 
@@ -1226,6 +1422,16 @@ Máximo 3 linhas. Sem markdown. Em português.
                   className="[&_[role=slider]]:bg-bronze [&_[role=slider]]:border-bronze"
                 />
               </div>
+              {(config?.margem_lucro || 0) > 80 && (
+                <p className="text-[9px] text-amber-400/70 mt-2">
+                  ⚠ Margem acima de 80% — mercado premium opera entre 50–80%. Verifique se está correto.
+                </p>
+              )}
+              {(config?.margem_lucro || 0) < 30 && (
+                <p className="text-[9px] text-red-400/70 mt-2">
+                  ⚠ Margem abaixo de 30% — risco de operar no prejuízo em meses com menos projetos.
+                </p>
+              )}
             </div>
           </div>
 
@@ -1239,8 +1445,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.horas_dia} 
+                      placeholder="8"
                       onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1248,8 +1455,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.dias_mes} 
+                      placeholder="22"
                       onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1257,8 +1465,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.percentual_produtivo} 
+                      placeholder="70"
                       onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1266,8 +1475,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.num_arquitetos} 
+                      placeholder="2"
                       onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1315,8 +1525,13 @@ Máximo 3 linhas. Sem markdown. Em português.
                       <p className="text-[10px] font-bold text-white uppercase">C) Combinar Estratégias</p>
                       <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
-                      </p>
-                    </div>
+              </p>
+            </div>
+            {(!config?.horas_dia || !config?.dias_mes) && (
+              <p className="text-[9px] text-amber-400/70 mt-2">
+                ⚠ Preencha os campos acima para calibrar seu custo/hora real
+              </p>
+            )}
                   </div>
                 </div>
               )}
@@ -1540,78 +1755,6 @@ Máximo 3 linhas. Sem markdown. Em português.
             </div>
           </div>
 
-          {/* Evolução do Custo/Hora Section */}
-          <div className="border border-white/10 rounded-[4px] overflow-hidden bg-white/[0.03]">
-            <button 
-              onClick={() => setIsEvolucaoOpen(!isEvolucaoOpen)}
-              className="w-full flex items-center justify-between p-5 hover:bg-white/[0.05] transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className={cn("p-2 rounded-full", isEvolucaoOpen ? "bg-bronze/15 text-bronze" : "bg-white/[0.12] text-white/60")}>
-                  <History size={16} />
-                </div>
-                <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">Evolução do Custo/Hora</span>
-              </div>
-              {isEvolucaoOpen ? <ChevronDown size={14} className="text-white/40" /> : <ChevronRight size={14} className="text-white/40" />}
-            </button>
-            
-            {isEvolucaoOpen && (
-              <div className="p-8 h-[350px] animate-in fade-in slide-in-from-top-2 duration-300">
-                {aiHistory.length < 2 ? (
-                  <div className="h-full flex items-center justify-center text-xs font-dm-mono text-white/40">
-                    Histórico disponível após 30 dias de uso (mínimo 2 diagnósticos salvos)
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={[...aiHistory].reverse()}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F0EBE5" />
-                      <XAxis 
-                        dataKey="criado_em" 
-                        tickFormatter={(val) => new Date(val).toLocaleDateString('pt-BR', { month: 'short' })}
-                        tick={{ fontSize: 10, fill: '#777' }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 10, fill: '#777' }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={(val) => `R$ ${val}`}
-                      />
-                      <RechartsTooltip 
-                        contentStyle={{ 
-                          backgroundColor: '#3A3A3A', 
-                          border: 'none', 
-                          borderRadius: '4px',
-                          color: '#fff',
-                          fontSize: '10px',
-                          fontFamily: 'DM Mono'
-                        }}
-                        itemStyle={{ color: '#fff' }}
-                        labelFormatter={(val) => new Date(val).toLocaleDateString('pt-BR')}
-                      />
-                      <ReferenceLine 
-                        y={120} 
-                        stroke="#777" 
-                        strokeDasharray="5 5" 
-                        label={{ value: 'Benchmark (R$ 120)', position: 'insideBottomRight', fontSize: 8, fill: '#777' }} 
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="custo_hora_momento" 
-                        stroke="#8B7355" 
-                        strokeWidth={2}
-                        dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#8B7355' }}
-                        activeDot={{ r: 6, fill: '#8B7355' }}
-                        name="Custo/Hora"
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-            )}
-          </div>
-
           {/* AI Suggestions Section */}
           <div className="space-y-4">
             <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em] flex items-center gap-2">
@@ -1666,95 +1809,6 @@ Máximo 3 linhas. Sem markdown. Em português.
                 </div>
               )}
             </div>
-          </div>
-          {/* Simulator Section */}
-          <div className="border-t border-white/10 pt-8 space-y-6">
-            <button 
-              onClick={() => setIsSimulatorOpen(!isSimulatorOpen)}
-              className="flex items-center gap-2 text-[10px] font-dm-mono text-bronze uppercase tracking-[0.2em] font-bold hover:opacity-70 transition-opacity"
-            >
-              {isSimulatorOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              SIMULADOR DE RECEITA
-            </button>
-
-            {isSimulatorOpen && (
-              <div className="bg-[#141414] p-8 border border-white/10 rounded-[4px] space-y-8 animate-in slide-in-from-bottom-2 duration-300">
-                <div className="flex items-center gap-4 text-xs font-dm-mono text-white">
-                  <span>Se fechar</span>
-                  <Input 
-                    type="number" 
-                    value={simNumProjetos}
-                    onChange={(e) => setSimNumProjetos(parseInt(e.target.value) || 0)}
-                    className="w-16 h-8 text-center border-white/10 focus:border-bronze"
-                  />
-                  <span>projetos de</span>
-                  <Input 
-                    type="number" 
-                    value={simHorasPorProjeto}
-                    onChange={(e) => setSimHorasPorProjeto(parseInt(e.target.value) || 0)}
-                    className="w-20 h-8 text-center border-white/10 focus:border-bronze"
-                  />
-                  <span>horas este mês:</span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-12">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/60">Receita bruta estimada:</span>
-                      <span className="font-bold text-white">
-                        R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/60">(-) Custos totais mensais:</span>
-                      <span className="text-red-400">
-                        R$ {calculations.monthlyCosts.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs font-dm-mono">
-                      <span className="text-white/60">(-) Impostos estimados:</span>
-                      <span className="text-red-400">
-                        R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice * (costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0) / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                      <span className="text-xs font-dm-mono font-bold uppercase tracking-widest">(=) Lucro estimado:</span>
-                      <span className={cn(
-                        "text-xl font-cormorant font-bold",
-                        (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) >= 0 ? "text-bronze" : "text-red-500"
-                      )}>
-                        R$ {(simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-white/60 font-dm-mono uppercase tracking-tighter">
-                      Isso representa {(( (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice - calculations.monthlyCosts) / (simNumProjetos * simHorasPorProjeto * calculations.suggestedPrice || 1) ) * 100).toFixed(1)}% de margem líquida.
-                    </p>
-                  </div>
-
-                  <div className="bg-[#E8E4DF]/20 p-6 rounded-[4px] border border-white/[0.08] flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-bronze">
-                        <Sparkles size={14} />
-                        <span className="text-[9px] font-bold uppercase tracking-widest font-dm-mono">Análise de Viabilidade</span>
-                      </div>
-                      <p className="text-[11px] font-dm-mono text-white leading-relaxed italic">
-                        {simAnalysis || "Configure seu cenário e clique em analisar para uma avaliação da IA."}
-                      </p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={getSimulatorAnalysis}
-                      disabled={isSimLoading}
-                      className="mt-4 border-bronze/30 text-bronze hover:bg-bronze hover:text-white text-[9px] uppercase tracking-widest font-bold h-8"
-                    >
-                      {isSimLoading ? <Loader2 size={12} className="animate-spin mr-2" /> : <Target size={12} className="mr-2" />}
-                      Analisar este cenário com IA
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
