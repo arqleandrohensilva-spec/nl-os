@@ -1239,8 +1239,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.horas_dia} 
+                      placeholder="8"
                       onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1248,8 +1249,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.dias_mes} 
+                      placeholder="22"
                       onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1257,8 +1259,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.percentual_produtivo} 
+                      placeholder="70"
                       onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1266,8 +1269,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Input 
                       type="number" 
                       value={config?.num_arquitetos} 
+                      placeholder="2"
                       onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze"
+                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
                     />
                   </div>
                   <div className="space-y-3">
