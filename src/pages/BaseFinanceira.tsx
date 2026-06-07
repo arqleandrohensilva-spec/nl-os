@@ -23,8 +23,17 @@ import {
   Lightbulb,
   FileText,
   History,
-  ArrowRight
+  ArrowRight,
+  ArrowUpRight
 } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
