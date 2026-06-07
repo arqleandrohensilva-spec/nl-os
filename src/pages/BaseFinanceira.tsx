@@ -59,13 +59,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const CATEGORIES: { id: CategoriaCusto; label: string; icon: any; color: string }[] = [
-  { id: 'fixo', label: 'Custo Fixo', icon: Building2, color: '#3A3A3A' },
-  { id: 'prolabore', label: 'Pró-labore', icon: Users, color: '#8B7355' },
-  { id: 'softwares', label: 'Softwares e Assinaturas', icon: Monitor, color: '#5A5A5A' },
-  { id: 'variavel', label: 'Custo Variável', icon: TrendingUp, color: '#B5A48A' },
-  { id: 'impostos', label: 'Impostos', icon: Receipt, color: '#777777' },
-  { id: 'reservas', label: 'Reservas', icon: Shield, color: '#D1D1D1' },
+const CATEGORIES: { id: CategoriaCusto; label: string; description: string; icon: any; color: string }[] = [
+  { id: 'fixo', label: 'OVERHEAD FIXO', description: 'custos fixos independentes de projeto', icon: Building2, color: '#3A3A3A' },
+  { id: 'variavel', label: 'CUSTOS VARIÁVEIS', description: 'variam conforme uso e operação', icon: TrendingUp, color: '#B5A48A' },
+  { id: 'prolabore', label: 'PRÓ-LABORE', description: 'retirada mensal dos sócios', icon: Users, color: '#8B7355' },
+  { id: 'impostos', label: 'IMPOSTOS', description: 'incidência sobre faturamento', icon: Receipt, color: '#777777' },
+  { id: 'reservas', label: 'RESERVAS', description: 'proteção e capital de giro', icon: Shield, color: '#D1D1D1' },
 ];
 
 const BaseFinanceira = () => {
@@ -213,8 +212,7 @@ const BaseFinanceira = () => {
       const totalMensal = calculations.monthlyCosts;
       const totalFixo = costs.filter(c => c.categoria === 'fixo').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
       const totalProlabore = costs.filter(c => c.categoria === 'prolabore').reduce((acc, c) => acc + c.valor, 0);
-      const totalSoftwares = costs.filter(c => c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
-      const totalVariavel = costs.filter(c => c.categoria === 'variavel').reduce((acc, c) => acc + c.valor, 0);
+      const totalVariavel = costs.filter(c => c.categoria === 'variavel' || c.categoria === 'softwares').reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
       const totalReservas = costs.filter(c => c.categoria === 'reservas').reduce((acc, c) => acc + c.valor, 0);
       const impostos = costs.filter(c => c.categoria === 'impostos').reduce((acc, c) => acc + c.valor, 0);
       const mercados = config?.mercados?.length ? config.mercados.join(', ') : 'São José dos Campos';
@@ -234,7 +232,6 @@ DADOS ATUAIS:
 BREAKDOWN DE CUSTOS:
 - Custo Fixo: R$ ${totalFixo.toFixed(2)} (${((totalFixo/totalMensal)*100).toFixed(1)}% do total)
 - Pró-labore: R$ ${totalProlabore.toFixed(2)} (${((totalProlabore/totalMensal)*100).toFixed(1)}% do total)
-- Softwares: R$ ${totalSoftwares.toFixed(2)} (${((totalSoftwares/totalMensal)*100).toFixed(1)}% do total)
 - Custo Variável: R$ ${totalVariavel.toFixed(2)} (${((totalVariavel/totalMensal)*100).toFixed(1)}% do total)
 - Impostos: ${impostos}%
 - Reservas: R$ ${totalReservas.toFixed(2)}
@@ -843,7 +840,9 @@ Máximo 3 linhas. Sem markdown. Em português.
           <div className="grid grid-cols-3 gap-8">
             <div className="col-span-2 space-y-4">
               {CATEGORIES.map((cat) => {
-                const catCosts = costs.filter(c => c.categoria === cat.id);
+                const catCosts = costs.filter(c => 
+                  c.categoria === cat.id || (cat.id === 'variavel' && c.categoria === 'softwares')
+                );
                 const totalCat = catCosts.reduce((acc, c) => {
                   if (c.frequencia === 'percentual') return acc;
                   return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
@@ -868,7 +867,10 @@ Máximo 3 linhas. Sem markdown. Em português.
                               >
                                 <cat.icon size={16} />
                               </div>
-                              <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest">{cat.label}</span>
+                              <div className="flex flex-col items-start text-left">
+                                <span className="text-xs font-dm-mono font-bold text-white uppercase tracking-widest leading-none">{cat.label}</span>
+                                <span className="text-[9px] text-white/30 uppercase tracking-widest mt-1">{cat.description}</span>
+                              </div>
                             </div>
                             <div className="flex items-center gap-6">
                               <span className="text-xs font-dm-mono text-bronze font-bold">
@@ -1025,7 +1027,9 @@ Máximo 3 linhas. Sem markdown. Em português.
                   el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }}
                 data={CATEGORIES.map(cat => {
-                  const catCosts = costs.filter(c => c.categoria === cat.id);
+                  const catCosts = costs.filter(c => 
+                    c.categoria === cat.id || (cat.id === 'variavel' && c.categoria === 'softwares')
+                  );
                   const total = catCosts.reduce((acc, c) => {
                     if (c.frequencia === 'percentual') return acc;
                     return acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor);
