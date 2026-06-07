@@ -2073,84 +2073,40 @@ export type Database = {
       get_project_by_token_or_slug: {
         Args: { p_val: string }
         Returns: {
-          area_m2: number | null
-          cidade: string | null
-          cliente_id: string | null
-          criado_em: string | null
-          criado_por: string | null
-          data_inicio: string | null
-          dropbox_folder: string | null
-          etapa_atual: string | null
-          horas_acompanhamento: number | null
-          horas_anteprojeto: number | null
-          horas_briefing: number | null
-          horas_conceito: number | null
-          horas_detalhamento: number | null
-          horas_estimadas: number | null
-          horas_executivo: number | null
+          area_m2: number
+          cidade: string
+          cliente_id: string
+          data_inicio: string
+          etapa_atual: string
           id: string
-          link_apresentacao: string | null
-          nome: string
-          nome_cliente: string | null
-          prazo_final: string | null
-          proposta_id: string | null
-          slug_cliente: string | null
-          status_geral: string | null
-          tipo: string | null
-          token_cliente: string | null
-          updated_at: string | null
-          valor_proposta: number | null
-          valor_total: number | null
+          nome_cliente: string
+          status_geral: string
+          tipo: string
+          token_cliente: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "projetos"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_project_files_by_token: {
         Args: { p_val: string }
         Returns: {
-          created_at: string | null
           dropbox_path: string
-          etapa: string | null
+          etapa: string
           id: string
-          liberado: boolean | null
+          liberado: boolean
           nome_arquivo: string
-          projeto_id: string | null
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "arquivos_projeto"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_project_stages_by_token: {
         Args: { p_val: string }
         Returns: {
-          aprovado_por: string | null
+          aprovado_por: string
           criado_em: string
-          data_aprovacao: string | null
-          data_entrega: string | null
-          data_inicio: string | null
+          data_aprovacao: string
+          data_entrega: string
           etapa: string
-          horas_estimadas: number | null
-          horas_lancadas: number | null
           id: string
-          moodboard_url: string | null
-          notas: string | null
-          projeto_id: string | null
-          status: string | null
+          status: string
           updated_at: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "projeto_etapas"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_proposal_by_slug: {
         Args: { p_slug: string; p_tipo: string }
