@@ -23,8 +23,17 @@ import {
   Lightbulb,
   FileText,
   History,
-  ArrowRight
+  ArrowRight,
+  ArrowUpRight
 } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 import { toast } from "sonner";
 import { cn } from '@/lib/utils';
@@ -110,6 +119,15 @@ const BaseFinanceira = () => {
   const [cenarioBMargem, setCenarioBMargem] = useState(50);
   const [isEvolucaoOpen, setIsEvolucaoOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [intelData, setIntelData] = useState({
+    horasEmUso: 0,
+    horasFaturáveis: 0,
+    fluxo3meses: 0,
+    recebidoMes: 0,
+    metaMensal: 0,
+    fluxoDetalhado: [] as { mes: string; valor: number }[]
+  });
+  const [sliderPrice, setSliderPrice] = useState(0);
 
 
   // Calculations
@@ -193,6 +211,39 @@ const BaseFinanceira = () => {
       }
     }
   }, [calculations.costPerHour, config?.id]);
+
+  useEffect(() => {
+    if (calculations.costPerHour > 0 && sliderPrice === 0) {
+      setSliderPrice(Math.round(calculations.suggestedPrice));
+    }
+  }, [calculations.suggestedPrice]);
+
+  const formatK = (value: number) => {
+    if (value >= 1000) return (value / 1000).toFixed(0) + 'k';
+    return value.toString();
+  };
+
+  const intelMetrics = useMemo(() => {
+    const horasEquilibrio = Math.ceil(calculations.monthlyCosts / calculations.costPerHour) || 0;
+    const projetosEquilibrio = Math.ceil(horasEquilibrio / 80) || 0;
+    
+    const horasDisponiveis = (config?.horas_dia || 0) * (config?.dias_mes || 0) * ((config?.percentual_produtivo || 0) / 100) * (config?.num_arquitetos || 0);
+    const capacidade = horasDisponiveis > 0 ? Math.round((intelData.horasEmUso / horasDisponiveis) * 100) : 0;
+    const eficiencia = horasDisponiveis > 0 ? Math.round((intelData.horasFaturáveis / horasDisponiveis) * 100) : 0;
+    const pctMeta = intelData.metaMensal > 0 ? Math.round((intelData.recebidoMes / intelData.metaMensal) * 100) : 0;
+
+    const horasParaSlider = sliderPrice > 0 ? Math.ceil(calculations.monthlyCosts / sliderPrice) : 0;
+
+    return {
+      horasEquilibrio,
+      projetosEquilibrio,
+      horasDisponiveis,
+      capacidade,
+      eficiencia,
+      pctMeta,
+      horasParaSlider
+    };
+  }, [calculations, config, intelData, sliderPrice]);
 
 
   const getAIDiagnostic = async () => {
@@ -428,6 +479,54 @@ Máximo 3 linhas. Sem markdown. Em português.
       setIsExporting(false);
     }
   };
+
+  const fetchIntelligenceData = async () => {
+    try {
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const next3Months = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate()).toISOString();
+
+      const [sessoesRes, parcelasPendentesRes, parcelasPagasRes, metaRes] = await Promise.all([
+        supabase.from('sessoes_horas').select('duracao_minutos, projeto_id').gte('inicio', firstDayOfMonth),
+        supabase.from('financeiro_parcelas').select('valor, data_vencimento').eq('status', 'pendente').gte('data_vencimento', now.toISOString()).lte('data_vencimento', next3Months),
+        supabase.from('financeiro_parcelas').select('valor_recebido').eq('status', 'pago').gte('data_recebimento', firstDayOfMonth),
+        supabase.from('configuracoes').select('value').eq('key', 'meta_mensal_receita').single()
+      ]);
+
+      const horasEmUso = (sessoesRes.data?.reduce((acc, s) => acc + (Number(s.duracao_minutos) || 0), 0) || 0) / 60;
+      const horasFaturáveis = horasEmUso; // Simplificação por enquanto
+      const fluxo3meses = parcelasPendentesRes.data?.reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
+      const recebidoMes = parcelasPagasRes.data?.reduce((acc, p) => acc + (Number(p.valor_recebido) || 0), 0) || 0;
+      const metaMensal = Number(metaRes.data?.value) || 0;
+
+      // Fluxo detalhado por mês
+      const meses = ['Este mês', 'Próximo mês', 'Mês seguinte'];
+      const fluxoDetalhado = meses.map((label, i) => {
+        const start = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + i + 1, 0);
+        const valor = parcelasPendentesRes.data?.filter(p => {
+          const d = new Date(p.data_vencimento);
+          return d >= start && d <= end;
+        }).reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
+        return { mes: label, valor };
+      });
+
+      setIntelData({
+        horasEmUso,
+        horasFaturáveis,
+        fluxo3meses,
+        recebidoMes,
+        metaMensal,
+        fluxoDetalhado
+      });
+    } catch (error) {
+      console.error('Error fetching intelligence data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchIntelligenceData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -700,6 +799,377 @@ Máximo 3 linhas. Sem markdown. Em português.
         </div>
 
         <div className="flex-1 overflow-y-auto p-10 space-y-8 scrollbar-hide">
+          {/* INTELIGÊNCIA FINANCEIRA Section */}
+          <div className="space-y-4">
+            <h3 className="text-[10px] font-bold text-white/30 uppercase tracking-[0.3em] flex items-center gap-2">
+              <Brain size={12} className="text-bronze" /> INTELIGÊNCIA FINANCEIRA
+            </h3>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Card 1: PONTO DE EQUILÍBRIO */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px]">
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">PONTO DE EQUILÍBRIO</p>
+                    <p className="font-cormorant text-2xl text-white">{intelMetrics.horasEquilibrio}h / mês</p>
+                    <p className="text-[9px] text-white/30 mt-1">para cobrir custos</p>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4">PONTO DE EQUILÍBRIO</SheetTitle>
+                    <SheetDescription>Análise de sustentabilidade financeira do escritório.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8">
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="bg-white/[0.03] p-6 border border-white/5 rounded">
+                        <p className="text-[64px] font-cormorant text-white leading-none">{intelMetrics.horasEquilibrio}h</p>
+                        <p className="text-[10px] uppercase tracking-widest text-white/40 mt-2">horas mínimas faturadas para cobrir custos</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/[0.03] p-4 border border-white/5 rounded">
+                          <p className="text-2xl font-cormorant text-white">{intelMetrics.projetosEquilibrio}</p>
+                          <p className="text-[9px] uppercase tracking-widest text-white/40">projetos simultâneos*</p>
+                        </div>
+                        <div className="bg-white/[0.03] p-4 border border-white/5 rounded">
+                          <p className="text-2xl font-cormorant text-white">R$ {calculations.monthlyCosts.toLocaleString('pt-BR')}</p>
+                          <p className="text-[9px] uppercase tracking-widest text-white/40">custo total mensal</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] uppercase tracking-widest text-bronze font-bold">BREAKDOWN POR CATEGORIA</h4>
+                      <div className="space-y-2">
+                        {CATEGORIES.map(cat => {
+                          const total = costs.filter(c => c.categoria === cat.id || (cat.id === 'variavel' && c.categoria === 'softwares'))
+                            .reduce((acc, c) => acc + (c.frequencia === 'anual' ? c.valor / 12 : c.valor), 0);
+                          const pct = calculations.monthlyCosts > 0 ? (total / calculations.monthlyCosts) * 100 : 0;
+                          if (total === 0) return null;
+                          return (
+                            <div key={cat.id} className="flex items-center justify-between text-[11px] font-dm-mono border-b border-white/5 pb-2">
+                              <span className="text-white/40">{cat.label}</span>
+                              <div className="flex gap-4">
+                                <span className="text-white">R$ {total.toLocaleString('pt-BR')}</span>
+                                <span className="text-bronze w-10 text-right">{pct.toFixed(0)}%</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="bg-white/[0.02] p-4 border border-white/5 rounded text-[11px] text-white/60 leading-relaxed italic">
+                      "Você precisa de <span className="text-white font-bold">{intelMetrics.horasEquilibrio} horas</span> faturadas por mês para cobrir todos os seus custos. Com projetos médios de 80h, isso equivale a <span className="text-white font-bold">{intelMetrics.projetosEquilibrio} projetos</span> simultâneos."
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-white/5">
+                      <div className="flex justify-between items-center">
+                        <h4 className="text-[10px] uppercase tracking-widest text-white/60">SIMULADOR DE TICKET/HORA</h4>
+                        <span className="text-xs font-dm-mono text-bronze">R$ {sliderPrice}/h</span>
+                      </div>
+                      <Slider 
+                        value={[sliderPrice]} 
+                        min={50}
+                        max={500}
+                        step={5}
+                        onValueChange={([val]) => setSliderPrice(val)}
+                        className="[&_[role=slider]]:bg-bronze [&_[role=slider]]:border-bronze"
+                      />
+                      <p className="text-[10px] text-white/40 font-dm-mono">
+                        Se você cobrar <span className="text-white">R$ {sliderPrice}/h</span>, precisará faturar <span className="text-bronze font-bold">{intelMetrics.horasParaSlider}h</span> para atingir o equilíbrio.
+                      </p>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Card 2: CAPACIDADE ESCRITÓRIO */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px]">
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">CAPACIDADE ESCRITÓRIO</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-cormorant text-2xl text-white">{intelMetrics.capacidade}%</p>
+                      <div className={cn(
+                        "w-2 h-2 rounded-full",
+                        intelMetrics.capacidade < 70 ? "bg-green-500" :
+                        intelMetrics.capacidade < 90 ? "bg-amber-500" : "bg-red-500"
+                      )} />
+                    </div>
+                    <p className="text-[9px] text-white/30 mt-1">ocupado</p>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4">CAPACIDADE DO ESCRITÓRIO</SheetTitle>
+                    <SheetDescription>Análise de carga horária e disponibilidade da equipe.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8">
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-[10px] uppercase tracking-widest text-white/40">
+                        <span>Horas em uso</span>
+                        <span>{intelMetrics.horasDisponiveis.toFixed(0)}h totais</span>
+                      </div>
+                      <div className="h-4 bg-white/5 rounded-full overflow-hidden flex">
+                        <div 
+                          className={cn(
+                            "h-full transition-all duration-500",
+                            intelMetrics.capacidade < 70 ? "bg-green-500/50" :
+                            intelMetrics.capacidade < 90 ? "bg-amber-500/50" : "bg-red-500/50"
+                          )} 
+                          style={{ width: `${Math.min(intelMetrics.capacidade, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[9px] font-dm-mono">
+                        <span className="text-white/60">{intelData.horasEmUso.toFixed(1)}h utilizadas</span>
+                        <span className="text-bronze">{(intelMetrics.horasDisponiveis - intelData.horasEmUso).toFixed(1)}h livres</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-xl font-cormorant text-white">{intelMetrics.horasDisponiveis.toFixed(0)}h</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Disponíveis</p>
+                      </div>
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-xl font-cormorant text-white">{intelData.horasEmUso.toFixed(1)}h</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Em uso</p>
+                      </div>
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-xl font-cormorant text-white">{Math.floor((intelMetrics.horasDisponiveis - intelData.horasEmUso) / 40)}</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Slots Livres*</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/[0.02] p-4 border border-white/5 rounded text-[11px] text-white/60 leading-relaxed italic">
+                      {intelMetrics.capacidade < 70 ? "Você tem capacidade para aceitar novos projetos sem comprometer os prazos atuais." :
+                       intelMetrics.capacidade < 90 ? "Capacidade moderada — avalie cuidadosamente a complexidade antes de fechar novos contratos." :
+                       "Capacidade crítica — alto risco de sobrecarga da equipe e atrasos em entregas."}
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
+                      onClick={() => window.location.href = '/horas'}
+                    >
+                      IR PARA CONTROLE DE HORAS <ArrowUpRight size={14} />
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Card 3: EFICIÊNCIA OPERACIONAL */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px]">
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">EFICIÊNCIA OPERACIONAL</p>
+                    <p className="font-cormorant text-2xl text-white">{intelMetrics.eficiencia}%</p>
+                    <p className="text-[9px] text-white/30 mt-1">faturável</p>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4">EFICIÊNCIA OPERACIONAL</SheetTitle>
+                    <SheetDescription>Relação entre horas totais trabalhadas e horas faturadas.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8 text-center">
+                    <div>
+                      <p className="text-[80px] font-cormorant text-white leading-none">{intelMetrics.eficiencia}%</p>
+                      <p className="text-[10px] uppercase tracking-widest text-bronze font-bold mt-2">de aproveitamento faturável</p>
+                    </div>
+
+                    <div className="bg-white/[0.03] p-6 border border-white/5 rounded space-y-4">
+                      <div className="flex justify-between items-center text-[10px] uppercase tracking-widest text-white/40">
+                        <span>Benchmark Mercado Premium</span>
+                        <span>65–75%</span>
+                      </div>
+                      <div className="relative h-2 bg-white/5 rounded-full">
+                        <div className="absolute left-[65%] right-[25%] h-full bg-bronze/20 rounded-full border-x border-bronze/40" />
+                        <div 
+                          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg border-2 border-bronze transition-all duration-1000"
+                          style={{ left: `calc(${Math.min(intelMetrics.eficiencia, 100)}% - 8px)` }}
+                        />
+                      </div>
+                      <p className="text-[10px] text-white/40 italic">Escritórios premium operam entre 65–75% de eficiência operacional.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2 text-left">
+                      <div className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded">
+                        <span className="text-[10px] uppercase tracking-widest text-white/40">Horas Faturáveis</span>
+                        <span className="text-xs font-dm-mono text-white">{intelData.horasFaturáveis.toFixed(1)}h</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded opacity-50">
+                        <span className="text-[10px] uppercase tracking-widest text-white/40">Horas Administrativas*</span>
+                        <span className="text-xs font-dm-mono text-white">{(intelData.horasEmUso - intelData.horasFaturáveis).toFixed(1)}h</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white/[0.02] border border-white/5 rounded opacity-30">
+                        <span className="text-[10px] uppercase tracking-widest text-white/40">Horas não registradas*</span>
+                        <span className="text-xs font-dm-mono text-white">{(intelMetrics.horasDisponiveis - intelData.horasEmUso).toFixed(1)}h</span>
+                      </div>
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
+                      onClick={() => window.location.href = '/horas'}
+                    >
+                      OTIMIZAR EFICIÊNCIA <ArrowUpRight size={14} />
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Card 4: FLUXO DE CAIXA */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px]">
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">FLUXO DE CAIXA</p>
+                    <p className="font-cormorant text-2xl text-white">R$ {formatK(intelData.fluxo3meses)}</p>
+                    <p className="text-[9px] text-white/30 mt-1">próx. 3 meses</p>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4">FLUXO DE CAIXA — PRÓXIMOS 3 MESES</SheetTitle>
+                    <SheetDescription>Previsibilidade de receita baseada em parcelas pendentes.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-6">
+                    {intelData.fluxoDetalhado.map((f, i) => (
+                      <div key={i} className="bg-white/[0.03] p-6 border border-white/5 rounded relative overflow-hidden">
+                        <div className="flex justify-between items-start">
+                          <div className="space-y-1">
+                            <p className="text-[10px] uppercase tracking-widest text-white/40">{f.mes}</p>
+                            <p className="text-3xl font-cormorant text-white">R$ {f.valor.toLocaleString('pt-BR')}</p>
+                          </div>
+                          {i === 0 && <span className="px-2 py-0.5 bg-bronze/10 text-bronze text-[8px] font-bold uppercase tracking-widest rounded">Atual</span>}
+                        </div>
+                        <div className="mt-4 h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-bronze/50" style={{ width: `${(f.valor / Math.max(...intelData.fluxoDetalhado.map(x => x.valor), 1)) * 100}%` }} />
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="bg-white/[0.02] p-4 border border-white/5 rounded text-[11px] text-white/60 leading-relaxed italic">
+                      "Os valores acima são calculados com base em todas as parcelas cadastradas como 'pendentes' nos projetos ativos do escritório."
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
+                      onClick={() => window.location.href = '/financeiro'}
+                    >
+                      VER DETALHES NO FINANCEIRO <ArrowUpRight size={14} />
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+
+              {/* Card 5: META DO MÊS */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <div className="bg-white/[0.02] border border-white/5 p-5 cursor-pointer hover:border-bronze/30 transition-all group rounded-[2px]">
+                    <p className="text-[8px] uppercase tracking-[0.3em] text-white/30 mb-2">META DO MÊS</p>
+                    <p className="font-cormorant text-2xl text-white">{intelMetrics.pctMeta}%</p>
+                    <p className="text-[9px] text-white/30 mt-1">confirmado</p>
+                    <div className="mt-4 flex justify-end">
+                      <ArrowRight size={14} className="text-bronze group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[480px] bg-[#141414] border-l border-white/5 p-8 text-white overflow-y-auto">
+                  <SheetHeader className="mb-8">
+                    <SheetTitle className="text-xl font-cormorant text-white border-b border-white/5 pb-4">META DO MÊS</SheetTitle>
+                    <SheetDescription>Acompanhamento do faturamento real versus meta estabelecida.</SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-8">
+                    <div className="text-center">
+                      <p className="text-[80px] font-cormorant text-white leading-none">{intelMetrics.pctMeta}%</p>
+                      <p className="text-[10px] uppercase tracking-widest text-bronze font-bold mt-2">atingido da meta mensal</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="h-6 bg-white/5 rounded-full overflow-hidden flex relative">
+                        {/* Confirmado */}
+                        <div 
+                          className="h-full bg-bronze transition-all duration-1000 relative group"
+                          style={{ width: `${Math.min(intelMetrics.pctMeta, 100)}%` }}
+                        >
+                          <div className="absolute inset-0 bg-white/10 animate-pulse" />
+                        </div>
+                        {/* Previsto (pendente este mês) */}
+                        <div 
+                          className="h-full bg-white/10 border-l border-white/20"
+                          style={{ width: `${Math.min((intelData.fluxoDetalhado[0]?.valor / intelData.metaMensal) * 100, 100 - intelMetrics.pctMeta)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-[9px] uppercase tracking-widest">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-bronze rounded-full" />
+                          <span className="text-white/60">Confirmado</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white/20 rounded-full" />
+                          <span className="text-white/60">Previsto</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-white/5 rounded-full" />
+                          <span className="text-white/60">Restante</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-lg font-cormorant text-white">R$ {intelData.recebidoMes.toLocaleString('pt-BR')}</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Recebido</p>
+                      </div>
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-lg font-cormorant text-white">R$ {(intelData.fluxoDetalhado[0]?.valor || 0).toLocaleString('pt-BR')}</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Pendente</p>
+                      </div>
+                      <div className="bg-white/[0.03] p-4 border border-white/5 rounded text-center">
+                        <p className="text-lg font-cormorant text-white">R$ {intelData.metaMensal.toLocaleString('pt-BR')}</p>
+                        <p className="text-[8px] uppercase tracking-widest text-white/40">Meta</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/[0.02] p-4 border border-white/5 rounded text-[11px] text-white/60 leading-relaxed italic">
+                      {intelMetrics.pctMeta >= 100 ? "Parabéns! Você atingiu a meta de faturamento para este mês." :
+                       intelMetrics.pctMeta >= 75 ? "Meta próxima! Continue o acompanhamento das parcelas pendentes para fechar o mês no alvo." :
+                       "Atenção ao faturamento — avalie novas entradas ou antecipação de parcelas para atingir a meta."}
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
+                      onClick={() => window.location.href = '/financeiro'}
+                    >
+                      IR PARA FINANCEIRO <ArrowUpRight size={14} />
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+
           {/* Top Result Cards */}
           <div className="grid grid-cols-2 gap-6">
             {/* Card 1: Custo/Hora Real */}
