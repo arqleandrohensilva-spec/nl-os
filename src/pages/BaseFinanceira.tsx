@@ -88,6 +88,10 @@ const BaseFinanceira = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [lastAiAnalysis, setLastAiAnalysis] = useState<Date | null>(null);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
+  const [isDiagnosticCollapsed, setIsDiagnosticCollapsed] = useState(() => {
+    const saved = localStorage.getItem('diagnostico_financeiro_collapsed');
+    return saved ? JSON.parse(saved) : true;
+  });
   const [aiHistory, setAiHistory] = useState<any[]>([]);
   const lastCustoHoraRef = useRef<number>(0);
 
