@@ -88,6 +88,10 @@ const BaseFinanceira = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [lastAiAnalysis, setLastAiAnalysis] = useState<Date | null>(null);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
+  const [isDiagnosticCollapsed, setIsDiagnosticCollapsed] = useState(() => {
+    const saved = localStorage.getItem('diagnostico_financeiro_collapsed');
+    return saved ? JSON.parse(saved) : true;
+  });
   const [aiHistory, setAiHistory] = useState<any[]>([]);
   const lastCustoHoraRef = useRef<number>(0);
 
@@ -553,7 +557,14 @@ Máximo 3 linhas. Sem markdown. Em português.
             />
 
             {/* AI Diagnostic Card */}
-          <div className="p-6 border border-white/5 rounded-[4px] space-y-6 transition-all duration-300">
+          <div 
+            className="p-6 border border-white/5 rounded-[4px] space-y-6 transition-all duration-300 cursor-pointer"
+            onClick={() => {
+              const newState = !isDiagnosticCollapsed;
+              setIsDiagnosticCollapsed(newState);
+              localStorage.setItem('diagnostico_financeiro_collapsed', JSON.stringify(newState));
+            }}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 text-white">
@@ -571,14 +582,15 @@ Máximo 3 linhas. Sem markdown. Em português.
                 )}>
                   {aiStatus === 'critico' ? 'Crítico' : aiStatus === 'atencao' ? 'Atenção' : 'Saudável'}
                 </span>
-              </div>
 
-              <div className="flex items-center gap-4">
                 {lastAiAnalysis && (
                   <p className="text-[9px] text-white/40 font-dm-mono italic">
                     Última análise: {lastAiAnalysis.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 )}
+              </div>
+
+              <div className="flex items-center gap-2">
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -591,90 +603,100 @@ Máximo 3 linhas. Sem markdown. Em português.
                 >
                   <RotateCcw size={10} className={cn(isAiLoading && "animate-spin")} /> {isAiLoading ? "Analisando..." : "Atualizar"}
                 </Button>
+                <div className="text-white/40 hover:text-white transition-colors">
+                  {isDiagnosticCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                </div>
               </div>
             </div>
 
-            {isAiLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="flex flex-col items-center gap-3">
-                  <Loader2 size={24} className="animate-spin text-bronze/50" />
-                  <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Processando dados financeiros...</span>
-                </div>
-              </div>
-            ) : aiDiagnostic ? (
-              <div className="grid grid-cols-1 gap-3">
-                {(() => {
-                  const paragraphs = aiDiagnostic.split('\n\n').filter(p => p.trim() !== '');
-                  return (
-                    <>
-                      {/* SITUAÇÃO ATUAL */}
-                      <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
-                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">SITUAÇÃO ATUAL</label>
-                        <p className="text-[11px] text-white/70 leading-relaxed">
-                          {paragraphs[0]}
-                        </p>
-                      </div>
-
-                      {/* OPORTUNIDADE */}
-                      <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
-                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">OPORTUNIDADE</label>
-                        <p className="text-[11px] text-white/70 leading-relaxed">
-                          {paragraphs[1]}
-                        </p>
-                      </div>
-
-                      {/* AÇÃO DESTA SEMANA */}
-                      <div className="bg-white/[0.02] border border-white/5 border-l-2 border-l-bronze rounded p-4 space-y-2">
-                        <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-bronze block">→ AÇÃO DESTA SEMANA</label>
-                        <p className="text-[11px] text-white/70 leading-relaxed">
-                          {paragraphs[2]}
-                        </p>
-                      </div>
-                    </>
-                  );
-                })()}
-
-                {/* Histórico colapsado */}
-                <div className="pt-2">
-                  <button 
-                    onClick={() => setIsHistoryExpanded(!isHistoryExpanded)}
-                    className="flex items-center gap-2 text-[9px] text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors"
-                  >
-                    VER HISTÓRICO DE ANÁLISES ({aiHistory.length}) {isHistoryExpanded ? <ChevronUp size={10} /> : <ChevronRight size={10} />}
-                  </button>
-
-                  {isHistoryExpanded && (
-                    <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                      {aiHistory.map((item) => (
-                        <div key={item.id} className="bg-white/[0.03] p-3 border border-white/10 rounded-[2px] space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <span className="text-[9px] font-dm-mono text-white/40">
-                                {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                              <span className={cn(
-                                "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
-                                item.status === 'critico' ? "bg-red-500/20 border-red-500/30 text-red-400" :
-                                item.status === 'atencao' ? "bg-amber-500/20 border-amber-500/30 text-amber-400" :
-                                "bg-green-500/20 border-green-500/30 text-green-400"
-                              )}>
-                                {item.status}
-                              </span>
-                            </div>
-                            <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
-                          </div>
-                          <p className="text-[10px] font-dm-mono text-white/70 truncate">
-                            {item.conteudo}
-                          </p>
-                        </div>
-                      ))}
+            {!isDiagnosticCollapsed && (
+              <div className="animate-in fade-in slide-in-from-top-4 duration-300 space-y-6">
+                {isAiLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 size={24} className="animate-spin text-bronze/50" />
+                      <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Processando dados financeiros...</span>
                     </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="py-8 text-center border border-dashed border-white/5 rounded">
-                <p className="text-[10px] text-white/30 uppercase tracking-widest">Clique em atualizar para gerar o diagnóstico financeiro</p>
+                  </div>
+                ) : aiDiagnostic ? (
+                  <div className="grid grid-cols-1 gap-3">
+                    {(() => {
+                      const paragraphs = aiDiagnostic.split('\n\n').filter(p => p.trim() !== '');
+                      return (
+                        <>
+                          {/* SITUAÇÃO ATUAL */}
+                          <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
+                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">SITUAÇÃO ATUAL</label>
+                            <p className="text-[11px] text-white/70 leading-relaxed">
+                              {paragraphs[0]}
+                            </p>
+                          </div>
+
+                          {/* OPORTUNIDADE */}
+                          <div className="bg-white/[0.02] border border-white/5 rounded p-4 space-y-2">
+                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-white/40 block">OPORTUNIDADE</label>
+                            <p className="text-[11px] text-white/70 leading-relaxed">
+                              {paragraphs[1]}
+                            </p>
+                          </div>
+
+                          {/* AÇÃO DESTA SEMANA */}
+                          <div className="bg-white/[0.02] border border-white/5 border-l-2 border-l-bronze rounded p-4 space-y-2">
+                            <label className="text-[8px] font-bold tracking-[0.3em] uppercase text-bronze block">→ AÇÃO DESTA SEMANA</label>
+                            <p className="text-[11px] text-white/70 leading-relaxed">
+                              {paragraphs[2]}
+                            </p>
+                          </div>
+                        </>
+                      );
+                    })()}
+
+                    {/* Histórico colapsado */}
+                    <div className="pt-2">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsHistoryExpanded(!isHistoryExpanded);
+                        }}
+                        className="flex items-center gap-2 text-[9px] text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors"
+                      >
+                        VER HISTÓRICO DE ANÁLISES ({aiHistory.length}) {isHistoryExpanded ? <ChevronUp size={10} /> : <ChevronRight size={10} />}
+                      </button>
+
+                      {isHistoryExpanded && (
+                        <div className="mt-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                          {aiHistory.map((item) => (
+                            <div key={item.id} className="bg-white/[0.03] p-3 border border-white/10 rounded-[2px] space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-[9px] font-dm-mono text-white/40">
+                                    {new Date(item.criado_em).toLocaleDateString('pt-BR')} {new Date(item.criado_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
+                                  <span className={cn(
+                                    "px-1.5 py-0.5 rounded-[1px] text-[7px] font-bold uppercase tracking-widest border",
+                                    item.status === 'critico' ? "bg-red-500/20 border-red-500/30 text-red-400" :
+                                    item.status === 'atencao' ? "bg-amber-500/20 border-amber-500/30 text-amber-400" :
+                                    "bg-green-500/20 border-green-500/30 text-green-400"
+                                  )}>
+                                    {item.status}
+                                  </span>
+                                </div>
+                                <span className="text-[9px] font-dm-mono text-bronze font-bold">R$ {Number(item.custo_hora_momento).toFixed(2)}/h</span>
+                              </div>
+                              <p className="text-[10px] font-dm-mono text-white/70 truncate">
+                                {item.conteudo}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-8 text-center border border-dashed border-white/5 rounded">
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest">Clique em atualizar para gerar o diagnóstico financeiro</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
