@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   FileText, 
   Lock, 
   Download, 
   Clock, 
-  Loader2
+  Loader2,
+  Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { cn } from '@/lib/utils';
 
 const ETAPAS_JORNADA = [
   'BRIEFING', 'CONCEITO', 'ESTUDO', 'EXECUTIVO', 'DETALHAMENTO', 'OBRA'
@@ -33,6 +35,7 @@ export default function PaginaCliente() {
   const [projeto, setProjeto] = useState<any>(null);
   const [etapas, setEtapas] = useState<any[]>([]);
   const [arquivos, setArquivos] = useState<any[]>([]);
+  const [parcelas, setParcelas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   
@@ -66,15 +69,16 @@ export default function PaginaCliente() {
 
       setProjeto(proj);
 
-      const { data: etps } = await supabase
-        .rpc('get_project_stages_by_token', { p_val: param });
+      // Parallel fetching for performance
+      const [etapasRes, arquivosRes, parcelasRes] = await Promise.all([
+        supabase.rpc('get_project_stages_by_token', { p_val: param }),
+        supabase.rpc('get_project_files_by_token', { p_val: param }),
+        supabase.from('financeiro_parcelas').select('*').eq('projeto_id', proj.id)
+      ]);
       
-      setEtapas(etps || []);
-
-      const { data: arqs } = await supabase
-        .rpc('get_project_files_by_token', { p_val: param });
-
-      setArquivos(arqs || []);
+      setEtapas(etapasRes.data || []);
+      setArquivos(arquivosRes.data || []);
+      setParcelas(parcelasRes.data || []);
     } catch (err) {
       console.error(err);
       setError(true);
@@ -107,9 +111,6 @@ export default function PaginaCliente() {
     }
 
     try {
-      const ipResponse = await fetch('https://api.ipify.org?format=json');
-      const { ip } = await ipResponse.json();
-
       const { error: updateError } = await (supabase
         .from('projeto_etapas') as any)
         .update({
@@ -218,7 +219,37 @@ export default function PaginaCliente() {
     );
   }
 
-  const etapasPendentes = etapas.filter(e => e.status === 'Aguardando aprovação');
+  // --- Logic for new blocks ---
+  
+  // REAL-TIME STATUS logic
+  const etapaAtualNome = projeto.etapa_atual || 'A definir';
+  
+  // Find next delivery
+  const proximaEtapaComData = etapas
+    .filter(e => e.status !== 'Aprovado' && e.data_entrega)
+    .sort((a, b) => new Date(a.data_entrega).getTime() - new Date(b.data_entrega).getTime())[0];
+  
+  let proximaEntregaTexto = 'A definir';
+  let isDeadlinePulsing = false;
+  if (proximaEtapaComData) {
+    const diasRestantes = differenceInDays(new Date(proximaEtapaComData.data_entrega), new Date());
+    if (diasRestantes < 0) {
+      proximaEntregaTexto = `Atrasado ${Math.abs(diasRestantes)}d`;
+    } else {
+      proximaEntregaTexto = `Em ${diasRestantes} dias`;
+    }
+    if (diasRestantes <= 7) isDeadlinePulsing = true;
+  }
+
+  // FINANCIAL SUMMARY logic
+  const valorTotal = parcelas.reduce((acc, p) => acc + (p.valor || 0), 0);
+  const jaPago = parcelas
+    .filter(p => ['pago', 'PAGO', 'Pago', 'recebido', 'RECEBIDO'].includes(p.status))
+    .reduce((acc, p) => acc + (p.valor || 0), 0);
+  const saldoRestante = valorTotal - jaPago;
+  const porcentagemQuitada = valorTotal > 0 ? Math.round((jaPago / valorTotal) * 100) : 0;
+
+  // ARQUIVOS grouping
   const arquivosPorEtapa = arquivos.reduce((acc: any, curr) => {
     const etapa = curr.etapa || 'Outros';
     if (!acc[etapa]) acc[etapa] = [];
@@ -226,90 +257,135 @@ export default function PaginaCliente() {
     return acc;
   }, {});
 
+  const etapasAguardando = etapas.filter(e => e.status === 'Aguardando aprovação');
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-bronze/30">
-      <header className="fixed top-0 left-0 right-0 h-20 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-bronze/20 z-50 px-8 md:px-20 flex items-center justify-between">
-        <h1 className="font-cormorant text-2xl italic">NL ARQUITETOS</h1>
-        <span className="text-[10px] text-bronze uppercase tracking-[0.3em] font-medium hidden sm:block">
-          A ARQUITETURA COMO DECISÃO
-        </span>
+      {/* HEADER FIXO */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-[#0A0A0A]/90 backdrop-blur-md border-b border-white/5 z-50">
+        <div className="max-w-[860px] mx-auto h-full px-6 flex items-center justify-between">
+          <h1 className="text-xs font-bold tracking-[0.3em] uppercase text-white/90">NL ARQUITETOS</h1>
+          <span className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-medium hidden sm:block">
+            A ARQUITETURA COMO DECISÃO
+          </span>
+        </div>
       </header>
 
-      <main className="pt-32 pb-20 px-8 md:px-20 max-w-7xl mx-auto space-y-20">
+      <main className="pt-32 pb-24 px-6 md:px-0 max-w-[860px] mx-auto space-y-24">
         
-        <section className="space-y-6">
-          <h2 className="font-cormorant text-4xl italic">Olá, {projeto.nome_cliente}.</h2>
+        {/* SEÇÃO 1 — SAUDAÇÃO */}
+        <section className="space-y-4">
+          <h2 className="font-cormorant text-[48px] italic leading-tight">Olá, {projeto.nome_cliente}.</h2>
           <div className="space-y-1">
-            <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">SEU PROJETO</p>
-            <p className="text-white/50 text-sm uppercase tracking-wider">
-              {projeto.tipo || 'Projeto'} · {projeto.cidade || 'São José dos Campos'} · {projeto.area_m2 || '--'}m²
+            <p className="text-bronze text-[10px] uppercase tracking-[0.25em] font-bold">
+              PROJETO · {projeto.tipo || 'RESIDENCIAL'} · {projeto.cidade || 'SÃO JOSÉ DOS CAMPOS'} · {projeto.area_m2 || '--'}m²
             </p>
-            <p className="text-white/30 text-xs">
-              Início: {projeto.data_inicio ? format(new Date(projeto.data_inicio), 'dd/MM/yyyy') : '--/--/----'}
+            <p className="text-white/30 text-[11px] font-dm-mono">
+              Iniciado em {projeto.data_inicio ? format(new Date(projeto.data_inicio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '--/--/----'}
             </p>
           </div>
         </section>
 
-        <section className="space-y-8">
-          <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">JORNADA DO PROJETO</p>
-          <div className="relative overflow-x-auto pb-4 scrollbar-hide">
-            <div className="flex min-w-[600px] justify-between items-start pr-10">
+        {/* SEÇÃO 2 — STATUS EM TEMPO REAL */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/5 border border-white/5 overflow-hidden">
+          {/* ETAPA ATUAL */}
+          <div className="bg-[#141414] p-8 space-y-4">
+            <span className="text-[8px] text-white/30 uppercase tracking-[0.3em] font-bold block">ETAPA ATUAL</span>
+            <p className="font-cormorant text-2xl leading-none">{etapaAtualNome}</p>
+          </div>
+          {/* PRÓXIMA ENTREGA */}
+          <div className="bg-[#141414] p-8 space-y-4">
+            <span className="text-[8px] text-white/30 uppercase tracking-[0.3em] font-bold block">PRÓXIMA ENTREGA</span>
+            <p className={cn(
+              "font-cormorant text-2xl leading-none",
+              isDeadlinePulsing && "text-bronze animate-pulse"
+            )}>
+              {proximaEntregaTexto}
+            </p>
+          </div>
+          {/* STATUS */}
+          <div className="bg-[#141414] p-8 space-y-4">
+            <span className="text-[8px] text-white/30 uppercase tracking-[0.3em] font-bold block">STATUS</span>
+            <p className="font-cormorant text-2xl leading-none">Em andamento</p>
+          </div>
+        </section>
+
+        {/* SEÇÃO 3 — JORNADA DO PROJETO */}
+        <section className="space-y-10">
+          <div className="flex items-center justify-between mb-2">
+             <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">JORNADA DO PROJETO</span>
+          </div>
+          
+          <div className="relative pt-4">
+            <div className="flex justify-between items-start">
               {ETAPAS_JORNADA.map((step, idx) => {
                 const etapaData = etapas.find(e => e.etapa?.toUpperCase() === step);
-                const isCurrent = projeto.etapa_atual?.toUpperCase() === step;
+                const isCurrent = (projeto.etapa_atual || '').toUpperCase() === step;
                 const isApproved = etapaData?.status === 'Aprovado';
                 
                 return (
-                  <div key={step} className="flex flex-col items-center text-center space-y-4 flex-1 relative">
-                    {idx < ETAPAS_JORNADA.length - 1 && (
-                      <div className="absolute top-1.5 left-1/2 w-full h-[1px] bg-white/10" />
-                    )}
-                    
-                    <div className="z-10 bg-[#0A0A0A]">
-                      {isApproved ? (
-                        <div className="w-3 h-3 rounded-full bg-bronze" />
-                      ) : isCurrent ? (
-                        <div className="w-3 h-3 rounded-full bg-bronze animate-pulse ring-4 ring-bronze/20" />
-                      ) : (
-                        <div className="w-3 h-3 rounded-full border border-white/20" />
-                      )}
-                    </div>
+                  <div key={step} className="flex flex-col items-center text-center space-y-4 flex-1 relative z-10">
+                    {/* Point */}
+                    <div className={cn(
+                      "w-3 h-3 rounded-full transition-all duration-500",
+                      isApproved ? "bg-bronze" : 
+                      isCurrent ? "bg-bronze animate-pulse ring-4 ring-bronze/20" : 
+                      "bg-[#1A1A1A] border border-white/10"
+                    )} />
 
+                    {/* Label */}
                     <div className="space-y-1 px-2">
-                      <p className={`text-[10px] tracking-widest font-bold ${isCurrent || isApproved ? 'text-white' : 'text-white/20'}`}>
+                      <p className={cn(
+                        "text-[9px] tracking-widest font-bold uppercase",
+                        (isCurrent || isApproved) ? "text-white" : "text-white/20"
+                      )}>
                         {step}
                       </p>
-                      <p className="text-[10px] text-white/30">
+                      <p className="text-[8px] text-white/30 font-dm-mono">
                         {etapaData?.data_entrega ? format(new Date(etapaData.data_entrega), 'dd/MM/yy') : 'A definir'}
                       </p>
+                      {isApproved && (
+                        <span className="text-[7px] text-green-500/80 font-bold tracking-tighter block">APROVADO</span>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Progress Bar Background */}
+            <div className="absolute top-[1.35rem] left-[8.33%] right-[8.33%] h-[1px] bg-white/5 z-0" />
+            
+            {/* Active Progress Bar */}
+            <div 
+              className="absolute top-[1.35rem] left-[8.33%] h-[1px] bg-bronze transition-all duration-1000 z-0"
+              style={{ 
+                width: `${Math.max(0, (ETAPAS_JORNADA.indexOf((projeto.etapa_atual || '').toUpperCase())) * 16.66)}%` 
+              }}
+            />
           </div>
         </section>
 
-        {etapasPendentes.length > 0 && (
-          <section className="space-y-6">
-            <div className="border border-bronze/30 bg-bronze/5 p-8 md:p-12 space-y-8">
-              <div className="flex items-center gap-3 text-bronze">
-                <Clock className="w-5 h-5" />
-                <span className="text-[10px] uppercase tracking-[0.2em] font-bold">AGUARDANDO SUA APROVAÇÃO</span>
-              </div>
+        {/* SEÇÃO 4 — AGUARDANDO APROVAÇÃO */}
+        {etapasAguardando.length > 0 && (
+          <section className="space-y-8">
+            {etapasAguardando.map((etapa) => (
+              <div key={etapa.id} className="border border-bronze/40 bg-bronze/[0.02] p-10 space-y-10">
+                <div className="flex items-center gap-3 text-bronze">
+                  <Clock className="w-4 h-4 animate-spin-slow" />
+                  <span className="text-[9px] uppercase tracking-[0.3em] font-bold">AGUARDANDO SUA APROVAÇÃO</span>
+                </div>
 
-              {etapasPendentes.map((etapa) => (
-                <div key={etapa.id} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                  <div className="space-y-2">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                  <div className="space-y-3">
                     <h3 className="font-cormorant text-3xl italic">{etapa.etapa}</h3>
-                    <p className="text-white/60 text-xs">
+                    <p className="text-white/40 text-[11px] font-dm-mono">
                       Enviado em {format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR })}
                     </p>
                   </div>
                   <div className="flex gap-4">
                     <Button 
-                      variant="outline" 
-                      className="border-bronze text-bronze hover:bg-bronze hover:text-white rounded-none uppercase text-[10px] tracking-widest h-12 px-8"
+                      className="bg-bronze hover:bg-bronze/90 text-white rounded-none uppercase text-[10px] tracking-widest h-12 px-10 transition-all"
                       onClick={() => {
                         setSelectedEtapa(etapa);
                         setShowAprovarModal(true);
@@ -319,7 +395,7 @@ export default function PaginaCliente() {
                     </Button>
                     <Button 
                       variant="ghost" 
-                      className="text-white/70 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest h-12"
+                      className="text-white/40 hover:text-white hover:bg-white/5 rounded-none uppercase text-[10px] tracking-widest h-12 transition-all"
                       onClick={() => {
                         setSelectedEtapa(etapa);
                         setShowAjusteModal(true);
@@ -329,41 +405,78 @@ export default function PaginaCliente() {
                     </Button>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* SEÇÃO 5 — RESUMO FINANCEIRO */}
+        {valorTotal > 0 && (
+          <section className="space-y-10">
+            <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">RESUMO FINANCEIRO DO PROJETO</span>
+            
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="space-y-2">
+                  <span className="text-[8px] text-white/30 uppercase tracking-widest block">VALOR TOTAL</span>
+                  <p className="font-cormorant text-2xl">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valorTotal)}</p>
+                </div>
+                <div className="space-y-2">
+                  <span className="text-[8px] text-white/30 uppercase tracking-widest block">JÁ PAGO</span>
+                  <p className="font-cormorant text-2xl text-bronze">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(jaPago)}</p>
+                </div>
+                <div className="space-y-2">
+                  <span className="text-[8px] text-white/30 uppercase tracking-widest block">SALDO RESTANTE</span>
+                  <p className="font-cormorant text-2xl text-white/60">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldoRestante)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="h-1 w-full bg-white/5 overflow-hidden">
+                  <div 
+                    className="h-full bg-bronze transition-all duration-1000"
+                    style={{ width: `${porcentagemQuitada}%` }}
+                  />
+                </div>
+                <p className="text-[10px] text-white/40 font-dm-mono tracking-widest uppercase">
+                  {porcentagemQuitada}% quitado
+                </p>
+              </div>
             </div>
           </section>
         )}
 
-        <section className="space-y-8">
-          <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">ARQUIVOS DISPONÍVEIS</p>
+        {/* SEÇÃO 6 — ARQUIVOS DISPONÍVEIS */}
+        <section className="space-y-10">
+          <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">ARQUIVOS DISPONÍVEIS</span>
           
           {Object.keys(arquivosPorEtapa).length === 0 ? (
-            <p className="text-white/30 italic text-sm">Nenhum arquivo disponível ainda.</p>
+            <p className="text-white/20 italic text-sm">Aguardando disponibilização dos primeiros arquivos...</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16">
               {Object.entries(arquivosPorEtapa).map(([etapa, arqs]: [string, any]) => (
-                <div key={etapa} className="space-y-6">
-                  <div className="flex items-center gap-3 text-white/60">
-                    <span className="text-lg">📁</span>
-                    <span className="uppercase text-[10px] tracking-[0.2em] font-bold">{etapa}</span>
-                  </div>
+                <div key={etapa} className="space-y-8">
+                  <h4 className="text-[10px] tracking-[0.3em] uppercase text-white/60 border-b border-white/5 pb-4 font-bold">{etapa}</h4>
                   
-                  <div className="space-y-6 pl-8 border-l border-white/5">
+                  <div className="space-y-6">
                     {arqs.map((arquivo: any) => (
                       <div key={arquivo.id} className="group">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-start gap-3">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
                             {arquivo.liberado ? (
-                              <FileText className="w-5 h-5 text-bronze mt-0.5" />
+                              <FileText className="w-4 h-4 text-bronze/60" />
                             ) : (
-                              <Lock className="w-5 h-5 text-white/20 mt-0.5" />
+                              <Lock className="w-4 h-4 text-white/10" />
                             )}
-                            <div className="space-y-1">
-                              <p className={`text-sm ${arquivo.liberado ? 'text-white' : 'text-white/30'}`}>
+                            <div className="space-y-0.5">
+                              <p className={cn(
+                                "text-[13px] tracking-tight transition-colors",
+                                arquivo.liberado ? 'text-white/80 group-hover:text-white' : 'text-white/20'
+                              )}>
                                 {arquivo.nome_arquivo}
                               </p>
                               {!arquivo.liberado && (
-                                <p className="text-white/20 italic text-[10px]">Disponível em breve</p>
+                                <p className="text-white/10 italic text-[9px] font-dm-mono">Disponível em breve</p>
                               )}
                             </div>
                           </div>
@@ -371,10 +484,9 @@ export default function PaginaCliente() {
                           {arquivo.liberado && (
                             <button 
                               onClick={() => handleDownload(arquivo.dropbox_path)}
-                              className="text-bronze hover:text-white transition-colors text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5"
+                              className="w-8 h-8 flex items-center justify-center border border-white/5 hover:border-bronze/40 hover:bg-bronze/5 transition-all text-white/40 hover:text-bronze"
                             >
                               <Download className="w-3.5 h-3.5" />
-                              <span className="hidden group-hover:inline">BAIXAR</span>
                             </button>
                           )}
                         </div>
@@ -387,47 +499,56 @@ export default function PaginaCliente() {
           )}
         </section>
 
-        <section className="space-y-8 max-w-2xl">
-          <p className="text-bronze text-[10px] uppercase tracking-widest font-bold">FALAR COM A NL</p>
-          <div className="space-y-6">
+        {/* SEÇÃO 7 — FALAR COM A NL */}
+        <section className="space-y-10 pt-12">
+          <span className="text-[10px] text-bronze uppercase tracking-[0.2em] font-bold">FALAR COM A NL</span>
+          <div className="grid grid-cols-1 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/60">Seu nome (opcional)</label>
               <Input 
                 value={nomeMensagem}
                 onChange={e => setNomeMensagem(e.target.value)}
-                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none h-12 text-white text-sm"
+                placeholder="Seu nome (opcional)"
+                className="bg-[#141414] border-white/10 focus:border-bronze/40 rounded-none h-14 text-white text-sm placeholder:text-white/10"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] uppercase tracking-widest text-white/60">Mensagem</label>
               <Textarea 
                 value={textoMensagem}
                 onChange={e => setTextoMensagem(e.target.value)}
-                placeholder="Dúvida, observação ou pedido de ajuste..."
-                className="bg-[#1A1A1A] border-white/10 focus:border-bronze/50 rounded-none min-h-[120px] text-white text-sm resize-none"
+                placeholder="Mensagem ou dúvida sobre o projeto..."
+                className="bg-[#141414] border-white/10 focus:border-bronze/40 rounded-none min-h-[160px] text-white text-sm resize-none placeholder:text-white/10 pt-4"
               />
             </div>
             <Button 
               disabled={enviandoMensagem || !textoMensagem}
               onClick={handleEnviarMensagem}
-              className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full h-14 uppercase text-[10px] tracking-[0.3em] font-bold"
+              className="bg-bronze hover:bg-bronze/80 text-white rounded-none w-full h-16 uppercase text-[10px] tracking-[0.4em] font-bold transition-all group"
             >
-              {enviandoMensagem ? <Loader2 className="animate-spin" /> : 'ENVIAR MENSAGEM'}
+              {enviandoMensagem ? <Loader2 className="animate-spin" /> : (
+                <span className="flex items-center gap-3">
+                  ENVIAR MENSAGEM
+                  <Send className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+              )}
             </Button>
           </div>
         </section>
 
       </main>
 
-      <footer className="py-20 border-t border-white/5 px-8 flex flex-col items-center gap-4">
-        <p className="text-white/20 text-[10px] uppercase tracking-[0.4em] text-center">
-          NL ARQUITETOS · São José dos Campos, SP
-        </p>
-        <p className="text-white/10 text-[8px] uppercase tracking-[0.6em] text-center">
-          A ARQUITETURA COMO DECISÃO
-        </p>
+      {/* FOOTER */}
+      <footer className="py-24 border-t border-white/5 px-6">
+        <div className="max-w-[860px] mx-auto flex flex-col items-center gap-4 text-center">
+          <p className="text-white/20 text-[10px] uppercase tracking-[0.5em] font-medium">
+            NL ARQUITETOS · São José dos Campos, SP
+          </p>
+          <p className="text-white/10 text-[8px] uppercase tracking-[0.8em]">
+            A ARQUITETURA COMO DECISÃO
+          </p>
+        </div>
       </footer>
 
+      {/* MODAIS (Existentes com visual mantido) */}
       <Dialog open={showAprovarModal} onOpenChange={setShowAprovarModal}>
         <DialogContent className="bg-[#121212] border-white/10 rounded-none text-white max-w-md">
           <DialogHeader className="space-y-4">
