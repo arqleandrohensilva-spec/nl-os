@@ -180,6 +180,20 @@ const ClienteFicha = () => {
   });
 
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projetoVinculado, setProjetoVinculado] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProjetoVinculado = async () => {
+      if (!id) return;
+      const { data } = await supabase
+        .from('projetos')
+        .select('id, token_cliente')
+        .eq('cliente_id', id)
+        .maybeSingle();
+      setProjetoVinculado(data);
+    };
+    fetchProjetoVinculado();
+  }, [id]);
   const [selectedProposalForProject, setSelectedProposalForProject] = useState<any>(null);
   const [openProposalId, setOpenProposalId] = useState<string | null>(null);
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
@@ -2174,6 +2188,33 @@ const ClienteFicha = () => {
                       </button>
                     )}
                   </div>
+                  
+                  {projetoVinculado?.token_cliente && (
+                    <div className="mt-6 p-4 bg-white/[0.02] border border-white/5">
+                      <p className="text-[8px] uppercase tracking-widest text-white/30 mb-3">PORTAL DO CLIENTE</p>
+                      <p className="text-[10px] text-white/50 mb-4">
+                        Compartilhe este link com o cliente para que ele acompanhe o projeto em tempo real.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            const url = `${window.location.origin}/cliente/${projetoVinculado.token_cliente}`;
+                            navigator.clipboard.writeText(url);
+                            toast.success('Link copiado!');
+                          }}
+                          className="flex items-center gap-2 px-4 py-2 bg-white/[0.04] border border-white/10 text-white/60 hover:text-bronze hover:border-bronze/30 transition-all text-[9px] font-bold uppercase tracking-widest"
+                        >
+                          <Copy size={12} /> COPIAR LINK
+                        </button>
+                        <button
+                          onClick={() => window.open(`/cliente/${projetoVinculado.token_cliente}`, '_blank')}
+                          className="flex items-center gap-2 px-4 py-2 bg-white/[0.04] border border-white/10 text-white/60 hover:text-bronze hover:border-bronze/30 transition-all text-[9px] font-bold uppercase tracking-widest"
+                        >
+                          <ExternalLink size={12} /> ABRIR PORTAL
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
 
                   

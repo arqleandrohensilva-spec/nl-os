@@ -7,7 +7,8 @@ import {
   CheckCircle2, 
   MoreVertical,
   Trash2,
-  Zap
+  Zap,
+  ExternalLink
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -283,6 +284,23 @@ const ProjetoDetalhe = () => {
               </div>
               <div className="flex items-center gap-4">
                 <Button variant="link" className="text-[#8B7355] text-xs uppercase" onClick={() => navigate(`/clientes/${projeto.cliente_id}`)}>VER FICHA →</Button>
+                <button
+                  onClick={async () => {
+                    let token = (projeto as any)?.token_cliente;
+                    if (!token) {
+                      token = Math.random().toString(36).substring(2, 14);
+                      await supabase.from('projetos').update({ token_cliente: token }).eq('id', projeto.id);
+                      setProjeto({ ...projeto, token_cliente: token } as any);
+                    }
+                    const url = `${window.location.origin}/cliente/${token}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success('Link do portal copiado!');
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/[0.04] border border-white/10 text-white/60 hover:text-bronze hover:border-bronze/30 transition-all text-[9px] font-bold uppercase tracking-widest"
+                >
+                  <ExternalLink size={12} />
+                  PORTAL DO CLIENTE
+                </button>
                 <Button 
                   onClick={handleUseInMarketingIA}
                   className="bg-bronze/10 text-bronze hover:bg-bronze/20 text-[10px] uppercase tracking-widest font-bold h-8 border border-bronze/20"
