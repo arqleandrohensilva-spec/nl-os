@@ -7,7 +7,8 @@ import {
   CheckCircle2, 
   MoreVertical,
   Trash2,
-  Zap
+  Zap,
+  ExternalLink
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
