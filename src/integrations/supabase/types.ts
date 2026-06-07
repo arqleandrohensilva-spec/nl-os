@@ -2095,6 +2095,17 @@ export type Database = {
           nome_arquivo: string
         }[]
       }
+      get_project_parcelas_by_token: {
+        Args: { p_val: string }
+        Returns: {
+          data_recebimento: string
+          data_vencimento: string
+          id: string
+          status: string
+          valor: number
+          valor_recebido: number
+        }[]
+      }
       get_project_stages_by_token: {
         Args: { p_val: string }
         Returns: {
