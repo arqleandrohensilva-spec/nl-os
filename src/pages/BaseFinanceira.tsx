@@ -119,6 +119,15 @@ const BaseFinanceira = () => {
   const [cenarioBMargem, setCenarioBMargem] = useState(50);
   const [isEvolucaoOpen, setIsEvolucaoOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [intelData, setIntelData] = useState({
+    horasEmUso: 0,
+    horasFaturáveis: 0,
+    fluxo3meses: 0,
+    recebidoMes: 0,
+    metaMensal: 0,
+    fluxoDetalhado: [] as { mes: string; valor: number }[]
+  });
+  const [sliderPrice, setSliderPrice] = useState(0);
 
 
   // Calculations
