@@ -447,6 +447,54 @@ Máximo 3 linhas. Sem markdown. Em português.
     }
   };
 
+  const fetchIntelligenceData = async () => {
+    try {
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const next3Months = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate()).toISOString();
+
+      const [sessoesRes, parcelasPendentesRes, parcelasPagasRes, metaRes] = await Promise.all([
+        supabase.from('sessoes_horas').select('duracao_minutos, projeto_id').gte('inicio', firstDayOfMonth),
+        supabase.from('financeiro_parcelas').select('valor, data_vencimento').eq('status', 'pendente').gte('data_vencimento', now.toISOString()).lte('data_vencimento', next3Months),
+        supabase.from('financeiro_parcelas').select('valor_recebido').eq('status', 'pago').gte('data_recebimento', firstDayOfMonth),
+        supabase.from('configuracoes').select('value').eq('key', 'meta_mensal_receita').single()
+      ]);
+
+      const horasEmUso = (sessoesRes.data?.reduce((acc, s) => acc + (Number(s.duracao_minutos) || 0), 0) || 0) / 60;
+      const horasFaturáveis = horasEmUso; // Simplificação por enquanto
+      const fluxo3meses = parcelasPendentesRes.data?.reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
+      const recebidoMes = parcelasPagasRes.data?.reduce((acc, p) => acc + (Number(p.valor_recebido) || 0), 0) || 0;
+      const metaMensal = Number(metaRes.data?.value) || 0;
+
+      // Fluxo detalhado por mês
+      const meses = ['Este mês', 'Próximo mês', 'Mês seguinte'];
+      const fluxoDetalhado = meses.map((label, i) => {
+        const start = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + i + 1, 0);
+        const valor = parcelasPendentesRes.data?.filter(p => {
+          const d = new Date(p.data_vencimento);
+          return d >= start && d <= end;
+        }).reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
+        return { mes: label, valor };
+      });
+
+      setIntelData({
+        horasEmUso,
+        horasFaturáveis,
+        fluxo3meses,
+        recebidoMes,
+        metaMensal,
+        fluxoDetalhado
+      });
+    } catch (error) {
+      console.error('Error fetching intelligence data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchIntelligenceData();
+  }, []);
+
   const fetchData = async () => {
     try {
       const [configRes, costsRes] = await Promise.all([
