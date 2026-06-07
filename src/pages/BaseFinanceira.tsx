@@ -1190,14 +1190,14 @@ Máximo 3 linhas. Sem markdown. Em português.
                           type="number" 
                           value={simNumProjetos}
                           onChange={(e) => setSimNumProjetos(parseInt(e.target.value) || 0)}
-                          className="w-16 h-8 text-center border-white/10 focus:border-bronze bg-white/5"
+                          className="w-16 h-8 text-center bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                         />
                         <span>projetos de</span>
                         <Input 
                           type="number" 
                           value={simHorasPorProjeto}
                           onChange={(e) => setSimHorasPorProjeto(parseInt(e.target.value) || 0)}
-                          className="w-20 h-8 text-center border-white/10 focus:border-bronze bg-white/5"
+                          className="w-20 h-8 text-center bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                         />
                         <span>horas este mês:</span>
                       </div>
@@ -1447,7 +1447,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       value={config?.horas_dia} 
                       placeholder="8"
                       onChange={(e) => updateConfig({ horas_dia: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1457,7 +1457,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       value={config?.dias_mes} 
                       placeholder="22"
                       onChange={(e) => updateConfig({ dias_mes: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1467,7 +1467,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       value={config?.percentual_produtivo} 
                       placeholder="70"
                       onChange={(e) => updateConfig({ percentual_produtivo: parseFloat(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1477,7 +1477,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       value={config?.num_arquitetos} 
                       placeholder="2"
                       onChange={(e) => updateConfig({ num_arquitetos: parseInt(e.target.value) })}
-                      className="h-9 border-white/10 text-xs font-dm-mono focus:border-bronze placeholder:text-white/20"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                     />
                   </div>
                   <div className="space-y-3">
@@ -1487,7 +1487,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                       value={config?.meta_custo_hora || ''} 
                       placeholder="Ex: 120"
                       onChange={(e) => updateConfig({ meta_custo_hora: parseFloat(e.target.value) })}
-                      className="h-9 border-bronze/50 bg-bronze/5 text-xs font-dm-mono focus:border-bronze"
+                      className="w-full bg-white/[0.04] border border-white/10 text-white placeholder-white/20 text-sm px-3 py-2 focus:outline-none focus:border-bronze/40"
                     />
                   </div>
                 </div>
