@@ -227,7 +227,7 @@ const BaseFinanceira = () => {
     const horasEquilibrio = Math.ceil(calculations.monthlyCosts / calculations.costPerHour) || 0;
     const projetosEquilibrio = Math.ceil(horasEquilibrio / 80) || 0;
     
-    const horasDisponiveis = (config?.horas_dia || 0) * (config?.dias_mes || 0) * ((config?.percentual_produtivo || 0) / 100) * (config?.num_arquitetos || 0);
+    const horasDisponiveis = (config?.horas_dia || 8) * (config?.dias_mes || 22) * ((config?.percentual_produtivo || 70) / 100) * (config?.num_arquitetos || 2);
     const capacidade = horasDisponiveis > 0 ? Math.round((intelData.horasEmUso / horasDisponiveis) * 100) : 0;
     const eficiencia = horasDisponiveis > 0 ? Math.round((intelData.horasFaturáveis / horasDisponiveis) * 100) : 0;
     const pctMeta = intelData.metaMensal > 0 ? Math.round((intelData.recebidoMes / intelData.metaMensal) * 100) : 0;
@@ -460,7 +460,7 @@ Máximo 3 linhas. Sem markdown. Em português.
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#FDFDFD'
+        backgroundColor: '#0d0d0d'
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -488,16 +488,21 @@ Máximo 3 linhas. Sem markdown. Em português.
 
       const [sessoesRes, parcelasPendentesRes, parcelasPagasRes, metaRes] = await Promise.all([
         supabase.from('sessoes_horas').select('duracao_minutos, projeto_id').gte('inicio', firstDayOfMonth),
-        supabase.from('financeiro_parcelas').select('valor, data_vencimento').eq('status', 'pendente').gte('data_vencimento', now.toISOString()).lte('data_vencimento', next3Months),
-        supabase.from('financeiro_parcelas').select('valor_recebido').eq('status', 'pago').gte('data_recebimento', firstDayOfMonth),
-        supabase.from('configuracoes').select('value').eq('key', 'meta_mensal_receita').single()
+        supabase.from('financeiro_parcelas').select('valor, data_vencimento')
+          .in('status', ['pendente', 'PENDENTE', 'Pendente', 'em_aberto', 'EM_ABERTO'])
+          .gte('data_vencimento', now.toISOString())
+          .lte('data_vencimento', next3Months),
+        supabase.from('financeiro_parcelas').select('valor_recebido')
+          .in('status', ['pago', 'PAGO', 'Pago', 'recebido', 'RECEBIDO'])
+          .gte('data_recebimento', firstDayOfMonth),
+        supabase.from('configuracoes').select('valor').eq('chave', 'meta_mensal_receita').maybeSingle()
       ]);
 
       const horasEmUso = (sessoesRes.data?.reduce((acc, s) => acc + (Number(s.duracao_minutos) || 0), 0) || 0) / 60;
       const horasFaturáveis = horasEmUso; // Simplificação por enquanto
       const fluxo3meses = parcelasPendentesRes.data?.reduce((acc, p) => acc + (Number(p.valor) || 0), 0) || 0;
       const recebidoMes = parcelasPagasRes.data?.reduce((acc, p) => acc + (Number(p.valor_recebido) || 0), 0) || 0;
-      const metaMensal = Number(metaRes.data?.value) || 0;
+      const metaMensal = Number(metaRes.data?.valor) || 0;
 
       // Fluxo detalhado por mês
       const meses = ['Este mês', 'Próximo mês', 'Mês seguinte'];
