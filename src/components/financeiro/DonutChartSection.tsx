@@ -62,7 +62,7 @@ const DonutChartSection: React.FC<DonutChartSectionProps> = ({ data, totalMonthl
         
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
           <span className="text-[10px] text-white/40 uppercase tracking-widest font-dm-mono">Total Mensal</span>
-          <span className="text-base font-cormorant font-bold text-graphite">
+          <span className="text-base font-cormorant font-bold text-white/70">
             {formatCurrency(totalMonthly)}
           </span>
         </div>
@@ -82,7 +82,7 @@ const DonutChartSection: React.FC<DonutChartSectionProps> = ({ data, totalMonthl
                   className="w-2 h-2 rounded-full" 
                   style={{ backgroundColor: entry.color }}
                 />
-                <span className="text-[10px] font-dm-mono text-graphite group-hover:text-bronze transition-colors">
+                <span className="text-[10px] font-dm-mono text-white/60 group-hover:text-bronze transition-colors">
                   {entry.name}
                 </span>
               </div>
