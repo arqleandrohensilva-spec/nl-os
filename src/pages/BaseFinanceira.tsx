@@ -1329,8 +1329,13 @@ Máximo 3 linhas. Sem markdown. Em português.
                       <p className="text-[10px] font-bold text-white uppercase">C) Combinar Estratégias</p>
                       <p className="text-[10px] text-white/40 leading-relaxed">
                         Reduzir R$ {(calculations.monthlyCosts * 0.1).toLocaleString('pt-BR', { minimumFractionDigits: 0 })} + Aumentar para {Math.round((calculations.monthlyCosts * 0.9) / config.meta_custo_hora)}h
-                      </p>
-                    </div>
+              </p>
+            </div>
+            {(!config?.horas_dia || !config?.dias_mes) && (
+              <p className="text-[9px] text-amber-400/70 mt-2">
+                ⚠ Preencha os campos acima para calibrar seu custo/hora real
+              </p>
+            )}
                   </div>
                 </div>
               )}
