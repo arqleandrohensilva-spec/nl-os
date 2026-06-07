@@ -93,6 +93,10 @@ const ProjetoDetalhe = () => {
   const [contrato, setContrato] = useState<any>(null);
   const [lead, setLead] = useState<any>(null);
   const [horasLog, setHorasLog] = useState<any[]>([]);
+  const [feeBurn, setFeeBurn] = useState(0);
+  const [valorTotalProjeto, setValorTotalProjeto] = useState(0);
+  const [horasLancadasTotal, setHorasLancadasTotal] = useState(0);
+  const [custoHora, setCustoHora] = useState(67.37);
 
   const fetchData = async () => {
     try {
@@ -121,6 +125,22 @@ const ProjetoDetalhe = () => {
       if (cData) setChecklist(cData);
       const { data: hData } = await supabase.from('projeto_horas_log').select('*').eq('projeto_id', id).order('criado_em', { ascending: false });
       if (hData) setHorasLog(hData);
+      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').single();
+      const cHora = configEsc?.custo_hora || 67.37;
+      setCustoHora(cHora);
+
+      const { data: sessoes } = await supabase.from('sessoes_horas').select('duracao_minutos').eq('projeto_id', id);
+      const horasLancadas = sessoes?.reduce((acc, s) => acc + (s.duracao_minutos / 60), 0) || 0;
+      setHorasLancadasTotal(horasLancadas);
+
+      const { data: pParcelas } = await supabase.from('financeiro_parcelas').select('valor').eq('projeto_id', id);
+      const vTotal = pParcelas?.reduce((acc, p) => acc + p.valor, 0) || 0;
+      setValorTotalProjeto(vTotal);
+
+      if (vTotal > 0) {
+        setFeeBurn((horasLancadas * cHora) / vTotal * 100);
+      }
+
     } finally {
       setLoading(false);
     }
@@ -226,6 +246,30 @@ const ProjetoDetalhe = () => {
     <div className="flex min-h-screen bg-[#0d0d0d]">
       <Sidebar user="Equipe NL" />
       <main className="flex-1 text-[#e8e8e8] font-sans p-6 md:p-12 overflow-x-hidden min-w-0">
+        {feeBurn >= 80 && projeto?.etapa_atual?.toUpperCase() !== 'ENTREGA' && (
+          <div className={cn(
+            "mb-8 px-6 py-3 flex items-center justify-between rounded-[2px]",
+            feeBurn >= 95 ? "bg-red-500/10 border border-red-500/20" : "bg-amber-500/10 border border-amber-500/20"
+          )}>
+            <div className="flex items-center gap-3">
+              <span className={cn(
+                "text-[10px] font-bold uppercase tracking-widest",
+                feeBurn >= 95 ? "text-red-400" : "text-amber-400"
+              )}>
+                {feeBurn >= 95 ? "🔴 Alerta Crítico" : "⚠ Alerta de Margem"}
+              </span>
+              <span className="text-[10px] text-white/60">
+                Este projeto consumiu {feeBurn.toFixed(0)}% do fee — restam {Math.max(0, valorTotalProjeto - horasLancadasTotal * custoHora).toLocaleString('pt-BR', {style:'currency', currency:'BRL'})} de margem
+              </span>
+            </div>
+            <span className={cn(
+              "text-[9px] uppercase tracking-widest",
+              feeBurn >= 95 ? "text-red-400/60" : "text-amber-400/60"
+            )}>
+              {Math.ceil(Math.max(0, (valorTotalProjeto - horasLancadasTotal * custoHora) / custoHora))}h restantes no orçamento
+            </span>
+          </div>
+        )}
         <div className="max-w-7xl mx-auto space-y-10">
           
           {/* HEADER */}

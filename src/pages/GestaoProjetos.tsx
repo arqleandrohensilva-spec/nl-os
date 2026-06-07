@@ -61,6 +61,7 @@ const GestaoProjetos = () => {
   const [checklists, setChecklists] = useState<Record<string, ChecklistInfo[]>>({});
   const [loading, setLoading] = useState(true);
   const [totalHorasMes, setTotalHorasMes] = useState(0);
+  const [feeBurns, setFeeBurns] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetchData();
@@ -127,6 +128,27 @@ const GestaoProjetos = () => {
         }, 0);
         setTotalHorasMes(Math.round(total / 60) || 0);
       }
+
+      // Calculate Fee Burns for all projects
+      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').single();
+      const custoHora = configEsc?.custo_hora || 67.37;
+
+      const { data: allSessoes } = await supabase.from('sessoes_horas').select('projeto_id, duracao_minutos');
+      const { data: allParcelas } = await supabase.from('financeiro_parcelas').select('projeto_id, valor');
+
+      const burns: Record<string, number> = {};
+      pData?.forEach(proj => {
+        const horasLancadas = allSessoes
+          ?.filter(s => s.projeto_id === proj.id)
+          .reduce((acc, s) => acc + (s.duracao_minutos / 60), 0) || 0;
+
+        const valorTotalProjeto = allParcelas
+          ?.filter(p => p.projeto_id === proj.id)
+          .reduce((acc, p) => acc + p.valor, 0) || 1;
+
+        burns[proj.id] = (horasLancadas * custoHora) / valorTotalProjeto * 100;
+      });
+      setFeeBurns(burns);
     } catch (error) {
       console.error('Error fetching projects:', error);
     } finally {
@@ -348,22 +370,38 @@ const GestaoProjetos = () => {
                 </div>
 
                 {/* Status */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <div style={{ 
-                    width: '5px', 
-                    height: '5px', 
-                    borderRadius: '50%', 
-                    background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
-                  }} />
-                  <span style={{ 
-                    fontFamily: 'Arial, sans-serif', 
-                    fontSize: '12px', 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.08em', 
-                    color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
-                  }}>
-                    {projeto.status_geral}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {feeBurns[projeto.id] >= 80 && (
+                    <div style={{ 
+                      fontSize: '8px', 
+                      fontWeight: 'bold', 
+                      color: feeBurns[projeto.id] >= 95 ? '#ef4444' : '#fbbf24', 
+                      padding: '2px 6px', 
+                      borderRadius: '2px', 
+                      border: `1px solid ${feeBurns[projeto.id] >= 95 ? '#ef4444' : '#fbbf24'}30`,
+                      background: `${feeBurns[projeto.id] >= 95 ? '#ef4444' : '#fbbf24'}10`,
+                      textTransform: 'uppercase'
+                    }}>
+                      {feeBurns[projeto.id] >= 95 ? '🔴 CRÍTICO' : '⚠ MARGEM'}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ 
+                      width: '5px', 
+                      height: '5px', 
+                      borderRadius: '50%', 
+                      background: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
+                    }} />
+                    <span style={{ 
+                      fontFamily: 'Arial, sans-serif', 
+                      fontSize: '12px', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '0.08em', 
+                      color: (projeto.status_geral?.toLowerCase() === 'ativo' || projeto.status_geral?.toLowerCase() === 'em andamento') ? '#4ade80' : '#555' 
+                    }}>
+                      {projeto.status_geral}
+                    </span>
+                  </div>
                 </div>
               </div>
             );
