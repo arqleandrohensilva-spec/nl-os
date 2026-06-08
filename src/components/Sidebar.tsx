@@ -599,7 +599,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           isPopoverOpen={popoverAberto === 'CONFIGURAÇÕES'}
         >
           <NavItem 
-            label="Configurações" 
+            label="Admin" 
+            active={location.pathname === '/sistema/admin'} 
+            onClick={() => navigate('/sistema/admin')} 
+            isCollapsed={isCollapsed}
+          />
+          <NavItem 
+            label="Sistema" 
             active={location.pathname === '/sistema/configuracoes'} 
             onClick={() => navigate('/sistema/configuracoes')} 
             isCollapsed={isCollapsed}

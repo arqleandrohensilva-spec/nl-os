@@ -36,6 +36,7 @@ import ClientesLista from "./pages/ClientesLista.tsx";
 import ClienteFicha from "./pages/ClienteFicha.tsx";
 import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
 import BriefingCompleto from "./pages/BriefingCompleto.tsx";
+import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,7 @@ const App = () => (
             <Route path="/calculadora/:proposalId" element={<PropostaCalculadora />} />
             <Route path="/proposta/calculadora/:proposalId" element={<Navigate to="/calculadora/:proposalId" replace />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
+            <Route path="/sistema/admin" element={<PainelAdministrativo />} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
             <Route path="/marketing/ia" element={<MarketingIA />} />
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
