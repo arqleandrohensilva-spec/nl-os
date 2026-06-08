@@ -107,6 +107,7 @@ function PaginaClienteContent() {
   
   const [textoMensagem, setTextoMensagem] = useState('');
   const [enviandoMensagem, setEnviandoMensagem] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<any>(null);
 
   useEffect(() => {
     fetchProjeto();
@@ -345,7 +346,6 @@ function PaginaClienteContent() {
     (a.tipo === 'imagem' || /\.(jpg|jpeg|png|webp)$/i.test(a.nome_arquivo || ''))
   );
 
-  const [selectedImage, setSelectedImage] = useState<any>(null);
 
   const ultimaEtapa = etapas.find(e => e.etapa?.toUpperCase() === 'OBRA' || e.etapa?.toUpperCase() === 'DETALHAMENTO');
   const dataFinal = ultimaEtapa?.data_entrega;
@@ -384,13 +384,13 @@ function PaginaClienteContent() {
         
         {/* SEÇÃO 1 — SAUDAÇÃO */}
         <section className="space-y-4">
-          <h2 className="font-cormorant text-[48px] italic leading-tight">Olá, {projeto.nome_cliente}.</h2>
+          <h2 className="font-cormorant text-[48px] italic leading-tight">Olá, {projeto?.nome_cliente || 'Cliente'}.</h2>
           <div className="space-y-1">
             <p className="text-bronze text-[10px] uppercase tracking-[0.25em] font-bold">
-              PROJETO · {projeto.tipo || 'RESIDENCIAL'} · {projeto.cidade || 'SÃO JOSÉ DOS CAMPOS'} · {projeto.area_m2 || '--'}m²
+              PROJETO · {projeto?.tipo || 'RESIDENCIAL'} · {projeto?.cidade || 'SÃO JOSÉ DOS CAMPOS'} · {projeto?.area_m2 || '--'}m²
             </p>
             <p className="text-white/30 text-[11px] font-dm-mono">
-              Iniciado em {projeto.data_inicio ? format(new Date(projeto.data_inicio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '--/--/----'}
+              Iniciado em {projeto?.data_inicio ? format(new Date(projeto.data_inicio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '--/--/----'}
             </p>
           </div>
         </section>
@@ -533,7 +533,7 @@ function PaginaClienteContent() {
                   <div className="space-y-3">
                     <h3 className="font-cormorant text-3xl italic">{etapa.etapa}</h3>
                     <p className="text-white/40 text-[11px] font-dm-mono">
-                      Enviado em {format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR })}
+                      Enviado em {(etapa.updated_at || etapa.criado_em) ? format(new Date(etapa.updated_at || etapa.criado_em), "dd 'de' MMMM", { locale: ptBR }) : 'A definir'}
                     </p>
                   </div>
                   <div className="flex gap-4">
@@ -695,11 +695,11 @@ function PaginaClienteContent() {
                       aprovado por {etapa.aprovado_por}
                     </span>
                   </div>
-                  <span className="text-[10px] text-white/30 uppercase tracking-widest">
-                    {etapa.data_aprovacao 
-                      ? format(new Date(etapa.data_aprovacao), "dd 'de' MMMM", { locale: ptBR })
-                      : ''}
-                  </span>
+                    <span className="text-[10px] text-white/30 uppercase tracking-widest">
+                      {etapa.data_aprovacao 
+                        ? format(new Date(etapa.data_aprovacao), "dd 'de' MMMM", { locale: ptBR })
+                        : ''}
+                    </span>
                 </div>
               ))}
             </div>
