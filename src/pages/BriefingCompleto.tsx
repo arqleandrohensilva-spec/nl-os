@@ -354,7 +354,15 @@ const BriefingCompleto = () => {
     }
   }, [step, answers, token]);
 
-  const questions = projeto ? QUESTIONS[projeto.tipo] || QUESTIONS['Arq+Int'] : [];
+  const getTipoKey = (tipo: string): string => {
+    const t = (tipo || '').toLowerCase().replace(/\s/g, '');
+    if ((t.includes('int') && t.includes('arq')) || t === 'arq+int') return 'Arq+Int';
+    if (t === 'interiores' || t === 'int') return 'Interiores';
+    if (t === 'comercial' || t === 'com') return 'Comercial';
+    return 'Arq+Int';
+  };
+
+  const questions = projeto ? QUESTIONS[getTipoKey(projeto.tipo)] : [];
   const currentQuestion = step >= 0 ? questions[step] : null;
 
   const handleNext = () => {
