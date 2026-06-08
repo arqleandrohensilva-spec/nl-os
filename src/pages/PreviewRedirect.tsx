@@ -18,15 +18,17 @@ export default function PreviewRedirect() {
           .rpc('get_project_by_token_or_slug', { p_val: token })
           .maybeSingle();
 
-        if (error || !data || !data.slug) {
-          console.error('Projeto não encontrado para o token:', token, error);
-          // Fallback: se não encontrar o slug mas o token existir, tenta abrir direto no /cliente/:token
-          // pois a PaginaCliente também aceita token.
+        // Type cast or access property safely
+        const project = data as any;
+
+        if (error || !project || !project.slug_cliente) {
+          console.log('Redirecionando via token:', token);
           navigate(`/cliente/${token}`, { replace: true });
           return;
         }
 
-        navigate(`/cliente/${data.slug}`, { replace: true });
+        console.log('Redirecionando via slug:', project.slug_cliente);
+        navigate(`/cliente/${project.slug_cliente}`, { replace: true });
       } catch (err) {
         console.error('Erro ao redirecionar:', err);
         navigate(`/cliente/${token}`, { replace: true });
