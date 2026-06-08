@@ -25,11 +25,16 @@ const PainelAdministrativo = () => {
   const { data: recentClients } = useQuery({
     queryKey: ['admin-recent-clients'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('clientes')
-        .select('id, nome, etapa_fluxo, criado_em')
-        .order('criado_em', { ascending: false })
+        .select('id, nome, etapa_fluxo, created_at')
+        .order('created_at', { ascending: false })
         .limit(5);
+      
+      if (error) {
+        console.error('Error fetching clients:', error);
+        return [];
+      }
       return data || [];
     }
   });
@@ -37,16 +42,25 @@ const PainelAdministrativo = () => {
   const { data: recentProjects } = useQuery({
     queryKey: ['admin-recent-projects'],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('projetos')
         .select('id, nome, token_cliente, criado_em')
         .order('criado_em', { ascending: false })
         .limit(5);
+      
+      if (error) {
+        console.error('Error fetching projects:', error);
+        return [];
+      }
       return data || [];
     }
   });
 
   const copyBriefingLink = (token: string) => {
+    if (!token) {
+      toast.error('Token não disponível para este projeto');
+      return;
+    }
     const url = `${window.location.origin}/briefing/${token}`;
     navigator.clipboard.writeText(url);
     toast.success('Link do briefing copiado!');
@@ -96,11 +110,11 @@ const PainelAdministrativo = () => {
                     Últimos Clientes
                   </h3>
                   <div className="space-y-4">
-                    {recentClients?.map((cliente) => (
+                    {recentClients && recentClients.length > 0 ? recentClients.map((cliente) => (
                       <div key={cliente.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                         <div>
                           <p className="text-[11px] text-white font-medium">{cliente.nome}</p>
-                          <p className="text-[9px] text-white/30 uppercase tracking-widest">Etapa: {cliente.etapa_fluxo}</p>
+                          <p className="text-[9px] text-white/30 uppercase tracking-widest">Etapa: {cliente.etapa_fluxo || 'Não definida'}</p>
                         </div>
                         <Button 
                           variant="ghost" 
@@ -111,7 +125,9 @@ const PainelAdministrativo = () => {
                           Ver Ficha <ArrowRight size={12} className="ml-1" />
                         </Button>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum cliente recente</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -127,11 +143,11 @@ const PainelAdministrativo = () => {
                     Briefings Recentes
                   </h3>
                   <div className="space-y-4">
-                    {recentProjects?.map((projeto) => (
+                    {recentProjects && recentProjects.length > 0 ? recentProjects.map((projeto) => (
                       <div key={projeto.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                         <div>
                           <p className="text-[11px] text-white font-medium">{projeto.nome}</p>
-                          <p className="text-[9px] text-white/30 uppercase tracking-widest">Iniciado em {new Date(projeto.criado_em).toLocaleDateString()}</p>
+                          <p className="text-[9px] text-white/30 uppercase tracking-widest">Iniciado em {projeto.criado_em ? new Date(projeto.criado_em).toLocaleDateString() : 'N/A'}</p>
                         </div>
                         <div className="flex gap-2">
                           <Button 
@@ -154,7 +170,9 @@ const PainelAdministrativo = () => {
                           </Button>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum briefing recente</p>
+                    )}
                   </div>
                 </div>
               </div>
