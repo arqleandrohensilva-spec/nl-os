@@ -304,7 +304,11 @@ function PaginaClienteContent() {
   // Find next delivery
   const proximaEtapaComData = etapas
     .filter(e => e.status !== 'Aprovado' && e.data_entrega)
-    .sort((a, b) => new Date(a.data_entrega).getTime() - new Date(b.data_entrega).getTime())[0];
+    .sort((a, b) => {
+      const dateA = a.data_entrega ? new Date(a.data_entrega).getTime() : 0;
+      const dateB = b.data_entrega ? new Date(b.data_entrega).getTime() : 0;
+      return dateA - dateB;
+    })[0];
   
   let proximaEntregaTexto = 'A definir';
   let isDeadlinePulsing = false;
