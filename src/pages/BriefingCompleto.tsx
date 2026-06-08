@@ -333,7 +333,7 @@ const BriefingCompleto = () => {
             setAnswers(parsed.answers || {});
             setStep(parsed.step !== undefined ? parsed.step : -1);
           } catch (e) {
-            console.error(\"Error parsing progress\", e);
+            console.error('Error parsing progress', e);
           }
         }
       } catch (e) {
@@ -390,7 +390,7 @@ const BriefingCompleto = () => {
       setIsFinished(true);
     } catch (e: any) {
       console.error(e);
-      toast.error(\"Erro ao enviar briefing: \" + e.message);
+      toast.error('Erro ao enviar briefing: ' + e.message);
     } finally {
       setIsSubmitting(false);
     }
