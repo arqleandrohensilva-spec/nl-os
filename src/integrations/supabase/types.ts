@@ -189,6 +189,38 @@ export type Database = {
           },
         ]
       }
+      briefings_completos: {
+        Row: {
+          criado_em: string | null
+          id: string
+          projeto_id: string | null
+          respostas: Json | null
+          tipo: string | null
+        }
+        Insert: {
+          criado_em?: string | null
+          id?: string
+          projeto_id?: string | null
+          respostas?: Json | null
+          tipo?: string | null
+        }
+        Update: {
+          criado_em?: string | null
+          id?: string
+          projeto_id?: string | null
+          respostas?: Json | null
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "briefings_completos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calculos_proposta: {
         Row: {
           complexidade: number
