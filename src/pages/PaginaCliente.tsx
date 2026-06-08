@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component, ErrorInfo, ReactNode } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -10,7 +10,9 @@ import {
   Download, 
   Clock, 
   Loader2,
-  Send
+  Send,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,11 +26,69 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
 
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-8 text-center">
+          <div className="max-w-md space-y-6">
+            <h1 className="font-cormorant text-4xl italic text-white mb-2">NL ARQUITETOS</h1>
+            <div className="bg-white/5 border border-white/10 p-8 space-y-4">
+              <div className="w-12 h-12 bg-bronze/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="text-bronze w-6 h-6" />
+              </div>
+              <h2 className="text-xl font-medium text-white">Ops! Algo deu errado.</h2>
+              <p className="text-white/60 text-sm leading-relaxed">
+                Houve um problema ao carregar as informações do seu portal. Nossa equipe técnica já foi notificada.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                className="w-full bg-bronze hover:bg-bronze/80 text-black rounded-none h-12 uppercase tracking-widest font-bold text-[10px] mt-4"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Tentar Recarregar
+              </Button>
+            </div>
+            <p className="text-white/20 text-[10px] uppercase tracking-widest">
+              A arquitetura como decisão
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const ETAPAS_JORNADA = [
   'BRIEFING', 'CONCEITO', 'ESTUDO', 'EXECUTIVO', 'DETALHAMENTO', 'OBRA'
 ];
 
-export default function PaginaCliente() {
+function PaginaClienteContent() {
+
   const { slug } = useParams();
   const location = useLocation();
   const param = slug || location.pathname.split('/').pop();
@@ -799,5 +859,13 @@ export default function PaginaCliente() {
       </Dialog>
 
     </div>
+  );
+}
+
+export default function PaginaCliente() {
+  return (
+    <ErrorBoundary>
+      <PaginaClienteContent />
+    </ErrorBoundary>
   );
 }
