@@ -87,7 +87,8 @@ const ETAPAS_JORNADA = [
   'BRIEFING', 'CONCEITO', 'ESTUDO', 'EXECUTIVO', 'DETALHAMENTO', 'OBRA'
 ];
 
-export default function PaginaCliente() {
+function PaginaClienteContent() {
+
   const { slug } = useParams();
   const location = useLocation();
   const param = slug || location.pathname.split('/').pop();
