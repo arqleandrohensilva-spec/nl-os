@@ -8,7 +8,9 @@ import {
   MoreVertical,
   Trash2,
   Zap,
-  ExternalLink
+  ExternalLink,
+  Eye,
+  Copy
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';

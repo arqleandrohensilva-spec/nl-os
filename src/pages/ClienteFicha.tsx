@@ -1365,11 +1365,57 @@ const ClienteFicha = () => {
                     </div>
                     
                     <div className="space-y-6 relative z-10">
-                      <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
-                          <Check size={12} className="text-green-500" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center">
+                            <Check size={12} className="text-green-500" />
+                          </div>
+                          <span className="text-xs font-bold text-green-500 uppercase tracking-[0.2em] font-['Courier_New']">APRESENTAÇÃO AGENDADA</span>
                         </div>
-                        <span className="text-xs font-bold text-green-500 uppercase tracking-[0.2em] font-['Courier_New']">APRESENTAÇÃO AGENDADA</span>
+                        
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[8px] uppercase tracking-[0.2em] border-bronze/20 bg-bronze/5 text-bronze hover:bg-bronze/10 font-bold"
+                            onClick={() => {
+                              const token = (projetoVinculado as any)?.token_cliente;
+                              if (token) {
+                                const url = `${window.location.origin}/briefing/${token}`;
+                                window.open(url, '_blank');
+                              } else {
+                                toast.error('Crie um projeto para gerar o link do briefing.');
+                              }
+                            }}
+                          >
+                            <Eye size={10} className="mr-1" />
+                            Entrar no Briefing
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[8px] uppercase tracking-[0.2em] border-bronze/20 bg-bronze/5 text-bronze hover:bg-bronze/10 font-bold"
+                            onClick={async () => {
+                              let token = (projetoVinculado as any)?.token_cliente;
+                              if (!token && projetoVinculado?.id) {
+                                token = Math.random().toString(36).substring(2, 14);
+                                await supabase.from('projetos').update({ token_cliente: token }).eq('id', projetoVinculado.id);
+                                setProjetoVinculado({ ...projetoVinculado, token_cliente: token });
+                              }
+                              
+                              if (token) {
+                                const url = `${window.location.origin}/briefing/${token}`;
+                                navigator.clipboard.writeText(url);
+                                toast.success('Link do briefing copiado!');
+                              } else {
+                                toast.error('Crie um projeto para gerar o link do briefing.');
+                              }
+                            }}
+                          >
+                            <Copy size={10} className="mr-1" />
+                            Copiar Link
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
