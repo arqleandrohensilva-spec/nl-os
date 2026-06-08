@@ -391,7 +391,8 @@ function PaginaClienteContent() {
           <h2 className="font-cormorant text-[48px] italic leading-tight">Olá, {projeto?.nome_cliente || 'Cliente'}.</h2>
           <div className="space-y-1">
             <p className="text-bronze text-[10px] uppercase tracking-[0.25em] font-bold">
-              PROJETO · {projeto?.tipo || 'RESIDENCIAL'} · {projeto?.cidade || 'SÃO JOSÉ DOS CAMPOS'} · {projeto?.area_m2 || '--'}m²
+              PROJETO · {projeto?.tipo || 'RESIDENCIAL'} · {projeto?.cidade || 'SÃO JOSÉ DOS CAMPOS'}
+              {projeto?.area_m2 && projeto.area_m2 > 0 ? ` · ${projeto.area_m2}M²` : ''}
             </p>
             <p className="text-white/30 text-[11px] font-dm-mono">
               Iniciado em {projeto?.data_inicio ? format(new Date(projeto.data_inicio), "dd 'de' MMMM 'de' yyyy", { locale: ptBR }) : '--/--/----'}
