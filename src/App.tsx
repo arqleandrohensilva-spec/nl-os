@@ -52,6 +52,7 @@ const App = () => (
           <Route path="/p/:tipo/:slug" element={<PropostaCliente />} />
           <Route path="/pre-briefing" element={<BriefingPublic />} />
           <Route path="/pre-briefing/:token" element={<BriefingPublic />} />
+          <Route path="/briefing/:token" element={<BriefingCompleto />} />
           <Route path="/satisfacao/:token" element={<PesquisaSatisfacao />} />
           <Route path="/cliente/:slug" element={<PaginaCliente />} />
           <Route path="/preview/:token" element={<PreviewRedirect />} />
