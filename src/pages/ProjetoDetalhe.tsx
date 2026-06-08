@@ -364,7 +364,30 @@ const ProjetoDetalhe = () => {
                     <AccordionContent className="space-y-6 pt-2 pb-8 border-t border-white/5">
                       {/* Checklist */}
                       <div className="space-y-3 mt-4">
-                        <p className="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4 font-mono">Checklist de Entrega</p>
+                        <div className="flex items-center justify-between mb-4">
+                          <p className="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest font-mono">Checklist de Entrega</p>
+                          {config.id === 'BRIEFING' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-6 text-[8px] uppercase tracking-[0.2em] border-bronze/20 bg-bronze/5 text-bronze hover:bg-bronze/10 font-bold"
+                              onClick={async () => {
+                                let token = (projeto as any)?.token_cliente;
+                                if (!token) {
+                                  token = Math.random().toString(36).substring(2, 14);
+                                  await supabase.from('projetos').update({ token_cliente: token }).eq('id', projeto.id);
+                                  setProjeto({ ...projeto, token_cliente: token } as any);
+                                }
+                                const url = `${window.location.origin}/briefing/${token}`;
+                                navigator.clipboard.writeText(url);
+                                toast.success('Link do briefing copiado!');
+                              }}
+                            >
+                              <ExternalLink size={10} className="mr-1" />
+                              Briefing Completo
+                            </Button>
+                          )}
+                        </div>
                         {checklist.filter(c => c.etapa === config.id).length > 0 ? (
                           checklist.filter(c => c.etapa === config.id).map(item => (
                             <div key={item.id} className="flex items-center gap-3 py-1">
