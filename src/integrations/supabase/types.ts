@@ -2080,6 +2080,7 @@ export type Database = {
           etapa_atual: string
           id: string
           nome_cliente: string
+          slug_cliente: string
           status_geral: string
           tipo: string
           token_cliente: string
