@@ -397,36 +397,36 @@ const BriefingCompleto = () => {
   };
 
   if (loading) return (
-    <div className=\"min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white font-['Courier_New']\">
-      <div className=\"animate-pulse tracking-widest uppercase text-xs\">Carregando projeto...</div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white font-['Courier_New']">
+      <div className="animate-pulse tracking-widest uppercase text-xs">Carregando projeto...</div>
     </div>
   );
 
   if (!projeto) return (
-    <div className=\"min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6\">
-      <div className=\"max-w-md w-full bg-[#141414] border border-white/10 p-10 text-center space-y-6\">
-        <AlertCircle className=\"mx-auto text-rose-500 w-12 h-12\" />
-        <h1 className=\"text-white font-['Georgia'] text-2xl\">Projeto não encontrado</h1>
-        <p className=\"text-white/60 text-sm leading-relaxed\">O link utilizado parece estar incorreto ou o projeto não está mais disponível.</p>
-        <Button variant=\"outline\" className=\"w-full border-white/10 text-white/60 uppercase tracking-widest text-[10px] h-12\" onClick={() => navigate('/')}>Voltar para Início</Button>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-[#141414] border border-white/10 p-10 text-center space-y-6">
+        <AlertCircle className="mx-auto text-rose-500 w-12 h-12" />
+        <h1 className="text-white font-['Georgia'] text-2xl">Projeto não encontrado</h1>
+        <p className="text-white/60 text-sm leading-relaxed">O link utilizado parece estar incorreto ou o projeto não está mais disponível.</p>
+        <Button variant="outline" className="w-full border-white/10 text-white/60 uppercase tracking-widest text-[10px] h-12" onClick={() => navigate('/')}>Voltar para Início</Button>
       </div>
     </div>
   );
 
   if (isFinished) return (
-    <div className=\"min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 font-['Courier_New'] relative overflow-hidden\">
-      <div className=\"absolute inset-0 opacity-20\"><img src={BACKGROUND_IMAGES[0]} alt=\"Bg\" className=\"w-full h-full object-cover\" /></div>
-      <div className=\"absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]\" />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className=\"relative z-10 max-w-xl w-full text-center space-y-12\">
-        <div className=\"space-y-4\">
-          <p className=\"text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase\">NL ARQUITETOS</p>
-          <div className=\"w-12 h-[1px] bg-[#8B7355]/30 mx-auto\" />
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 font-['Courier_New'] relative overflow-hidden">
+      <div className="absolute inset-0 opacity-20"><img src={BACKGROUND_IMAGES[0]} alt="Bg" className="w-full h-full object-cover" /></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-xl w-full text-center space-y-12">
+        <div className="space-y-4">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
+          <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
         </div>
-        <div className=\"space-y-6\">
-          <h1 className=\"text-white font-['Georgia'] text-4xl md:text-5xl italic\">Briefing recebido.</h1>
-          <p className=\"text-white/60 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-md mx-auto\">A NL Arquitetos revisará suas respostas antes da reunião.</p>
+        <div className="space-y-6">
+          <h1 className="text-white font-['Georgia'] text-4xl md:text-5xl italic">Briefing recebido.</h1>
+          <p className="text-white/60 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-md mx-auto">A NL Arquitetos revisará suas respostas antes da reunião.</p>
         </div>
-        <div className=\"pt-12 border-t border-white/10\"><p className=\"text-white/20 text-[9px] uppercase tracking-[0.8em]\">A arquitetura como decisão.</p></div>
+        <div className="pt-12 border-t border-white/10"><p className="text-white/20 text-[9px] uppercase tracking-[0.8em]">A arquitetura como decisão.</p></div>
       </motion.div>
     </div>
   );
@@ -434,73 +434,73 @@ const BriefingCompleto = () => {
   const bgImage = BACKGROUND_IMAGES[Math.max(0, step) % BACKGROUND_IMAGES.length];
 
   return (
-    <div className=\"min-h-screen bg-[#0a0a0a] text-white flex flex-col font-['Courier_New'] relative overflow-hidden\">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col font-['Courier_New'] relative overflow-hidden">
       <AnimatePresence mode='wait'>
-        <motion.div key={bgImage} initial={{ opacity: 0 }} animate={{ opacity: 0.25 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className=\"absolute inset-0 z-0\"><img src={bgImage} alt=\"Project context\" className=\"w-full h-full object-cover grayscale\" /></motion.div>
+        <motion.div key={bgImage} initial={{ opacity: 0 }} animate={{ opacity: 0.25 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="absolute inset-0 z-0"><img src={bgImage} alt="Project context" className="w-full h-full object-cover grayscale" /></motion.div>
       </AnimatePresence>
-      <div className=\"absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0\" />
-      <header className=\"relative z-10 p-8 flex justify-between items-center\">
-        <div className=\"space-y-1\">
-          <p className=\"text-[#8B7355] text-[10px] font-bold tracking-[0.5em]\">NL ARQUITETOS</p>
-          <p className=\"text-white/40 text-[9px] tracking-widest\">BRIEFING EXCLUSIVO</p>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
+      <header className="relative z-10 p-8 flex justify-between items-center">
+        <div className="space-y-1">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
+          <p className="text-white/40 text-[9px] tracking-widest">BRIEFING EXCLUSIVO</p>
         </div>
         {step >= 0 && (
-          <div className=\"flex flex-col items-end gap-2\">
-            <div className=\"text-[9px] text-white/40 tracking-widest uppercase\">Progresso {Math.round(((step + 1) / questions.length) * 100)}%</div>
-            <div className=\"w-32 bg-white/10 h-1 rounded-full overflow-hidden\"><motion.div className=\"bg-[#8B7355] h-full\" initial={{ width: 0 }} animate={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div>
+          <div className="flex flex-col items-end gap-2">
+            <div className="text-[9px] text-white/40 tracking-widest uppercase">Progresso {Math.round(((step + 1) / questions.length) * 100)}%</div>
+            <div className="w-32 bg-white/10 h-1 rounded-full overflow-hidden"><motion.div className="bg-[#8B7355] h-full" initial={{ width: 0 }} animate={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div>
           </div>
         )}
       </header>
-      <main className=\"relative z-10 flex-1 flex items-center px-8 md:px-24 py-12\">
-        <div className=\"max-w-3xl w-full\">
-          <AnimatePresence mode=\"wait\">
+      <main className="relative z-10 flex-1 flex items-center px-8 md:px-24 py-12">
+        <div className="max-w-3xl w-full">
+          <AnimatePresence mode="wait">
             {step === -1 ? (
-              <motion.div key=\"welcome\" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className=\"space-y-10\">
-                <div className=\"space-y-6\"><h1 className=\"text-5xl md:text-7xl font-['Georgia'] italic leading-tight\">Vamos conhecer o seu projeto.</h1><p className=\"text-white/60 text-xs md:text-sm uppercase tracking-widest leading-relaxed max-w-lg\">Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.</p></div>
-                <div className=\"pt-8\"><Button onClick={() => setStep(0)} className=\"bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-16 px-12 text-xs font-bold tracking-[0.3em] uppercase transition-all\">Começar Briefing</Button></div>
+              <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
+                <div className="space-y-6"><h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">Vamos conhecer o seu projeto.</h1><p className="text-white/60 text-xs md:text-sm uppercase tracking-widest leading-relaxed max-w-lg">Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.</p></div>
+                <div className="pt-8"><Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-16 px-12 text-xs font-bold tracking-[0.3em] uppercase transition-all">Começar Briefing</Button></div>
               </motion.div>
             ) : (
-              <motion.div key={currentQuestion?.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className=\"space-y-10\">
-                <div className=\"space-y-4\"><span className=\"text-[#8B7355] font-bold text-[10px] tracking-[0.4em] uppercase\">Questão {step + 1} de {questions.length}</span><h2 className=\"text-3xl md:text-5xl font-['Georgia'] italic leading-tight\">{currentQuestion?.title}</h2>{currentQuestion?.subtitle && (<p className=\"text-white/50 text-[11px] uppercase tracking-widest leading-relaxed\">{currentQuestion.subtitle}</p>)}</div>
-                <div className=\"py-6\">
+              <motion.div key={currentQuestion?.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
+                <div className="space-y-4"><span className="text-[#8B7355] font-bold text-[10px] tracking-[0.4em] uppercase">Questão {step + 1} de {questions.length}</span><h2 className="text-3xl md:text-5xl font-['Georgia'] italic leading-tight">{currentQuestion?.title}</h2>{currentQuestion?.subtitle && (<p className="text-white/50 text-[11px] uppercase tracking-widest leading-relaxed">{currentQuestion.subtitle}</p>)}</div>
+                <div className="py-6">
                   {currentQuestion?.type === 'choice' && (
-                    <div className=\"grid gap-3 max-w-xl\">
+                    <div className="grid gap-3 max-w-xl">
                       {currentQuestion.options?.map(option => (
-                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn(\"w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group\", answers[currentQuestion.id] === option ? \"bg-white text-black border-white\" : \"bg-white/5 border-white/10 hover:border-white/30 text-white/80\")}>
-                          <span className=\"text-[11px] uppercase tracking-widest font-bold\">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-white text-black border-white" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
+                          <span className="text-[11px] uppercase tracking-widest font-bold">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
                         </button>
                       ))}
                     </div>
                   )}
                   {currentQuestion?.type === 'investment' && (
-                    <div className=\"grid gap-3 max-w-xl\">
+                    <div className="grid gap-3 max-w-xl">
                       {currentQuestion.options?.map(option => (
-                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn(\"w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group\", answers[currentQuestion.id] === option ? \"bg-[#8B7355] text-white border-[#8B7355]\" : \"bg-white/5 border-white/10 hover:border-white/30 text-white/80\")}>
-                          <span className=\"text-[11px] uppercase tracking-widest font-bold\">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-[#8B7355] text-white border-[#8B7355]" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
+                          <span className="text-[11px] uppercase tracking-widest font-bold">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
                         </button>
                       ))}
                     </div>
                   )}
                   {currentQuestion?.type === 'multi' && (
-                    <div className=\"grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl\">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                       {currentQuestion.options?.map(option => {
                         const current = answers[currentQuestion.id] || [];
                         const isSelected = current.includes(option);
                         return (
-                          <div key={option} onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} className={cn(\"cursor-pointer flex items-center gap-4 p-5 border transition-all duration-300\", isSelected ? \"bg-white/10 border-white/40\" : \"bg-white/5 border-white/5 hover:border-white/20\")}>
-                            <Checkbox checked={isSelected} className=\"border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]\" /><span className=\"text-[10px] uppercase tracking-widest font-bold\">{option}</span>
+                          <div key={option} onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} className={cn("cursor-pointer flex items-center gap-4 p-5 border transition-all duration-300", isSelected ? "bg-white/10 border-white/40" : "bg-white/5 border-white/5 hover:border-white/20")}>
+                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" /><span className="text-[10px] uppercase tracking-widest font-bold">{option}</span>
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  {currentQuestion?.type === 'text' && (<div className=\"max-w-2xl\"><Textarea autoFocus placeholder={currentQuestion.placeholder || 'Sua resposta aqui...'} value={answers[currentQuestion.id] || ''} onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)} className=\"bg-transparent border-0 border-b border-white/20 rounded-none text-xl p-0 h-24 focus:ring-0 focus:border-[#8B7355] transition-all placeholder:text-white/10 font-['Georgia'] italic resize-none\" /></div>)}
+                  {currentQuestion?.type === 'text' && (<div className="max-w-2xl"><Textarea autoFocus placeholder={currentQuestion.placeholder || 'Sua resposta aqui...'} value={answers[currentQuestion.id] || ''} onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)} className="bg-transparent border-0 border-b border-white/20 rounded-none text-xl p-0 h-24 focus:ring-0 focus:border-[#8B7355] transition-all placeholder:text-white/10 font-['Georgia'] italic resize-none" /></div>)}
                 </div>
-                <div className=\"flex items-center gap-6 pt-8\">
-                  {step >= 0 && (<button onClick={handleBack} className=\"text-white/30 hover:text-white flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] transition-all\"><ChevronLeft size={16} /> Voltar</button>)}
+                <div className="flex items-center gap-6 pt-8">
+                  {step >= 0 && (<button onClick={handleBack} className="text-white/30 hover:text-white flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] transition-all"><ChevronLeft size={16} /> Voltar</button>)}
                   {currentQuestion?.type !== 'choice' && currentQuestion?.type !== 'investment' && (
-                    <Button onClick={handleNext} disabled={isSubmitting || (currentQuestion?.type === 'text' && !answers[currentQuestion.id]) || (currentQuestion?.type === 'multi' && (!answers[currentQuestion.id] || answers[currentQuestion.id].length === 0))} className=\"bg-white text-black hover:bg-white/90 rounded-none h-14 px-10 text-[10px] font-bold tracking-[0.3em] uppercase group\">
-                      {step === questions.length - 1 ? (isSubmitting ? 'Enviando...' : 'Finalizar') : 'Próximo'}<ChevronRight size={16} className=\"ml-2 group-hover:translate-x-1 transition-transform\" />
+                    <Button onClick={handleNext} disabled={isSubmitting || (currentQuestion?.type === 'text' && !answers[currentQuestion.id]) || (currentQuestion?.type === 'multi' && (!answers[currentQuestion.id] || answers[currentQuestion.id].length === 0))} className="bg-white text-black hover:bg-white/90 rounded-none h-14 px-10 text-[10px] font-bold tracking-[0.3em] uppercase group">
+                      {step === questions.length - 1 ? (isSubmitting ? 'Enviando...' : 'Finalizar') : 'Próximo'}<ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   )}
                 </div>
@@ -509,8 +509,8 @@ const BriefingCompleto = () => {
           </AnimatePresence>
         </div>
       </main>
-      <footer className=\"relative z-10 p-8 flex justify-between items-end\"><div className=\"hidden md:block\"><p className=\"text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose\">© 2026 NL ARQUITETOS<br />SÃO JOSÉ DOS CAMPOS · SP</p></div><div className=\"text-right\"><p className=\"text-white/20 text-[9px] uppercase tracking-[0.4em]\">A ARQUITETURA COMO DECISÃO.</p></div></footer>
-      <div className=\"fixed inset-0 pointer-events-none opacity-[0.03] z-[99] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]\" />
+      <footer className="relative z-10 p-8 flex justify-between items-end"><div className="hidden md:block"><p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">© 2026 NL ARQUITETOS<br />SÃO JOSÉ DOS CAMPOS · SP</p></div><div className="text-right"><p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">A ARQUITETURA COMO DECISÃO.</p></div></footer>
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[99] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
     </div>
   );
 };
