@@ -861,3 +861,11 @@ function PaginaClienteContent() {
     </div>
   );
 }
+
+export default function PaginaCliente() {
+  return (
+    <ErrorBoundary>
+      <PaginaClienteContent />
+    </ErrorBoundary>
+  );
+}
