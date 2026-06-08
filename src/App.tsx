@@ -35,6 +35,7 @@ import CalculadoraList from "./pages/CalculadoraList.tsx";
 import ClientesLista from "./pages/ClientesLista.tsx";
 import ClienteFicha from "./pages/ClienteFicha.tsx";
 import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
+import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 
 const queryClient = new QueryClient();
 
