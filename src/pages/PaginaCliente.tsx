@@ -697,7 +697,9 @@ function PaginaClienteContent() {
                       {etapa.etapa}
                     </span>
                     <span className="text-[10px] text-white/40 ml-2">
-                      aprovado por {etapa.aprovado_por}
+                      aprovado por {etapa.aprovado_por === 'sistema' || etapa.aprovado_por === 'system' 
+                        ? 'NL Arquitetos' 
+                        : etapa.aprovado_por || 'NL Arquitetos'}
                     </span>
                   </div>
                     <span className="text-[10px] text-white/30 uppercase tracking-widest">
