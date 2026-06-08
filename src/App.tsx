@@ -28,6 +28,7 @@ import MarketingIA from "./pages/MarketingIA.tsx";
 import ScriptsAtendimento from "./pages/ScriptsAtendimento.tsx";
 import ModoApresentacao from "./pages/ModoApresentacao.tsx";
 import PaginaCliente from "./pages/PaginaCliente.tsx";
+import PreviewRedirect from "./pages/PreviewRedirect.tsx";
 import PropostaCliente from "./pages/PropostaCliente.tsx";
 import PropostaCalculadora from "./pages/PropostaCalculadora.tsx";
 import CalculadoraList from "./pages/CalculadoraList.tsx";
