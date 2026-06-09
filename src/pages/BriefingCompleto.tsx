@@ -301,6 +301,23 @@ const BACKGROUND_IMAGES = [
 ];
 
 const BriefingCompleto = () => {
+  useEffect(() => {
+    // Adicionando fontes premium se não existirem
+    if (!document.getElementById('font-georgia-italic')) {
+      const style = document.createElement('style');
+      style.id = 'font-georgia-italic';
+      style.innerHTML = `
+        @font-face {
+          font-family: 'GeorgiaItalic';
+          src: local('Georgia Italic'), local('Georgia-Italic');
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+
   const { token } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
