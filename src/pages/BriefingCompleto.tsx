@@ -301,6 +301,23 @@ const BACKGROUND_IMAGES = [
 ];
 
 const BriefingCompleto = () => {
+  useEffect(() => {
+    // Adicionando fontes premium se não existirem
+    if (!document.getElementById('font-georgia-italic')) {
+      const style = document.createElement('style');
+      style.id = 'font-georgia-italic';
+      style.innerHTML = `
+        @font-face {
+          font-family: 'GeorgiaItalic';
+          src: local('Georgia Italic'), local('Georgia-Italic');
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+
   const { token } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -458,7 +475,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]" />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-xl w-full text-center space-y-12">
         <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETURA</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
         </div>
         <div className="space-y-6">
@@ -480,7 +497,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
       <header className="relative z-10 p-8 flex justify-between items-center">
         <div className="space-y-1">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETURA</p>
           <p className="text-white/40 text-[9px] tracking-widest">
             {tipoLabel[projeto?.tipo] || 'BRIEFING EXCLUSIVO'}
           </p>
@@ -498,6 +515,16 @@ const BriefingCompleto = () => {
             {step === -1 ? (
               <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
                 <div className="space-y-6">
+                  {projeto?.nome_cliente && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-[#8B7355] font-['Georgia'] italic text-lg"
+                    >
+                      Seja bem-vindo, {projeto.nome_cliente}.
+                    </motion.p>
+                  )}
                   <h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">
                     {tituloIntro[projeto?.tipo] || 'Vamos conhecer o seu projeto.'}
                   </h1>
@@ -505,7 +532,17 @@ const BriefingCompleto = () => {
                     Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.
                   </p>
                 </div>
-                <div className="pt-8"><Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">Começar Briefing</Button></div>
+                <div className="flex flex-col gap-6 pt-8">
+                  <div className="flex items-center gap-4">
+                    <Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">
+                      Começar Briefing
+                    </Button>
+                    <div className="flex items-center gap-2 text-white/30 text-[9px] tracking-widest uppercase font-['Arial']">
+                      <span className="w-4 h-[1px] bg-white/10"></span>
+                      TEMPO ESTIMADO: 5 MINUTOS
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             ) : (
               <motion.div key={currentQuestion?.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
@@ -557,7 +594,19 @@ const BriefingCompleto = () => {
           </AnimatePresence>
         </div>
       </main>
-      <footer className="relative z-10 p-8 flex justify-between items-end"><div className="hidden md:block"><p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">© 2026 NL ARQUITETOS<br />SÃO JOSÉ DOS CAMPOS · SP</p></div><div className="text-right"><p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">A ARQUITETURA COMO DECISÃO.</p></div></footer>
+      <footer className="relative z-10 p-8 flex justify-between items-end">
+        <div className="hidden md:block">
+          <p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">
+            © 2026 NL ARQUITETURA<br />
+            SÃO JOSÉ DOS CAMPOS · SP
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">
+            A ARQUITETURA COMO DECISÃO.
+          </p>
+        </div>
+      </footer>
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[99] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
     </div>
   );
