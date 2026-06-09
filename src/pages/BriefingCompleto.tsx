@@ -475,7 +475,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]" />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-xl w-full text-center space-y-12">
         <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETURA</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
         </div>
         <div className="space-y-6">
@@ -497,7 +497,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
       <header className="relative z-10 p-8 flex justify-between items-center">
         <div className="space-y-1">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETURA</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
           <p className="text-white/40 text-[9px] tracking-widest">
             {tipoLabel[projeto?.tipo] || 'BRIEFING EXCLUSIVO'}
           </p>
@@ -520,7 +520,7 @@ const BriefingCompleto = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="text-[#8B7355] font-['Georgia'] italic text-lg"
+                      className="text-white/30 font-['Georgia'] italic text-lg"
                     >
                       Seja bem-vindo, {projeto.nome_cliente}.
                     </motion.p>
@@ -534,7 +534,7 @@ const BriefingCompleto = () => {
                 </div>
                 <div className="flex flex-col gap-6 pt-8">
                   <div className="flex items-center gap-4">
-                    <Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">
+                    <Button onClick={() => setStep(0)} className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-10 h-12 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300">
                       Começar Briefing
                     </Button>
                     <div className="flex items-center gap-2 text-white/30 text-[9px] tracking-widest uppercase font-['Arial']">
@@ -597,7 +597,7 @@ const BriefingCompleto = () => {
       <footer className="relative z-10 p-8 flex justify-between items-end">
         <div className="hidden md:block">
           <p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">
-            © 2026 NL ARQUITETURA<br />
+            © 2026 NL ARQUITETOS<br />
             SÃO JOSÉ DOS CAMPOS · SP
           </p>
         </div>
