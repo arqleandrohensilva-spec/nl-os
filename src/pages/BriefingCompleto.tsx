@@ -481,7 +481,9 @@ const BriefingCompleto = () => {
       <header className="relative z-10 p-8 flex justify-between items-center">
         <div className="space-y-1">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
-          <p className="text-white/40 text-[9px] tracking-widest">BRIEFING EXCLUSIVO</p>
+          <p className="text-white/40 text-[9px] tracking-widest">
+            {tipoLabel[projeto?.tipo] || 'BRIEFING EXCLUSIVO'}
+          </p>
         </div>
         {step >= 0 && (
           <div className="flex flex-col items-end gap-2">
