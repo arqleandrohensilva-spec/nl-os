@@ -458,7 +458,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]" />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-xl w-full text-center space-y-12">
         <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETURA</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
         </div>
         <div className="space-y-6">
