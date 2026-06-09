@@ -381,6 +381,19 @@ const BriefingCompleto = () => {
   };
 
   const questions = projeto ? QUESTIONS[getTipoKey(projeto.tipo)] : [];
+  
+  const tipoLabel: Record<string, string> = {
+    'ARQ+INT': 'BRIEFING EXCLUSIVO · ARQ+INT',
+    'Interiores': 'BRIEFING EXCLUSIVO · INTERIORES',
+    'Comercial': 'BRIEFING EXCLUSIVO · COMERCIAL',
+  };
+
+  const tituloIntro: Record<string, string> = {
+    'ARQ+INT': 'Vamos conhecer o seu projeto de arquitetura.',
+    'Interiores': 'Vamos conhecer o seu projeto de interiores.',
+    'Comercial': 'Vamos conhecer o seu projeto comercial.',
+  };
+
   const currentQuestion = step >= 0 ? questions[step] : null;
 
   const handleNext = () => {
