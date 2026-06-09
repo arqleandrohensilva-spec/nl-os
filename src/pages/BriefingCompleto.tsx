@@ -498,6 +498,16 @@ const BriefingCompleto = () => {
             {step === -1 ? (
               <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
                 <div className="space-y-6">
+                  {projeto?.nome_cliente && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="text-[#8B7355] font-['Georgia'] italic text-lg"
+                    >
+                      Seja bem-vindo, {projeto.nome_cliente}.
+                    </motion.p>
+                  )}
                   <h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">
                     {tituloIntro[projeto?.tipo] || 'Vamos conhecer o seu projeto.'}
                   </h1>
@@ -505,7 +515,17 @@ const BriefingCompleto = () => {
                     Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.
                   </p>
                 </div>
-                <div className="pt-8"><Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">Começar Briefing</Button></div>
+                <div className="flex flex-col gap-6 pt-8">
+                  <div className="flex items-center gap-4">
+                    <Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">
+                      Começar Briefing
+                    </Button>
+                    <div className="flex items-center gap-2 text-white/30 text-[9px] tracking-widest uppercase font-['Arial']">
+                      <span className="w-4 h-[1px] bg-white/10"></span>
+                      TEMPO ESTIMADO: 5 MINUTOS
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             ) : (
               <motion.div key={currentQuestion?.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
