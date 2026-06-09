@@ -214,7 +214,7 @@ const ProjetosModelo = () => {
         });
       }
       toast.success("Projetos modelo criados com sucesso!");
-      fetchModelos();
+      await fetchModelos();
     } catch (err) {
       console.error("Erro ao criar modelos:", err);
       toast.error("Erro ao criar projetos modelo");
