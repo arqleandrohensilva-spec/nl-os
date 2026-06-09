@@ -512,15 +512,16 @@ const BriefingCompleto = () => {
           </p>
         </div>
         {step >= 0 && (
-          <div className="flex items-center gap-3">
-            <div className="w-24 bg-white/10 h-[2px] rounded-full overflow-hidden">
+          <div className="flex items-center gap-4">
+            <div className="text-[9px] text-white/30 tracking-[0.2em] font-medium">PASSO {step + 1} DE {questions.length}</div>
+            <div className="w-16 bg-white/5 h-[1px] rounded-full overflow-hidden">
               <motion.div 
-                className="bg-[#8B7355] h-full" 
+                className="bg-white/40 h-full" 
                 initial={{ width: 0 }} 
                 animate={{ width: `${((step + 1) / questions.length) * 100}%` }} 
+                transition={{ duration: 0.8, ease: "circOut" }}
               />
             </div>
-            <div className="text-[10px] text-white/40 font-['Arial'] font-medium">{Math.round(((step + 1) / questions.length) * 100)}%</div>
           </div>
         )}
       </header>
