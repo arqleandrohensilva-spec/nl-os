@@ -680,19 +680,21 @@ const BriefingCompleto = () => {
                 </div>
               </motion.div>
             )}
-            )}
           </AnimatePresence>
         </div>
       </main>
-      <footer className="relative z-10 p-8 flex justify-between items-end">
-        <div className="hidden md:block">
-          <p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">
-            © 2026 NL ARQUITETOS<br />
+      <footer className="relative z-10 p-12 flex justify-between items-center border-t border-white/[0.03]">
+        <div className="flex items-center gap-6">
+          <p className="text-white/10 text-[8px] uppercase tracking-[0.4em]">
+            NL ARQUITETOS · 2026
+          </p>
+          <div className="w-[1px] h-3 bg-white/5 hidden md:block" />
+          <p className="text-white/10 text-[8px] uppercase tracking-[0.4em] hidden md:block">
             SÃO JOSÉ DOS CAMPOS · SP
           </p>
         </div>
         <div className="text-right">
-          <p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">
+          <p className="text-white/10 text-[8px] uppercase tracking-[0.6em]">
             A ARQUITETURA COMO DECISÃO.
           </p>
         </div>
