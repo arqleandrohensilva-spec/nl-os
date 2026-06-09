@@ -170,6 +170,7 @@ const ProjetosModelo = () => {
         .select('*')
         .ilike('nome', '[MODELO]%');
       
+      console.log('Modelos encontrados:', data, error);
       if (data) setModelos(data);
     } catch (err) {
       console.error("Erro ao carregar modelos:", err);
