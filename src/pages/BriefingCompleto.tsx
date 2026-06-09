@@ -561,51 +561,125 @@ const BriefingCompleto = () => {
                 </div>
               </motion.div>
             ) : (
-              <motion.div key={currentQuestion?.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
-                <div className="space-y-4"><span className="text-[#8B7355] font-bold text-[10px] tracking-[0.4em] uppercase">Questão {step + 1} de {questions.length}</span><h2 className="text-3xl md:text-5xl font-['Georgia'] italic leading-tight">{currentQuestion?.title}</h2>{currentQuestion?.subtitle && (<p className="text-white/50 text-[11px] uppercase tracking-widest leading-relaxed">{currentQuestion.subtitle}</p>)}</div>
-                <div className="py-6">
+              <motion.div 
+                key={currentQuestion?.id} 
+                initial={{ opacity: 0, y: 30 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                exit={{ opacity: 0, y: -30 }} 
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-16"
+              >
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <span className="text-[#8B7355] font-bold text-[9px] tracking-[0.4em] uppercase">QUESTÃO {step + 1}</span>
+                    <div className="h-[1px] w-8 bg-[#8B7355]/20" />
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-['Georgia'] italic leading-[1.15] text-white/90">
+                    {currentQuestion?.title}
+                  </h2>
+                  {currentQuestion?.subtitle && (
+                    <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] leading-relaxed max-w-xl">
+                      {currentQuestion.subtitle}
+                    </p>
+                  )}
+                </div>
+
+                <div className="py-2">
                   {currentQuestion?.type === 'choice' && (
-                    <div className="grid gap-3 max-w-xl">
+                    <div className="grid gap-4 max-w-xl">
                       {currentQuestion.options?.map(option => (
-                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-white text-black border-white" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
-                          <span className="text-xs font-['Arial']">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                        <button 
+                          key={option} 
+                          onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 400); }} 
+                          className={cn(
+                            "w-full text-left p-6 border transition-all duration-500 flex justify-between items-center group relative overflow-hidden", 
+                            answers[currentQuestion.id] === option 
+                              ? "bg-white text-black border-white" 
+                              : "bg-white/[0.02] border-white/10 hover:border-white/30 text-white/70 hover:text-white hover:scale-[1.01]"
+                          )}
+                        >
+                          <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
+                          {answers[currentQuestion.id] === option && <Check size={14} className="relative z-10" />}
                         </button>
                       ))}
                     </div>
                   )}
+
                   {currentQuestion?.type === 'investment' && (
-                    <div className="grid gap-3 max-w-xl">
+                    <div className="grid gap-4 max-w-xl">
                       {currentQuestion.options?.map(option => (
-                        <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-[#8B7355] text-white border-[#8B7355]" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
-                          <span className="text-xs font-['Arial']">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                        <button 
+                          key={option} 
+                          onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 400); }} 
+                          className={cn(
+                            "w-full text-left p-6 border transition-all duration-500 flex justify-between items-center group", 
+                            answers[currentQuestion.id] === option 
+                              ? "bg-[#8B7355] text-white border-[#8B7355]" 
+                              : "bg-white/[0.02] border-white/10 hover:border-white/30 text-white/70 hover:text-white hover:scale-[1.01]"
+                          )}
+                        >
+                          <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
+                          {answers[currentQuestion.id] === option && <Check size={14} />}
                         </button>
                       ))}
                     </div>
                   )}
+
                   {currentQuestion?.type === 'multi' && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
                       {currentQuestion.options?.map(option => {
                         const current = answers[currentQuestion.id] || [];
                         const isSelected = current.includes(option);
                         return (
-                          <div key={option} onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} className={cn("cursor-pointer flex items-center gap-4 p-5 border transition-all duration-300", isSelected ? "bg-white/10 border-white/40" : "bg-white/5 border-white/5 hover:border-white/20")}>
-                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" /><span className="text-xs font-['Arial']">{option}</span>
+                          <div 
+                            key={option} 
+                            onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} 
+                            className={cn(
+                              "cursor-pointer flex items-center gap-4 p-6 border transition-all duration-500 hover:scale-[1.01]", 
+                              isSelected ? "bg-white/10 border-white/40 text-white" : "bg-white/[0.02] border-white/5 hover:border-white/20 text-white/60 hover:text-white"
+                            )}
+                          >
+                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" />
+                            <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  {currentQuestion?.type === 'text' && (<div className="max-w-2xl"><Textarea autoFocus placeholder={currentQuestion.placeholder || 'Sua resposta aqui...'} value={answers[currentQuestion.id] || ''} onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)} className="bg-transparent border-0 border-b border-white/20 rounded-none text-xl p-0 h-24 focus:ring-0 focus:border-[#8B7355] transition-all placeholder:text-white/10 font-['Georgia'] italic resize-none" /></div>)}
+
+                  {currentQuestion?.type === 'text' && (
+                    <div className="max-w-2xl">
+                      <Textarea 
+                        autoFocus 
+                        placeholder={currentQuestion.placeholder || 'Escreva aqui...'} 
+                        value={answers[currentQuestion.id] || ''} 
+                        onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)} 
+                        className="bg-transparent border-0 border-b border-white/10 rounded-none text-2xl p-0 min-h-[120px] focus:ring-0 focus:border-white/40 transition-all placeholder:text-white/5 font-['Georgia'] italic resize-none leading-relaxed" 
+                      />
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-6 pt-8">
-                  {step >= 0 && (<button onClick={handleBack} className="text-white/30 hover:text-white flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] transition-all"><ChevronLeft size={16} /> Voltar</button>)}
-                  {currentQuestion?.type !== 'choice' && currentQuestion?.type !== 'investment' && (
-                    <Button onClick={handleNext} disabled={isSubmitting || (currentQuestion?.type === 'text' && !answers[currentQuestion.id]) || (currentQuestion?.type === 'multi' && (!answers[currentQuestion.id] || answers[currentQuestion.id].length === 0))} className="bg-white text-black hover:bg-white/90 rounded-none h-14 px-10 text-[10px] font-bold tracking-[0.3em] uppercase group">
-                      {step === questions.length - 1 ? (isSubmitting ? 'Enviando...' : 'Finalizar') : 'Próximo'}<ChevronRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+
+                <div className="flex items-center gap-10 pt-4">
+                  {step >= 0 && (
+                    <button onClick={handleBack} className="text-white/20 hover:text-white/60 flex items-center gap-3 text-[9px] uppercase tracking-[0.3em] transition-all duration-300">
+                      <ChevronLeft size={14} strokeWidth={1.5} /> 
+                      Voltar
+                    </button>
+                  )}
+                  {(currentQuestion?.type === 'text' || currentQuestion?.type === 'multi') && (
+                    <Button 
+                      onClick={handleNext} 
+                      disabled={isSubmitting || (currentQuestion?.type === 'text' && !answers[currentQuestion.id]) || (currentQuestion?.type === 'multi' && (!answers[currentQuestion.id] || answers[currentQuestion.id].length === 0))} 
+                      className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-12 px-12 text-[9px] font-bold tracking-[0.4em] uppercase group transition-all duration-500"
+                    >
+                      {step === questions.length - 1 ? (isSubmitting ? 'Enviando...' : 'Finalizar') : 'Próxima'}
+                      <ChevronRight size={14} className="ml-3 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   )}
                 </div>
               </motion.div>
+            )}
             )}
           </AnimatePresence>
         </div>
