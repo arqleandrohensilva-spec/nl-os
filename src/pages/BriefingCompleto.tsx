@@ -497,7 +497,14 @@ const BriefingCompleto = () => {
           <AnimatePresence mode="wait">
             {step === -1 ? (
               <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
-                <div className="space-y-6"><h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">Vamos conhecer o seu projeto.</h1><p className="text-white/60 text-xs md:text-sm tracking-relaxed max-w-lg font-['Arial'] leading-relaxed">Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.</p></div>
+                <div className="space-y-6">
+                  <h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">
+                    {tituloIntro[projeto?.tipo] || 'Vamos conhecer o seu projeto.'}
+                  </h1>
+                  <p className="text-white/60 text-xs md:text-sm tracking-relaxed max-w-lg font-['Arial'] leading-relaxed">
+                    Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.
+                  </p>
+                </div>
                 <div className="pt-8"><Button onClick={() => setStep(0)} className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none h-14 px-8 text-[10px] font-bold tracking-[0.4em] uppercase transition-all">Começar Briefing</Button></div>
               </motion.div>
             ) : (
