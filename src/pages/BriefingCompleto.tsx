@@ -492,7 +492,16 @@ const BriefingCompleto = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col font-['Courier_New'] relative overflow-hidden">
       <AnimatePresence mode='wait'>
-        <motion.div key={bgImage} initial={{ opacity: 0 }} animate={{ opacity: 0.25 }} exit={{ opacity: 0 }} transition={{ duration: 1.5 }} className="absolute inset-0 z-0"><img src={bgImage} alt="Project context" className="w-full h-full object-cover grayscale" /></motion.div>
+        <motion.div 
+          key={bgImage} 
+          initial={{ opacity: 0, scale: 1.1 }} 
+          animate={{ opacity: 0.15, scale: 1 }} 
+          exit={{ opacity: 0, scale: 1.05 }} 
+          transition={{ duration: 2, ease: "easeOut" }} 
+          className="absolute inset-0 z-0"
+        >
+          <img src={bgImage} alt="Project context" className="w-full h-full object-cover grayscale" />
+        </motion.div>
       </AnimatePresence>
       <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
       <header className="relative z-10 p-8 flex justify-between items-center">
