@@ -503,9 +503,15 @@ const BriefingCompleto = () => {
           </p>
         </div>
         {step >= 0 && (
-          <div className="flex flex-col items-end gap-2">
-            <div className="text-[9px] text-white/40 tracking-widest uppercase">Progresso {Math.round(((step + 1) / questions.length) * 100)}%</div>
-            <div className="w-32 bg-white/10 h-1 rounded-full overflow-hidden"><motion.div className="bg-[#8B7355] h-full" initial={{ width: 0 }} animate={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div>
+          <div className="flex items-center gap-3">
+            <div className="w-24 bg-white/10 h-[2px] rounded-full overflow-hidden">
+              <motion.div 
+                className="bg-[#8B7355] h-full" 
+                initial={{ width: 0 }} 
+                animate={{ width: `${((step + 1) / questions.length) * 100}%` }} 
+              />
+            </div>
+            <div className="text-[10px] text-white/40 font-['Arial'] font-medium">{Math.round(((step + 1) / questions.length) * 100)}%</div>
           </div>
         )}
       </header>
@@ -552,7 +558,7 @@ const BriefingCompleto = () => {
                     <div className="grid gap-3 max-w-xl">
                       {currentQuestion.options?.map(option => (
                         <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-white text-black border-white" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
-                          <span className="text-[11px] uppercase tracking-widest font-bold">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                          <span className="text-xs font-['Arial']">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
                         </button>
                       ))}
                     </div>
@@ -561,7 +567,7 @@ const BriefingCompleto = () => {
                     <div className="grid gap-3 max-w-xl">
                       {currentQuestion.options?.map(option => (
                         <button key={option} onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 300); }} className={cn("w-full text-left p-6 border transition-all duration-300 flex justify-between items-center group", answers[currentQuestion.id] === option ? "bg-[#8B7355] text-white border-[#8B7355]" : "bg-white/5 border-white/10 hover:border-white/30 text-white/80")}>
-                          <span className="text-[11px] uppercase tracking-widest font-bold">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
+                          <span className="text-xs font-['Arial']">{option}</span>{answers[currentQuestion.id] === option && <Check size={16} />}
                         </button>
                       ))}
                     </div>
@@ -573,7 +579,7 @@ const BriefingCompleto = () => {
                         const isSelected = current.includes(option);
                         return (
                           <div key={option} onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} className={cn("cursor-pointer flex items-center gap-4 p-5 border transition-all duration-300", isSelected ? "bg-white/10 border-white/40" : "bg-white/5 border-white/5 hover:border-white/20")}>
-                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" /><span className="text-[10px] uppercase tracking-widest font-bold">{option}</span>
+                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" /><span className="text-xs font-['Arial']">{option}</span>
                           </div>
                         );
                       })}
