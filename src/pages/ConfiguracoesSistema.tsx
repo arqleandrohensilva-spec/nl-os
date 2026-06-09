@@ -158,180 +158,95 @@ const UsefulLinks = () => {
 };
 
 const ProjetosModelo = () => {
-  const [modelos, setModelos] = useState<any[]>([]);
-  const [clientes, setClientes] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
+  const [modelosList, setModelosList] = useState<any[]>([]);
+  const [loadingModelos, setLoadingModelos] = useState(false);
 
   const fetchModelos = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('projetos')
-        .select('*')
-        .ilike('nome', '[MODELO]%');
-      
-      console.log('Modelos encontrados:', data, error);
-      if (data) setModelos(data);
-    } catch (err) {
-      console.error("Erro ao carregar modelos:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchClientes = async () => {
-    try {
-      const { data } = await supabase
-        .from('clientes')
-        .select('id, nome')
-        .order('nome');
-      if (data) setClientes(data);
-    } catch (err) {
-      console.error("Erro ao carregar clientes:", err);
-    }
+    const { data, error } = await supabase
+      .from('projetos')
+      .select('id, nome, tipo, token_cliente, cliente_id')
+      .ilike('nome', '%MODELO%');
+    
+    console.log('Modelos:', data, error);
+    if (data) setModelosList(data);
   };
 
   useEffect(() => {
     fetchModelos();
-    fetchClientes();
   }, []);
 
-  const criarProjetosModelo = async () => {
-    setIsCreating(true);
-    const modelosNovos = [
-      { nome: '[MODELO] ARQ+INT', tipo: 'ARQ+INT', cidade: 'São José dos Campos', area_m2: 250, status_geral: 'em_andamento' },
-      { nome: '[MODELO] Interiores', tipo: 'Interiores', cidade: 'São José dos Campos', area_m2: 120, status_geral: 'em_andamento' },
-      { nome: '[MODELO] Comercial', tipo: 'Comercial', cidade: 'São José dos Campos', area_m2: 180, status_geral: 'em_andamento' },
+  const criarModelos = async () => {
+    setLoadingModelos(true);
+    const modelos = [
+      { nome: '[MODELO] ARQ+INT', tipo: 'ARQ+INT', cidade: 'São José dos Campos', area_m2: 250, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
+      { nome: '[MODELO] Interiores', tipo: 'Interiores', cidade: 'São José dos Campos', area_m2: 120, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
+      { nome: '[MODELO] Comercial', tipo: 'Comercial', cidade: 'São José dos Campos', area_m2: 180, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
     ];
 
-    try {
-      for (const modelo of modelosNovos) {
-        const token = Math.random().toString(36).substring(2, 14);
-        await supabase.from('projetos').insert({
-          ...modelo,
-          token_cliente: token,
-          nome_cliente: 'Modelo de Teste',
-        });
-      }
-      toast.success("Projetos modelo criados com sucesso!");
-      await fetchModelos();
-    } catch (err) {
-      console.error("Erro ao criar modelos:", err);
-      toast.error("Erro ao criar projetos modelo");
-    } finally {
-      setIsCreating(false);
+    for (const modelo of modelos) {
+      const token = Math.random().toString(36).substring(2, 14);
+      await supabase.from('projetos').insert({ ...modelo, token_cliente: token });
     }
+
+    await fetchModelos(); // buscar novamente após criar
+    setLoadingModelos(false);
+    toast.success('Projetos modelo criados!');
   };
-
-  const vincularACliente = async (projetoId: string, clienteId: string, nomeAtual: string) => {
-    try {
-      const novoNome = nomeAtual.replace('[MODELO] ', '');
-      const { error } = await supabase
-        .from('projetos')
-        .update({ 
-          cliente_id: clienteId,
-          nome: novoNome 
-        })
-        .eq('id', projetoId);
-
-      if (error) throw error;
-      toast.success("Projeto vinculado ao cliente com sucesso!");
-      fetchModelos();
-    } catch (err) {
-      console.error("Erro ao vincular cliente:", err);
-      toast.error("Erro ao vincular cliente ao projeto");
-    }
-  };
-
-  const copyBriefingLink = (token: string) => {
-    const url = `${window.location.origin}/briefing-completo/${token}`;
-    navigator.clipboard.writeText(url);
-    toast.success("Link do briefing copiado!");
-  };
-
-  const abrirPortal = (token: string) => {
-    window.open(`/portal-cliente/${token}`, '_blank');
-  };
-
-  const abrirBriefing = (token: string) => {
-    window.open(`/briefing-completo/${token}`, '_blank');
-  };
-
-  if (loading) return null;
 
   return (
     <section className="mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
-      <header className="mb-8 border-b border-white/5 pb-4 flex justify-between items-center">
+      <header className="mb-8 border-b border-white/5 pb-4">
         <p className="font-mono text-[10px] text-bronze uppercase tracking-[0.5em] font-bold">PROJETOS MODELO</p>
-        {modelos.length === 0 && (
-          <Button 
-            onClick={criarProjetosModelo}
-            disabled={isCreating}
-            className="h-8 bg-bronze hover:bg-bronze/80 text-black text-[9px] uppercase tracking-widest font-bold px-4 rounded-[1px]"
-          >
-            {isCreating ? <RefreshCcw size={12} className="animate-spin mr-2" /> : <Layout size={12} className="mr-2" />}
-            Criar Projetos Modelo
-          </Button>
-        )}
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {modelos.map((modelo) => (
-          <div key={modelo.id} className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all rounded-[1px] relative group">
-            <div className="absolute top-4 right-4">
-              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[8px] uppercase tracking-tighter rounded-[1px]">MODELO</Badge>
+      {modelosList.length === 0 ? (
+        <div className="flex justify-center py-10 border border-dashed border-white/10 rounded-[1px]">
+          <button 
+            onClick={criarModelos} 
+            disabled={loadingModelos}
+            className="text-[10px] font-bold text-bronze border border-bronze/30 px-6 py-3 uppercase tracking-[0.2em] hover:bg-bronze hover:text-black transition-all disabled:opacity-50"
+          >
+            {loadingModelos ? 'Criando...' : 'CRIAR PROJETOS MODELO'}
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {modelosList.map(m => (
+            <div key={m.id} className="bg-white/[0.02] border border-white/5 p-6 rounded-[1px] relative group">
+              <span className="text-[8px] text-amber-400 uppercase tracking-widest border border-amber-400/30 px-2 py-1 inline-block mb-4">MODELO</span>
+              <p className="text-white font-bold mb-1 uppercase tracking-wider">{m.nome}</p>
+              <p className="text-white/30 text-[9px] uppercase tracking-widest mb-6">{m.tipo}</p>
+              
+              <div className="flex flex-col gap-2">
+                <button 
+                  onClick={() => { 
+                    navigator.clipboard.writeText(`${window.location.origin}/briefing-completo/${m.token_cliente}`); 
+                    toast.success('Link do briefing copiado!'); 
+                  }}
+                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
+                >
+                  <Copy size={12} />
+                  COPIAR LINK BRIEFING
+                </button>
+                <button 
+                  onClick={() => window.open(`/briefing-completo/${m.token_cliente}`, '_blank')}
+                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
+                >
+                  <ExternalLink size={12} />
+                  ABRIR BRIEFING
+                </button>
+                <button 
+                  onClick={() => window.open(`/portal-cliente/${m.token_cliente}`, '_blank')}
+                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
+                >
+                  <Layout size={12} />
+                  ABRIR PORTAL
+                </button>
+              </div>
             </div>
-            
-            <div className="mb-6">
-              <h4 className="text-[12px] font-bold text-white tracking-[0.1em] uppercase mb-1">{modelo.nome}</h4>
-              <p className="text-[10px] text-white/40 uppercase tracking-widest">{modelo.cidade}</p>
-            </div>
-
-            <div className="space-y-2 mb-6">
-              <Button 
-                variant="outline"
-                onClick={() => copyBriefingLink(modelo.token_cliente)}
-                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
-              >
-                <Copy size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
-                COPIAR LINK BRIEFING
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => abrirPortal(modelo.token_cliente)}
-                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
-              >
-                <ExternalLink size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
-                ABRIR PORTAL
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => abrirBriefing(modelo.token_cliente)}
-                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
-              >
-                <Eye size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
-                ABRIR BRIEFING
-              </Button>
-            </div>
-
-            <div className="pt-4 border-t border-white/5">
-              <Label className="text-[8px] uppercase tracking-widest text-white/30 mb-2 block">VINCULAR A CLIENTE</Label>
-              <Select onValueChange={(value) => vincularACliente(modelo.id, value, modelo.nome)}>
-                <SelectTrigger className="h-9 bg-black/40 border-white/10 rounded-[1px] text-[10px] text-white/70">
-                  <SelectValue placeholder="Selecionar Cliente" />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1A1816] border-[#2A2A2A] text-white">
-                  {clientes.map(cliente => (
-                    <SelectItem key={cliente.id} value={cliente.id} className="text-[10px] uppercase tracking-widest focus:bg-bronze focus:text-black">
-                      {cliente.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 };
