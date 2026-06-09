@@ -19,12 +19,22 @@ import {
   Layout,
   FileText,
   Save,
-  DollarSign
+  DollarSign,
+  UserPlus,
+  ArrowUpRight,
+  Eye
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const iconMap: Record<string, any> = {
   ClipboardList,
@@ -142,6 +152,184 @@ const UsefulLinks = () => {
             </div>
           );
         })}
+      </div>
+    </section>
+  );
+};
+
+const ProjetosModelo = () => {
+  const [modelos, setModelos] = useState<any[]>([]);
+  const [clientes, setClientes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const fetchModelos = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('projetos')
+        .select('*')
+        .ilike('nome', '[MODELO]%');
+      
+      if (data) setModelos(data);
+    } catch (err) {
+      console.error("Erro ao carregar modelos:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchClientes = async () => {
+    try {
+      const { data } = await supabase
+        .from('clientes')
+        .select('id, nome')
+        .order('nome');
+      if (data) setClientes(data);
+    } catch (err) {
+      console.error("Erro ao carregar clientes:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchModelos();
+    fetchClientes();
+  }, []);
+
+  const criarProjetosModelo = async () => {
+    setIsCreating(true);
+    const modelosNovos = [
+      { nome: '[MODELO] ARQ+INT', tipo: 'ARQ+INT', cidade: 'São José dos Campos', area_m2: 250, status_geral: 'em_andamento' },
+      { nome: '[MODELO] Interiores', tipo: 'Interiores', cidade: 'São José dos Campos', area_m2: 120, status_geral: 'em_andamento' },
+      { nome: '[MODELO] Comercial', tipo: 'Comercial', cidade: 'São José dos Campos', area_m2: 180, status_geral: 'em_andamento' },
+    ];
+
+    try {
+      for (const modelo of modelosNovos) {
+        const token = Math.random().toString(36).substring(2, 14);
+        await supabase.from('projetos').insert({
+          ...modelo,
+          token_cliente: token,
+          nome_cliente: 'Modelo de Teste',
+        });
+      }
+      toast.success("Projetos modelo criados com sucesso!");
+      fetchModelos();
+    } catch (err) {
+      console.error("Erro ao criar modelos:", err);
+      toast.error("Erro ao criar projetos modelo");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const vincularACliente = async (projetoId: string, clienteId: string, nomeAtual: string) => {
+    try {
+      const novoNome = nomeAtual.replace('[MODELO] ', '');
+      const { error } = await supabase
+        .from('projetos')
+        .update({ 
+          cliente_id: clienteId,
+          nome: novoNome 
+        })
+        .eq('id', projetoId);
+
+      if (error) throw error;
+      toast.success("Projeto vinculado ao cliente com sucesso!");
+      fetchModelos();
+    } catch (err) {
+      console.error("Erro ao vincular cliente:", err);
+      toast.error("Erro ao vincular cliente ao projeto");
+    }
+  };
+
+  const copyBriefingLink = (token: string) => {
+    const url = `${window.location.origin}/briefing-completo/${token}`;
+    navigator.clipboard.writeText(url);
+    toast.success("Link do briefing copiado!");
+  };
+
+  const abrirPortal = (token: string) => {
+    window.open(`/portal-cliente/${token}`, '_blank');
+  };
+
+  const abrirBriefing = (token: string) => {
+    window.open(`/briefing-completo/${token}`, '_blank');
+  };
+
+  if (loading) return null;
+
+  return (
+    <section className="mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
+      <header className="mb-8 border-b border-white/5 pb-4 flex justify-between items-center">
+        <p className="font-mono text-[10px] text-bronze uppercase tracking-[0.5em] font-bold">PROJETOS MODELO</p>
+        {modelos.length === 0 && (
+          <Button 
+            onClick={criarProjetosModelo}
+            disabled={isCreating}
+            className="h-8 bg-bronze hover:bg-bronze/80 text-black text-[9px] uppercase tracking-widest font-bold px-4 rounded-[1px]"
+          >
+            {isCreating ? <RefreshCcw size={12} className="animate-spin mr-2" /> : <Layout size={12} className="mr-2" />}
+            Criar Projetos Modelo
+          </Button>
+        )}
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {modelos.map((modelo) => (
+          <div key={modelo.id} className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all rounded-[1px] relative group">
+            <div className="absolute top-4 right-4">
+              <Badge className="bg-amber-500/10 text-amber-500 border-amber-500/20 text-[8px] uppercase tracking-tighter rounded-[1px]">MODELO</Badge>
+            </div>
+            
+            <div className="mb-6">
+              <h4 className="text-[12px] font-bold text-white tracking-[0.1em] uppercase mb-1">{modelo.nome}</h4>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest">{modelo.cidade}</p>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              <Button 
+                variant="outline"
+                onClick={() => copyBriefingLink(modelo.token_cliente)}
+                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
+              >
+                <Copy size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
+                COPIAR LINK BRIEFING
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => abrirPortal(modelo.token_cliente)}
+                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
+              >
+                <ExternalLink size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
+                ABRIR PORTAL
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => abrirBriefing(modelo.token_cliente)}
+                className="w-full justify-start h-9 border-white/5 bg-white/5 hover:bg-bronze hover:text-black transition-all text-[9px] uppercase tracking-widest font-bold rounded-[1px] group/btn"
+              >
+                <Eye size={12} className="mr-3 text-bronze group-hover/btn:text-black" />
+                ABRIR BRIEFING
+              </Button>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <Label className="text-[8px] uppercase tracking-widest text-white/30 mb-2 block">VINCULAR A CLIENTE</Label>
+              <Select onValueChange={(value) => vincularACliente(modelo.id, value, modelo.nome)}>
+                <SelectTrigger className="h-9 bg-black/40 border-white/10 rounded-[1px] text-[10px] text-white/70">
+                  <SelectValue placeholder="Selecionar Cliente" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1A1816] border-[#2A2A2A] text-white">
+                  {clientes.map(cliente => (
+                    <SelectItem key={cliente.id} value={cliente.id} className="text-[10px] uppercase tracking-widest focus:bg-bronze focus:text-black">
+                      {cliente.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -313,6 +501,7 @@ const ConfiguracoesSistema = () => {
             <h1 className="text-4xl font-cormorant italic text-white">Configurações do Sistema</h1>
           </header>
             <UsefulLinks />
+            <ProjetosModelo />
 
             {/* Seção Meta Mensal */}
             <section className="mb-12 bg-white/[0.03] border border-white/5 p-8 relative overflow-hidden group">
