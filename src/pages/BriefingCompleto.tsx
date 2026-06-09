@@ -480,7 +480,7 @@ const BriefingCompleto = () => {
       <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
       <header className="relative z-10 p-8 flex justify-between items-center">
         <div className="space-y-1">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETURA</p>
           <p className="text-white/40 text-[9px] tracking-widest">
             {tipoLabel[projeto?.tipo] || 'BRIEFING EXCLUSIVO'}
           </p>
