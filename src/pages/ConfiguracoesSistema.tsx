@@ -152,104 +152,72 @@ const UsefulLinks = () => {
             </div>
           );
         })}
+
+        {/* Links Fixos de Briefing */}
+        <div className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]">
+          <div className="p-3 bg-white/5 text-bronze rounded-[1px] group-hover:bg-bronze/10 transition-colors">
+            <ClipboardList size={18} />
+          </div>
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-bold text-white tracking-[0.1em] uppercase">BRIEFING ARQ+INT</h4>
+              <button 
+                onClick={() => copyToClipboard('app.nl.arq.br/briefing/arqint')}
+                className="text-[9px] font-bold text-bronze border border-bronze/30 px-3 py-1 uppercase tracking-widest hover:bg-bronze hover:text-black transition-all flex items-center gap-2"
+              >
+                <Copy size={10} />
+                COPIAR
+              </button>
+            </div>
+            <p className="text-[11px] text-white/40 italic font-medium">app.nl.arq.br/briefing/arqint</p>
+            <p className="text-[9px] text-white/20 uppercase tracking-widest">ENVIE PARA CLIENTES DE ARQ+INT</p>
+          </div>
+        </div>
+
+        <div className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]">
+          <div className="p-3 bg-white/5 text-bronze rounded-[1px] group-hover:bg-bronze/10 transition-colors">
+            <ClipboardList size={18} />
+          </div>
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-bold text-white tracking-[0.1em] uppercase">BRIEFING INTERIORES</h4>
+              <button 
+                onClick={() => copyToClipboard('app.nl.arq.br/briefing/interiores')}
+                className="text-[9px] font-bold text-bronze border border-bronze/30 px-3 py-1 uppercase tracking-widest hover:bg-bronze hover:text-black transition-all flex items-center gap-2"
+              >
+                <Copy size={10} />
+                COPIAR
+              </button>
+            </div>
+            <p className="text-[11px] text-white/40 italic font-medium">app.nl.arq.br/briefing/interiores</p>
+            <p className="text-[9px] text-white/20 uppercase tracking-widest">ENVIE PARA CLIENTES DE INTERIORES</p>
+          </div>
+        </div>
+
+        <div className="bg-[#1A1816] border border-[#2A2A2A] p-6 hover:border-bronze transition-all flex items-start gap-4 group rounded-[1px]">
+          <div className="p-3 bg-white/5 text-bronze rounded-[1px] group-hover:bg-bronze/10 transition-colors">
+            <ClipboardList size={18} />
+          </div>
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] font-bold text-white tracking-[0.1em] uppercase">BRIEFING COMERCIAL</h4>
+              <button 
+                onClick={() => copyToClipboard('app.nl.arq.br/briefing/comercial')}
+                className="text-[9px] font-bold text-bronze border border-bronze/30 px-3 py-1 uppercase tracking-widest hover:bg-bronze hover:text-black transition-all flex items-center gap-2"
+              >
+                <Copy size={10} />
+                COPIAR
+              </button>
+            </div>
+            <p className="text-[11px] text-white/40 italic font-medium">app.nl.arq.br/briefing/comercial</p>
+            <p className="text-[9px] text-white/20 uppercase tracking-widest">ENVIE PARA CLIENTES COMERCIAIS</p>
+          </div>
+        </div>
       </div>
     </section>
   );
 };
 
-const ProjetosModelo = () => {
-  const [modelosList, setModelosList] = useState<any[]>([]);
-  const [loadingModelos, setLoadingModelos] = useState(false);
-
-  const fetchModelos = async () => {
-    const { data, error } = await supabase
-      .from('projetos')
-      .select('id, nome, tipo, token_cliente, cliente_id')
-      .ilike('nome', '%MODELO%');
-    
-    console.log('Modelos:', data, error);
-    if (data) setModelosList(data);
-  };
-
-  useEffect(() => {
-    fetchModelos();
-  }, []);
-
-  const criarModelos = async () => {
-    setLoadingModelos(true);
-    const modelos = [
-      { nome: '[MODELO] ARQ+INT', tipo: 'ARQ+INT', cidade: 'São José dos Campos', area_m2: 250, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
-      { nome: '[MODELO] Interiores', tipo: 'Interiores', cidade: 'São José dos Campos', area_m2: 120, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
-      { nome: '[MODELO] Comercial', tipo: 'Comercial', cidade: 'São José dos Campos', area_m2: 180, status_geral: 'em_andamento', nome_cliente: 'Modelo de Teste' },
-    ];
-
-    for (const modelo of modelos) {
-      const token = Math.random().toString(36).substring(2, 14);
-      await supabase.from('projetos').insert({ ...modelo, token_cliente: token });
-    }
-
-    await fetchModelos(); // buscar novamente após criar
-    setLoadingModelos(false);
-    toast.success('Projetos modelo criados!');
-  };
-
-  return (
-    <section className="mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
-      <header className="mb-8 border-b border-white/5 pb-4">
-        <p className="font-mono text-[10px] text-bronze uppercase tracking-[0.5em] font-bold">PROJETOS MODELO</p>
-      </header>
-
-      {modelosList.length === 0 ? (
-        <div className="flex justify-center py-10 border border-dashed border-white/10 rounded-[1px]">
-          <button 
-            onClick={criarModelos} 
-            disabled={loadingModelos}
-            className="text-[10px] font-bold text-bronze border border-bronze/30 px-6 py-3 uppercase tracking-[0.2em] hover:bg-bronze hover:text-black transition-all disabled:opacity-50"
-          >
-            {loadingModelos ? 'Criando...' : 'CRIAR PROJETOS MODELO'}
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {modelosList.map(m => (
-            <div key={m.id} className="bg-white/[0.02] border border-white/5 p-6 rounded-[1px] relative group">
-              <span className="text-[8px] text-amber-400 uppercase tracking-widest border border-amber-400/30 px-2 py-1 inline-block mb-4">MODELO</span>
-              <p className="text-white font-bold mb-1 uppercase tracking-wider">{m.nome}</p>
-              <p className="text-white/30 text-[9px] uppercase tracking-widest mb-6">{m.tipo}</p>
-              
-              <div className="flex flex-col gap-2">
-                <button 
-                  onClick={() => { 
-                    navigator.clipboard.writeText(`${window.location.origin}/briefing-completo/${m.token_cliente}`); 
-                    toast.success('Link do briefing copiado!'); 
-                  }}
-                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
-                >
-                  <Copy size={12} />
-                  COPIAR LINK BRIEFING
-                </button>
-                <button 
-                  onClick={() => window.open(`/briefing-completo/${m.token_cliente}`, '_blank')}
-                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
-                >
-                  <ExternalLink size={12} />
-                  ABRIR BRIEFING
-                </button>
-                <button 
-                  onClick={() => window.open(`/portal-cliente/${m.token_cliente}`, '_blank')}
-                  className="text-[9px] uppercase tracking-widest border border-white/10 text-white/50 py-3 hover:border-bronze/40 hover:text-bronze transition-all flex items-center justify-center gap-2"
-                >
-                  <Layout size={12} />
-                  ABRIR PORTAL
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-};
 
 const ConfiguracoesSistema = () => {
   const [dropboxStatus, setDropboxStatus] = useState<'connected' | 'disconnected' | 'loading'>('loading');
@@ -417,7 +385,7 @@ const ConfiguracoesSistema = () => {
             <h1 className="text-4xl font-cormorant italic text-white">Configurações do Sistema</h1>
           </header>
             <UsefulLinks />
-            <ProjetosModelo />
+            
 
             {/* Seção Meta Mensal */}
             <section className="mb-12 bg-white/[0.03] border border-white/5 p-8 relative overflow-hidden group">

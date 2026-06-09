@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -302,6 +302,7 @@ const BACKGROUND_IMAGES = [
 
 const BriefingCompleto = () => {
   const { token } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
@@ -310,40 +311,57 @@ const BriefingCompleto = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!token) {
+  // Detectar tipo pela rota fixa
+  const tipoByPath: Record<string, string> = {
+    '/briefing/arqint': 'ARQ+INT',
+    '/briefing/interiores': 'Interiores',
+    '/briefing/comercial': 'Comercial',
+  };
+
+  const tipoFixo = tipoByPath[location.pathname];
+
+  const fetchProjeto = async () => {
+    if (!token) return;
+    try {
+      const { data, error } = await supabase
+        .rpc('get_project_by_token_or_slug', { p_val: token })
+        .maybeSingle();
+      if (error || !data) {
+        toast.error("Link de briefing inválido ou expirado.");
         setLoading(false);
         return;
       }
-      try {
-        const { data, error } = await supabase
-          .rpc('get_project_by_token_or_slug', { p_val: token })
-          .maybeSingle();
-        if (error || !data) {
-          toast.error("Link de briefing inválido ou expirado.");
-          setLoading(false);
-          return;
+      setProjeto(data);
+      const savedProgress = localStorage.getItem(`briefing_progress_${token}`);
+      if (savedProgress) {
+        try {
+          const parsed = JSON.parse(savedProgress);
+          setAnswers(parsed.answers || {});
+          setStep(parsed.step !== undefined ? parsed.step : -1);
+        } catch (e) {
+          console.error('Error parsing progress', e);
         }
-        setProjeto(data);
-        const savedProgress = localStorage.getItem(`briefing_progress_${token}`);
-        if (savedProgress) {
-          try {
-            const parsed = JSON.parse(savedProgress);
-            setAnswers(parsed.answers || {});
-            setStep(parsed.step !== undefined ? parsed.step : -1);
-          } catch (e) {
-            console.error('Error parsing progress', e);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchData();
-  }, [token]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tipoFixo) {
+      setProjeto({ tipo: tipoFixo, nome_cliente: null, id: null });
+      setLoading(false);
+      return;
+    }
+    // Se tem token, buscar projeto normalmente
+    if (token) {
+      fetchProjeto();
+    } else {
+      setLoading(false);
+    }
+  }, [token, tipoFixo]);
 
   useEffect(() => {
     if (token && step >= 0) {
@@ -389,7 +407,7 @@ const BriefingCompleto = () => {
       const { error } = await supabase
         .from('briefings_completos')
         .insert({
-          projeto_id: projeto.id,
+          projeto_id: projeto.id || null,
           tipo: projeto.tipo,
           respostas: answers
         });
