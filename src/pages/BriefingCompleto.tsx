@@ -577,7 +577,19 @@ const BriefingCompleto = () => {
           </AnimatePresence>
         </div>
       </main>
-      <footer className="relative z-10 p-8 flex justify-between items-end"><div className="hidden md:block"><p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">© 2026 NL ARQUITETOS<br />SÃO JOSÉ DOS CAMPOS · SP</p></div><div className="text-right"><p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">A ARQUITETURA COMO DECISÃO.</p></div></footer>
+      <footer className="relative z-10 p-8 flex justify-between items-end">
+        <div className="hidden md:block">
+          <p className="text-white/10 text-[9px] uppercase tracking-[0.4em] leading-loose">
+            © 2026 NL ARQUITETURA<br />
+            SÃO JOSÉ DOS CAMPOS · SP
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-white/20 text-[9px] uppercase tracking-[0.4em]">
+            A ARQUITETURA COMO DECISÃO.
+          </p>
+        </div>
+      </footer>
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[99] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
     </div>
   );
