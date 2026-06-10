@@ -513,7 +513,6 @@ const BriefingCompleto = () => {
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-  return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col cursor-none relative overflow-hidden">
       <CustomCursor />
       <BackgroundLayer imageIndex={chapterIndex} opacity={0.05} />
