@@ -340,16 +340,16 @@ const BriefingCompleto = () => {
     </div>
   );
 
-  const chapter = BRIEFING_ARQINT.capitulos[chapterIndex];
+  const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
       <header className="p-8 flex justify-between items-center">
         <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
         <div className="flex gap-4 items-center">
-           <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capitulos.length}</span>
+           <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
            <div className="w-24 h-[1px] bg-white/20">
-             <div className="h-full bg-white" style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capitulos.length) * 100}%` }} />
+             <div className="h-full bg-white" style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }} />
            </div>
         </div>
       </header>
