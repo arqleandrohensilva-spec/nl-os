@@ -220,6 +220,55 @@ const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80'
 ];
 
+const ARCHITECTURAL_QUOTES = [
+  "A arquitetura começa onde termina a engenharia.",
+  "Menos é mais quando mais é demais.",
+  "A luz é o que define o espaço.",
+  "O detalhe não é o detalhe. O detalhe é o projeto.",
+  "Arquitetura é música congelada.",
+  "O espaço é o fôlego da arte."
+];
+
+const CustomCursor = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('button')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseover', onMouseOver);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseover', onMouseOver);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+      animate={{
+        x: position.x - 16,
+        y: position.y - 16,
+        scale: isHovering ? 1.5 : 1,
+        backgroundColor: isHovering ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)"
+      }}
+      transition={{ type: "spring", damping: 20, stiffness: 250, mass: 0.5 }}
+    />
+  );
+};
+
 const BriefingCompleto = () => {
   const { token } = useParams();
   const navigate = useNavigate();
