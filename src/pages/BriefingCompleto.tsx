@@ -243,11 +243,20 @@ const BriefingCompleto = () => {
           .maybeSingle();
         if (data) {
           setProjeto(data);
+          
+          // Prefill logic
+          const prefillAnswers: any = {};
+          if (data.nome_cliente) prefillAnswers['nome'] = data.nome_cliente;
+          if (data.cidade) prefillAnswers['cidade'] = data.cidade;
+          if (data.whatsapp) prefillAnswers['telefone'] = data.whatsapp;
+
           const saved = localStorage.getItem(`briefing_progress_${token}`);
           if (saved) {
             const parsed = JSON.parse(saved);
-            setAnswers(parsed.answers || {});
+            setAnswers({ ...prefillAnswers, ...(parsed.answers || {}) });
             setChapterIndex(parsed.chapterIndex !== undefined ? parsed.chapterIndex : -1);
+          } else {
+            setAnswers(prefillAnswers);
           }
         }
       } catch (e) {
