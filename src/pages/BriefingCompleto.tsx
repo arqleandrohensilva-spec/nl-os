@@ -326,16 +326,42 @@ const BriefingCompleto = () => {
   );
 
   if (chapterIndex === -1) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-24 py-12">
-      <div className="space-y-10 max-w-2xl">
-        {projeto?.nome_cliente && <p className="text-[#8B7355] font-['Georgia'] italic">Confirmamos: {projeto.nome_cliente}</p>}
-        <h1 className="text-6xl font-['Georgia'] italic text-white">Vamos começar o seu briefing.</h1>
-        <Button 
-          onClick={() => setChapterIndex(0)} 
-          className="border border-white/20 text-white/60 hover:text-white bg-transparent px-10 h-12 font-bold tracking-[0.4em] uppercase transition-all"
-        >
-          Começar Briefing
-        </Button>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 font-['Courier_New'] relative overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <img src={BACKGROUND_IMAGES[0]} alt="Context" className="w-full h-full object-cover grayscale" />
+      </div>
+      <div className="relative z-10 space-y-12 max-w-3xl">
+        <div className="space-y-4">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
+          <div className="w-12 h-[1px] bg-[#8B7355]/30" />
+        </div>
+        
+        <div className="space-y-6">
+          {projeto?.nome_cliente && (
+            <p className="text-white/40 font-['Georgia'] italic text-xl">
+              Seja bem-vindo, {projeto.nome_cliente}.
+            </p>
+          )}
+          <h1 className="text-5xl md:text-7xl font-['Georgia'] italic text-white leading-tight">
+            Vamos começar o desenvolvimento do seu projeto.
+          </h1>
+          <p className="text-white/40 text-xs md:text-sm tracking-widest leading-relaxed max-w-xl font-['Arial'] uppercase">
+            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho.
+          </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pt-8">
+          <Button 
+            onClick={() => setChapterIndex(0)} 
+            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-12 h-14 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-500"
+          >
+            Começar Briefing
+          </Button>
+          <div className="flex items-center gap-3 text-white/20 text-[9px] tracking-[0.3em] uppercase">
+            <span className="w-6 h-[1px] bg-white/10" />
+            Tempo estimado: 15 minutos
+          </div>
+        </div>
       </div>
     </div>
   );
