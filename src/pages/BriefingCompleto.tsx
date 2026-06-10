@@ -279,6 +279,20 @@ const BriefingCompleto = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState("");
+  
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.current = (e.clientX / window.innerWidth - 0.5) * 20;
+      mouseY.current = (e.clientY / window.innerHeight - 0.5) * 20;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchProjeto = async () => {
