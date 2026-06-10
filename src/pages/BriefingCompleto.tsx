@@ -363,46 +363,129 @@ const BriefingCompleto = () => {
         </div>
       </header>
 
-      <main className="flex-1 px-24 py-12 max-w-4xl space-y-12">
-        <h1 className="text-5xl font-['Georgia'] italic">{chapter.titulo}</h1>
-        {chapter.blocos.map(bloco => (
-          <div key={bloco.id} className="space-y-8">
-            <h3 className="text-xl text-white/50 border-b border-white/10 pb-4">{bloco.titulo}</h3>
-            {bloco.perguntas.map(p => (
-              <div key={p.id} className="space-y-3">
-                <label className="text-xs uppercase tracking-widest text-white/60">{p.label}</label>
-                {p.tipo === 'text' && <Input value={answers[p.id] || ''} onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} className="bg-transparent border-white/10" />}
-                {p.tipo === 'textarea' && <Textarea value={answers[p.id] || ''} onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} className="bg-transparent border-white/10" />}
-                {p.tipo === 'select' && (
-                  <div className="flex flex-wrap gap-2">
-                    {p.opcoes?.map(opt => (
-                      <button key={opt} onClick={() => setAnswers({...answers, [p.id]: opt})} className={cn("px-4 py-2 border rounded-sm text-sm", answers[p.id] === opt ? "bg-white text-black" : "border-white/20")}>{opt}</button>
-                    ))}
-                  </div>
-                )}
-                {p.tipo === 'multiselect' && (
-                  <div className="flex flex-wrap gap-2">
-                    {p.opcoes?.map(opt => (
-                      <button key={opt} onClick={() => {
-                        const current = answers[p.id] || [];
-                        const next = current.includes(opt) ? current.filter((i: string) => i !== opt) : [...current, opt];
-                        setAnswers({...answers, [p.id]: next});
-                      }} className={cn("px-4 py-2 border rounded-sm text-sm", (answers[p.id] || []).includes(opt) ? "bg-white text-black" : "border-white/20")}>{opt}</button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-16 overflow-y-auto">
+        <motion.div
+          key={chapterIndex}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="space-y-16 pb-24"
+        >
+          <div className="space-y-4">
+            <span className="text-[#8B7355] font-bold text-[10px] tracking-[0.4em] uppercase">Capítulo {chapterIndex + 1}</span>
+            <h1 className="text-4xl md:text-6xl font-['Georgia'] italic leading-tight">{chapter.titulo}</h1>
           </div>
-        ))}
-        <div className="flex gap-4 pt-12">
-          <Button onClick={handleBack} variant="outline" className="border-white/10 uppercase tracking-widest text-[10px]">Voltar</Button>
-          <Button onClick={handleNext} className="bg-white text-black uppercase tracking-widest text-[10px]">{chapterIndex === 5 ? 'Finalizar' : 'Continuar'}</Button>
-        </div>
+
+          {chapter.blocos.map(bloco => (
+            <div key={bloco.id} className="space-y-12">
+              <div className="space-y-2">
+                <h3 className="text-xs uppercase tracking-[0.3em] text-white/30 font-bold">{bloco.titulo}</h3>
+                <div className="h-[1px] w-12 bg-[#8B7355]/30" />
+              </div>
+              
+              <div className="grid gap-10">
+                {bloco.perguntas.map(p => (
+                  <div key={p.id} className="space-y-4 group">
+                    <label className={cn(
+                      "text-[10px] uppercase tracking-[0.2em] transition-colors duration-300",
+                      answers[p.id] ? "text-[#8B7355]" : "text-white/40 group-focus-within:text-white/70"
+                    )}>
+                      {p.label}
+                      {p.id === 'nome' && projeto?.nome_cliente && (
+                        <span className="ml-2 lowercase italic text-white/20 font-serif font-normal tracking-normal">(Confirmamos: {projeto.nome_cliente})</span>
+                      )}
+                    </label>
+
+                    {p.tipo === 'text' && (
+                      <Input 
+                        value={answers[p.id] || ''} 
+                        onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
+                        className="bg-transparent border-0 border-b border-white/10 rounded-none px-0 h-10 focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-lg font-['Arial']"
+                        placeholder="Escreva aqui..."
+                      />
+                    )}
+
+                    {p.tipo === 'textarea' && (
+                      <Textarea 
+                        value={answers[p.id] || ''} 
+                        onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
+                        className="bg-transparent border-0 border-b border-white/10 rounded-none px-0 min-h-[100px] focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-lg font-['Arial'] resize-none leading-relaxed"
+                        placeholder={p.placeholder || "Desenvolva sua resposta..."}
+                      />
+                    )}
+
+                    {p.tipo === 'select' && (
+                      <div className="flex flex-wrap gap-3">
+                        {p.opcoes?.map(opt => (
+                          <button 
+                            key={opt} 
+                            onClick={() => setAnswers({...answers, [p.id]: opt})} 
+                            className={cn(
+                              "px-6 py-3 border transition-all duration-300 text-[11px] uppercase tracking-widest",
+                              answers[p.id] === opt 
+                                ? "bg-white text-black border-white" 
+                                : "bg-white/[0.02] border-white/10 text-white/50 hover:border-white/30 hover:text-white"
+                            )}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {p.tipo === 'multiselect' && (
+                      <div className="flex flex-wrap gap-2">
+                        {p.opcoes?.map(opt => {
+                          const isSelected = (answers[p.id] || []).includes(opt);
+                          return (
+                            <button 
+                              key={opt} 
+                              onClick={() => {
+                                const current = answers[p.id] || [];
+                                const next = isSelected ? current.filter((i: string) => i !== opt) : [...current, opt];
+                                setAnswers({...answers, [p.id]: next});
+                              }} 
+                              className={cn(
+                                "px-5 py-2 border transition-all duration-300 text-[10px] uppercase tracking-wider rounded-full",
+                                isSelected 
+                                  ? "bg-[#8B7355] text-white border-[#8B7355]" 
+                                  : "bg-transparent border-white/10 text-white/40 hover:border-white/30 hover:text-white"
+                              )}
+                            >
+                              {opt}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="flex items-center gap-8 pt-12">
+            <button 
+              onClick={handleBack} 
+              className="text-white/20 hover:text-white/60 flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] transition-all"
+            >
+              <ChevronLeft size={14} />
+              Voltar
+            </button>
+            <Button 
+              onClick={handleNext} 
+              className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-14 px-12 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-500 group"
+            >
+              {chapterIndex === 5 ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing') : 'Próximo Capítulo'}
+              <ChevronRight size={14} className="ml-3 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </div>
+        </motion.div>
       </main>
 
-      <footer className="p-8 text-[9px] uppercase tracking-[0.5em] text-white/20 text-center">
-        NL ARQUITETOS · 2026 · A ARQUITETURA COMO DECISÃO
+      <footer className="p-12 text-[8px] uppercase tracking-[0.5em] text-white/10 flex justify-between items-center border-t border-white/[0.03]">
+        <p>NL ARQUITETOS · 2026</p>
+        <p>A ARQUITETURA COMO DECISÃO.</p>
       </footer>
     </div>
   );
