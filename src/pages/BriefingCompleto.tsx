@@ -367,11 +367,25 @@ const BriefingCompleto = () => {
   );
 
   if (showTransition) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-center p-12">
-      <div className="space-y-6">
-        <h2 className="text-3xl font-['Georgia'] italic text-white">ARQUITETURA CONCLUÍDA</h2>
-        <p className="text-white/60 text-sm">Capítulos 1, 2 e 3 registrados.<br/>Agora vamos falar sobre os interiores.</p>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center font-['Courier_New'] relative overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <img src={BACKGROUND_IMAGES[3]} alt="Transition" className="w-full h-full object-cover grayscale" />
       </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative z-10 space-y-8"
+      >
+        <div className="space-y-2">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Módulo concluído</p>
+          <h2 className="text-3xl md:text-5xl font-['Georgia'] italic text-white">ARQUITETURA</h2>
+        </div>
+        <div className="w-12 h-[1px] bg-white/10 mx-auto" />
+        <p className="text-white/40 text-[10px] uppercase tracking-[0.3em] leading-relaxed max-w-sm mx-auto">
+          Capítulos 1, 2 e 3 registrados.<br/><br/>
+          Agora vamos falar sobre os interiores — a atmosfera e os detalhes que fazem a casa ser sua.
+        </p>
+      </motion.div>
     </div>
   );
 
