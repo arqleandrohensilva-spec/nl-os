@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from "sonner";
@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, AlertCircle, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
 // --- DATA STRUCTURE ---
 const BRIEFING_ARQINT = {
@@ -220,6 +220,55 @@ const BACKGROUND_IMAGES = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80'
 ];
 
+const ARCHITECTURAL_QUOTES = [
+  "A arquitetura começa onde termina a engenharia.",
+  "Menos é mais quando mais é demais.",
+  "A luz é o que define o espaço.",
+  "O detalhe não é o detalhe. O detalhe é o projeto.",
+  "Arquitetura é música congelada.",
+  "O espaço é o fôlego da arte."
+];
+
+const CustomCursor = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('button')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseover', onMouseOver);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseover', onMouseOver);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
+      animate={{
+        x: position.x - 16,
+        y: position.y - 16,
+        scale: isHovering ? 1.5 : 1,
+        backgroundColor: isHovering ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)"
+      }}
+      transition={{ type: "spring", damping: 20, stiffness: 250, mass: 0.5 }}
+    />
+  );
+};
+
 const BriefingCompleto = () => {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -230,6 +279,20 @@ const BriefingCompleto = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [showTransition, setShowTransition] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState("");
+  
+  const mouseX = useRef(0);
+  const mouseY = useRef(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseX.current = (e.clientX / window.innerWidth - 0.5) * 20;
+      mouseY.current = (e.clientY / window.innerHeight - 0.5) * 20;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const fetchProjeto = async () => {
@@ -247,7 +310,6 @@ const BriefingCompleto = () => {
           // Prefill logic
           const prefillAnswers: any = {};
           if (data.nome_cliente) prefillAnswers['nome'] = data.nome_cliente;
-          if (data.cidade) prefillAnswers['cidade'] = data.cidade;
           if (data.cidade) prefillAnswers['cidade'] = data.cidade;
 
           const saved = localStorage.getItem(`briefing_progress_${token}`);
@@ -270,22 +332,25 @@ const BriefingCompleto = () => {
 
   useEffect(() => {
     if (token && chapterIndex >= -1) {
+      setIsSaving(true);
       localStorage.setItem(`briefing_progress_${token}`, JSON.stringify({
         chapterIndex,
         answers
       }));
+      const timer = setTimeout(() => setIsSaving(false), 800);
+      return () => clearTimeout(timer);
     }
   }, [chapterIndex, answers, token]);
 
   const handleNext = () => {
-    if (chapterIndex === 2) {
+    if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
+      setCurrentQuote(ARCHITECTURAL_QUOTES[chapterIndex % ARCHITECTURAL_QUOTES.length]);
       setShowTransition(true);
       setTimeout(() => {
         setShowTransition(false);
         setChapterIndex(chapterIndex + 1);
-      }, 3000);
-    } else if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
-      setChapterIndex(chapterIndex + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 2000);
     } else {
       submitBriefing();
     }
@@ -311,15 +376,37 @@ const BriefingCompleto = () => {
   };
 
   if (loading) return null;
+
+  const BackgroundLayer = ({ imageIndex, opacity = 0.1 }: { imageIndex: number, opacity?: number }) => (
+    <motion.div 
+      className="absolute inset-0 pointer-events-none"
+      style={{ opacity }}
+    >
+      <motion.img 
+        src={BACKGROUND_IMAGES[imageIndex % BACKGROUND_IMAGES.length]} 
+        alt="Background" 
+        className="w-full h-full object-cover grayscale"
+        animate={{
+          scale: 1.1,
+          x: mouseX.current * 0.5,
+          y: mouseY.current * 0.5,
+        }}
+        transition={{ type: "tween", ease: "linear", duration: 0.1 }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
+    </motion.div>
+  );
+
   if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[4]} alt="Final" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Arial'] relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={4} opacity={0.15} />
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-md p-10 md:p-16 border border-white/5"
+        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-xl p-10 md:p-16 border border-white/5 rounded-2xl shadow-2xl"
       >
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Briefing concluído</p>
@@ -331,9 +418,9 @@ const BriefingCompleto = () => {
           <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase font-['Arial']">
             Você acaba de concluir a primeira etapa estratégica do desenvolvimento do seu projeto.
           </p>
-          <div className="py-6 border-y border-white/5 space-y-4">
-            <p className="text-white/60 text-xs md:text-sm leading-relaxed">
-              Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião.
+          <div className="py-8 border-y border-white/5 space-y-6">
+            <p className="text-white/60 text-xs md:text-sm leading-relaxed font-['Georgia'] italic">
+              "Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião."
             </p>
             <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.3em] uppercase">
               Próxima etapa: Reunião de Diagnóstico e Direcionamento.
@@ -341,7 +428,7 @@ const BriefingCompleto = () => {
           </div>
         </div>
 
-        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4">
+        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4 font-['Arial']">
           A arquitetura como decisão.
         </p>
       </motion.div>
@@ -349,39 +436,44 @@ const BriefingCompleto = () => {
   );
 
   if (chapterIndex === -1) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[0]} alt="Context" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={0} opacity={0.2} />
+      
       <div className="relative z-10 space-y-12 max-w-3xl">
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30" />
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-8">
           {projeto?.nome_cliente && (
-            <p className="text-white/40 font-['Georgia'] italic text-xl">
+            <motion.p 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-white/40 font-['Georgia'] italic text-xl"
+            >
               Seja bem-vindo, {projeto.nome_cliente}.
-            </p>
+            </motion.p>
           )}
           <h1 className="text-5xl md:text-7xl font-['Georgia'] italic text-white leading-tight">
             Vamos começar o desenvolvimento do seu projeto.
           </h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-widest leading-relaxed max-w-xl font-['Arial'] uppercase">
-            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho.
+          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed max-w-xl font-['Arial'] uppercase">
+            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pt-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-10 pt-8">
           <Button 
             onClick={() => setChapterIndex(0)} 
-            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-12 h-14 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-500"
+            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-700 rounded-none group"
           >
-            Começar Briefing
+            <span className="relative z-10">Começar Briefing</span>
+            <div className="absolute inset-0 bg-white/5 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500" />
           </Button>
-          <div className="flex items-center gap-3 text-white/20 text-[9px] tracking-[0.3em] uppercase">
-            <span className="w-6 h-[1px] bg-white/10" />
+          <div className="flex items-center gap-4 text-white/20 text-[9px] tracking-[0.3em] uppercase">
+            <span className="w-8 h-[1px] bg-white/10" />
             Tempo estimado: 15 minutos
           </div>
         </div>
@@ -390,24 +482,30 @@ const BriefingCompleto = () => {
   );
 
   if (showTransition) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[3]} alt="Transition" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={chapterIndex + 1} opacity={0.15} />
+      
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 space-y-8"
+        exit={{ opacity: 0, scale: 1.02 }}
+        className="relative z-10 space-y-12"
       >
-        <div className="space-y-2">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Módulo concluído</p>
-          <h2 className="text-3xl md:text-5xl font-['Georgia'] italic text-white">ARQUITETURA</h2>
+        <div className="space-y-4">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Capítulo {chapterIndex + 1} Concluído</p>
+          <div className="w-12 h-[1px] bg-white/10 mx-auto" />
         </div>
-        <div className="w-12 h-[1px] bg-white/10 mx-auto" />
-        <p className="text-white/40 text-[10px] uppercase tracking-[0.3em] leading-relaxed max-w-sm mx-auto">
-          Capítulos 1, 2 e 3 registrados.<br/><br/>
-          Agora vamos falar sobre os interiores — a atmosfera e os detalhes que fazem a casa ser sua.
-        </p>
+        
+        <h2 className="text-2xl md:text-4xl font-['Georgia'] italic text-white/90 max-w-2xl leading-relaxed">
+          "{currentQuote}"
+        </h2>
+        
+        <div className="flex items-center justify-center gap-4">
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse" />
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-75" />
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-150" />
+        </div>
       </motion.div>
     </div>
   );
@@ -415,89 +513,149 @@ const BriefingCompleto = () => {
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
-      <header className="p-8 flex justify-between items-center">
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col cursor-none relative overflow-hidden">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={chapterIndex} opacity={0.05} />
+
+      <header className="p-8 flex justify-between items-center relative z-20">
         <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
-        <div className="flex gap-4 items-center">
-           <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
-           <div className="w-24 h-[1px] bg-white/20">
-             <div className="h-full bg-white" style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }} />
-           </div>
+        
+        <div className="flex gap-8 items-center">
+          <AnimatePresence>
+            {isSaving && (
+              <motion.div 
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2 text-[#8B7355] text-[8px] uppercase tracking-widest font-bold"
+              >
+                <Save size={10} className="animate-pulse" />
+                <span>Salvo</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex gap-4 items-center">
+             <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
+             <div className="w-24 h-[1px] bg-white/10 overflow-hidden">
+               <motion.div 
+                className="h-full bg-[#8B7355]" 
+                initial={{ width: 0 }}
+                animate={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }}
+                transition={{ duration: 0.8, ease: "circOut" }}
+               />
+             </div>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-16 overflow-y-auto">
+      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-24 overflow-y-auto relative z-10 scrollbar-hide">
         <motion.div
           key={chapterIndex}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="space-y-16 pb-24"
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
+          className="space-y-24 pb-32"
         >
-          <div className="space-y-4">
-            <span className="text-[#8B7355] font-bold text-[10px] tracking-[0.4em] uppercase">Capítulo {chapterIndex + 1}</span>
-            <h1 className="text-4xl md:text-6xl font-['Georgia'] italic leading-tight">{chapter.titulo}</h1>
+          <div className="space-y-6">
+            <motion.span 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-[#8B7355] font-bold text-[10px] tracking-[0.5em] uppercase block"
+            >
+              Capítulo {chapterIndex + 1}
+            </motion.span>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight text-white/90"
+            >
+              {chapter.titulo}
+            </motion.h1>
           </div>
 
-          {chapter.blocos.map(bloco => (
-            <div key={bloco.id} className="space-y-12">
-              <div className="space-y-2">
-                <h3 className="text-xs uppercase tracking-[0.3em] text-white/30 font-bold">{bloco.titulo}</h3>
-                <div className="h-[1px] w-12 bg-[#8B7355]/30" />
+          {chapter.blocos.map((bloco, bIdx) => (
+            <motion.div 
+              key={bloco.id} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ delay: bIdx * 0.1 }}
+              className="space-y-16"
+            >
+              <div className="space-y-3">
+                <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/20 font-bold">{bloco.titulo}</h3>
+                <div className="h-[1px] w-12 bg-[#8B7355]/20" />
               </div>
               
-              <div className="grid gap-10">
+              <div className="grid gap-16">
                 {bloco.perguntas.map(p => (
-                  <div key={p.id} className="space-y-4 group">
+                  <div key={p.id} className="space-y-6 group relative">
                     <label className={cn(
-                      "text-[10px] uppercase tracking-[0.2em] transition-colors duration-300",
-                      answers[p.id] ? "text-[#8B7355]" : "text-white/40 group-focus-within:text-white/70"
+                      "text-[10px] uppercase tracking-[0.3em] transition-all duration-500 block",
+                      answers[p.id] ? "text-[#8B7355]" : "text-white/30 group-focus-within:text-white/60"
                     )}>
                       {p.label}
                       {p.id === 'nome' && projeto?.nome_cliente && (
-                        <span className="ml-2 lowercase italic text-white/20 font-serif font-normal tracking-normal">(Confirmamos: {projeto.nome_cliente})</span>
+                        <span className="ml-3 lowercase italic text-white/20 font-serif font-normal tracking-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
                       )}
                     </label>
 
                     {p.tipo === 'text' && (
-                      <Input 
-                        value={answers[p.id] || ''} 
-                        onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                        className="bg-transparent border-0 border-b border-white/10 rounded-none px-0 h-10 focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-lg font-['Arial']"
-                        placeholder="Escreva aqui..."
-                      />
+                      <div className="relative">
+                        <Input 
+                          value={answers[p.id] || ''} 
+                          onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
+                          className="bg-transparent border-0 border-b border-white/5 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-xl font-['Arial'] placeholder:text-white/5"
+                          placeholder="Digite aqui..."
+                        />
+                        <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#8B7355] group-focus-within:w-full transition-all duration-700" />
+                      </div>
                     )}
 
                     {p.tipo === 'textarea' && (
-                      <Textarea 
-                        value={answers[p.id] || ''} 
-                        onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                        className="bg-transparent border-0 border-b border-white/10 rounded-none px-0 min-h-[100px] focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-lg font-['Arial'] resize-none leading-relaxed"
-                        placeholder={p.placeholder || "Desenvolva sua resposta..."}
-                      />
+                      <div className="relative">
+                        <Textarea 
+                          value={answers[p.id] || ''} 
+                          onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
+                          className="bg-transparent border-0 border-b border-white/5 rounded-none px-0 min-h-[120px] focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-xl font-['Arial'] resize-none leading-relaxed placeholder:text-white/5"
+                          placeholder={p.placeholder || "Sua resposta..."}
+                        />
+                        <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#8B7355] group-focus-within:w-full transition-all duration-700" />
+                      </div>
                     )}
 
                     {p.tipo === 'select' && (
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex flex-wrap gap-4">
                         {p.opcoes?.map(opt => (
                           <button 
                             key={opt} 
                             onClick={() => setAnswers({...answers, [p.id]: opt})} 
                             className={cn(
-                              "px-6 py-3 border transition-all duration-300 text-[11px] uppercase tracking-widest",
+                              "px-8 py-4 border transition-all duration-500 text-[10px] font-bold uppercase tracking-[0.2em] relative overflow-hidden group/btn",
                               answers[p.id] === opt 
-                                ? "bg-white text-black border-white" 
-                                : "bg-white/[0.02] border-white/10 text-white/50 hover:border-white/30 hover:text-white"
+                                ? "text-black border-white" 
+                                : "border-white/5 text-white/30 hover:border-white/20 hover:text-white/60"
                             )}
                           >
-                            {opt}
+                            <span className="relative z-10">{opt}</span>
+                            <motion.div 
+                              className="absolute inset-0 bg-white"
+                              initial={false}
+                              animate={{ scaleY: answers[p.id] === opt ? 1 : 0 }}
+                              transition={{ duration: 0.4, ease: "circOut" }}
+                              style={{ originY: 1 }}
+                            />
                           </button>
                         ))}
                       </div>
                     )}
 
                     {p.tipo === 'multiselect' && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {p.opcoes?.map(opt => {
                           const isSelected = (answers[p.id] || []).includes(opt);
                           return (
@@ -509,13 +667,19 @@ const BriefingCompleto = () => {
                                 setAnswers({...answers, [p.id]: next});
                               }} 
                               className={cn(
-                                "px-5 py-2 border transition-all duration-300 text-[10px] uppercase tracking-wider rounded-full",
+                                "px-6 py-3 border transition-all duration-500 text-[10px] uppercase tracking-widest rounded-full relative overflow-hidden group/chip",
                                 isSelected 
-                                  ? "bg-[#8B7355] text-white border-[#8B7355]" 
-                                  : "bg-transparent border-white/10 text-white/40 hover:border-white/30 hover:text-white"
+                                  ? "text-white border-[#8B7355]" 
+                                  : "bg-transparent border-white/5 text-white/20 hover:border-white/30 hover:text-white"
                               )}
                             >
-                              {opt}
+                              <span className="relative z-10">{opt}</span>
+                              <motion.div 
+                                className="absolute inset-0 bg-[#8B7355]"
+                                initial={false}
+                                animate={{ opacity: isSelected ? 1 : 0 }}
+                                transition={{ duration: 0.3 }}
+                              />
                             </button>
                           );
                         })}
@@ -524,31 +688,36 @@ const BriefingCompleto = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
 
-          <div className="flex items-center gap-8 pt-12">
+          <div className="flex items-center gap-12 pt-16">
             <button 
               onClick={handleBack} 
-              className="text-white/20 hover:text-white/60 flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] transition-all"
+              className="text-white/10 hover:text-white/50 flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] transition-all group"
             >
-              <ChevronLeft size={14} />
-              Voltar
+              <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Voltar</span>
             </button>
             <Button 
               onClick={handleNext} 
-              className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-14 px-12 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-500 group"
+              className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-16 px-16 text-[10px] font-bold tracking-[0.5em] uppercase transition-all duration-700 group relative overflow-hidden"
             >
-              {chapterIndex === 5 ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing') : 'Próximo Capítulo'}
-              <ChevronRight size={14} className="ml-3 group-hover:translate-x-1 transition-transform" />
+              <span className="relative z-10">
+                {chapterIndex === BRIEFING_ARQINT.capítulos.length - 1 
+                  ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing') 
+                  : 'Próximo Capítulo'}
+              </span>
+              <ChevronRight size={16} className="ml-4 relative z-10 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </motion.div>
       </main>
 
-      <footer className="p-12 text-[8px] uppercase tracking-[0.5em] text-white/10 flex justify-between items-center border-t border-white/[0.03]">
+      <footer className="p-12 text-[8px] uppercase tracking-[0.6em] text-white/5 flex justify-between items-center border-t border-white/[0.02] relative z-20">
         <p>NL ARQUITETOS · 2026</p>
-        <p>A ARQUITETURA COMO DECISÃO.</p>
+        <p className="hidden md:block">A ARQUITETURA COMO DECISÃO.</p>
+        <p>CONDOMÍNIO LAGUNA · SP</p>
       </footer>
     </div>
   );
