@@ -5,288 +5,208 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { ChevronRight, ChevronLeft, Check, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type QuestionType = 'choice' | 'text' | 'multi' | 'investment';
-
-interface Question {
-  id: string;
-  title: string;
-  subtitle?: string;
-  type: QuestionType;
-  options?: string[];
-  placeholder?: string;
-}
-
-const QUESTIONS: Record<string, Question[]> = {
-  'Arq+Int': [
+// --- DATA STRUCTURE ---
+const BRIEFING_ARQINT = {
+  capítulos: [
     {
-      id: 'descrever_espaco',
-      title: 'Como você descreveria o espaço que quer criar?',
-      subtitle: 'Não precisa ser técnico — fale como sente.',
-      type: 'choice',
-      options: [
-        'Um lugar de chegada que acalma ao entrar',
-        'Um espaço que impressiona e convida a ficar',
-        'Um ambiente que responde à rotina com eficiência',
-        'Uma extensão da natureza, dentro e fora integrados'
+      id: 1,
+      titulo: 'Você e o Seu Projeto',
+      blocos: [
+        {
+          id: 'B01',
+          titulo: 'Identificação e Contexto',
+          perguntas: [
+            { id: 'nome', label: 'Nome completo', tipo: 'text', prefill: 'nome_cliente' },
+            { id: 'telefone', label: 'Telefone', tipo: 'text', prefill: 'whatsapp' },
+            { id: 'email', label: 'E-mail', tipo: 'text' },
+            { id: 'cidade', label: 'Cidade', tipo: 'text', prefill: 'cidade' },
+            { id: 'endereco', label: 'Endereço do imóvel', tipo: 'text' },
+            { id: 'tipo_imovel', label: 'Tipo do imóvel', tipo: 'select', opcoes: ['Terreno vazio', 'Construção a demolir', 'Reforma', 'Ainda não definido'] },
+            { id: 'fase', label: 'Fase atual', tipo: 'select', opcoes: ['Acabei de adquirir', 'Tenho há algum tempo', 'Ainda vou adquirir'] },
+            { id: 'decisao', label: 'Quem participa das decisões', tipo: 'select', opcoes: ['Só eu', 'Casal', 'Família', 'Tenho sócios'] },
+            { id: 'usuarios', label: 'Quem utilizará o imóvel', tipo: 'textarea', placeholder: 'Ex: Casal, dois filhos de 8 e 12 anos...' },
+          ]
+        },
+        {
+          id: 'B02',
+          titulo: 'Sonho e Objetivos',
+          perguntas: [
+            { id: 'motivacao', label: 'O que motivou este projeto neste momento?', tipo: 'textarea' },
+            { id: 'conquista', label: 'O que espera conquistar com este projeto?', tipo: 'textarea' },
+            { id: 'futuro', label: 'Como imagina sua vida nesta casa daqui a 5 anos?', tipo: 'textarea' },
+            { id: 'simbolo', label: 'Se esta casa representasse uma conquista da sua vida, qual seria?', tipo: 'textarea' },
+          ]
+        }
       ]
     },
     {
-      id: 'quem_vai_viver',
-      title: 'Me conta sobre quem vai viver nesse espaço.',
-      subtitle: 'Quantas pessoas, idades, rotinas — isso define tudo.',
-      type: 'text',
-      placeholder: 'Descreva os moradores e suas rotinas...'
-    },
-    {
-      id: 'tipo_imovel_status',
-      title: 'É terreno ou imóvel existente?',
-      type: 'choice',
-      options: [
-        'Terreno — construção do zero',
-        'Imóvel existente — demolir e reconstruir',
-        'Imóvel existente — reformar',
-        'Ainda não definido'
+      id: 2,
+      titulo: 'O Terreno e a Família',
+      blocos: [
+        {
+          id: 'B03',
+          titulo: 'Terreno e Localização',
+          perguntas: [
+            { id: 'escolha_terreno', label: 'O que fez você escolher este terreno?', tipo: 'textarea' },
+            { id: 'vista', label: 'Existe alguma vista que gostaria de valorizar?', tipo: 'textarea' },
+            { id: 'esconder', label: 'Existe algo do entorno que gostaria de esconder?', tipo: 'textarea' },
+            { id: 'topografia', label: 'Possui levantamento topográfico?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'] },
+            { id: 'sondagem', label: 'Possui sondagem do solo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'] },
+            { id: 'restricoes', label: 'Conhece as restrições do loteamento ou condomínio?', tipo: 'select', opcoes: ['Sim, conheço', 'Parcialmente', 'Não verificamos ainda'] },
+          ]
+        },
+        {
+          id: 'B04',
+          titulo: 'Perfil da Família',
+          perguntas: [
+            { id: 'dia_perfeito', label: 'Como seria um dia perfeito na sua casa?', tipo: 'textarea' },
+            { id: 'filhos', label: 'Possui filhos?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'pets', label: 'Possui pets?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'visitas', label: 'Recebem amigos ou familiares com frequência?', tipo: 'select', opcoes: ['Raramente', 'Às vezes', 'Com frequência'] },
+            { id: 'qtd_visitas', label: 'Quantas pessoas normalmente recebem?', tipo: 'select', opcoes: ['Até 10', '10 a 20', '20 a 50', 'Mais de 50'] },
+          ]
+        },
+        {
+          id: 'B05',
+          titulo: 'Rotina e Hábitos',
+          perguntas: [
+            { id: 'rotina_semana', label: 'Como funciona sua rotina durante a semana?', tipo: 'textarea' },
+            { id: 'rotina_fds', label: 'Como funciona sua rotina nos finais de semana?', tipo: 'textarea' },
+            { id: 'home_office', label: 'Necessidade de home office?', tipo: 'select', opcoes: ['Sim, uso diariamente', 'Sim, ocasionalmente', 'Não'] },
+            { id: 'lazer', label: 'Atividades de lazer em casa', tipo: 'multiselect', opcoes: ['Churrasco', 'Piscina', 'Academia', 'Cinema', 'Videogame', 'Leitura', 'Vinhos / Adega', 'Área gourmet', 'Festas', 'Jardim'] },
+          ]
+        }
       ]
     },
     {
-      id: 'ambientes_inegociaveis',
-      title: 'Quais ambientes são absolutamente inegociáveis?',
-      subtitle: 'Selecione todos que se aplicam.',
-      type: 'multi',
-      options: [
-        'Suíte master com closet',
-        'Quartos adicionais',
-        'Home office dedicado',
-        'Área gourmet',
-        'Piscina',
-        'Garagem ampla',
-        'Jardim ou área verde',
-        'Lavabo',
-        'Despensa',
-        'Área de serviço'
+      id: 3,
+      titulo: 'Arquitetura',
+      blocos: [
+        {
+          id: 'B06',
+          titulo: 'Estilo Arquitetônico',
+          perguntas: [
+            { id: 'estilo_gosta', label: 'Estilos que mais lhe agradam', tipo: 'multiselect', opcoes: ['Moderno', 'Contemporâneo', 'Minimalista', 'Industrial', 'Clássico', 'Tropical', 'Rústico'] },
+            { id: 'estilo_nao', label: 'Estilos que não combinam com você', tipo: 'multiselect', opcoes: ['Muito colorido', 'Muito vidro', 'Muito concreto aparente', 'Pé-direito duplo', 'Ambientes muito integrados', 'Cores escuras', 'Estilo rústico'] },
+            { id: 'sentimento', label: 'Como deseja se sentir ao chegar em sua casa?', tipo: 'textarea' },
+            { id: 'referencias_arq', label: 'Referências de projetos arquitetônicos', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, endereços de casas que admira...' },
+          ]
+        },
+        {
+          id: 'B07',
+          titulo: 'Programa de Necessidades',
+          perguntas: [
+            { id: 'ambientes', label: 'Ambientes indispensáveis', tipo: 'multiselect', opcoes: ['Suíte master', 'Closet', 'Quartos adicionais', 'Escritório / Home office', 'Área gourmet', 'Piscina', 'Academia', 'Adega', 'Brinquedoteca', 'Cinema', 'Lavabo', 'Dependência de serviço', 'Garagem coberta', 'Jardim'] },
+            { id: 'ambientes_desejo', label: 'Ambientes desejáveis — se o orçamento permitir', tipo: 'textarea' },
+            { id: 'tres_itens', label: 'Quais são os 3 itens que não podem faltar?', tipo: 'textarea' },
+            { id: 'eliminar', label: 'Algum ambiente que pode ser eliminado se necessário?', tipo: 'textarea' },
+            { id: 'futuro', label: 'Existe alguma necessidade futura que devemos considerar?', tipo: 'textarea', placeholder: 'Ex: quarto para filho, espaço para envelhecer, home office maior...' },
+          ]
+        },
+        {
+          id: 'B08',
+          titulo: 'Tecnologia e Sustentabilidade',
+          perguntas: [
+            { id: 'sustentabilidade', label: 'Interesse em sustentabilidade', tipo: 'multiselect', opcoes: ['Energia solar', 'Aquecimento solar', 'Reaproveitamento de água', 'Ventilação cruzada', 'Eficiência energética', 'Materiais sustentáveis'] },
+            { id: 'tecnologia_arq', label: 'Interesse em tecnologia na estrutura', tipo: 'multiselect', opcoes: ['Automação residencial', 'Carregador para veículo elétrico', 'Infraestrutura para câmeras', 'Internet cabeada', 'Gerador'] },
+          ]
+        }
       ]
     },
     {
-      id: 'o_que_incomoda',
-      title: 'O que mais te incomoda no lugar onde você vive hoje?',
-      subtitle: 'As dores do presente são o projeto do futuro.',
-      type: 'text',
-      placeholder: 'O que não funciona hoje?'
-    },
-    {
-      id: 'espaco_inesquecivel',
-      title: 'Tem algum espaço que você visitou e nunca esqueceu?',
-      subtitle: 'Hotel, casa de amigo, restaurante — qualquer lugar que ficou na memória.',
-      type: 'text'
-    },
-    {
-      id: 'o_que_nao_quer',
-      title: 'O que você definitivamente não quer ver no projeto?',
-      subtitle: 'Tão importante quanto o que quer — define os limites.',
-      type: 'text'
-    },
-    {
-      id: 'investimento',
-      title: 'Qual é a faixa de investimento para a execução?',
-      type: 'investment',
-      options: [
-        'Até R$ 300 mil',
-        'R$ 300 mil – R$ 600 mil',
-        'R$ 600 mil – R$ 1,2 milhão',
-        'Acima de R$ 1,2 milhão',
-        'Prefiro discutir na reunião'
+      id: 4,
+      titulo: 'Interiores',
+      blocos: [
+        {
+          id: 'B09',
+          titulo: 'Ambientes e Interiores',
+          perguntas: [
+            { id: 'ambientes_int', label: 'Ambientes a trabalhar nos interiores', tipo: 'multiselect', opcoes: ['Sala de estar', 'Sala de jantar', 'Cozinha', 'Área gourmet', 'Suíte master', 'Quartos adicionais', 'Banheiros', 'Escritório', 'Cinema', 'Academia', 'Lavabo'] },
+            { id: 'pe_direito', label: 'Pé-direito desejado', tipo: 'select', opcoes: ['Padrão', 'Diferenciado em alguns ambientes', 'Alto em toda a casa'] },
+          ]
+        },
+        {
+          id: 'B10',
+          titulo: 'Mobiliário e Marcenaria',
+          perguntas: [
+            { id: 'moveis_existentes', label: 'Móveis existentes serão mantidos?', tipo: 'select', opcoes: ['Sim, vários ficam', 'Alguns ficam', 'Não — começo do zero'] },
+            { id: 'moveis_quais', label: 'Quais móveis ficam?', tipo: 'textarea' },
+            { id: 'marcenaria', label: 'Marcenaria existente?', tipo: 'select', opcoes: ['Sim, fica', 'Sim, vai embora', 'Não tenho'] },
+            { id: 'nivel_marcenaria', label: 'Nível de marcenaria desejado', tipo: 'select', opcoes: ['Básica', 'Intermediária', 'Premium', 'Sob medida completa'] },
+          ]
+        },
+        {
+          id: 'B11',
+          titulo: 'Estilo dos Interiores',
+          perguntas: [
+            { id: 'materiais_gosta', label: 'Materiais preferidos', tipo: 'multiselect', opcoes: ['Madeira', 'Pedra natural', 'Mármore', 'Concreto', 'Metal', 'Vidro', 'Tecidos naturais', 'Cerâmica'] },
+            { id: 'materiais_nao', label: 'Materiais que não gostaria de utilizar', tipo: 'textarea' },
+            { id: 'referencias_int', label: 'Referências de interiores', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, ambientes que admira...' },
+            { id: 'nao_quer_int', label: 'O que definitivamente não quer ver nos interiores?', tipo: 'textarea' },
+          ]
+        },
+        {
+          id: 'B12',
+          titulo: 'Iluminação e Tecnologia',
+          perguntas: [
+            { id: 'tecnologia_int', label: 'Tecnologia nos interiores', tipo: 'multiselect', opcoes: ['Automação residencial', 'Som ambiente', 'Internet cabeada', 'Sistema de câmeras', 'Fechadura digital', 'Iluminação cênica', 'Home theater'] },
+          ]
+        }
       ]
     },
     {
-      id: 'quem_decide',
-      title: 'Quem toma as decisões finais?',
-      type: 'choice',
-      options: ['Só eu', 'Casal', 'Família', 'Tenho sócios']
-    },
-    {
-      id: 'extra',
-      title: 'Tem algo que quer garantir que a NL sabe antes da reunião?',
-      subtitle: 'Espaço livre — qualquer detalhe, preocupação ou sonho.',
-      type: 'text'
-    }
-  ],
-  'Interiores': [
-    {
-      id: 'sentir_espaco',
-      title: 'Como você quer que esse espaço te faça sentir?',
-      subtitle: 'A atmosfera que você quer criar antes de qualquer decisão técnica.',
-      type: 'choice',
-      options: [
-        'Acolhedor e quente',
-        'Limpo e minimalista',
-        'Sofisticado e elegante',
-        'Vivo e cheio de personalidade'
+      id: 5,
+      titulo: 'Investimento e Planejamento',
+      blocos: [
+        {
+          id: 'B13',
+          titulo: 'Orçamento',
+          perguntas: [
+            { id: 'investimento', label: 'Faixa de investimento prevista', tipo: 'select', opcoes: ['Até R$ 300k', 'R$ 300k – R$ 600k', 'R$ 600k – R$ 1,2M', 'R$ 1,2M – R$ 2M', 'Acima de R$ 2M'] },
+            { id: 'limite', label: 'Existe um limite máximo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Prefiro discutir na reunião'] },
+            { id: 'concentrar', label: 'Onde deseja concentrar os investimentos?', tipo: 'textarea' },
+            { id: 'padrao', label: 'Preferência de padrão', tipo: 'select', opcoes: ['Alto padrão em áreas estratégicas', 'Padrão bom uniforme em toda a casa', 'Ainda não sei'] },
+          ]
+        },
+        {
+          id: 'B14',
+          titulo: 'Prioridades',
+          perguntas: [
+            { id: 'prioridades', label: 'Ordene do mais para o menos importante', tipo: 'textarea', placeholder: 'Liste os itens por ordem de importância...' },
+            { id: 'cortar', label: 'Se fosse necessário reduzir custos, o que revisaria primeiro?', tipo: 'textarea' },
+          ]
+        },
+        {
+          id: 'B15',
+          titulo: 'Escala de Importância',
+          perguntas: [
+            { id: 'escala', label: 'Avalie cada item de 1 (menos importante) a 5 (essencial)', tipo: 'textarea', placeholder: 'Ex: Conforto: 5, Estética: 4...' },
+          ]
+        }
       ]
     },
     {
-      id: 'quem_vai_viver',
-      title: 'Me conta sobre quem vai usar esse espaço.',
-      subtitle: 'Quantas pessoas, idades, rotinas — isso define tudo.',
-      type: 'text'
-    },
-    {
-      id: 'tipo_imovel',
-      title: 'Qual é o imóvel?',
-      type: 'choice',
-      options: ['Apartamento', 'Casa', 'Cobertura', 'Outro']
-    },
-    {
-      id: 'ambientes_trabalhados',
-      title: 'Quais ambientes serão trabalhados?',
-      subtitle: 'Selecione todos que se aplicam.',
-      type: 'multi',
-      options: [
-        'Sala de estar',
-        'Sala de jantar',
-        'Cozinha',
-        'Suíte master',
-        'Quartos',
-        'Banheiros',
-        'Home office',
-        'Varanda',
-        'Área de serviço',
-        'Todos os ambientes'
+      id: 6,
+      titulo: 'Expectativas Finais',
+      blocos: [
+        {
+          id: 'B16',
+          titulo: 'Medos e Expectativas',
+          perguntas: [
+            { id: 'medos', label: 'Quais são seus 3 maiores medos em relação à obra?', tipo: 'textarea' },
+            { id: 'excelente', label: 'O que seria um projeto excelente para você?', tipo: 'textarea' },
+            { id: 'sucesso', label: 'O que faria você considerar este projeto um sucesso?', tipo: 'textarea' },
+            { id: 'valeu', label: 'Quando sua casa estiver pronta, o que fará você dizer que todo o investimento valeu a pena?', tipo: 'textarea' },
+            { id: 'frase', label: 'Em uma única frase, descreva a casa dos seus sonhos.', tipo: 'textarea', placeholder: 'Ex: "Quero uma casa elegante, mas onde meus filhos queiram ficar."' },
+            { id: 'mais', label: 'Existe alguma informação importante que ainda não perguntamos?', tipo: 'textarea' },
+          ]
+        }
       ]
-    },
-    {
-      id: 'moveis_permanentes',
-      title: 'Tem móveis ou itens que ficam — e que precisam ser respeitados no projeto?',
-      subtitle: 'Peças com valor afetivo, investimento anterior, estrutura que não muda.',
-      type: 'text'
-    },
-    {
-      id: 'o_que_incomoda',
-      title: 'O que mais te incomoda no espaço como está hoje?',
-      subtitle: 'O que não funciona, o que falta, o que te irrita.',
-      type: 'text'
-    },
-    {
-      id: 'espaco_inesquecivel',
-      title: 'Tem algum ambiente que você visitou e nunca esqueceu?',
-      subtitle: 'Pode ser de uma revista, viagem, amigo, hotel.',
-      type: 'text'
-    },
-    {
-      id: 'o_que_nao_quer',
-      title: 'O que você definitivamente não quer ver no projeto?',
-      subtitle: 'Estilos, materiais, cores, sensações — o que não representa você.',
-      type: 'text'
-    },
-    {
-      id: 'investimento',
-      title: 'Qual é a faixa de investimento?',
-      type: 'investment',
-      options: [
-        'Até R$ 50 mil',
-        'R$ 50 mil – R$ 100 mil',
-        'R$ 100 mil – R$ 200 mil',
-        'R$ 200 mil – R$ 350 mil',
-        'Acima de R$ 350 mil',
-        'Prefiro discutir na reunião'
-      ]
-    },
-    {
-      id: 'extra',
-      title: 'Tem algo que quer garantir que a NL sabe antes da reunião?',
-      type: 'text'
-    }
-  ],
-  'Comercial': [
-    {
-      id: 'negocio',
-      title: 'Me conta sobre o seu negócio.',
-      subtitle: 'O que é, como funciona, o que vende ou oferece.',
-      type: 'text'
-    },
-    {
-      id: 'status_negocio',
-      title: 'É abertura, reforma ou expansão?',
-      type: 'choice',
-      options: [
-        'Abertura — espaço novo',
-        'Reforma — espaço existente',
-        'Expansão — aumentar o que existe'
-      ]
-    },
-    {
-      id: 'cliente_alvo',
-      title: 'Quem é o cliente do seu negócio?',
-      subtitle: 'Perfil, faixa etária, comportamento — quem você quer atrair.',
-      type: 'text'
-    },
-    {
-      id: 'sentir_espaco',
-      title: 'Como você quer que as pessoas se sintam ao entrar no seu espaço?',
-      subtitle: 'A primeira impressão que você quer causar.',
-      type: 'choice',
-      options: [
-        'Impressionado e curioso',
-        'Acolhido e confortável',
-        'Confiante e seguro',
-        'Estimulado e inspirado'
-      ]
-    },
-    {
-      id: 'areas_indispensaveis',
-      title: 'Quais áreas são indispensáveis?',
-      type: 'multi',
-      options: [
-        'Área de atendimento ao cliente',
-        'Área de espera',
-        'Escritório ou sala de reunião',
-        'Estoques',
-        'Área para funcionários',
-        'Banheiro para clientes',
-        'Vitrine ou exposição'
-      ]
-    },
-    {
-      id: 'identidade_visual',
-      title: 'Tem identidade visual definida — logo, cores, fontes?',
-      type: 'choice',
-      options: [
-        'Sim, está tudo definido',
-        'Sim, mas pode evoluir',
-        'Não tenho ainda',
-        'Estou desenvolvendo'
-      ]
-    },
-    {
-      id: 'marca_tres_palavras',
-      title: 'Em três palavras — como você descreveria a sua marca?',
-      type: 'text'
-    },
-    {
-      id: 'o_que_nao_quer',
-      title: 'O que você definitivamente não quer ver no espaço?',
-      subtitle: 'Estilos, materiais, referências — o que não representa sua marca.',
-      type: 'text'
-    },
-    {
-      id: 'investimento',
-      title: 'Qual é a faixa de investimento?',
-      type: 'investment',
-      options: [
-        'Até R$ 100 mil',
-        'R$ 100 mil – R$ 300 mil',
-        'R$ 300 mil – R$ 600 mil',
-        'Acima de R$ 600 mil',
-        'Prefiro discutir na reunião'
-      ]
-    },
-    {
-      id: 'extra',
-      title: 'Tem data de inauguração em mente? Tem algo mais que quer garantir que a NL sabe?',
-      type: 'text'
     }
   ]
 };
@@ -301,405 +221,180 @@ const BACKGROUND_IMAGES = [
 ];
 
 const BriefingCompleto = () => {
-  useEffect(() => {
-    // Adicionando fontes premium se não existirem
-    if (!document.getElementById('font-georgia-italic')) {
-      const style = document.createElement('style');
-      style.id = 'font-georgia-italic';
-      style.innerHTML = `
-        @font-face {
-          font-family: 'GeorgiaItalic';
-          src: local('Georgia Italic'), local('Georgia-Italic');
-          font-style: italic;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }, []);
-
-
   const { token } = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
-  const [step, setStep] = useState(-1);
+  const [chapterIndex, setChapterIndex] = useState(-1);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
 
-  // Detectar tipo pela rota fixa
-  const tipoByPath: Record<string, string> = {
-    '/briefing/arqint': 'ARQ+INT',
-    '/briefing/interiores': 'Interiores',
-    '/briefing/comercial': 'Comercial',
-  };
-
-  const tipoFixo = tipoByPath[location.pathname];
-
-  const fetchProjeto = async () => {
-    if (!token) return;
-    try {
-      const { data, error } = await supabase
-        .rpc('get_project_by_token_or_slug', { p_val: token })
-        .maybeSingle();
-      if (error || !data) {
-        toast.error("Link de briefing inválido ou expirado.");
+  useEffect(() => {
+    const fetchProjeto = async () => {
+      if (!token) {
         setLoading(false);
         return;
       }
-      setProjeto(data);
-      const savedProgress = localStorage.getItem(`briefing_progress_${token}`);
-      if (savedProgress) {
-        try {
-          const parsed = JSON.parse(savedProgress);
-          setAnswers(parsed.answers || {});
-          setStep(parsed.step !== undefined ? parsed.step : -1);
-        } catch (e) {
-          console.error('Error parsing progress', e);
+      try {
+        const { data, error } = await supabase
+          .rpc('get_project_by_token_or_slug', { p_val: token })
+          .maybeSingle();
+        if (data) {
+          setProjeto(data);
+          const saved = localStorage.getItem(`briefing_progress_${token}`);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            setAnswers(parsed.answers || {});
+            setChapterIndex(parsed.chapterIndex !== undefined ? parsed.chapterIndex : -1);
+          }
         }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    fetchProjeto();
+  }, [token]);
 
   useEffect(() => {
-    if (tipoFixo) {
-      setProjeto({ tipo: tipoFixo, nome_cliente: null, id: null });
-      setLoading(false);
-      return;
-    }
-    // Se tem token, buscar projeto normalmente
-    if (token) {
-      fetchProjeto();
-    } else {
-      setLoading(false);
-    }
-  }, [token, tipoFixo]);
-
-  useEffect(() => {
-    if (token && step >= 0) {
+    if (token && chapterIndex >= -1) {
       localStorage.setItem(`briefing_progress_${token}`, JSON.stringify({
-        step,
+        chapterIndex,
         answers
       }));
     }
-  }, [step, answers, token]);
-
-  const getTipoKey = (tipo: string): string => {
-    const t = (tipo || '').toLowerCase().replace(/\s/g, '');
-    if ((t.includes('int') && t.includes('arq')) || t === 'arq+int') return 'Arq+Int';
-    if (t === 'interiores' || t === 'int') return 'Interiores';
-    if (t === 'comercial' || t === 'com') return 'Comercial';
-    return 'Arq+Int';
-  };
-
-  const questions = projeto ? QUESTIONS[getTipoKey(projeto.tipo)] : [];
-  
-  const tipoLabel: Record<string, string> = {
-    'ARQ+INT': 'BRIEFING EXCLUSIVO · ARQ+INT',
-    'Interiores': 'BRIEFING EXCLUSIVO · INTERIORES',
-    'Comercial': 'BRIEFING EXCLUSIVO · COMERCIAL',
-  };
-
-  const tituloIntro: Record<string, string> = {
-    'ARQ+INT': 'Vamos conhecer o seu projeto de arquitetura.',
-    'Interiores': 'Vamos conhecer o seu projeto de interiores.',
-    'Comercial': 'Vamos conhecer o seu projeto comercial.',
-  };
-
-  const currentQuestion = step >= 0 ? questions[step] : null;
+  }, [chapterIndex, answers, token]);
 
   const handleNext = () => {
-    if (step < questions.length - 1) {
-      setStep(step + 1);
+    if (chapterIndex === 2) {
+      setShowTransition(true);
+      setTimeout(() => {
+        setShowTransition(false);
+        setChapterIndex(chapterIndex + 1);
+      }, 3000);
+    } else if (chapterIndex < BRIEFING_ARQINT.capitulos.length - 1) {
+      setChapterIndex(chapterIndex + 1);
     } else {
       submitBriefing();
     }
   };
 
   const handleBack = () => {
-    if (step > -1) {
-      setStep(step - 1);
-    }
-  };
-
-  const handleAnswerChange = (questionId: string, answer: any) => {
-    setAnswers(prev => ({ ...prev, [questionId]: answer }));
+    if (chapterIndex > 0) setChapterIndex(chapterIndex - 1);
+    else setChapterIndex(-1);
   };
 
   const submitBriefing = async () => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('briefings_completos')
-        .insert({
-          projeto_id: projeto.id || null,
-          tipo: projeto.tipo,
-          respostas: answers
-        });
-      if (error) throw error;
+      await supabase.from('briefings_completos').insert({
+        projeto_id: projeto?.id,
+        respostas: answers
+      });
       localStorage.removeItem(`briefing_progress_${token}`);
       setIsFinished(true);
-    } catch (e: any) {
-      console.error(e);
-      toast.error('Erro ao enviar briefing: ' + e.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white font-['Courier_New']">
-      <div className="animate-pulse tracking-widest uppercase text-xs">Carregando projeto...</div>
-    </div>
-  );
-
-  if (!projeto) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-[#141414] border border-white/10 p-10 text-center space-y-6">
-        <AlertCircle className="mx-auto text-rose-500 w-12 h-12" />
-        <h1 className="text-white font-['Georgia'] text-2xl">Projeto não encontrado</h1>
-        <p className="text-white/60 text-sm leading-relaxed">O link utilizado parece estar incorreto ou o projeto não está mais disponível.</p>
-        <Button variant="outline" className="w-full border-white/10 text-white/60 uppercase tracking-widest text-[10px] h-12" onClick={() => navigate('/')}>Voltar para Início</Button>
+  if (loading) return null;
+  if (isFinished) return (
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center">
+      <div className="max-w-xl space-y-8">
+        <h1 className="text-4xl font-['Georgia'] italic text-white">Briefing concluído.</h1>
+        <p className="text-white/60 font-['Arial'] leading-relaxed">
+          Parabéns. Você acaba de concluir a primeira etapa do desenvolvimento do seu projeto.<br/><br/>
+          Nossa equipe analisará cuidadosamente suas respostas para que a próxima reunião seja mais estratégica.<br/><br/>
+          Próxima etapa: Reunião de Diagnóstico e Direcionamento.<br/><br/>
+          A arquitetura como decisão.
+        </p>
       </div>
     </div>
   );
 
-  if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20"><img src={BACKGROUND_IMAGES[0]} alt="Bg" className="w-full h-full object-cover" /></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 to-[#0a0a0a]" />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-xl w-full text-center space-y-12">
-        <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
-          <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
-        </div>
-        <div className="space-y-6">
-          <h1 className="text-white font-['Georgia'] text-4xl md:text-5xl italic">Briefing recebido.</h1>
-          <p className="text-white/60 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-md mx-auto">A NL Arquitetos revisará suas respostas antes da reunião.</p>
-        </div>
-        <div className="pt-12 border-t border-white/10"><p className="text-white/20 text-[9px] uppercase tracking-[0.8em]">A arquitetura como decisão.</p></div>
-      </motion.div>
+  if (chapterIndex === -1) return (
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-24 py-12">
+      <div className="space-y-10 max-w-2xl">
+        {projeto?.nome_cliente && <p className="text-[#8B7355] font-['Georgia'] italic">Confirmamos: {projeto.nome_cliente}</p>}
+        <h1 className="text-6xl font-['Georgia'] italic text-white">Vamos começar o seu briefing.</h1>
+        <Button 
+          onClick={() => setChapterIndex(0)} 
+          className="border border-white/20 text-white/60 hover:text-white bg-transparent px-10 h-12 font-bold tracking-[0.4em] uppercase transition-all"
+        >
+          Começar Briefing
+        </Button>
+      </div>
     </div>
   );
 
-  const bgImage = BACKGROUND_IMAGES[Math.max(0, step) % BACKGROUND_IMAGES.length];
+  if (showTransition) return (
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-center p-12">
+      <div className="space-y-6">
+        <h2 className="text-3xl font-['Georgia'] italic text-white">ARQUITETURA CONCLUÍDA</h2>
+        <p className="text-white/60 text-sm">Capítulos 1, 2 e 3 registrados.<br/>Agora vamos falar sobre os interiores.</p>
+      </div>
+    </div>
+  );
+
+  const chapter = BRIEFING_ARQINT.capitulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col font-['Courier_New'] relative overflow-hidden">
-      <AnimatePresence mode='wait'>
-        <motion.div 
-          key={bgImage} 
-          initial={{ opacity: 0, scale: 1.1 }} 
-          animate={{ opacity: 0.15, scale: 1 }} 
-          exit={{ opacity: 0, scale: 1.05 }} 
-          transition={{ duration: 2, ease: "easeOut" }} 
-          className="absolute inset-0 z-0"
-        >
-          <img src={bgImage} alt="Project context" className="w-full h-full object-cover grayscale" />
-        </motion.div>
-      </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/20 z-0" />
-      <header className="relative z-10 p-8 flex justify-between items-center">
-        <div className="space-y-1">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em]">NL ARQUITETOS</p>
-          <p className="text-white/40 text-[9px] tracking-widest">
-            {tipoLabel[projeto?.tipo] || 'BRIEFING EXCLUSIVO'}
-          </p>
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
+      <header className="p-8 flex justify-between items-center">
+        <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
+        <div className="flex gap-4 items-center">
+           <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capitulos.length}</span>
+           <div className="w-24 h-[1px] bg-white/20">
+             <div className="h-full bg-white" style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capitulos.length) * 100}%` }} />
+           </div>
         </div>
-        {step >= 0 && (
-          <div className="flex items-center gap-4">
-            <div className="text-[9px] text-white/30 tracking-[0.2em] font-medium">PASSO {step + 1} DE {questions.length}</div>
-            <div className="w-16 bg-white/5 h-[1px] rounded-full overflow-hidden">
-              <motion.div 
-                className="bg-white/40 h-full" 
-                initial={{ width: 0 }} 
-                animate={{ width: `${((step + 1) / questions.length) * 100}%` }} 
-                transition={{ duration: 0.8, ease: "circOut" }}
-              />
-            </div>
-          </div>
-        )}
       </header>
-      <main className="relative z-10 flex-1 flex items-center px-8 md:px-24 py-12">
-        <div className="max-w-3xl w-full">
-          <AnimatePresence mode="wait">
-            {step === -1 ? (
-              <motion.div key="welcome" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-10">
-                <div className="space-y-6">
-                  {projeto?.nome_cliente && (
-                    <motion.p 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="text-white/30 font-['Georgia'] italic text-lg"
-                    >
-                      Seja bem-vindo, {projeto.nome_cliente}.
-                    </motion.p>
-                  )}
-                  <h1 className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight">
-                    {tituloIntro[projeto?.tipo] || 'Vamos conhecer o seu projeto.'}
-                  </h1>
-                  <p className="text-white/60 text-xs md:text-sm tracking-relaxed max-w-lg font-['Arial'] leading-relaxed">
-                    Este briefing é a base de tudo que construiremos juntos. Seja honesto — cada detalhe importa.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-6 pt-8">
-                  <div className="flex items-center gap-4">
-                    <Button onClick={() => setStep(0)} className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-10 h-12 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-300">
-                      Começar Briefing
-                    </Button>
-                    <div className="flex items-center gap-2 text-white/30 text-[9px] tracking-widest uppercase font-['Arial']">
-                      <span className="w-4 h-[1px] bg-white/10"></span>
-                      TEMPO ESTIMADO: 5 MINUTOS
-                    </div>
+
+      <main className="flex-1 px-24 py-12 max-w-4xl space-y-12">
+        <h1 className="text-5xl font-['Georgia'] italic">{chapter.titulo}</h1>
+        {chapter.blocos.map(bloco => (
+          <div key={bloco.id} className="space-y-8">
+            <h3 className="text-xl text-white/50 border-b border-white/10 pb-4">{bloco.titulo}</h3>
+            {bloco.perguntas.map(p => (
+              <div key={p.id} className="space-y-3">
+                <label className="text-xs uppercase tracking-widest text-white/60">{p.label}</label>
+                {p.tipo === 'text' && <Input value={answers[p.id] || ''} onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} className="bg-transparent border-white/10" />}
+                {p.tipo === 'textarea' && <Textarea value={answers[p.id] || ''} onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} className="bg-transparent border-white/10" />}
+                {p.tipo === 'select' && (
+                  <div className="flex flex-wrap gap-2">
+                    {p.opcoes?.map(opt => (
+                      <button key={opt} onClick={() => setAnswers({...answers, [p.id]: opt})} className={cn("px-4 py-2 border rounded-sm text-sm", answers[p.id] === opt ? "bg-white text-black" : "border-white/20")}>{opt}</button>
+                    ))}
                   </div>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div 
-                key={currentQuestion?.id} 
-                initial={{ opacity: 0, y: 30 }} 
-                animate={{ opacity: 1, y: 0 }} 
-                exit={{ opacity: 0, y: -30 }} 
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-16"
-              >
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <span className="text-[#8B7355] font-bold text-[9px] tracking-[0.4em] uppercase">QUESTÃO {step + 1}</span>
-                    <div className="h-[1px] w-8 bg-[#8B7355]/20" />
+                )}
+                {p.tipo === 'multiselect' && (
+                  <div className="flex flex-wrap gap-2">
+                    {p.opcoes?.map(opt => (
+                      <button key={opt} onClick={() => {
+                        const current = answers[p.id] || [];
+                        const next = current.includes(opt) ? current.filter((i: string) => i !== opt) : [...current, opt];
+                        setAnswers({...answers, [p.id]: next});
+                      }} className={cn("px-4 py-2 border rounded-sm text-sm", (answers[p.id] || []).includes(opt) ? "bg-white text-black" : "border-white/20")}>{opt}</button>
+                    ))}
                   </div>
-                  <h2 className="text-4xl md:text-6xl font-['Georgia'] italic leading-[1.15] text-white/90">
-                    {currentQuestion?.title}
-                  </h2>
-                  {currentQuestion?.subtitle && (
-                    <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] leading-relaxed max-w-xl">
-                      {currentQuestion.subtitle}
-                    </p>
-                  )}
-                </div>
-
-                <div className="py-2">
-                  {currentQuestion?.type === 'choice' && (
-                    <div className="grid gap-4 max-w-xl">
-                      {currentQuestion.options?.map(option => (
-                        <button 
-                          key={option} 
-                          onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 400); }} 
-                          className={cn(
-                            "w-full text-left p-6 border transition-all duration-500 flex justify-between items-center group relative overflow-hidden", 
-                            answers[currentQuestion.id] === option 
-                              ? "bg-white text-black border-white" 
-                              : "bg-white/[0.02] border-white/10 hover:border-white/30 text-white/70 hover:text-white hover:scale-[1.01]"
-                          )}
-                        >
-                          <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
-                          {answers[currentQuestion.id] === option && <Check size={14} className="relative z-10" />}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {currentQuestion?.type === 'investment' && (
-                    <div className="grid gap-4 max-w-xl">
-                      {currentQuestion.options?.map(option => (
-                        <button 
-                          key={option} 
-                          onClick={() => { handleAnswerChange(currentQuestion.id, option); setTimeout(handleNext, 400); }} 
-                          className={cn(
-                            "w-full text-left p-6 border transition-all duration-500 flex justify-between items-center group", 
-                            answers[currentQuestion.id] === option 
-                              ? "bg-[#8B7355] text-white border-[#8B7355]" 
-                              : "bg-white/[0.02] border-white/10 hover:border-white/30 text-white/70 hover:text-white hover:scale-[1.01]"
-                          )}
-                        >
-                          <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
-                          {answers[currentQuestion.id] === option && <Check size={14} />}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {currentQuestion?.type === 'multi' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                      {currentQuestion.options?.map(option => {
-                        const current = answers[currentQuestion.id] || [];
-                        const isSelected = current.includes(option);
-                        return (
-                          <div 
-                            key={option} 
-                            onClick={() => { const next = isSelected ? current.filter((i: string) => i !== option) : [...current, option]; handleAnswerChange(currentQuestion.id, next); }} 
-                            className={cn(
-                              "cursor-pointer flex items-center gap-4 p-6 border transition-all duration-500 hover:scale-[1.01]", 
-                              isSelected ? "bg-white/10 border-white/40 text-white" : "bg-white/[0.02] border-white/5 hover:border-white/20 text-white/60 hover:text-white"
-                            )}
-                          >
-                            <Checkbox checked={isSelected} className="border-white/20 data-[state=checked]:bg-[#8B7355] data-[state=checked]:border-[#8B7355]" />
-                            <span className="text-[13px] font-['Arial'] tracking-wide">{option.toLowerCase()}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {currentQuestion?.type === 'text' && (
-                    <div className="max-w-2xl">
-                      <Textarea 
-                        autoFocus 
-                        placeholder={currentQuestion.placeholder || 'Escreva aqui...'} 
-                        value={answers[currentQuestion.id] || ''} 
-                        onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)} 
-                        className="bg-transparent border-0 border-b border-white/10 rounded-none text-2xl p-0 min-h-[120px] focus:ring-0 focus:border-white/40 transition-all placeholder:text-white/5 font-['Georgia'] italic resize-none leading-relaxed" 
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-10 pt-4">
-                  {step >= 0 && (
-                    <button onClick={handleBack} className="text-white/20 hover:text-white/60 flex items-center gap-3 text-[9px] uppercase tracking-[0.3em] transition-all duration-300">
-                      <ChevronLeft size={14} strokeWidth={1.5} /> 
-                      Voltar
-                    </button>
-                  )}
-                  {(currentQuestion?.type === 'text' || currentQuestion?.type === 'multi') && (
-                    <Button 
-                      onClick={handleNext} 
-                      disabled={isSubmitting || (currentQuestion?.type === 'text' && !answers[currentQuestion.id]) || (currentQuestion?.type === 'multi' && (!answers[currentQuestion.id] || answers[currentQuestion.id].length === 0))} 
-                      className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-12 px-12 text-[9px] font-bold tracking-[0.4em] uppercase group transition-all duration-500"
-                    >
-                      {step === questions.length - 1 ? (isSubmitting ? 'Enviando...' : 'Finalizar') : 'Próxima'}
-                      <ChevronRight size={14} className="ml-3 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+        <div className="flex gap-4 pt-12">
+          <Button onClick={handleBack} variant="outline" className="border-white/10 uppercase tracking-widest text-[10px]">Voltar</Button>
+          <Button onClick={handleNext} className="bg-white text-black uppercase tracking-widest text-[10px]">{chapterIndex === 5 ? 'Finalizar' : 'Continuar'}</Button>
         </div>
       </main>
-      <footer className="relative z-10 p-12 flex justify-between items-center border-t border-white/[0.03]">
-        <div className="flex items-center gap-6">
-          <p className="text-white/10 text-[8px] uppercase tracking-[0.4em]">
-            NL ARQUITETOS · 2026
-          </p>
-          <div className="w-[1px] h-3 bg-white/5 hidden md:block" />
-          <p className="text-white/10 text-[8px] uppercase tracking-[0.4em] hidden md:block">
-            SÃO JOSÉ DOS CAMPOS · SP
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-white/10 text-[8px] uppercase tracking-[0.6em]">
-            A ARQUITETURA COMO DECISÃO.
-          </p>
-        </div>
+
+      <footer className="p-8 text-[9px] uppercase tracking-[0.5em] text-white/20 text-center">
+        NL ARQUITETOS · 2026 · A ARQUITETURA COMO DECISÃO
       </footer>
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-[99] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
     </div>
   );
 };
