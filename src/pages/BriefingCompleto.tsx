@@ -296,7 +296,7 @@ const BriefingCompleto = () => {
           // Prefill logic
           const prefillAnswers: any = {};
           if (data.nome_cliente) prefillAnswers['nome'] = data.nome_cliente;
-          if (data.cidade) prefillAnswers['cidade'] = data.cidade;
+          if (data.whatsapp) prefillAnswers['telefone'] = data.whatsapp;
           if (data.cidade) prefillAnswers['cidade'] = data.cidade;
 
           const saved = localStorage.getItem(`briefing_progress_${token}`);
