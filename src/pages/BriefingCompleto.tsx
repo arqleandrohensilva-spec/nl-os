@@ -513,18 +513,44 @@ const BriefingCompleto = () => {
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
-      <header className="p-8 flex justify-between items-center">
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col cursor-none relative overflow-hidden">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={chapterIndex} opacity={0.05} />
+
+      <header className="p-8 flex justify-between items-center relative z-20">
         <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
-        <div className="flex gap-4 items-center">
-           <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
-           <div className="w-24 h-[1px] bg-white/20">
-             <div className="h-full bg-white" style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }} />
-           </div>
+        
+        <div className="flex gap-8 items-center">
+          <AnimatePresence>
+            {isSaving && (
+              <motion.div 
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2 text-[#8B7355] text-[8px] uppercase tracking-widest font-bold"
+              >
+                <Save size={10} className="animate-pulse" />
+                <span>Salvo</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="flex gap-4 items-center">
+             <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
+             <div className="w-24 h-[1px] bg-white/10 overflow-hidden">
+               <motion.div 
+                className="h-full bg-[#8B7355]" 
+                initial={{ width: 0 }}
+                animate={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }}
+                transition={{ duration: 0.8, ease: "circOut" }}
+               />
+             </div>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-16 overflow-y-auto">
+      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-24 overflow-y-auto relative z-10 scrollbar-hide">
         <motion.div
           key={chapterIndex}
           initial={{ opacity: 0, y: 20 }}
