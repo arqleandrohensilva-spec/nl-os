@@ -275,7 +275,7 @@ const BriefingCompleto = () => {
         setShowTransition(false);
         setChapterIndex(chapterIndex + 1);
       }, 3000);
-    } else if (chapterIndex < BRIEFING_ARQINT.capitulos.length - 1) {
+    } else if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
       setChapterIndex(chapterIndex + 1);
     } else {
       submitBriefing();
