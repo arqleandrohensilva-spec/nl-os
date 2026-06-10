@@ -312,16 +312,39 @@ const BriefingCompleto = () => {
 
   if (loading) return null;
   if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center">
-      <div className="max-w-xl space-y-8">
-        <h1 className="text-4xl font-['Georgia'] italic text-white">Briefing concluído.</h1>
-        <p className="text-white/60 font-['Arial'] leading-relaxed">
-          Parabéns. Você acaba de concluir a primeira etapa do desenvolvimento do seu projeto.<br/><br/>
-          Nossa equipe analisará cuidadosamente suas respostas para que a próxima reunião seja mais estratégica.<br/><br/>
-          Próxima etapa: Reunião de Diagnóstico e Direcionamento.<br/><br/>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Courier_New'] relative overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <img src={BACKGROUND_IMAGES[4]} alt="Final" className="w-full h-full object-cover grayscale" />
+      </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-md p-10 md:p-16 border border-white/5"
+      >
+        <div className="space-y-4">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Briefing concluído</p>
+          <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
+        </div>
+
+        <div className="space-y-6">
+          <h1 className="text-4xl md:text-5xl font-['Georgia'] italic text-white leading-tight">Parabéns.</h1>
+          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase font-['Arial']">
+            Você acaba de concluir a primeira etapa estratégica do desenvolvimento do seu projeto.
+          </p>
+          <div className="py-6 border-y border-white/5 space-y-4">
+            <p className="text-white/60 text-xs md:text-sm leading-relaxed">
+              Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião.
+            </p>
+            <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.3em] uppercase">
+              Próxima etapa: Reunião de Diagnóstico e Direcionamento.
+            </p>
+          </div>
+        </div>
+
+        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4">
           A arquitetura como decisão.
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 
