@@ -332,22 +332,25 @@ const BriefingCompleto = () => {
 
   useEffect(() => {
     if (token && chapterIndex >= -1) {
+      setIsSaving(true);
       localStorage.setItem(`briefing_progress_${token}`, JSON.stringify({
         chapterIndex,
         answers
       }));
+      const timer = setTimeout(() => setIsSaving(false), 800);
+      return () => clearTimeout(timer);
     }
   }, [chapterIndex, answers, token]);
 
   const handleNext = () => {
-    if (chapterIndex === 2) {
+    if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
+      setCurrentQuote(ARCHITECTURAL_QUOTES[chapterIndex % ARCHITECTURAL_QUOTES.length]);
       setShowTransition(true);
       setTimeout(() => {
         setShowTransition(false);
         setChapterIndex(chapterIndex + 1);
-      }, 3000);
-    } else if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
-      setChapterIndex(chapterIndex + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 2000);
     } else {
       submitBriefing();
     }
