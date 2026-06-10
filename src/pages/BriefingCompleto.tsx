@@ -376,15 +376,37 @@ const BriefingCompleto = () => {
   };
 
   if (loading) return null;
+
+  const BackgroundLayer = ({ imageIndex, opacity = 0.1 }: { imageIndex: number, opacity?: number }) => (
+    <motion.div 
+      className="absolute inset-0 pointer-events-none"
+      style={{ opacity }}
+    >
+      <motion.img 
+        src={BACKGROUND_IMAGES[imageIndex % BACKGROUND_IMAGES.length]} 
+        alt="Background" 
+        className="w-full h-full object-cover grayscale"
+        animate={{
+          scale: 1.1,
+          x: mouseX.current * 0.5,
+          y: mouseY.current * 0.5,
+        }}
+        transition={{ type: "tween", ease: "linear", duration: 0.1 }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
+    </motion.div>
+  );
+
   if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[4]} alt="Final" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Arial'] relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={4} opacity={0.15} />
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-md p-10 md:p-16 border border-white/5"
+        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-xl p-10 md:p-16 border border-white/5 rounded-2xl shadow-2xl"
       >
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Briefing concluído</p>
@@ -396,9 +418,9 @@ const BriefingCompleto = () => {
           <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase font-['Arial']">
             Você acaba de concluir a primeira etapa estratégica do desenvolvimento do seu projeto.
           </p>
-          <div className="py-6 border-y border-white/5 space-y-4">
-            <p className="text-white/60 text-xs md:text-sm leading-relaxed">
-              Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião.
+          <div className="py-8 border-y border-white/5 space-y-6">
+            <p className="text-white/60 text-xs md:text-sm leading-relaxed font-['Georgia'] italic">
+              "Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião."
             </p>
             <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.3em] uppercase">
               Próxima etapa: Reunião de Diagnóstico e Direcionamento.
@@ -406,7 +428,7 @@ const BriefingCompleto = () => {
           </div>
         </div>
 
-        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4">
+        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4 font-['Arial']">
           A arquitetura como decisão.
         </p>
       </motion.div>
@@ -414,39 +436,44 @@ const BriefingCompleto = () => {
   );
 
   if (chapterIndex === -1) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[0]} alt="Context" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={0} opacity={0.2} />
+      
       <div className="relative z-10 space-y-12 max-w-3xl">
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30" />
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-8">
           {projeto?.nome_cliente && (
-            <p className="text-white/40 font-['Georgia'] italic text-xl">
+            <motion.p 
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="text-white/40 font-['Georgia'] italic text-xl"
+            >
               Seja bem-vindo, {projeto.nome_cliente}.
-            </p>
+            </motion.p>
           )}
           <h1 className="text-5xl md:text-7xl font-['Georgia'] italic text-white leading-tight">
             Vamos começar o desenvolvimento do seu projeto.
           </h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-widest leading-relaxed max-w-xl font-['Arial'] uppercase">
-            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho.
+          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed max-w-xl font-['Arial'] uppercase">
+            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pt-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-10 pt-8">
           <Button 
             onClick={() => setChapterIndex(0)} 
-            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-12 h-14 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-500"
+            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-700 rounded-none group"
           >
-            Começar Briefing
+            <span className="relative z-10">Começar Briefing</span>
+            <div className="absolute inset-0 bg-white/5 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500" />
           </Button>
-          <div className="flex items-center gap-3 text-white/20 text-[9px] tracking-[0.3em] uppercase">
-            <span className="w-6 h-[1px] bg-white/10" />
+          <div className="flex items-center gap-4 text-white/20 text-[9px] tracking-[0.3em] uppercase">
+            <span className="w-8 h-[1px] bg-white/10" />
             Tempo estimado: 15 minutos
           </div>
         </div>
@@ -455,24 +482,30 @@ const BriefingCompleto = () => {
   );
 
   if (showTransition) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center font-['Courier_New'] relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <img src={BACKGROUND_IMAGES[3]} alt="Transition" className="w-full h-full object-cover grayscale" />
-      </div>
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center relative overflow-hidden cursor-none">
+      <CustomCursor />
+      <BackgroundLayer imageIndex={chapterIndex + 1} opacity={0.15} />
+      
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative z-10 space-y-8"
+        exit={{ opacity: 0, scale: 1.02 }}
+        className="relative z-10 space-y-12"
       >
-        <div className="space-y-2">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Módulo concluído</p>
-          <h2 className="text-3xl md:text-5xl font-['Georgia'] italic text-white">ARQUITETURA</h2>
+        <div className="space-y-4">
+          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Capítulo {chapterIndex + 1} Concluído</p>
+          <div className="w-12 h-[1px] bg-white/10 mx-auto" />
         </div>
-        <div className="w-12 h-[1px] bg-white/10 mx-auto" />
-        <p className="text-white/40 text-[10px] uppercase tracking-[0.3em] leading-relaxed max-w-sm mx-auto">
-          Capítulos 1, 2 e 3 registrados.<br/><br/>
-          Agora vamos falar sobre os interiores — a atmosfera e os detalhes que fazem a casa ser sua.
-        </p>
+        
+        <h2 className="text-2xl md:text-4xl font-['Georgia'] italic text-white/90 max-w-2xl leading-relaxed">
+          "{currentQuote}"
+        </h2>
+        
+        <div className="flex items-center justify-center gap-4">
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse" />
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-75" />
+          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-150" />
+        </div>
       </motion.div>
     </div>
   );
