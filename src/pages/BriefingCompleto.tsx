@@ -62,10 +62,10 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B02',
           titulo: 'Sonho e Objetivos',
           perguntas: [
-            { id: 'motivacao', label: 'O que motivou este projeto neste momento?', tipo: 'textarea' },
-            { id: 'conquista', label: 'O que espera conquistar com este projeto?', tipo: 'textarea' },
-            { id: 'futuro', label: 'Como imagina sua vida nesta casa daqui a 5 anos?', tipo: 'textarea' },
-            { id: 'simbolo', label: 'Se esta casa representasse uma conquista da sua vida, qual seria?', tipo: 'textarea' },
+            { id: 'motivacao', label: 'O que motivou este projeto neste momento?', tipo: 'textarea', orientacao: 'Ex: Mudança de fase de vida, realização pessoal, investimento.' },
+            { id: 'conquista', label: 'O que espera conquistar com este projeto?', tipo: 'textarea', orientacao: 'Sua maior expectativa em relação ao resultado final.' },
+            { id: 'futuro', label: 'Como imagina sua vida nesta casa daqui a 5 anos?', tipo: 'textarea', orientacao: 'Considere o crescimento da família ou novos hobbies.' },
+            { id: 'simbolo', label: 'Se esta casa representasse uma conquista da sua vida, qual seria?', tipo: 'textarea', orientacao: 'O significado emocional deste projeto para você.' },
           ]
         }
       ]
