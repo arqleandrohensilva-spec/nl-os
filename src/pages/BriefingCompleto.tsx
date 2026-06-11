@@ -203,15 +203,15 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B14',
           titulo: 'Prioridades',
           perguntas: [
-            { id: 'prioridades', label: 'Ordene do mais para o menos importante', tipo: 'textarea', placeholder: 'Liste os itens por ordem de importância...' },
-            { id: 'cortar', label: 'Se fosse necessário reduzir custos, o que revisaria primeiro?', tipo: 'textarea' },
+            { id: 'prioridades', label: 'Ordene do mais para o menos importante', tipo: 'textarea', placeholder: 'Liste os itens por ordem de importância...', orientacao: 'O que não pode ser negociado no projeto.' },
+            { id: 'cortar', label: 'Se fosse necessário reduzir custos, o que revisaria primeiro?', tipo: 'textarea', orientacao: 'Itens que poderiam ser simplificados.' },
           ]
         },
         {
           id: 'B15',
           titulo: 'Escala de Importância',
           perguntas: [
-            { id: 'escala', label: 'Avalie cada item de 1 (menos importante) a 5 (essencial)', tipo: 'textarea', placeholder: 'Ex: Conforto: 5, Estética: 4...' },
+            { id: 'escala', label: 'Avalie cada item de 1 (menos importante) a 5 (essencial)', tipo: 'textarea', placeholder: 'Ex: Conforto: 5, Estética: 4...', orientacao: 'Pense em Conforto, Estética, Tecnologia, Custo e Prazo.' },
           ]
         }
       ]
@@ -224,12 +224,12 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B16',
           titulo: 'Medos e Expectativas',
           perguntas: [
-            { id: 'medos', label: 'Quais são seus 3 maiores medos em relação à obra?', tipo: 'textarea' },
-            { id: 'excelente', label: 'O que seria um projeto excelente para você?', tipo: 'textarea' },
-            { id: 'sucesso', label: 'O que faria você considerar este projeto um sucesso?', tipo: 'textarea' },
-            { id: 'valeu', label: 'Quando sua casa estiver pronta, o que fará você dizer que todo o investimento valeu a pena?', tipo: 'textarea' },
-            { id: 'frase', label: 'Em uma única frase, descreva a casa dos seus sonhos.', tipo: 'textarea', placeholder: 'Ex: "Quero uma casa elegante, mas onde meus filhos queiram ficar."' },
-            { id: 'mais', label: 'Existe alguma informação importante que ainda não perguntamos?', tipo: 'textarea' },
+            { id: 'medos', label: 'Quais são seus 3 maiores medos em relação à obra?', tipo: 'textarea', orientacao: 'Ex: Estourar orçamento, atraso, qualidade dos acabamentos.' },
+            { id: 'excelente', label: 'O que seria um projeto excelente para você?', tipo: 'textarea', orientacao: 'Aquele que supera suas expectativas.' },
+            { id: 'sucesso', label: 'O que faria você considerar este projeto um sucesso?', tipo: 'textarea', orientacao: 'O critério final de satisfação.' },
+            { id: 'valeu', label: 'Quando sua casa estiver pronta, o que fará você dizer que todo o investimento valeu a pena?', tipo: 'textarea', orientacao: 'O momento da realização.' },
+            { id: 'frase', label: 'Em uma única frase, descreva a casa dos seus sonhos.', tipo: 'textarea', placeholder: 'Ex: "Quero uma casa elegante, mas onde meus filhos queiram ficar."', orientacao: 'O conceito central do seu lar.' },
+            { id: 'mais', label: 'Existe alguma informação importante que ainda não perguntamos?', tipo: 'textarea', orientacao: 'Fique à vontade para adicionar qualquer detalhe.' },
           ]
         }
       ]
