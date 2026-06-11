@@ -55,7 +55,7 @@ const BRIEFING_ARQINT: BriefingData = {
             { id: 'tipo_imovel', label: 'Tipo do imóvel', tipo: 'select', opcoes: ['Terreno vazio', 'Construção a demolir', 'Reforma', 'Ainda não definido'], orientacao: 'Ajuda a entender o ponto de partida técnico.' },
             { id: 'fase', label: 'Fase atual', tipo: 'select', opcoes: ['Acabei de adquirir', 'Tenho há algum tempo', 'Ainda vou adquirir'], orientacao: 'O projeto deve considerar o tempo de posse.' },
             { id: 'decisao', label: 'Quem participa das decisões', tipo: 'select', opcoes: ['Só eu', 'Casal', 'Família', 'Tenho sócios'], orientacao: 'Fundamental para alinhar as expectativas de todos.' },
-            { id: 'usuarios', label: 'Quem utilizará o imóvel', tipo: 'textarea', placeholder: 'Ex: Casal, dois filhos de 8 e 12 anos...' },
+            { id: 'usuarios', label: 'Quem utilizará o imóvel', tipo: 'textarea', placeholder: 'Ex: Casal, dois filhos de 8 e 12 anos...', orientacao: 'Considere moradores permanentes e frequentes.' },
           ]
         },
         {
