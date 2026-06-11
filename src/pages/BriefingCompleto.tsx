@@ -550,16 +550,21 @@ const BriefingCompleto = () => {
               
               <div className="grid gap-16">
                 {bloco.perguntas.map(p => (
-                  <div key={p.id} className="space-y-6 group relative">
-                    <label className={cn(
-                      "text-[10px] uppercase tracking-[0.3em] transition-all duration-500 block",
-                      answers[p.id] ? "text-[#8B7355]" : "text-white/30 group-focus-within:text-white/60"
-                    )}>
-                      {p.label}
-                      {p.id === 'nome' && projeto?.nome_cliente && (
-                        <span className="ml-3 lowercase italic text-white/20 font-serif font-normal tracking-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
-                      )}
-                    </label>
+                    <div key={p.id} className="space-y-6 group relative">
+                      <div className="space-y-1">
+                        <label className={cn(
+                          "text-[10px] uppercase tracking-[0.3em] transition-all duration-500 block",
+                          answers[p.id] ? "text-[#8B7355]" : "text-white/30 group-focus-within:text-white/60"
+                        )}>
+                          {p.label}
+                          {p.id === 'nome' && projeto?.nome_cliente && (
+                            <span className="ml-3 lowercase italic text-white/20 font-serif font-normal tracking-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
+                          )}
+                        </label>
+                        {p.orientacao && (
+                          <p className="text-[9px] text-white/20 font-['Arial'] italic tracking-wide">{p.orientacao}</p>
+                        )}
+                      </div>
 
                     {p.tipo === 'text' && (
                       <div className="relative">
