@@ -117,10 +117,10 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B06',
           titulo: 'Estilo Arquitetônico',
           perguntas: [
-            { id: 'estilo_gosta', label: 'Estilos que mais lhe agradam', tipo: 'multiselect', opcoes: ['Moderno', 'Contemporâneo', 'Minimalista', 'Industrial', 'Clássico', 'Tropical', 'Rústico'] },
-            { id: 'estilo_nao', label: 'Estilos que não combinam com você', tipo: 'multiselect', opcoes: ['Muito colorido', 'Muito vidro', 'Muito concreto aparente', 'Pé-direito duplo', 'Ambientes muito integrados', 'Cores escuras', 'Estilo rústico'] },
+            { id: 'estilo_gosta', label: 'Estilos que mais lhe agradam', tipo: 'multiselect', opcoes: ['Moderno', 'Contemporâneo', 'Minimalista', 'Industrial', 'Clássico', 'Tropical', 'Rústico'], orientacao: 'O "estilo" define a linguagem visual da casa.' },
+            { id: 'estilo_nao', label: 'Estilos que não combinam com você', tipo: 'multiselect', opcoes: ['Muito colorido', 'Muito vidro', 'Muito concreto aparente', 'Pé-direito duplo', 'Ambientes muito integrados', 'Cores escuras', 'Estilo rústico'], orientacao: 'Tão importante quanto o que você gosta é o que você quer evitar.' },
             { id: 'sentimento', label: 'Como deseja se sentir ao chegar em sua casa?', tipo: 'textarea', orientacao: 'Pense em sensações como paz, acolhimento, energia ou orgulho.' },
-            { id: 'referencias_arq', label: 'Referências de projetos arquitetônicos', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, endereços de casas que admira...' },
+            { id: 'referencias_arq', label: 'Referências de projetos arquitetônicos', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, endereços de casas que admira...', orientacao: 'Imagens valem mais que mil palavras no design.' },
           ]
         },
         {
