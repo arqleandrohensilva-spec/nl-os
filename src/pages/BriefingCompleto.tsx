@@ -78,12 +78,12 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B03',
           titulo: 'Terreno e Localização',
           perguntas: [
-            { id: 'escolha_terreno', label: 'O que fez você escolher este terreno?', tipo: 'textarea' },
-            { id: 'vista', label: 'Existe alguma vista que gostaria de valorizar?', tipo: 'textarea' },
-            { id: 'esconder', label: 'Existe algo do entorno que gostaria de esconder?', tipo: 'textarea' },
-            { id: 'topografia', label: 'Possui levantamento topográfico?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'] },
-            { id: 'sondagem', label: 'Possui sondagem do solo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'] },
-            { id: 'restricoes', label: 'Conhece as restrições do loteamento ou condomínio?', tipo: 'select', opcoes: ['Sim, conheço', 'Parcialmente', 'Não verificamos ainda'] },
+            { id: 'escolha_terreno', label: 'O que fez você escolher este terreno?', tipo: 'textarea', orientacao: 'A localização, o tamanho, a vista ou o preço?' },
+            { id: 'vista', label: 'Existe alguma vista que gostaria de valorizar?', tipo: 'textarea', orientacao: 'Ex: Mata, pôr do sol, skyline da cidade.' },
+            { id: 'esconder', label: 'Existe algo do entorno que gostaria de esconder?', tipo: 'textarea', orientacao: 'Ex: Vizinho muito próximo, barulho da rua, poste.' },
+            { id: 'topografia', label: 'Possui levantamento topográfico?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'], orientacao: 'Documento que detalha os níveis do terreno.' },
+            { id: 'sondagem', label: 'Possui sondagem do solo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'], orientacao: 'Teste que verifica a resistência do solo para fundações.' },
+            { id: 'restricoes', label: 'Conhece as restrições do loteamento ou condomínio?', tipo: 'select', opcoes: ['Sim, conheço', 'Parcialmente', 'Não verificamos ainda'], orientacao: 'Regras de recuos, altura máxima e materiais.' },
           ]
         },
         {
