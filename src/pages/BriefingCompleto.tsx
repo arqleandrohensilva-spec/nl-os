@@ -37,7 +37,7 @@ interface BriefingData {
 }
 
 // --- DATA STRUCTURE ---
-const BRIEFING_ARQINT = {
+const BRIEFING_ARQINT: BriefingData = {
   capítulos: [
     {
       id: 1,
