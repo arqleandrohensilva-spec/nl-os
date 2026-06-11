@@ -10,6 +10,32 @@ import { ChevronRight, ChevronLeft, Check, AlertCircle, Save } from 'lucide-reac
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
+interface Pergunta {
+  id: string;
+  label: string;
+  tipo: string;
+  prefill?: string;
+  opcoes?: string[];
+  placeholder?: string;
+  orientacao?: string;
+}
+
+interface Bloco {
+  id: string;
+  titulo: string;
+  perguntas: Pergunta[];
+}
+
+interface Capitulo {
+  id: number;
+  titulo: string;
+  blocos: Bloco[];
+}
+
+interface BriefingData {
+  capítulos: Capitulo[];
+}
+
 // --- DATA STRUCTURE ---
 const BRIEFING_ARQINT = {
   capítulos: [
