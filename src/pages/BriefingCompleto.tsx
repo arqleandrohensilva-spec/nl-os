@@ -561,6 +561,7 @@ const BriefingCompleto = () => {
                             <span className="ml-3 lowercase italic text-white/20 font-serif font-normal tracking-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
                           )}
                         </label>
+                        {/* @ts-ignore */}
                         {p.orientacao && (
                           <p className="text-[9px] text-white/20 font-['Arial'] italic tracking-wide">{p.orientacao}</p>
                         )}
