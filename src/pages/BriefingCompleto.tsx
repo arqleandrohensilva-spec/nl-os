@@ -48,7 +48,7 @@ const BRIEFING_ARQINT: BriefingData = {
           titulo: 'Identificação e Contexto',
           perguntas: [
             { id: 'nome', label: 'Nome completo', tipo: 'text', prefill: 'nome_cliente', orientacao: 'Informe seu nome completo conforme documento.' },
-            { id: 'telefone', label: 'Telefone', tipo: 'text', prefill: 'whatsapp' },
+            { id: 'telefone', label: 'Telefone', tipo: 'text', prefill: 'whatsapp', orientacao: 'Seu melhor número para contato rápido via WhatsApp.' },
             { id: 'email', label: 'E-mail', tipo: 'text' },
             { id: 'cidade', label: 'Cidade', tipo: 'text', prefill: 'cidade' },
             { id: 'endereco', label: 'Endereço do imóvel', tipo: 'text' },
