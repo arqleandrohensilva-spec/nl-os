@@ -160,10 +160,10 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B10',
           titulo: 'Mobiliário e Marcenaria',
           perguntas: [
-            { id: 'moveis_existentes', label: 'Móveis existentes serão mantidos?', tipo: 'select', opcoes: ['Sim, vários ficam', 'Alguns ficam', 'Não — começo do zero'] },
-            { id: 'moveis_quais', label: 'Quais móveis ficam?', tipo: 'textarea' },
-            { id: 'marcenaria', label: 'Marcenaria existente?', tipo: 'select', opcoes: ['Sim, fica', 'Sim, vai embora', 'Não tenho'] },
-            { id: 'nivel_marcenaria', label: 'Nível de marcenaria desejado', tipo: 'select', opcoes: ['Básica', 'Intermediária', 'Premium', 'Sob medida completa'] },
+            { id: 'moveis_existentes', label: 'Móveis existentes serão mantidos?', tipo: 'select', opcoes: ['Sim, vários ficam', 'Alguns ficam', 'Não — começo do zero'], orientacao: 'Fundamental para o dimensionamento dos novos espaços.' },
+            { id: 'moveis_quais', label: 'Quais móveis ficam?', tipo: 'textarea', orientacao: 'Liste ou descreva os itens principais (Ex: Mesa de jantar herdada).' },
+            { id: 'marcenaria', label: 'Marcenaria existente?', tipo: 'select', opcoes: ['Sim, fica', 'Sim, vai embora', 'Não tenho'], orientacao: 'Armários embutidos que você já possui.' },
+            { id: 'nivel_marcenaria', label: 'Nível de marcenaria desejado', tipo: 'select', opcoes: ['Básica', 'Intermediária', 'Premium', 'Sob medida completa'], orientacao: 'Impacta significativamente no orçamento final de interiores.' },
           ]
         },
         {
