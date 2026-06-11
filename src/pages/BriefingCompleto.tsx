@@ -193,10 +193,10 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B13',
           titulo: 'Orçamento',
           perguntas: [
-            { id: 'investimento', label: 'Faixa de investimento prevista', tipo: 'select', opcoes: ['Até R$ 300k', 'R$ 300k – R$ 600k', 'R$ 600k – R$ 1,2M', 'R$ 1,2M – R$ 2M', 'Acima de R$ 2M'] },
-            { id: 'limite', label: 'Existe um limite máximo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Prefiro discutir na reunião'] },
-            { id: 'concentrar', label: 'Onde deseja concentrar os investimentos?', tipo: 'textarea' },
-            { id: 'padrao', label: 'Preferência de padrão', tipo: 'select', opcoes: ['Alto padrão em áreas estratégicas', 'Padrão bom uniforme em toda a casa', 'Ainda não sei'] },
+            { id: 'investimento', label: 'Faixa de investimento prevista', tipo: 'select', opcoes: ['Até R$ 300k', 'R$ 300k – R$ 600k', 'R$ 600k – R$ 1,2M', 'R$ 1,2M – R$ 2M', 'Acima de R$ 2M'], orientacao: 'Estimativa global para obra e acabamentos.' },
+            { id: 'limite', label: 'Existe um limite máximo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Prefiro discutir na reunião'], orientacao: 'Fundamental para o controle financeiro do projeto.' },
+            { id: 'concentrar', label: 'Onde deseja concentrar os investimentos?', tipo: 'textarea', orientacao: 'Ex: Fachada, área social, automação.' },
+            { id: 'padrao', label: 'Preferência de padrão', tipo: 'select', opcoes: ['Alto padrão em áreas estratégicas', 'Padrão bom uniforme em toda a casa', 'Ainda não sei'], orientacao: 'Define a especificação de materiais.' },
           ]
         },
         {
