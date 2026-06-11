@@ -229,45 +229,6 @@ const ARCHITECTURAL_QUOTES = [
   "O espaço é o fôlego da arte."
 ];
 
-const CustomCursor = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-    };
-
-    const onMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'BUTTON' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.closest('button')) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseover', onMouseOver);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseover', onMouseOver);
-    };
-  }, []);
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 w-8 h-8 border border-white/30 rounded-full pointer-events-none z-[9999] mix-blend-difference hidden md:block"
-      animate={{
-        x: position.x - 16,
-        y: position.y - 16,
-        scale: isHovering ? 1.5 : 1,
-        backgroundColor: isHovering ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)"
-      }}
-      transition={{ type: "spring", damping: 20, stiffness: 250, mass: 0.5 }}
-    />
-  );
-};
 
 const BriefingCompleto = () => {
   const { token } = useParams();
@@ -399,8 +360,7 @@ const BriefingCompleto = () => {
   );
 
   if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Arial'] relative overflow-hidden cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Arial'] relative overflow-hidden">
       <BackgroundLayer imageIndex={4} opacity={0.15} />
       
       <motion.div 
@@ -436,8 +396,7 @@ const BriefingCompleto = () => {
   );
 
   if (chapterIndex === -1) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 relative overflow-hidden cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 relative overflow-hidden">
       <BackgroundLayer imageIndex={0} opacity={0.2} />
       
       <div className="relative z-10 space-y-12 max-w-3xl">
@@ -482,8 +441,7 @@ const BriefingCompleto = () => {
   );
 
   if (showTransition) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center relative overflow-hidden cursor-none">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center relative overflow-hidden">
       <BackgroundLayer imageIndex={chapterIndex + 1} opacity={0.15} />
       
       <motion.div 
@@ -513,8 +471,7 @@ const BriefingCompleto = () => {
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col cursor-none relative overflow-hidden">
-      <CustomCursor />
+    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col relative overflow-hidden">
       <BackgroundLayer imageIndex={chapterIndex} opacity={0.05} />
 
       <header className="p-8 flex justify-between items-center relative z-20">
