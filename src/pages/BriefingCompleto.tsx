@@ -101,10 +101,10 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B05',
           titulo: 'Rotina e Hábitos',
           perguntas: [
-            { id: 'rotina_semana', label: 'Como funciona sua rotina durante a semana?', tipo: 'textarea' },
-            { id: 'rotina_fds', label: 'Como funciona sua rotina nos finais de semana?', tipo: 'textarea' },
-            { id: 'home_office', label: 'Necessidade de home office?', tipo: 'select', opcoes: ['Sim, uso diariamente', 'Sim, ocasionalmente', 'Não'] },
-            { id: 'lazer', label: 'Atividades de lazer em casa', tipo: 'multiselect', opcoes: ['Churrasco', 'Piscina', 'Academia', 'Cinema', 'Videogame', 'Leitura', 'Vinhos / Adega', 'Área gourmet', 'Festas', 'Jardim'] },
+            { id: 'rotina_semana', label: 'Como funciona sua rotina durante a semana?', tipo: 'textarea', orientacao: 'Horários, trabalho, refeições e descanso.' },
+            { id: 'rotina_fds', label: 'Como funciona sua rotina nos finais de semana?', tipo: 'textarea', orientacao: 'Lazer, visitas e hobbies em casa.' },
+            { id: 'home_office', label: 'Necessidade de home office?', tipo: 'select', opcoes: ['Sim, uso diariamente', 'Sim, ocasionalmente', 'Não'], orientacao: 'Indispensável para o planejamento acústico e de iluminação.' },
+            { id: 'lazer', label: 'Atividades de lazer em casa', tipo: 'multiselect', opcoes: ['Churrasco', 'Piscina', 'Academia', 'Cinema', 'Videogame', 'Leitura', 'Vinhos / Adega', 'Área gourmet', 'Festas', 'Jardim'], orientacao: 'Selecione tudo o que faz parte do seu estilo de vida.' },
           ]
         }
       ]
