@@ -90,11 +90,11 @@ const BRIEFING_ARQINT: BriefingData = {
           id: 'B04',
           titulo: 'Perfil da Família',
           perguntas: [
-            { id: 'dia_perfeito', label: 'Como seria um dia perfeito na sua casa?', tipo: 'textarea' },
-            { id: 'filhos', label: 'Possui filhos?', tipo: 'select', opcoes: ['Sim', 'Não'] },
-            { id: 'pets', label: 'Possui pets?', tipo: 'select', opcoes: ['Sim', 'Não'] },
-            { id: 'visitas', label: 'Recebem amigos ou familiares com frequência?', tipo: 'select', opcoes: ['Raramente', 'Às vezes', 'Com frequência'] },
-            { id: 'qtd_visitas', label: 'Quantas pessoas normalmente recebem?', tipo: 'select', opcoes: ['Até 10', '10 a 20', '20 a 50', 'Mais de 50'] },
+            { id: 'dia_perfeito', label: 'Como seria um dia perfeito na sua casa?', tipo: 'textarea', orientacao: 'Descreva sua rotina ideal, do amanhecer ao descanso.' },
+            { id: 'filhos', label: 'Possui filhos?', tipo: 'select', opcoes: ['Sim', 'Não'], orientacao: 'Considere também planos futuros para filhos.' },
+            { id: 'pets', label: 'Possui pets?', tipo: 'select', opcoes: ['Sim', 'Não'], orientacao: 'Informe se vivem dentro ou fora de casa.' },
+            { id: 'visitas', label: 'Recebem amigos ou familiares com frequência?', tipo: 'select', opcoes: ['Raramente', 'Às vezes', 'Com frequência'], orientacao: 'Isso impacta no dimensionamento das áreas sociais.' },
+            { id: 'qtd_visitas', label: 'Quantas pessoas normalmente recebem?', tipo: 'select', opcoes: ['Até 10', '10 a 20', '20 a 50', 'Mais de 50'], orientacao: 'Ajuda a prever assentos e fluxo de circulação.' },
           ]
         },
         {
