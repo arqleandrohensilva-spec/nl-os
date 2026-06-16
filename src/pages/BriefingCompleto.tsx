@@ -438,8 +438,8 @@ const BriefingCompleto = () => {
               </div>
 
               <div className="grid gap-10">
-                {bloco.perguntas.map(p => (
-                  <div key={p.id} className="space-y-3">
+                {bloco.perguntas.map((p, idx) => (
+                  <div key={p.id} className={cn("space-y-3", idx !== bloco.perguntas.length - 1 && "border-b border-[#D1D1D1] pb-10")}>
                     <div className="space-y-1">
                       <label className="font-['Georgia'] italic text-base text-[#3A3A3A] block">
                         {p.label}
