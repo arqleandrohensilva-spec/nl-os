@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { ChevronRight, ChevronLeft, Check, AlertCircle, Save } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+
 
 interface Pergunta {
   id: string;
@@ -237,49 +235,15 @@ const BRIEFING_ARQINT: BriefingData = {
   ]
 };
 
-const BACKGROUND_IMAGES = [
-  'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1613545325278-f24b0cae1224?auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&q=80',
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80'
-];
-
-const ARCHITECTURAL_QUOTES = [
-  "A arquitetura começa onde termina a engenharia.",
-  "Menos é mais quando mais é demais.",
-  "A luz é o que define o espaço.",
-  "O detalhe não é o detalhe. O detalhe é o projeto.",
-  "Arquitetura é música congelada.",
-  "O espaço é o fôlego da arte."
-];
-
-
 const BriefingCompleto = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
   const [chapterIndex, setChapterIndex] = useState(-1);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [showTransition, setShowTransition] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [currentQuote, setCurrentQuote] = useState("");
-  
-  const mouseX = useRef(0);
-  const mouseY = useRef(0);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.current = (e.clientX / window.innerWidth - 0.5) * 20;
-      mouseY.current = (e.clientY / window.innerHeight - 0.5) * 20;
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   useEffect(() => {
     const fetchProjeto = async () => {
@@ -288,13 +252,12 @@ const BriefingCompleto = () => {
         return;
       }
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .rpc('get_project_by_token_or_slug', { p_val: token })
           .maybeSingle();
         if (data) {
           setProjeto(data);
-          
-          // Prefill logic
+
           const prefillAnswers: any = {};
           if (data.nome_cliente) prefillAnswers['nome'] = data.nome_cliente;
           if (data.cidade) prefillAnswers['cidade'] = data.cidade;
@@ -331,13 +294,8 @@ const BriefingCompleto = () => {
 
   const handleNext = () => {
     if (chapterIndex < BRIEFING_ARQINT.capítulos.length - 1) {
-      setCurrentQuote(ARCHITECTURAL_QUOTES[chapterIndex % ARCHITECTURAL_QUOTES.length]);
-      setShowTransition(true);
-      setTimeout(() => {
-        setShowTransition(false);
-        setChapterIndex(chapterIndex + 1);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 2000);
+      setChapterIndex(chapterIndex + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       submitBriefing();
     }
@@ -346,6 +304,7 @@ const BriefingCompleto = () => {
   const handleBack = () => {
     if (chapterIndex > 0) setChapterIndex(chapterIndex - 1);
     else setChapterIndex(-1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const submitBriefing = async () => {
@@ -364,36 +323,10 @@ const BriefingCompleto = () => {
 
   if (loading) return null;
 
-  const BackgroundLayer = ({ imageIndex, opacity = 0.1 }: { imageIndex: number, opacity?: number }) => (
-    <motion.div 
-      className="absolute inset-0 pointer-events-none"
-      style={{ opacity }}
-    >
-      <motion.img 
-        src={BACKGROUND_IMAGES[imageIndex % BACKGROUND_IMAGES.length]} 
-        alt="Background" 
-        className="w-full h-full object-cover grayscale"
-        animate={{
-          scale: 1.1,
-          x: mouseX.current * 0.5,
-          y: mouseY.current * 0.5,
-        }}
-        transition={{ type: "tween", ease: "linear", duration: 0.1 }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
-    </motion.div>
-  );
-
+  // ---- TELA FINAL (escura) ----
   if (isFinished) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6 md:p-12 text-center font-['Arial'] relative overflow-hidden">
-      <BackgroundLayer imageIndex={4} opacity={0.15} />
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 max-w-2xl space-y-12 bg-black/40 backdrop-blur-xl p-10 md:p-16 border border-white/5 rounded-2xl shadow-2xl"
-      >
+    <div className="min-h-screen bg-[#141414] flex items-center justify-center p-6 md:p-12 text-center font-['Arial']">
+      <div className="max-w-2xl space-y-12">
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Briefing concluído</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
@@ -401,7 +334,7 @@ const BriefingCompleto = () => {
 
         <div className="space-y-6">
           <h1 className="text-4xl md:text-5xl font-['Georgia'] italic text-white leading-tight">Parabéns.</h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase font-['Arial']">
+          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase">
             Você acaba de concluir a primeira etapa estratégica do desenvolvimento do seu projeto.
           </p>
           <div className="py-8 border-y border-white/5 space-y-6">
@@ -414,48 +347,42 @@ const BriefingCompleto = () => {
           </div>
         </div>
 
-        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4 font-['Arial']">
+        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4">
           A arquitetura como decisão.
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 
+  // ---- TELA DE ENTRADA (escura) ----
   if (chapterIndex === -1) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center px-8 md:px-24 py-12 relative overflow-hidden">
-      <BackgroundLayer imageIndex={0} opacity={0.2} />
-      
-      <div className="relative z-10 space-y-12 max-w-3xl">
+    <div className="min-h-screen bg-[#141414] flex items-center px-8 md:px-24 py-12">
+      <div className="space-y-12 max-w-3xl">
         <div className="space-y-4">
           <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
           <div className="w-12 h-[1px] bg-[#8B7355]/30" />
         </div>
-        
+
         <div className="space-y-8">
           {projeto?.nome_cliente && (
-            <motion.p 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-white/40 font-['Georgia'] italic text-xl"
-            >
+            <p className="text-white/40 font-['Georgia'] italic text-xl">
               Seja bem-vindo, {projeto.nome_cliente}.
-            </motion.p>
+            </p>
           )}
           <h1 className="text-5xl md:text-7xl font-['Georgia'] italic text-white leading-tight">
             Vamos começar o desenvolvimento do seu projeto.
           </h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed max-w-xl font-['Arial'] uppercase">
+          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed max-w-xl uppercase">
             Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
           </p>
         </div>
 
         <div className="flex flex-col md:flex-row items-start md:items-center gap-10 pt-8">
-          <Button 
-            onClick={() => setChapterIndex(0)} 
-            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-all duration-700 rounded-none group"
+          <Button
+            onClick={() => setChapterIndex(0)}
+            className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-colors rounded-none"
           >
-            <span className="relative z-10">Começar Briefing</span>
-            <div className="absolute inset-0 bg-white/5 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500" />
+            Começar Briefing
           </Button>
           <div className="flex items-center gap-4 text-white/20 text-[9px] tracking-[0.3em] uppercase">
             <span className="w-8 h-[1px] bg-white/10" />
@@ -466,162 +393,94 @@ const BriefingCompleto = () => {
     </div>
   );
 
-  if (showTransition) return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-12 text-center relative overflow-hidden">
-      <BackgroundLayer imageIndex={chapterIndex + 1} opacity={0.15} />
-      
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 1.02 }}
-        className="relative z-10 space-y-12"
-      >
-        <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Capítulo {chapterIndex + 1} Concluído</p>
-          <div className="w-12 h-[1px] bg-white/10 mx-auto" />
-        </div>
-        
-        <h2 className="text-2xl md:text-4xl font-['Georgia'] italic text-white/90 max-w-2xl leading-relaxed">
-          "{currentQuote}"
-        </h2>
-        
-        <div className="flex items-center justify-center gap-4">
-          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse" />
-          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-75" />
-          <div className="w-1 h-1 rounded-full bg-white/20 animate-pulse delay-150" />
-        </div>
-      </motion.div>
-    </div>
-  );
-
+  // ---- TELAS DE PERGUNTAS (claras) ----
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#E8E4DF] text-[#3A3A3A] flex flex-col relative">
-      <header className="px-8 md:px-16 py-5 border-b border-[#3A3A3A]/10 flex justify-between items-center relative z-20">
-        <p className="font-['Courier_New'] text-[10px] tracking-[0.35em] text-[#3A3A3A]/40 uppercase">NL ARQUITETOS</p>
-
-        <div className="flex gap-8 items-center">
-          <p className="font-['Courier_New'] text-[8px] tracking-[0.25em] text-[#8B7355] uppercase hidden md:block">Briefing Exclusivo · ARQ+INT</p>
-
-          <AnimatePresence>
-            {isSaving && (
-              <motion.div 
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0 }}
-                className="text-[7px] uppercase tracking-widest text-[#8B7355]/50 flex items-center gap-1"
-              >
-                <Save size={9} className="animate-pulse" />
-                <span>Progresso salvo</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="flex gap-4 items-center">
-             <span className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355] uppercase">Capítulo {chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
-             <div className="w-24 h-[1px] bg-[#3A3A3A]/10 overflow-hidden">
-               <motion.div 
-                className="h-[1px] bg-[#8B7355]" 
-                initial={{ width: 0 }}
-                animate={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }}
-                transition={{ duration: 0.8, ease: "circOut" }}
-               />
-             </div>
-          </div>
+    <div className="min-h-screen bg-[#F5F5F5] text-[#3A3A3A] flex flex-col">
+      <header className="px-8 md:px-16 py-5 bg-white border-b border-[#D1D1D1] flex justify-between items-center">
+        <p className="font-['Georgia'] text-[#3A3A3A] text-sm">NL ARQUITETOS</p>
+        <div className="flex gap-6 items-center">
+          {isSaving && (
+            <span className="text-[7px] uppercase tracking-widest text-[#8B7355] flex items-center gap-1">
+              <Save size={9} />
+              Progresso salvo
+            </span>
+          )}
+          <p className="font-['Courier_New'] text-[8px] tracking-widest text-[#8B7355] uppercase">Briefing · ARQ+INT</p>
         </div>
       </header>
 
-      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full space-y-24 overflow-y-auto relative z-10 scrollbar-hide">
-        <motion.div
-          key={chapterIndex}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -30 }}
-          transition={{ duration: 1, ease: [0.19, 1, 0.22, 1] }}
-          className="space-y-24 pb-32"
-        >
-          <div className="space-y-6">
-            <motion.span 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355] uppercase block"
-            >
+      {/* Barra de progresso */}
+      <div className="h-[1px] bg-[#D1D1D1] w-full">
+        <div
+          className="h-[1px] bg-[#8B7355] transition-all duration-500"
+          style={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }}
+        />
+      </div>
+
+      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full">
+        <div className="space-y-16 pb-24">
+          <div className="space-y-3">
+            <span className="font-['Courier_New'] text-[8px] tracking-widest text-[#8B7355] uppercase block">
               Capítulo {chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}
-            </motion.span>
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="font-['Georgia'] italic text-2xl md:text-3xl leading-tight text-[#3A3A3A]"
-            >
+            </span>
+            <h1 className="font-['Georgia'] italic text-2xl md:text-3xl leading-tight text-[#3A3A3A]">
               {chapter.titulo}
-            </motion.h1>
+            </h1>
           </div>
 
-          {chapter.blocos.map((bloco, bIdx) => (
-            <motion.div 
-              key={bloco.id} 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ delay: bIdx * 0.1 }}
-              className="space-y-16"
-            >
-              <div className="space-y-3">
-                <h3 className="font-['Courier_New'] text-[8px] uppercase tracking-[0.3em] text-[#8B7355]">{bloco.titulo}</h3>
-                <div className="h-[1px] w-12 bg-[#8B7355]/30" />
+          {chapter.blocos.map((bloco) => (
+            <div key={bloco.id} className="space-y-10">
+              <div className="space-y-2">
+                <h3 className="font-['Georgia'] italic text-[22px] text-[#3A3A3A]">{bloco.titulo}</h3>
+                <div className="h-[1px] w-12 bg-[#8B7355]/40" />
               </div>
-              
-              <div className="grid gap-16">
+
+              <div className="grid gap-10">
                 {bloco.perguntas.map(p => (
-                    <div key={p.id} className="space-y-6 group relative">
-                      <div className="space-y-1">
-                        <label className="font-['Georgia'] italic text-[#3A3A3A] text-lg leading-snug block">
-                          {p.label}
-                          {p.id === 'nome' && projeto?.nome_cliente && (
-                            <span className="ml-3 lowercase italic text-[#8B7355] font-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
-                          )}
-                        </label>
-                        {(p as any).orientacao && (
-                          <p className="font-['Arial'] text-[10px] text-[#777777]">{(p as any).orientacao}</p>
+                  <div key={p.id} className="space-y-3">
+                    <div className="space-y-1">
+                      <label className="font-['Georgia'] italic text-base text-[#3A3A3A] block">
+                        {p.label}
+                        {p.id === 'nome' && projeto?.nome_cliente && (
+                          <span className="ml-3 lowercase italic text-[#8B7355] font-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
                         )}
-                      </div>
+                      </label>
+                      {(p as any).orientacao && (
+                        <p className="font-['Arial'] text-[10px] text-[#777777]">{(p as any).orientacao}</p>
+                      )}
+                    </div>
 
                     {p.tipo === 'text' && (
-                      <div className="relative">
-                        <Input 
-                          value={answers[p.id] || ''} 
-                          onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                          className="bg-transparent border-0 border-b border-[#3A3A3A]/20 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] transition-all text-sm font-['Arial'] text-[#3A3A3A] placeholder:text-[#3A3A3A]/25"
-                          placeholder="Digite aqui..."
-                        />
-                      </div>
+                      <Input
+                        value={answers[p.id] || ''}
+                        onChange={(e) => setAnswers({ ...answers, [p.id]: e.target.value })}
+                        className="bg-white border border-[#D1D1D1] rounded-none p-3 h-auto focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] text-[#3A3A3A] font-['Arial'] text-sm placeholder:text-[#3A3A3A]/30"
+                        placeholder="Digite aqui..."
+                      />
                     )}
 
                     {p.tipo === 'textarea' && (
-                      <div className="relative">
-                        <Textarea 
-                          value={answers[p.id] || ''} 
-                          onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                          className="bg-transparent border-0 border-b border-[#3A3A3A]/20 rounded-none px-0 min-h-[120px] focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] transition-all text-sm font-['Arial'] text-[#3A3A3A] resize-none leading-relaxed placeholder:text-[#3A3A3A]/25"
-                          placeholder={p.placeholder || "Sua resposta..."}
-                        />
-                      </div>
+                      <Textarea
+                        value={answers[p.id] || ''}
+                        onChange={(e) => setAnswers({ ...answers, [p.id]: e.target.value })}
+                        className="bg-white border border-[#D1D1D1] rounded-none p-3 min-h-[120px] focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] text-[#3A3A3A] font-['Arial'] text-sm resize-none leading-relaxed placeholder:text-[#3A3A3A]/30"
+                        placeholder={p.placeholder || "Sua resposta..."}
+                      />
                     )}
 
                     {p.tipo === 'select' && (
-                      <div className="flex flex-wrap gap-4">
+                      <div className="flex flex-wrap gap-3">
                         {p.opcoes?.map(opt => (
-                          <button 
-                            key={opt} 
-                            onClick={() => setAnswers({...answers, [p.id]: opt})} 
+                          <button
+                            key={opt}
+                            onClick={() => setAnswers({ ...answers, [p.id]: opt })}
                             className={cn(
-                              "px-6 py-3 border text-[9px] uppercase tracking-widest transition-all font-['Arial']",
-                              answers[p.id] === opt 
-                                ? "border-[#8B7355] text-[#3A3A3A] bg-[#8B7355]/[0.08]" 
-                                : "border-[#3A3A3A]/15 text-[#3A3A3A]/50 hover:border-[#3A3A3A]/30"
+                              "px-5 py-3 border font-['Arial'] text-[10px] uppercase tracking-widest transition-colors",
+                              answers[p.id] === opt
+                                ? "border-[#8B7355] text-[#3A3A3A] bg-white"
+                                : "border-[#D1D1D1] text-[#3A3A3A]/60 hover:border-[#8B7355]"
                             )}
                           >
                             {opt}
@@ -635,18 +494,18 @@ const BriefingCompleto = () => {
                         {p.opcoes?.map(opt => {
                           const isSelected = (answers[p.id] || []).includes(opt);
                           return (
-                            <button 
-                              key={opt} 
+                            <button
+                              key={opt}
                               onClick={() => {
                                 const current = answers[p.id] || [];
                                 const next = isSelected ? current.filter((i: string) => i !== opt) : [...current, opt];
-                                setAnswers({...answers, [p.id]: next});
-                              }} 
+                                setAnswers({ ...answers, [p.id]: next });
+                              }}
                               className={cn(
-                                "px-5 py-2 border rounded-full text-[9px] uppercase tracking-widest transition-all",
+                                "px-5 py-2 border rounded-full font-['Arial'] text-[10px] uppercase tracking-widest transition-colors",
                                 isSelected
-                                  ? "border-[#8B7355] text-[#3A3A3A] bg-[#8B7355]/10"
-                                  : "border-[#3A3A3A]/12 text-[#3A3A3A]/40 hover:border-[#3A3A3A]/25"
+                                  ? "border-[#8B7355] bg-[#8B7355]/5 text-[#3A3A3A]"
+                                  : "border-[#D1D1D1] text-[#3A3A3A]/60 hover:border-[#8B7355]"
                               )}
                             >
                               {opt}
@@ -658,36 +517,33 @@ const BriefingCompleto = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ))}
 
-          <div className="flex items-center gap-12 pt-16">
-            <button 
-              onClick={handleBack} 
-              className="text-[#3A3A3A]/30 hover:text-[#3A3A3A]/60 flex items-center gap-3 text-[9px] uppercase tracking-widest transition-all group"
+          <div className="flex items-center gap-10 pt-8">
+            <button
+              onClick={handleBack}
+              className="text-[#777777] hover:text-[#3A3A3A] flex items-center gap-2 font-['Arial'] text-[9px] uppercase tracking-widest transition-colors"
             >
-              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              <span>Voltar</span>
+              <ChevronLeft size={14} />
+              Voltar
             </button>
-            <Button 
-              onClick={handleNext} 
-              className="border border-[#3A3A3A]/30 bg-transparent text-[#3A3A3A] hover:bg-[#3A3A3A] hover:text-[#E8E4DF] rounded-none h-12 px-10 text-[9px] uppercase tracking-[0.4em] transition-all duration-500 group"
+            <Button
+              onClick={handleNext}
+              className="border border-[#3A3A3A] bg-transparent text-[#3A3A3A] hover:bg-[#3A3A3A] hover:text-white rounded-none px-8 py-3 h-auto font-['Arial'] text-[9px] uppercase tracking-widest transition-colors"
             >
-              <span className="relative z-10">
-                {chapterIndex === BRIEFING_ARQINT.capítulos.length - 1 
-                  ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing') 
-                  : 'Próximo Capítulo'}
-              </span>
-              <ChevronRight size={14} className="ml-3 relative z-10 group-hover:translate-x-1 transition-transform" />
+              {chapterIndex === BRIEFING_ARQINT.capítulos.length - 1
+                ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing')
+                : 'Próximo Capítulo'}
+              <ChevronRight size={14} className="ml-2" />
             </Button>
           </div>
-        </motion.div>
+        </div>
       </main>
 
-      <footer className="px-8 md:px-16 py-5 border-t border-[#3A3A3A]/[0.06] flex justify-between text-[7px] uppercase tracking-[0.5em] text-[#3A3A3A]/20 relative z-20">
+      <footer className="px-8 md:px-16 py-5 border-t border-[#D1D1D1] flex justify-between font-['Arial'] text-[8px] text-[#777777]">
         <p>NL ARQUITETOS · 2026</p>
         <p className="hidden md:block">A ARQUITETURA COMO DECISÃO.</p>
-        <p>CONDOMÍNIO LAGUNA · SP</p>
       </footer>
     </div>
   );
