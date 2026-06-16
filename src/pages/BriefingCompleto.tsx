@@ -419,11 +419,11 @@ const BriefingCompleto = () => {
         />
       </div>
 
-      <main className="flex-1 px-8 md:px-24 py-12 max-w-4xl mx-auto w-full">
+      <main className="flex-1 px-8 md:px-12 py-12 max-w-[640px] mx-auto w-full">
         <div className="space-y-16 pb-24">
           <div className="space-y-3">
             <span className="font-['Courier_New'] text-[8px] tracking-widest text-[#8B7355] uppercase block">
-              Capítulo {chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}
+              {String(chapterIndex + 1).padStart(2, '0')} · {String(BRIEFING_ARQINT.capítulos.length).padStart(2, '0')}
             </span>
             <h1 className="font-['Georgia'] italic text-2xl md:text-3xl leading-tight text-[#3A3A3A]">
               {chapter.titulo}
@@ -438,8 +438,8 @@ const BriefingCompleto = () => {
               </div>
 
               <div className="grid gap-10">
-                {bloco.perguntas.map(p => (
-                  <div key={p.id} className="space-y-3">
+                {bloco.perguntas.map((p, idx) => (
+                  <div key={p.id} className={cn("space-y-3", idx !== bloco.perguntas.length - 1 && "border-b border-[#D1D1D1] pb-10")}>
                     <div className="space-y-1">
                       <label className="font-['Georgia'] italic text-base text-[#3A3A3A] block">
                         {p.label}
