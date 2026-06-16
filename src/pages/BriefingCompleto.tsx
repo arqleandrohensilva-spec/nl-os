@@ -497,32 +497,32 @@ const BriefingCompleto = () => {
   const chapter = BRIEFING_ARQINT.capítulos[chapterIndex];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col relative overflow-hidden">
-      <BackgroundLayer imageIndex={chapterIndex} opacity={0.05} />
+    <div className="min-h-screen bg-[#E8E4DF] text-[#3A3A3A] flex flex-col relative">
+      <header className="px-8 md:px-16 py-5 border-b border-[#3A3A3A]/10 flex justify-between items-center relative z-20">
+        <p className="font-['Courier_New'] text-[10px] tracking-[0.35em] text-[#3A3A3A]/40 uppercase">NL ARQUITETOS</p>
 
-      <header className="p-8 flex justify-between items-center relative z-20">
-        <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
-        
         <div className="flex gap-8 items-center">
+          <p className="font-['Courier_New'] text-[8px] tracking-[0.25em] text-[#8B7355] uppercase hidden md:block">Briefing Exclusivo · ARQ+INT</p>
+
           <AnimatePresence>
             {isSaving && (
               <motion.div 
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0 }}
-                className="flex items-center gap-2 text-[#8B7355] text-[8px] uppercase tracking-widest font-bold"
+                className="text-[7px] uppercase tracking-widest text-[#8B7355]/50 flex items-center gap-1"
               >
-                <Save size={10} className="animate-pulse" />
-                <span>Salvo</span>
+                <Save size={9} className="animate-pulse" />
+                <span>Progresso salvo</span>
               </motion.div>
             )}
           </AnimatePresence>
 
           <div className="flex gap-4 items-center">
-             <span className="text-[10px] uppercase tracking-widest text-white/40">{chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
-             <div className="w-24 h-[1px] bg-white/10 overflow-hidden">
+             <span className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355] uppercase">Capítulo {chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}</span>
+             <div className="w-24 h-[1px] bg-[#3A3A3A]/10 overflow-hidden">
                <motion.div 
-                className="h-full bg-[#8B7355]" 
+                className="h-[1px] bg-[#8B7355]" 
                 initial={{ width: 0 }}
                 animate={{ width: `${((chapterIndex + 1) / BRIEFING_ARQINT.capítulos.length) * 100}%` }}
                 transition={{ duration: 0.8, ease: "circOut" }}
@@ -546,15 +546,15 @@ const BriefingCompleto = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-[#8B7355] font-bold text-[10px] tracking-[0.5em] uppercase block"
+              className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355] uppercase block"
             >
-              Capítulo {chapterIndex + 1}
+              Capítulo {chapterIndex + 1} de {BRIEFING_ARQINT.capítulos.length}
             </motion.span>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-5xl md:text-7xl font-['Georgia'] italic leading-tight text-white/90"
+              className="font-['Georgia'] italic text-2xl md:text-3xl leading-tight text-[#3A3A3A]"
             >
               {chapter.titulo}
             </motion.h1>
@@ -570,25 +570,22 @@ const BriefingCompleto = () => {
               className="space-y-16"
             >
               <div className="space-y-3">
-                <h3 className="text-[10px] uppercase tracking-[0.4em] text-white/20 font-bold">{bloco.titulo}</h3>
-                <div className="h-[1px] w-12 bg-[#8B7355]/20" />
+                <h3 className="font-['Courier_New'] text-[8px] uppercase tracking-[0.3em] text-[#8B7355]">{bloco.titulo}</h3>
+                <div className="h-[1px] w-12 bg-[#8B7355]/30" />
               </div>
               
               <div className="grid gap-16">
                 {bloco.perguntas.map(p => (
                     <div key={p.id} className="space-y-6 group relative">
                       <div className="space-y-1">
-                        <label className={cn(
-                          "text-[10px] uppercase tracking-[0.3em] transition-all duration-500 block",
-                          answers[p.id] ? "text-[#8B7355]" : "text-white/30 group-focus-within:text-white/60"
-                        )}>
+                        <label className="font-['Georgia'] italic text-[#3A3A3A] text-lg leading-snug block">
                           {p.label}
                           {p.id === 'nome' && projeto?.nome_cliente && (
-                            <span className="ml-3 lowercase italic text-white/20 font-serif font-normal tracking-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
+                            <span className="ml-3 lowercase italic text-[#8B7355] font-normal text-xs">(Confirmamos: {projeto.nome_cliente})</span>
                           )}
                         </label>
                         {(p as any).orientacao && (
-                          <p className="text-[9px] text-white/20 font-['Arial'] italic tracking-wide">{(p as any).orientacao}</p>
+                          <p className="font-['Arial'] text-[10px] text-[#777777]">{(p as any).orientacao}</p>
                         )}
                       </div>
 
@@ -597,10 +594,9 @@ const BriefingCompleto = () => {
                         <Input 
                           value={answers[p.id] || ''} 
                           onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                          className="bg-transparent border-0 border-b border-white/5 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-xl font-['Arial'] placeholder:text-white/5"
+                          className="bg-transparent border-0 border-b border-[#3A3A3A]/20 rounded-none px-0 h-12 focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] transition-all text-sm font-['Arial'] text-[#3A3A3A] placeholder:text-[#3A3A3A]/25"
                           placeholder="Digite aqui..."
                         />
-                        <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#8B7355] group-focus-within:w-full transition-all duration-700" />
                       </div>
                     )}
 
@@ -609,10 +605,9 @@ const BriefingCompleto = () => {
                         <Textarea 
                           value={answers[p.id] || ''} 
                           onChange={(e) => setAnswers({...answers, [p.id]: e.target.value})} 
-                          className="bg-transparent border-0 border-b border-white/5 rounded-none px-0 min-h-[120px] focus-visible:ring-0 focus-visible:border-[#8B7355] transition-all text-xl font-['Arial'] resize-none leading-relaxed placeholder:text-white/5"
+                          className="bg-transparent border-0 border-b border-[#3A3A3A]/20 rounded-none px-0 min-h-[120px] focus-visible:ring-0 focus-visible:border-[#8B7355] focus:border-[#8B7355] transition-all text-sm font-['Arial'] text-[#3A3A3A] resize-none leading-relaxed placeholder:text-[#3A3A3A]/25"
                           placeholder={p.placeholder || "Sua resposta..."}
                         />
-                        <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#8B7355] group-focus-within:w-full transition-all duration-700" />
                       </div>
                     )}
 
@@ -623,20 +618,13 @@ const BriefingCompleto = () => {
                             key={opt} 
                             onClick={() => setAnswers({...answers, [p.id]: opt})} 
                             className={cn(
-                              "px-8 py-4 border transition-all duration-500 text-[10px] font-bold uppercase tracking-[0.2em] relative overflow-hidden group/btn",
+                              "px-6 py-3 border text-[9px] uppercase tracking-widest transition-all font-['Arial']",
                               answers[p.id] === opt 
-                                ? "text-black border-white" 
-                                : "border-white/5 text-white/30 hover:border-white/20 hover:text-white/60"
+                                ? "border-[#8B7355] text-[#3A3A3A] bg-[#8B7355]/[0.08]" 
+                                : "border-[#3A3A3A]/15 text-[#3A3A3A]/50 hover:border-[#3A3A3A]/30"
                             )}
                           >
-                            <span className="relative z-10">{opt}</span>
-                            <motion.div 
-                              className="absolute inset-0 bg-white"
-                              initial={false}
-                              animate={{ scaleY: answers[p.id] === opt ? 1 : 0 }}
-                              transition={{ duration: 0.4, ease: "circOut" }}
-                              style={{ originY: 1 }}
-                            />
+                            {opt}
                           </button>
                         ))}
                       </div>
@@ -655,19 +643,13 @@ const BriefingCompleto = () => {
                                 setAnswers({...answers, [p.id]: next});
                               }} 
                               className={cn(
-                                "px-6 py-3 border transition-all duration-500 text-[10px] uppercase tracking-widest rounded-full relative overflow-hidden group/chip",
-                                isSelected 
-                                  ? "text-white border-[#8B7355]" 
-                                  : "bg-transparent border-white/5 text-white/20 hover:border-white/30 hover:text-white"
+                                "px-5 py-2 border rounded-full text-[9px] uppercase tracking-widest transition-all",
+                                isSelected
+                                  ? "border-[#8B7355] text-[#3A3A3A] bg-[#8B7355]/10"
+                                  : "border-[#3A3A3A]/12 text-[#3A3A3A]/40 hover:border-[#3A3A3A]/25"
                               )}
                             >
-                              <span className="relative z-10">{opt}</span>
-                              <motion.div 
-                                className="absolute inset-0 bg-[#8B7355]"
-                                initial={false}
-                                animate={{ opacity: isSelected ? 1 : 0 }}
-                                transition={{ duration: 0.3 }}
-                              />
+                              {opt}
                             </button>
                           );
                         })}
@@ -682,27 +664,27 @@ const BriefingCompleto = () => {
           <div className="flex items-center gap-12 pt-16">
             <button 
               onClick={handleBack} 
-              className="text-white/10 hover:text-white/50 flex items-center gap-4 text-[10px] uppercase tracking-[0.4em] transition-all group"
+              className="text-[#3A3A3A]/30 hover:text-[#3A3A3A]/60 flex items-center gap-3 text-[9px] uppercase tracking-widest transition-all group"
             >
-              <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
               <span>Voltar</span>
             </button>
             <Button 
               onClick={handleNext} 
-              className="bg-white text-black hover:bg-black hover:text-white border border-white rounded-none h-16 px-16 text-[10px] font-bold tracking-[0.5em] uppercase transition-all duration-700 group relative overflow-hidden"
+              className="border border-[#3A3A3A]/30 bg-transparent text-[#3A3A3A] hover:bg-[#3A3A3A] hover:text-[#E8E4DF] rounded-none h-12 px-10 text-[9px] uppercase tracking-[0.4em] transition-all duration-500 group"
             >
               <span className="relative z-10">
                 {chapterIndex === BRIEFING_ARQINT.capítulos.length - 1 
                   ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing') 
                   : 'Próximo Capítulo'}
               </span>
-              <ChevronRight size={16} className="ml-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+              <ChevronRight size={14} className="ml-3 relative z-10 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </motion.div>
       </main>
 
-      <footer className="p-12 text-[8px] uppercase tracking-[0.6em] text-white/5 flex justify-between items-center border-t border-white/[0.02] relative z-20">
+      <footer className="px-8 md:px-16 py-5 border-t border-[#3A3A3A]/[0.06] flex justify-between text-[7px] uppercase tracking-[0.5em] text-[#3A3A3A]/20 relative z-20">
         <p>NL ARQUITETOS · 2026</p>
         <p className="hidden md:block">A ARQUITETURA COMO DECISÃO.</p>
         <p>CONDOMÍNIO LAGUNA · SP</p>
