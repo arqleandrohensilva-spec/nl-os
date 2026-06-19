@@ -478,7 +478,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
       <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
@@ -501,7 +500,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
       <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
         <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
@@ -610,7 +608,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
 
       {/* Header */}
       <header className="brief-header">
