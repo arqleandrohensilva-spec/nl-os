@@ -463,8 +463,12 @@ const BriefingCompleto = () => {
       submitBriefing();
       return;
     }
-    setCurCap(next);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setVisible(false);
+    setTimeout(() => {
+      setCurCap(next);
+      setVisible(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 220);
   };
 
   const handleNext = () => goToCap(curCap + 1);
