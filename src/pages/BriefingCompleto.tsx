@@ -338,6 +338,37 @@ const BRIEFING_STYLES = `
   .brief-next:disabled { opacity: 0.5; cursor: default; }
 `;
 
+const Fundo = () => (
+  <>
+    {/* Camada 1 — imagem da capa */}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundImage:
+          "url('https://www.dropbox.com/scl/fi/qvuvyvkomvhugkcz8drty/Capa-Branca.png?rlkey=c2320yi5ryugoiw0hw8t0m6b9&raw=1')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0.3,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }}
+    />
+    {/* Camada 2 — lavagem creme por cima */}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: '#F7F4EF',
+        opacity: 0.58,
+        pointerEvents: 'none',
+        zIndex: 1,
+      }}
+    />
+  </>
+);
+
 const Monograma = () => (
   <div
     style={{
@@ -347,7 +378,7 @@ const Monograma = () => (
       alignItems: 'center',
       justifyContent: 'center',
       pointerEvents: 'none',
-      zIndex: 0,
+      zIndex: 1,
       overflow: 'hidden',
     }}
   >
