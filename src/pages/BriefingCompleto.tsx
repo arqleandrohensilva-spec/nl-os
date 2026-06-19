@@ -336,6 +336,37 @@ const BRIEFING_STYLES = `
   .brief-next:disabled { opacity: 0.5; cursor: default; }
 `;
 
+const Monograma = () => (
+  <div
+    style={{
+      position: 'fixed',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      zIndex: 0,
+      overflow: 'hidden',
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        fontWeight: 200,
+        fontSize: 'clamp(220px, 38vw, 480px)',
+        letterSpacing: '-0.04em',
+        color: '#BF7A4A',
+        opacity: 0.07,
+        userSelect: 'none',
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      NL
+    </span>
+  </div>
+);
+
 const BriefingCompleto = () => {
   const { token } = useParams();
   const [loading, setLoading] = useState(true);
