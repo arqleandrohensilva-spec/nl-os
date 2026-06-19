@@ -862,7 +862,27 @@ const BRIEFING_STYLES = `
     .brief-entry-figure { height: 240px; }
     .brief-entry-content { padding: 3rem 2rem; }
   }
+
+  /* Anexo opcional (upload) */
+  .brief-anexo { margin-top: 12px; }
+  .brief-anexo-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 6px;
+    border: 1px dashed var(--brief-accent); background: var(--brief-accent-bg); color: #9D5E2E;
+    font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.18s;
+  }
+  .brief-anexo-btn:hover { background: #F6E3D5; }
+  .brief-anexo-hint { font-size: 11px; color: var(--brief-text-4); margin-top: 6px; }
+  .brief-anexo-file {
+    display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 12px;
+    border-radius: 6px; border: 1px solid var(--brief-border); background: var(--brief-surface);
+    font-size: 12px; color: var(--brief-text-2);
+  }
+  .brief-anexo-remove {
+    border: none; background: none; color: var(--brief-text-3); cursor: pointer; font-size: 14px; line-height: 1;
+  }
+  .brief-anexo-remove:hover { color: #C0392B; }
 `;
+
 
 const Fundo = () => (
   <>
@@ -912,6 +932,29 @@ const BriefingCompleto = () => {
   const [hasSaved, setHasSaved] = useState(false);
   const [savedCap, setSavedCap] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [uploadingAnexo, setUploadingAnexo] = useState(false);
+
+  const handleAnexoUpload = async (file: File) => {
+    if (!file) return;
+    setUploadingAnexo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${token || 'sem-token'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('briefing-anexos').upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data: signed } = await supabase.storage
+        .from('briefing-anexos')
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
+      setAnswers(prev => ({
+        ...prev,
+        manual_marca_anexo: { nome: file.name, url: signed?.signedUrl || path },
+      }));
+    } catch (e) {
+      console.error('Erro ao enviar anexo', e);
+    } finally {
+      setUploadingAnexo(false);
+    }
+  };
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
   const isInt = tipoKey === 'INTERIORES';
@@ -997,6 +1040,9 @@ const BriefingCompleto = () => {
         acc[cap.titulo] = cap.blocos.reduce((bAcc: any, bloco) => {
           bAcc[bloco.titulo] = bloco.perguntas.reduce((pAcc: any, p) => {
             pAcc[p.label] = answers[p.id] ?? null;
+            if (p.id === 'manual_marca' && answers.manual_marca_anexo) {
+              pAcc['Anexo (manual de marca / logo / paleta)'] = answers.manual_marca_anexo.url;
+            }
             return pAcc;
           }, {});
           return bAcc;
@@ -1393,10 +1439,49 @@ const BriefingCompleto = () => {
                     <label className="brief-flabel">{p.label}</label>
                     {p.orientacao && <p className="brief-fhint">{p.orientacao}</p>}
                     {renderInput(p)}
+                    {p.id === 'manual_marca' && answers.manual_marca === 'Sim' && (
+                      <div className="brief-anexo">
+                        {answers.manual_marca_anexo ? (
+                          <div className="brief-anexo-file">
+                            <span>📎 {answers.manual_marca_anexo.nome}</span>
+                            <button
+                              type="button"
+                              className="brief-anexo-remove"
+                              onClick={() => setAnswers(prev => {
+                                const next = { ...prev };
+                                delete next.manual_marca_anexo;
+                                return next;
+                              })}
+                              aria-label="Remover anexo"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <label className="brief-anexo-btn">
+                              {uploadingAnexo ? 'Enviando...' : '📎 Anexar arquivo (se desejar)'}
+                              <input
+                                type="file"
+                                accept="image/*,.pdf,.zip"
+                                style={{ display: 'none' }}
+                                disabled={uploadingAnexo}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleAnexoUpload(file);
+                                }}
+                              />
+                            </label>
+                            <p className="brief-anexo-hint">Manual de marca, logo ou paleta — PDF, imagem ou ZIP.</p>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
+
           </div>
         ))}
 
