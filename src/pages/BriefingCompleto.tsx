@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from "@/components/ui/button";
-import { cn } from '@/lib/utils';
 
 
 interface Pergunta {
@@ -232,34 +230,126 @@ const BRIEFING_ARQINT: BriefingData = {
   ]
 };
 
-// Flatten todas as perguntas em uma lista linear
-const todasPerguntas = BRIEFING_ARQINT.capítulos.flatMap(cap =>
-  cap.blocos.flatMap(bloco =>
-    bloco.perguntas.map(p => ({
-      ...p,
-      capTitulo: cap.titulo,
-      capId: cap.id,
-      blocoTitulo: bloco.titulo,
-      blocoId: bloco.id,
-    }))
-  )
-);
+// --- DESIGN TOKENS + ESTILOS ---
+const BRIEFING_STYLES = `
+  .brief-root, .brief-root * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+  .brief-root {
+    --brief-bg: #F7F4EF;
+    --brief-surface: #FFFFFF;
+    --brief-border: #E0DAD3;
+    --brief-border-sub: #EAE4DB;
+    --brief-accent: #BF7A4A;
+    --brief-accent-dark: #A8683B;
+    --brief-accent-bg: #FBF0E8;
+    --brief-text-1: #1A1816;
+    --brief-text-2: #5A524A;
+    --brief-text-3: #A89F95;
+    --brief-text-4: #BFB8B0;
+  }
+
+  .brief-header {
+    height: 52px; padding: 0 2rem; background: var(--brief-surface);
+    border-bottom: 1px solid var(--brief-border-sub);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brief-logo { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: var(--brief-text-1); }
+  .brief-badge { font-size: 11px; color: var(--brief-text-3); letter-spacing: 0.06em; }
+
+  .brief-progress-track { height: 2px; width: 100%; background: var(--brief-border-sub); }
+  .brief-progress-fill { height: 2px; background: var(--brief-accent); transition: width 0.3s ease; }
+
+  .brief-dots { display: flex; justify-content: center; gap: 6px; padding: 1.5rem 0 0; }
+  .brief-dot { width: 6px; height: 6px; border-radius: 50%; background: #DDD7CE; transition: all 0.2s ease; }
+  .brief-dot--active { width: 20px; height: 6px; border-radius: 3px; background: var(--brief-accent); }
+
+  .brief-main { max-width: 680px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  .brief-captag { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
+  .brief-captag span { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; color: var(--brief-accent); text-transform: uppercase; }
+  .brief-captag .brief-line { flex: 1; height: 1px; background: var(--brief-border-sub); }
+
+  .brief-captitle { font-size: 26px; font-weight: 300; color: var(--brief-text-1); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 6px; }
+  .brief-capsub { font-size: 13px; color: var(--brief-text-3); line-height: 1.6; margin-bottom: 2.5rem; }
+
+  .brief-section { margin-bottom: 2.5rem; }
+  .brief-section-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.12em; color: var(--brief-text-3);
+    text-transform: uppercase; padding-bottom: 12px; border-bottom: 1px solid var(--brief-border-sub); margin-bottom: 1.5rem;
+  }
+
+  .brief-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1rem; }
+  .brief-full { grid-column: 1 / -1; }
+  @media (max-width: 520px) { .brief-grid { grid-template-columns: 1fr; } }
+
+  .brief-flabel { font-size: 12px; font-weight: 500; color: var(--brief-text-2); display: block; margin-bottom: 6px; }
+  .brief-fhint { font-size: 11px; color: var(--brief-text-4); margin-bottom: 8px; line-height: 1.4; }
+
+  .brief-input {
+    height: 42px; width: 100%; border: 1px solid var(--brief-border); border-radius: 6px;
+    background: var(--brief-surface); padding: 0 14px; font-size: 13px; color: var(--brief-text-1); outline: none;
+    transition: border-color 0.18s;
+  }
+  .brief-textarea {
+    height: 88px; width: 100%; border: 1px solid var(--brief-border); border-radius: 6px;
+    background: var(--brief-surface); padding: 12px 14px; font-size: 13px; color: var(--brief-text-1);
+    outline: none; resize: none; line-height: 1.6; transition: border-color 0.18s;
+  }
+  .brief-input:focus, .brief-textarea:focus { border-color: var(--brief-accent); }
+  .brief-input::placeholder, .brief-textarea::placeholder { color: var(--brief-text-4); }
+
+  .brief-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .brief-chip {
+    padding: 8px 16px; border-radius: 20px; border: 1px solid var(--brief-border); background: var(--brief-surface);
+    font-size: 12px; color: #6B6259; cursor: pointer; transition: all 0.18s;
+  }
+  .brief-chip:hover { border-color: var(--brief-accent); color: var(--brief-accent); }
+  .brief-chip--active { background: var(--brief-accent-bg); border-color: var(--brief-accent); color: #9D5E2E; font-weight: 500; }
+
+  .brief-darkcard {
+    background: #1A1816; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem;
+    border-left: 3px solid var(--brief-accent);
+  }
+  .brief-darkcard .brief-flabel { color: #F7F4EF; font-size: 15px; font-weight: 300; }
+  .brief-darkcard .brief-fhint { color: rgba(247,244,239,0.45); }
+  .brief-textarea--dark {
+    height: 88px; width: 100%; border: 1px solid #3A3530; border-radius: 6px; background: #2A2520;
+    padding: 12px 14px; font-size: 13px; color: #F7F4EF; outline: none; resize: none; line-height: 1.6; transition: border-color 0.18s;
+  }
+  .brief-textarea--dark:focus { border-color: var(--brief-accent); }
+  .brief-textarea--dark::placeholder { color: rgba(247,244,239,0.3); }
+
+  .brief-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 2rem; border-top: 1px solid var(--brief-border-sub); margin-top: 2rem;
+  }
+  .brief-back {
+    padding: 10px 18px; border-radius: 6px; border: 1px solid var(--brief-border); background: transparent;
+    font-size: 12px; color: var(--brief-text-3); cursor: pointer; transition: all 0.18s;
+  }
+  .brief-back:hover { color: var(--brief-text-2); border-color: var(--brief-text-3); }
+  .brief-counter { font-size: 11px; color: #C0B8B0; }
+  .brief-next {
+    padding: 12px 28px; border-radius: 6px; border: none; background: var(--brief-accent); color: #FFFFFF;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; transition: background 0.18s;
+  }
+  .brief-next:hover { background: var(--brief-accent-dark); }
+  .brief-next:disabled { opacity: 0.5; cursor: default; }
+`;
 
 const BriefingCompleto = () => {
   const { token } = useParams();
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
   const [started, setStarted] = useState(false);
-  const [curIdx, setCurIdx] = useState(0);
+  const [curCap, setCurCap] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [transition, setTransition] = useState<null | { capAnterior: string; capProximo: string }>(null);
   const [hasSaved, setHasSaved] = useState(false);
-  const [savedIdx, setSavedIdx] = useState(0);
+  const [savedCap, setSavedCap] = useState(0);
 
-  const total = todasPerguntas.length;
+  const capitulos = BRIEFING_ARQINT.capítulos;
+  const totalCaps = capitulos.length;
 
   useEffect(() => {
     const fetchProjeto = async () => {
@@ -282,9 +372,10 @@ const BriefingCompleto = () => {
           if (saved) {
             const parsed = JSON.parse(saved);
             setAnswers({ ...prefillAnswers, ...(parsed.answers || {}) });
-            if (parsed.curIdx && parsed.curIdx > 0) {
+            const savedIdx = parsed.curCap ?? 0;
+            if (savedIdx && savedIdx > 0) {
               setHasSaved(true);
-              setSavedIdx(parsed.curIdx);
+              setSavedCap(savedIdx);
             }
           } else {
             setAnswers(prefillAnswers);
@@ -302,37 +393,22 @@ const BriefingCompleto = () => {
   // Salvar progresso a cada mudança
   useEffect(() => {
     if (token && started) {
-      localStorage.setItem(`briefing_progress_${token}`, JSON.stringify({ curIdx, answers }));
+      localStorage.setItem(`briefing_progress_${token}`, JSON.stringify({ curCap, answers }));
     }
-  }, [curIdx, answers, token, started]);
+  }, [curCap, answers, token, started]);
 
-  const goToIndex = (nextIdx: number) => {
-    if (nextIdx >= total) {
+  const goToCap = (next: number) => {
+    if (next >= totalCaps) {
       submitBriefing();
       return;
     }
-    const anterior = todasPerguntas[curIdx];
-    const proxima = todasPerguntas[nextIdx];
-    const mudaCapitulo = nextIdx > curIdx && anterior.capId !== proxima.capId;
-
-    setVisible(false);
-    setTimeout(() => {
-      setCurIdx(nextIdx);
-      if (mudaCapitulo) {
-        setTransition({ capAnterior: anterior.capTitulo, capProximo: proxima.capTitulo });
-        setTimeout(() => {
-          setTransition(null);
-          setVisible(true);
-        }, 1500);
-      } else {
-        setVisible(true);
-      }
-    }, 200);
+    setCurCap(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleNext = () => goToIndex(curIdx + 1);
+  const handleNext = () => goToCap(curCap + 1);
   const handleBack = () => {
-    if (curIdx > 0) goToIndex(curIdx - 1);
+    if (curCap > 0) goToCap(curCap - 1);
   };
 
   const submitBriefing = async () => {
@@ -362,274 +438,217 @@ const BriefingCompleto = () => {
 
   if (loading) return null;
 
-  // ---- TELA FINAL (escura) ----
+  // ---- TELA FINAL ----
   if (isFinished) return (
-    <div className="min-h-screen bg-[#141414] flex items-center justify-center p-6 md:p-12 text-center font-['Arial']">
-      <div className="max-w-2xl space-y-12">
-        <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">Briefing concluído</p>
-          <div className="w-12 h-[1px] bg-[#8B7355]/30 mx-auto" />
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <style>{BRIEFING_STYLES}</style>
+      <div style={{ maxWidth: 520, textAlign: 'center' }}>
+        <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
+          <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
-
-        <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl font-['Georgia'] italic text-white leading-tight">Parabéns.</h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed uppercase">
-            Você acaba de concluir a primeira etapa estratégica do desenvolvimento do seu projeto.
-          </p>
-          <div className="py-8 border-y border-white/5 space-y-6">
-            <p className="text-white/60 text-xs md:text-sm leading-relaxed font-['Georgia'] italic">
-              "Nossa equipe analisará cuidadosamente cada uma de suas respostas. Esse material será o pilar da nossa próxima reunião."
-            </p>
-            <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.3em] uppercase">
-              Próxima etapa: Reunião de Diagnóstico e Direcionamento.
-            </p>
-          </div>
-        </div>
-
-        <p className="text-white/20 text-[9px] uppercase tracking-[0.6em] pt-4">
-          A arquitetura como decisão.
+        <h1 style={{ fontSize: 32, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
+          Obrigado.
+        </h1>
+        <p style={{ fontSize: 14, color: '#A89F95', lineHeight: 1.7, marginBottom: '2rem' }}>
+          Você concluiu a primeira etapa estratégica do seu projeto. Nossa equipe analisará cuidadosamente cada resposta — esse material será o pilar da nossa próxima reunião.
+        </p>
+        <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          Próxima etapa: Reunião de Diagnóstico e Direcionamento
         </p>
       </div>
     </div>
   );
 
-  // ---- TELA DE ENTRADA (escura) ----
+  // ---- TELA DE ENTRADA ----
   if (!started) return (
-    <div className="min-h-screen bg-[#141414] flex items-center px-8 md:px-24 py-12">
-      <div className="space-y-12 max-w-3xl">
-        <div className="space-y-4">
-          <p className="text-[#8B7355] text-[10px] font-bold tracking-[0.5em] uppercase">NL ARQUITETOS</p>
-          <div className="w-12 h-[1px] bg-[#8B7355]/30" />
-        </div>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem' }}>
+      <style>{BRIEFING_STYLES}</style>
+      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+        <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
-        <div className="space-y-8">
-          {projeto?.nome_cliente && (
-            <p className="text-white/40 font-['Georgia'] italic text-xl">
-              Seja bem-vindo, {projeto.nome_cliente}.
-            </p>
-          )}
-          <h1 className="text-5xl md:text-7xl font-['Georgia'] italic text-white leading-tight">
-            Vamos começar o desenvolvimento do seu projeto.
-          </h1>
-          <p className="text-white/40 text-xs md:text-sm tracking-[0.2em] leading-relaxed max-w-xl uppercase">
-            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
+        {projeto?.nome_cliente && (
+          <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
+            Seja bem-vindo, {projeto.nome_cliente}.
           </p>
-        </div>
+        )}
+        <h1 style={{ fontSize: 28, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '1rem' }}>
+          Vamos começar o desenvolvimento do seu projeto.
+        </h1>
+        <p style={{ fontSize: 14, color: '#A89F95', maxWidth: 480, lineHeight: 1.7, marginBottom: '2rem' }}>
+          Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
+        </p>
+        <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
+          Tempo estimado: 15 minutos
+        </p>
 
         {hasSaved ? (
-          <div className="space-y-6 pt-8">
-            <p className="text-white/40 font-['Georgia'] italic text-base">
-              Você tem progresso salvo. Continuar de onde parou?
-            </p>
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <Button
-                onClick={() => { setCurIdx(savedIdx); setStarted(true); }}
-                className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-colors rounded-none"
-              >
-                Continuar
-              </Button>
-              <Button
-                onClick={() => { setCurIdx(0); setStarted(true); }}
-                className="border border-white/10 text-white/30 hover:text-white/60 hover:border-white/30 bg-transparent px-10 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-colors rounded-none"
-              >
-                Começar do início
-              </Button>
-            </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+            <button className="brief-next" onClick={() => { setCurCap(savedCap); setStarted(true); }}>
+              Continuar de onde parou
+            </button>
+            <button className="brief-back" onClick={() => { setCurCap(0); setStarted(true); }}>
+              Começar do início
+            </button>
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-10 pt-8">
-            <Button
-              onClick={() => { setCurIdx(0); setStarted(true); }}
-              className="border border-white/20 text-white/60 hover:text-white hover:border-white/50 bg-transparent px-14 h-16 text-[10px] font-bold tracking-[0.4em] uppercase transition-colors rounded-none"
-            >
-              Começar Briefing
-            </Button>
-            <div className="flex items-center gap-4 text-white/20 text-[9px] tracking-[0.3em] uppercase">
-              <span className="w-8 h-[1px] bg-white/10" />
-              Tempo estimado: 15 minutos
-            </div>
-          </div>
+          <button className="brief-next" onClick={() => { setCurCap(0); setStarted(true); }}>
+            Começar Briefing
+          </button>
         )}
       </div>
     </div>
   );
 
-  // ---- TELA DE TRANSIÇÃO ENTRE CAPÍTULOS ----
-  if (transition) return (
-    <div className="min-h-screen bg-[#0e0c09] text-[#E8DFD0] flex items-center justify-center text-center px-16">
-      <div>
-        <p className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355] uppercase mb-4">
-          {transition.capAnterior} · concluído
-        </p>
-        <p className="font-['Cormorant_Garamond'] text-[28px] font-light italic text-[#E8DFD0] leading-relaxed">
-          {transition.capProximo}
-        </p>
-      </div>
-    </div>
-  );
+  // ---- TELAS DE CAPÍTULO ----
+  const cap = capitulos[curCap];
+  const progressPct = ((curCap + 1) / totalCaps) * 100;
+  const isLastCap = curCap === totalCaps - 1;
 
-  // ---- TELAS DE PERGUNTAS (escuro quente, uma por vez) ----
-  const p = todasPerguntas[curIdx];
-  const isText = p.tipo === 'text' || p.tipo === 'textarea';
-  const blocoNum = String(p.blocoId).replace(/\D/g, '') || String(curIdx + 1);
+  const renderInput = (p: Pergunta, dark = false) => {
+    const val = answers[p.id] || '';
+    const setVal = (v: any) => setAnswers({ ...answers, [p.id]: v });
+
+    if (p.tipo === 'textarea') {
+      return (
+        <textarea
+          className={dark ? 'brief-textarea--dark' : 'brief-textarea'}
+          value={val}
+          onChange={(e) => setVal(e.target.value)}
+          placeholder={p.placeholder || 'Sua resposta...'}
+        />
+      );
+    }
+    if (p.tipo === 'select') {
+      return (
+        <div className="brief-chips">
+          {p.opcoes?.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              className={`brief-chip${answers[p.id] === opt ? ' brief-chip--active' : ''}`}
+              onClick={() => setVal(opt)}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      );
+    }
+    if (p.tipo === 'multiselect') {
+      const current: string[] = answers[p.id] || [];
+      return (
+        <div className="brief-chips">
+          {p.opcoes?.map(opt => {
+            const selected = current.includes(opt);
+            return (
+              <button
+                key={opt}
+                type="button"
+                className={`brief-chip${selected ? ' brief-chip--active' : ''}`}
+                onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+              >
+                {opt}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+    // text (default)
+    return (
+      <input
+        className="brief-input"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        placeholder={p.placeholder || ''}
+      />
+    );
+  };
+
+  const isFull = (p: Pergunta) => p.tipo === 'textarea' || p.tipo === 'multiselect';
 
   return (
-    <div className="min-h-screen bg-[#0e0c09] text-[#E8DFD0] flex flex-col">
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816' }}>
+      <style>{BRIEFING_STYLES}</style>
+
       {/* Header */}
-      <header className="px-8 md:px-16 py-4 flex items-center gap-6 border-b border-white/[0.03]">
-        <p className="font-['Courier_New'] text-[10px] tracking-[0.35em] text-[#E8DFD0]/25 uppercase">NL Arquitetos</p>
-        <div className="flex-1 h-[1px] bg-white/[0.06]">
-          <div
-            className="h-[1px] bg-[#8B7355] transition-all duration-500"
-            style={{ width: `${((curIdx + 1) / total) * 100}%` }}
-          />
-        </div>
-        <p className="font-['Courier_New'] text-[9px] tracking-[0.2em] text-[#8B7355]/50">
-          {String(curIdx + 1).padStart(2, '0')} · {String(total).padStart(2, '0')}
-        </p>
+      <header className="brief-header">
+        <span className="brief-logo">NL ARQUITETOS</span>
+        <span className="brief-badge">Briefing · ARQ+INT</span>
       </header>
 
-      {/* Corpo */}
-      <main className="flex-1 flex items-center justify-center px-8 md:px-24 py-16">
-        <div
-          className="w-full max-w-[580px] mx-auto"
-          style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.2s ease' }}
-        >
-          <p className="font-['Courier_New'] text-[8px] tracking-[0.4em] text-[#8B7355]/50 uppercase mb-5">
-            {p.blocoTitulo} · {blocoNum}
-          </p>
+      {/* Barra de progresso */}
+      <div className="brief-progress-track">
+        <div className="brief-progress-fill" style={{ width: `${progressPct}%` }} />
+      </div>
 
-          <h1 className="font-['Cormorant_Garamond'] text-[36px] md:text-[42px] font-light italic text-[#E8DFD0] leading-[1.2] mb-3">
-            {p.label}
-          </h1>
+      {/* Dots de capítulo */}
+      <div className="brief-dots">
+        {capitulos.map((_, i) => (
+          <div key={i} className={`brief-dot${i === curCap ? ' brief-dot--active' : ''}`} />
+        ))}
+      </div>
 
-          {(p as any).orientacao && (
-            <p className="font-['Arial'] text-[11px] text-[#E8DFD0]/35 leading-relaxed mb-10">
-              {(p as any).orientacao}
-            </p>
-          )}
-
-          {p.tipo === 'text' && (
-            <input
-              autoFocus
-              value={answers[p.id] || ''}
-              onChange={(e) => setAnswers({ ...answers, [p.id]: e.target.value })}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleNext(); }}
-              placeholder={p.placeholder || 'Digite aqui...'}
-              className="w-full bg-transparent border-0 border-b border-[#E8DFD0]/10 focus:border-[#8B7355] text-[#E8DFD0] font-['Arial'] text-[16px] py-3 placeholder:text-[#E8DFD0]/18 outline-none caret-[#8B7355] transition-colors"
-            />
-          )}
-
-          {p.tipo === 'textarea' && (
-            <textarea
-              autoFocus
-              rows={3}
-              value={answers[p.id] || ''}
-              onChange={(e) => setAnswers({ ...answers, [p.id]: e.target.value })}
-              placeholder={p.placeholder || 'Sua resposta...'}
-              className="w-full bg-transparent border-0 border-b border-[#E8DFD0]/10 focus:border-[#8B7355] text-[#E8DFD0] font-['Arial'] text-[16px] py-3 placeholder:text-[#E8DFD0]/18 outline-none caret-[#8B7355] transition-colors resize-none leading-relaxed"
-            />
-          )}
-
-          {p.tipo === 'select' && (
-            <div className="flex flex-col gap-3">
-              {p.opcoes?.map(opt => {
-                const selected = answers[p.id] === opt;
-                return (
-                  <button
-                    key={opt}
-                    onClick={() => setAnswers({ ...answers, [p.id]: opt })}
-                    className={cn(
-                      "w-full text-left px-5 py-4 border font-['Arial'] text-[12px] transition-all",
-                      selected
-                        ? "border-[#8B7355] text-[#E8DFD0] bg-[#8B7355]/[0.06]"
-                        : "border-[#E8DFD0]/[0.08] text-[#E8DFD0]/40 hover:border-[#8B7355]/30 hover:text-[#E8DFD0]/70"
-                    )}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {p.tipo === 'multiselect' && (
-            <div className="flex flex-wrap gap-3">
-              {p.opcoes?.map(opt => {
-                const selected = (answers[p.id] || []).includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      const current = answers[p.id] || [];
-                      const next = selected ? current.filter((i: string) => i !== opt) : [...current, opt];
-                      setAnswers({ ...answers, [p.id]: next });
-                    }}
-                    className={cn(
-                      "px-4 py-2 rounded-full border font-['Arial'] text-[11px] transition-all",
-                      selected
-                        ? "border-[#8B7355] text-[#E8DFD0] bg-[#8B7355]/[0.08]"
-                        : "border-[#E8DFD0]/[0.08] text-[#E8DFD0]/35 hover:border-[#8B7355]/30"
-                    )}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {p.tipo === 'rating' && (
-            <div className="flex gap-3">
-              {[1, 2, 3, 4, 5].map(n => {
-                const selected = answers[p.id] === n;
-                return (
-                  <button
-                    key={n}
-                    onClick={() => setAnswers({ ...answers, [p.id]: n })}
-                    className={cn(
-                      "w-10 h-10 border font-['Courier_New'] text-[12px] transition-all",
-                      selected
-                        ? "border-[#8B7355] text-[#8B7355] bg-[#8B7355]/[0.06]"
-                        : "border-[#E8DFD0]/[0.08] text-[#E8DFD0]/30 hover:border-[#8B7355]/30"
-                    )}
-                  >
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+      {/* Área principal */}
+      <main className="brief-main">
+        <div className="brief-captag">
+          <span>Capítulo {String(curCap + 1).padStart(2, '0')} · {String(totalCaps).padStart(2, '0')}</span>
+          <div className="brief-line" />
         </div>
-      </main>
 
-      {/* Navegação inferior */}
-      <footer className="px-8 md:px-16 py-5 flex justify-between items-center border-t border-white/[0.03]">
-        <button
-          onClick={handleBack}
-          style={{ visibility: curIdx === 0 ? 'hidden' : 'visible' }}
-          className="font-['Courier_New'] text-[9px] tracking-[0.2em] text-[#E8DFD0]/15 uppercase hover:text-[#E8DFD0]/40 transition-colors"
-        >
-          ← Voltar
-        </button>
+        <h1 className="brief-captitle">{cap.titulo}</h1>
+        <p className="brief-capsub">Responda com calma — não há respostas certas ou erradas.</p>
 
-        <div className="flex items-center gap-8">
-          {isText && (
-            <span className="font-['Courier_New'] text-[10px] text-[#8B7355]/30 tracking-[0.1em] hidden md:inline">
-              pressione Enter ↵
-            </span>
-          )}
+        {cap.blocos.map(bloco => (
+          <div key={bloco.id} className="brief-section">
+            <div className="brief-section-label">{bloco.titulo}</div>
+            <div className="brief-grid">
+              {bloco.perguntas.map(p => {
+                const dark = p.id === 'frase';
+                if (dark) {
+                  return (
+                    <div key={p.id} className="brief-field brief-full">
+                      <div className="brief-darkcard">
+                        <label className="brief-flabel">{p.label}</label>
+                        {p.orientacao && <p className="brief-fhint">{p.orientacao}</p>}
+                        {renderInput(p, true)}
+                      </div>
+                    </div>
+                  );
+                }
+                return (
+                  <div key={p.id} className={`brief-field${isFull(p) ? ' brief-full' : ''}`}>
+                    <label className="brief-flabel">{p.label}</label>
+                    {p.orientacao && <p className="brief-fhint">{p.orientacao}</p>}
+                    {renderInput(p)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        {/* Navegação inferior */}
+        <div className="brief-nav">
           <button
-            onClick={handleNext}
-            disabled={isSubmitting}
-            className="px-8 py-3 border border-[#E8DFD0]/15 text-[#E8DFD0] font-['Courier_New'] text-[9px] tracking-[0.25em] uppercase hover:border-[#8B7355] hover:text-[#8B7355] transition-all disabled:opacity-40"
+            className="brief-back"
+            onClick={handleBack}
+            style={{ visibility: curCap === 0 ? 'hidden' : 'visible' }}
           >
-            {curIdx === total - 1
-              ? (isSubmitting ? 'enviando...' : 'enviar briefing →')
-              : 'continuar →'}
+            Voltar
+          </button>
+
+          <span className="brief-counter">
+            {String(curCap + 1).padStart(2, '0')} / {String(totalCaps).padStart(2, '0')}
+          </span>
+
+          <button className="brief-next" onClick={handleNext} disabled={isSubmitting}>
+            {isLastCap
+              ? (isSubmitting ? 'Enviando...' : 'Finalizar Briefing')
+              : 'Próximo Capítulo'}
           </button>
         </div>
-      </footer>
+      </main>
     </div>
   );
 };
