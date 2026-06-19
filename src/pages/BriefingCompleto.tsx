@@ -717,7 +717,7 @@ const BriefingCompleto = () => {
   const submitBriefing = async () => {
     setIsSubmitting(true);
     try {
-      const respostasOrganizadas = BRIEFING_ARQINT.capítulos.reduce((acc: any, cap) => {
+      const respostasOrganizadas = briefingData.capítulos.reduce((acc: any, cap) => {
         acc[cap.titulo] = cap.blocos.reduce((bAcc: any, bloco) => {
           bAcc[bloco.titulo] = bloco.perguntas.reduce((pAcc: any, p) => {
             pAcc[p.label] = answers[p.id] ?? null;
