@@ -926,7 +926,8 @@ const BriefingCompleto = () => {
     }
     if (p.tipo === 'multiselect') {
       const current: string[] = answers[p.id] || [];
-      const hasImagens = p.opcoes?.every(opt => ESTILO_IMAGENS[opt]);
+      const estiloMap = tipoKey === 'INTERIORES' ? ESTILO_IMAGENS_INT : ESTILO_IMAGENS;
+      const hasImagens = p.opcoes?.every(opt => estiloMap[opt]);
       if (hasImagens) {
         // Normaliza o valor em um mapa de pesos { estilo: 'amo' | 'gosto' }.
         const raw = answers[p.id];
@@ -956,7 +957,7 @@ const BriefingCompleto = () => {
                   >
                     <img
                       className="brief-stylecard__img"
-                      src={ESTILO_IMAGENS[opt]}
+                      src={estiloMap[opt]}
                       alt={`Estilo ${opt}`}
                       loading="lazy"
                       width={768}
