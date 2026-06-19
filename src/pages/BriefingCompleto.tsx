@@ -369,36 +369,7 @@ const Fundo = () => (
   </>
 );
 
-const Monograma = () => (
-  <div
-    style={{
-      position: 'fixed',
-      inset: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      pointerEvents: 'none',
-      zIndex: 1,
-      overflow: 'hidden',
-    }}
-  >
-    <span
-      style={{
-        fontFamily: "'Inter', sans-serif",
-        fontWeight: 200,
-        fontSize: 'clamp(220px, 38vw, 480px)',
-        letterSpacing: '-0.04em',
-        color: '#BF7A4A',
-        opacity: 0.07,
-        userSelect: 'none',
-        lineHeight: 1,
-        whiteSpace: 'nowrap',
-      }}
-    >
-      NL
-    </span>
-  </div>
-);
+
 
 const BriefingCompleto = () => {
   const { token } = useParams();
@@ -507,7 +478,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
       <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
@@ -530,7 +500,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
       <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
         <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
@@ -639,7 +608,6 @@ const BriefingCompleto = () => {
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
-      <Monograma />
 
       {/* Header */}
       <header className="brief-header">
