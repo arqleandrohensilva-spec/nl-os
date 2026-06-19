@@ -973,6 +973,40 @@ const BriefingCompleto = () => {
         );
       }
 
+      // Multiselect com imagens simples (sem peso amo/gosto), ex: materiais
+      const hasMaterial = p.opcoes?.every(opt => MATERIAL_IMAGENS[opt]);
+      if (hasMaterial) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = current.includes(opt);
+              return (
+                <div key={opt} className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={MATERIAL_IMAGENS[opt]}
+                      alt={opt}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">✓</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+
+
+
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => {
