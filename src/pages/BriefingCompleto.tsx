@@ -657,14 +657,30 @@ const BriefingCompleto = () => {
         ))}
       </div>
 
+      {/* Nome do capítulo + contador */}
+      <div className="brief-chapname-row" style={{ marginBottom: '2rem' }}>
+        <span className="brief-chapname">{cap.titulo}</span>
+        <span className="brief-chapcount">{curCap + 1} de {totalCaps}</span>
+      </div>
+
       {/* Área principal */}
       <main className="brief-main">
+        <div
+          className="brief-chapter-fade"
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'translateY(0)' : 'translateY(6px)',
+          }}
+        >
         <div className="brief-captag">
           <span>Capítulo {String(curCap + 1).padStart(2, '0')} · {String(totalCaps).padStart(2, '0')}</span>
           <div className="brief-line" />
         </div>
 
-        <h1 className="brief-captitle">{cap.titulo}</h1>
+        <div className="brief-h1wrap">
+          <span className="brief-ghostnum">{String(curCap + 1).padStart(2, '0')}</span>
+          <h1 className="brief-captitle" style={{ position: 'relative', zIndex: 1 }}>{cap.titulo}</h1>
+        </div>
         <p className="brief-capsub">Responda com calma — não há respostas certas ou erradas.</p>
 
         {cap.blocos.map(bloco => (
