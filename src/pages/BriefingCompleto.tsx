@@ -506,8 +506,9 @@ const BriefingCompleto = () => {
   if (isFinished) return (
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Fundo />
       <Monograma />
-      <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
