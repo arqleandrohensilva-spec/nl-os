@@ -20,6 +20,7 @@ import estiloIntIndustrial from '@/assets/estilos/int-industrial.jpg';
 import estiloIntRustico from '@/assets/estilos/int-rustico.jpg';
 
 import comHero from '@/assets/estilos/com-hero.jpg';
+import arqintHero from '@/assets/estilos/arqint-hero.jpg';
 import estiloComMinimalista from '@/assets/estilos/com-minimalista.jpg';
 import estiloComContemporaneo from '@/assets/estilos/com-contemporaneo.jpg';
 import estiloComIndustrial from '@/assets/estilos/com-industrial.jpg';
@@ -964,7 +965,8 @@ const BriefingCompleto = () => {
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
   const isInt = tipoKey === 'INTERIORES';
   const isComercial = tipoKey === 'COMERCIAL';
-  const isPremium = isInt || isComercial;
+  const isArqInt = tipoKey === 'ARQINT';
+  const isPremium = isInt || isComercial || isArqInt;
   const rootCls = `brief-root${isPremium ? ' brief-root--int' : ''}`;
   const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
@@ -1114,8 +1116,8 @@ const BriefingCompleto = () => {
         <div className="brief-entry-split">
           <div className="brief-entry-figure">
             <img
-              src={isComercial ? comHero : intHero}
-              alt={isComercial ? 'Espaço comercial' : 'Ambiente de interiores'}
+              src={isComercial ? comHero : isArqInt ? arqintHero : intHero}
+              alt={isComercial ? 'Espaço comercial' : isArqInt ? 'Arquitetura e interiores' : 'Ambiente de interiores'}
               width={960}
               height={1280}
             />
@@ -1123,7 +1125,7 @@ const BriefingCompleto = () => {
           <div className="brief-entry-content">
             <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
             <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              {isComercial ? 'Briefing · Comercial' : 'Briefing · Interiores'}
+              {isComercial ? 'Briefing · Comercial' : isArqInt ? 'Briefing · Arquitetura + Interiores' : 'Briefing · Interiores'}
             </p>
             {projeto?.nome_cliente && (
               <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
@@ -1131,12 +1133,14 @@ const BriefingCompleto = () => {
               </p>
             )}
             <h1 className="brief-entry-title" style={{ color: '#1A1816', marginBottom: '1.25rem' }}>
-              {isComercial ? 'Vamos dar forma ao seu espaço.' : 'Vamos dar vida aos seus ambientes.'}
+              {isComercial ? 'Vamos dar forma ao seu espaço.' : isArqInt ? 'Vamos projetar do alicerce ao detalhe.' : 'Vamos dar vida aos seus ambientes.'}
             </h1>
             <p style={{ fontSize: 15, color: '#A89F95', maxWidth: 460, lineHeight: 1.7, marginBottom: '2rem' }}>
               {isComercial
                 ? 'Este briefing é a base estratégica do seu projeto comercial. Cada resposta traduz a identidade da sua marca em espaço.'
-                : 'Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.'}
+                : isArqInt
+                  ? 'Este briefing é a base estratégica de tudo que construiremos — da arquitetura aos interiores. Cada resposta define um caminho único para o seu projeto.'
+                  : 'Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.'}
             </p>
             <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
               Tempo estimado: 15 minutos
