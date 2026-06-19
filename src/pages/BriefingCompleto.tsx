@@ -351,6 +351,29 @@ const BRIEFING_STYLES = `
   .brief-chip:hover { border-color: var(--brief-accent); color: var(--brief-accent); }
   .brief-chip--active { background: var(--brief-accent-bg); border-color: var(--brief-accent); color: #9D5E2E; font-weight: 500; }
 
+  .brief-stylegrid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; width: 100%;
+  }
+  .brief-stylecard {
+    position: relative; border: 1px solid var(--brief-border); border-radius: 10px; overflow: hidden;
+    cursor: pointer; background: var(--brief-surface); padding: 0; text-align: left;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  }
+  .brief-stylecard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,24,22,0.12); border-color: var(--brief-accent); }
+  .brief-stylecard__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; transition: filter 0.2s; }
+  .brief-stylecard__label {
+    display: block; padding: 9px 12px; font-size: 12px; letter-spacing: 0.04em; color: #6B6259;
+    font-family: 'Inter', sans-serif;
+  }
+  .brief-stylecard--active { border-color: var(--brief-accent); box-shadow: 0 0 0 2px var(--brief-accent); }
+  .brief-stylecard--active .brief-stylecard__label { color: #9D5E2E; font-weight: 500; }
+  .brief-stylecard__check {
+    position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--brief-accent); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; opacity: 0; transform: scale(0.7); transition: all 0.18s;
+  }
+  .brief-stylecard--active .brief-stylecard__check { opacity: 1; transform: scale(1); }
+
   .brief-darkcard {
     background: #1A1816; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem;
     border-left: 3px solid var(--brief-accent);
