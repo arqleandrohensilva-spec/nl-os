@@ -248,10 +248,9 @@ const BRIEFING_STYLES = `
   }
 
   .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 2; }
-  .brief-header { background: transparent; }
 
   .brief-header {
-    height: 52px; padding: 0 2rem; background: var(--brief-surface);
+    height: 52px; padding: 0 2rem; background: transparent;
     border-bottom: 1px solid var(--brief-border-sub);
     display: flex; align-items: center; justify-content: space-between;
   }
