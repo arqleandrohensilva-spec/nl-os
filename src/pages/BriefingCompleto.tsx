@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+import intHero from '@/assets/estilos/int-hero.jpg';
 import estiloModerno from '@/assets/estilos/moderno.jpg';
 import estiloContemporaneo from '@/assets/estilos/contemporaneo.jpg';
 import estiloMinimalista from '@/assets/estilos/minimalista.jpg';
