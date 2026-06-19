@@ -915,10 +915,14 @@ const BriefingCompleto = () => {
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
   const isInt = tipoKey === 'INTERIORES';
-  const rootCls = `brief-root${isInt ? ' brief-root--int' : ''}`;
+  const isComercial = tipoKey === 'COMERCIAL';
+  const isPremium = isInt || isComercial;
+  const rootCls = `brief-root${isPremium ? ' brief-root--int' : ''}`;
   const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
-    : BRIEFING_ARQINT;
+    : tipoKey === 'COMERCIAL'
+      ? BRIEFING_COMERCIAL
+      : BRIEFING_ARQINT;
   const capitulos = briefingData.capítulos;
   const totalCaps = capitulos.length;
 
