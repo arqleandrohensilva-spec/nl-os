@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+import intHero from '@/assets/estilos/int-hero.jpg';
 import estiloModerno from '@/assets/estilos/moderno.jpg';
 import estiloContemporaneo from '@/assets/estilos/contemporaneo.jpg';
 import estiloMinimalista from '@/assets/estilos/minimalista.jpg';
@@ -477,6 +478,7 @@ const getTipoKey = (tipo: string): string => {
 
 // --- DESIGN TOKENS + ESTILOS ---
 const BRIEFING_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap');
   .brief-root, .brief-root * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
   .brief-root {
     --brief-bg: #F7F4EF;
@@ -647,6 +649,62 @@ const BRIEFING_STYLES = `
   }
   .brief-next:hover { background: var(--brief-accent-dark); }
   .brief-next:disabled { opacity: 0.5; cursor: default; }
+
+  /* ===== Premium INTERIORES ===== */
+  /* Tipografia serif elegante apenas nos títulos do briefing de interiores */
+  .brief-root--int .brief-captitle,
+  .brief-root--int .brief-entry-title,
+  .brief-root--int .brief-final-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .brief-root--int .brief-captitle { font-size: 34px; line-height: 1.15; }
+  .brief-root--int .brief-entry-title { font-size: 40px; line-height: 1.1; }
+  .brief-root--int .brief-final-title { font-size: 42px; line-height: 1.1; }
+  .brief-root--int .brief-ghostnum { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+  /* Animação de entrada (stagger) das perguntas ao abrir o capítulo */
+  @keyframes brief-rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .brief-root--int .brief-section { opacity: 0; animation: brief-rise 0.5s ease forwards; }
+  .brief-root--int .brief-section:nth-of-type(1) { animation-delay: 0.05s; }
+  .brief-root--int .brief-section:nth-of-type(2) { animation-delay: 0.13s; }
+  .brief-root--int .brief-section:nth-of-type(3) { animation-delay: 0.21s; }
+  .brief-root--int .brief-section:nth-of-type(4) { animation-delay: 0.29s; }
+  .brief-root--int .brief-section:nth-of-type(5) { animation-delay: 0.37s; }
+  .brief-root--int .brief-section:nth-of-type(6) { animation-delay: 0.45s; }
+  .brief-root--int .brief-captag,
+  .brief-root--int .brief-h1wrap,
+  .brief-root--int .brief-capsub { opacity: 0; animation: brief-rise 0.5s ease forwards; }
+  .brief-root--int .brief-h1wrap { animation-delay: 0.04s; }
+  .brief-root--int .brief-capsub { animation-delay: 0.08s; }
+
+  /* Tela inicial editorial (split) */
+  .brief-entry-split {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; min-height: 100vh; width: 100%;
+  }
+  .brief-entry-figure {
+    position: relative; overflow: hidden; background: #EFEAE3;
+  }
+  .brief-entry-figure img {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  }
+  .brief-entry-figure::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(120deg, rgba(26,24,22,0.04), rgba(247,244,239,0.20));
+  }
+  .brief-entry-content {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 4rem clamp(2rem, 6vw, 6rem); animation: brief-rise 0.6s ease forwards;
+  }
+  @media (max-width: 820px) {
+    .brief-entry-split { grid-template-columns: 1fr; min-height: auto; }
+    .brief-entry-figure { height: 240px; }
+    .brief-entry-content { padding: 3rem 2rem; }
+  }
 `;
 
 const Fundo = () => (
@@ -699,6 +757,8 @@ const BriefingCompleto = () => {
   const [visible, setVisible] = useState(true);
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
+  const isInt = tipoKey === 'INTERIORES';
+  const rootCls = `brief-root${isInt ? ' brief-root--int' : ''}`;
   const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
     : BRIEFING_ARQINT;
@@ -798,14 +858,14 @@ const BriefingCompleto = () => {
 
   // ---- TELA FINAL ----
   if (isFinished) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
+    <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
       <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
-        <h1 style={{ fontSize: 32, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
+        <h1 className="brief-final-title" style={{ fontSize: 32, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
           Obrigado.
         </h1>
         <p style={{ fontSize: 14, color: '#A89F95', lineHeight: 1.7, marginBottom: '2rem' }}>
@@ -819,45 +879,79 @@ const BriefingCompleto = () => {
   );
 
   // ---- TELA DE ENTRADA ----
-  if (!started) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
-      <style>{BRIEFING_STYLES}</style>
-      <Fundo />
-      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
-        <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
-
-        {projeto?.nome_cliente && (
-          <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
-            Seja bem-vindo, {projeto.nome_cliente}.
-          </p>
-        )}
-        <h1 style={{ fontSize: 28, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '1rem' }}>
-          Vamos começar o desenvolvimento do seu projeto.
-        </h1>
-        <p style={{ fontSize: 14, color: '#A89F95', maxWidth: 480, lineHeight: 1.7, marginBottom: '2rem' }}>
-          Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
-        </p>
-        <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
-          Tempo estimado: 15 minutos
-        </p>
-
-        {hasSaved ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            <button className="brief-next" onClick={() => { setCurCap(savedCap); setStarted(true); }}>
-              Continuar de onde parou
-            </button>
-            <button className="brief-back" onClick={() => { setCurCap(0); setStarted(true); }}>
-              Começar do início
-            </button>
-          </div>
-        ) : (
-          <button className="brief-next" onClick={() => { setCurCap(0); setStarted(true); }}>
-            Começar Briefing
-          </button>
-        )}
+  if (!started) {
+    const entryActions = hasSaved ? (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+        <button className="brief-next" onClick={() => { setCurCap(savedCap); setStarted(true); }}>
+          Continuar de onde parou
+        </button>
+        <button className="brief-back" onClick={() => { setCurCap(0); setStarted(true); }}>
+          Começar do início
+        </button>
       </div>
-    </div>
-  );
+    ) : (
+      <button className="brief-next" onClick={() => { setCurCap(0); setStarted(true); }}>
+        Começar Briefing
+      </button>
+    );
+
+    // Versão editorial (split com imagem) — apenas INTERIORES
+    if (isInt) return (
+      <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', position: 'relative' }}>
+        <style>{BRIEFING_STYLES}</style>
+        <div className="brief-entry-split">
+          <div className="brief-entry-figure">
+            <img src={intHero} alt="Ambiente de interiores" width={960} height={1280} />
+          </div>
+          <div className="brief-entry-content">
+            <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
+            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>Briefing · Interiores</p>
+            {projeto?.nome_cliente && (
+              <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
+                Seja bem-vindo, {projeto.nome_cliente}.
+              </p>
+            )}
+            <h1 className="brief-entry-title" style={{ color: '#1A1816', marginBottom: '1.25rem' }}>
+              Vamos dar vida aos seus ambientes.
+            </h1>
+            <p style={{ fontSize: 15, color: '#A89F95', maxWidth: 460, lineHeight: 1.7, marginBottom: '2rem' }}>
+              Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.
+            </p>
+            <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
+              Tempo estimado: 15 minutos
+            </p>
+            {entryActions}
+          </div>
+        </div>
+      </div>
+    );
+
+    return (
+      <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
+        <style>{BRIEFING_STYLES}</style>
+        <Fundo />
+        <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
+
+          {projeto?.nome_cliente && (
+            <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
+              Seja bem-vindo, {projeto.nome_cliente}.
+            </p>
+          )}
+          <h1 className="brief-entry-title" style={{ fontSize: 28, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '1rem' }}>
+            Vamos começar o desenvolvimento do seu projeto.
+          </h1>
+          <p style={{ fontSize: 14, color: '#A89F95', maxWidth: 480, lineHeight: 1.7, marginBottom: '2rem' }}>
+            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
+          </p>
+          <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
+            Tempo estimado: 15 minutos
+          </p>
+          {entryActions}
+        </div>
+      </div>
+    );
+  }
 
   // ---- TELAS DE CAPÍTULO ----
   const cap = capitulos[curCap];
@@ -1057,7 +1151,7 @@ const BriefingCompleto = () => {
   const isFull = (p: Pergunta) => p.tipo === 'textarea' || p.tipo === 'multiselect';
 
   return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
+    <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
 
@@ -1088,6 +1182,7 @@ const BriefingCompleto = () => {
       {/* Área principal */}
       <main className="brief-main">
         <div
+          key={curCap}
           className="brief-chapter-fade"
           style={{
             opacity: visible ? 1 : 0,
