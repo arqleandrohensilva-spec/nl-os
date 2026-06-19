@@ -732,7 +732,14 @@ const BriefingCompleto = () => {
               : 'Próximo Capítulo'}
           </button>
         </div>
+        </div>
       </main>
+
+      {/* Rodapé */}
+      <footer className="brief-footer">
+        <div className="brief-footer-main">NL ARQUITETOS · 2026</div>
+        <div className="brief-footer-tag">A ARQUITETURA COMO DECISÃO.</div>
+      </footer>
     </div>
   );
 };
