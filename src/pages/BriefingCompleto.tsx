@@ -19,6 +19,14 @@ import estiloIntClassico from '@/assets/estilos/int-classico.jpg';
 import estiloIntIndustrial from '@/assets/estilos/int-industrial.jpg';
 import estiloIntRustico from '@/assets/estilos/int-rustico.jpg';
 
+import comHero from '@/assets/estilos/com-hero.jpg';
+import estiloComMinimalista from '@/assets/estilos/com-minimalista.jpg';
+import estiloComContemporaneo from '@/assets/estilos/com-contemporaneo.jpg';
+import estiloComIndustrial from '@/assets/estilos/com-industrial.jpg';
+import estiloComClassico from '@/assets/estilos/com-classico.jpg';
+import estiloComSofisticado from '@/assets/estilos/com-sofisticado.jpg';
+import estiloComCriativo from '@/assets/estilos/com-criativo.jpg';
+
 import matMadeira from '@/assets/materiais/madeira.jpg';
 import matPedra from '@/assets/materiais/pedra-natural.jpg';
 import matMarmore from '@/assets/materiais/marmore.jpg';
@@ -52,6 +60,16 @@ const ESTILO_IMAGENS_INT: Record<string, string> = {
   'Rústico': estiloIntRustico,
   'Boho': estiloBoho,
   'Escandinavo': estiloEscandinavo,
+};
+
+// Imagens focadas em ambientes comerciais para o briefing COMERCIAL
+const ESTILO_IMAGENS_COM: Record<string, string> = {
+  'Minimalista': estiloComMinimalista,
+  'Contemporâneo': estiloComContemporaneo,
+  'Industrial': estiloComIndustrial,
+  'Clássico': estiloComClassico,
+  'Sofisticado': estiloComSofisticado,
+  'Criativo': estiloComCriativo,
 };
 
 // Imagens visuais para materiais (multiselect simples) e iluminação (seleção única)
@@ -468,6 +486,145 @@ const BRIEFING_INTERIORES: BriefingData = {
   ]
 };
 
+// --- BRIEFING COMERCIAL ---
+const BRIEFING_COMERCIAL: BriefingData = {
+  capítulos: [
+    {
+      id: 1,
+      titulo: 'O Negócio e a Marca',
+      blocos: [
+        {
+          id: 'A',
+          titulo: 'Dados do Negócio',
+          perguntas: [
+            { id: 'empresa', label: 'Nome da empresa / marca', tipo: 'text', orientacao: 'Como sua marca é conhecida pelo público.' },
+            { id: 'segmento', label: 'Segmento / setor de atuação', tipo: 'text', orientacao: 'Ex: gastronomia, saúde, varejo, tecnologia.' },
+            { id: 'endereco', label: 'Endereço do espaço', tipo: 'text', orientacao: 'Onde o projeto será executado.' },
+            { id: 'area_total', label: 'Área total (m²)', tipo: 'text', orientacao: 'Área aproximada do espaço a ser projetado.' },
+            { id: 'tipo_intervencao', label: 'É espaço novo, reforma ou rebranding?', tipo: 'select', opcoes: ['Espaço novo', 'Reforma', 'Rebranding'], orientacao: 'Define o ponto de partida do projeto.' },
+            { id: 'tipo_espaco', label: 'Tipo de espaço', tipo: 'select', opcoes: ['Escritório', 'Loja', 'Restaurante', 'Clínica', 'Hotel', 'Outro'], orientacao: 'A função principal do ambiente.' },
+          ]
+        },
+        {
+          id: 'B',
+          titulo: 'Identidade da Marca',
+          perguntas: [
+            { id: 'identidade_visual', label: 'Como descreve a identidade visual da marca?', tipo: 'textarea', orientacao: 'A personalidade e o tom visual que representam o negócio.' },
+            { id: 'manual_marca', label: 'Tem manual de marca, logo e paleta de cores definida?', tipo: 'select', opcoes: ['Sim', 'Não'], orientacao: 'Materiais de identidade já existentes.' },
+            { id: 'sensacao', label: 'Qual a sensação que o espaço deve transmitir ao cliente?', tipo: 'textarea', orientacao: 'Ex: confiança, sofisticação, acolhimento, energia.' },
+            { id: 'concorrentes', label: 'Tem concorrentes cujo ambiente admira — ou quer se diferenciar?', tipo: 'textarea', orientacao: 'Referências de mercado, positivas ou a evitar.' },
+            { id: 'referencias_marca', label: 'Referências visuais de espaços que fazem sentido para a marca', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, fotos de espaços...', orientacao: 'Imagens valem mais que mil palavras.' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 2,
+      titulo: 'Pessoas e Espaços',
+      blocos: [
+        {
+          id: 'C',
+          titulo: 'Usuários do Espaço',
+          perguntas: [
+            { id: 'qtd_funcionarios', label: 'Quantos funcionários usarão o espaço?', tipo: 'text', orientacao: 'Considere a equipe atual e o crescimento previsto.' },
+            { id: 'perfil_cliente', label: 'Qual o perfil do cliente/visitante?', tipo: 'textarea', orientacao: 'Quem frequenta o espaço — idade, comportamento, expectativas.' },
+            { id: 'atendimento', label: 'Há atendimento ao público? Como funciona o fluxo?', tipo: 'textarea', orientacao: 'Descreva o percurso do cliente dentro do espaço.' },
+            { id: 'reunioes_clientes', label: 'Precisa de espaço para reuniões com clientes?', tipo: 'select', opcoes: ['Sim', 'Não'], orientacao: 'Salas ou áreas dedicadas a atendimentos.' },
+            { id: 'area_espera', label: 'Tem necessidade de área de espera? Como deve ser essa experiência?', tipo: 'textarea', orientacao: 'A primeira impressão de quem aguarda atendimento.' },
+          ]
+        },
+        {
+          id: 'D',
+          titulo: 'Programa de Necessidades',
+          perguntas: [
+            { id: 'ambientes', label: 'Ambientes necessários', tipo: 'multiselect', opcoes: ['Recepção/entrada', 'Sala de reuniões', 'Área de atendimento', 'Workstations', 'Sala da diretoria', 'Copa/cozinha', 'Banheiros funcionários/clientes', 'Depósito/arquivo', 'Outros ambientes específicos'], orientacao: 'Selecione todos os espaços que o projeto deve contemplar.' },
+            { id: 'ambientes_detalhe', label: 'Detalhe salas de reunião (quantas / capacidade) e outros ambientes específicos', tipo: 'textarea', placeholder: 'Ex: 2 salas de reunião (6 e 12 pessoas), sala de descanso...', orientacao: 'Ajuda no dimensionamento de cada ambiente.' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 3,
+      titulo: 'Requisitos Funcionais',
+      blocos: [
+        {
+          id: 'E',
+          titulo: 'Requisitos Funcionais',
+          perguntas: [
+            { id: 'acustica', label: 'Há necessidade de acústica especial em algum ambiente?', tipo: 'textarea', orientacao: 'Salas de reunião, atendimento sigiloso, áreas barulhentas.' },
+            { id: 'tecnologia', label: 'Precisa de tecnologia integrada — telas, automação, videoconferência?', tipo: 'textarea', orientacao: 'Infraestrutura tecnológica do espaço.' },
+            { id: 'equipamentos', label: 'Há equipamentos específicos que precisam de instalação?', tipo: 'textarea', orientacao: 'Ex: cozinha industrial, equipamentos médicos, maquinário.' },
+            { id: 'pico_movimento', label: 'Qual o pico de movimento de pessoas?', tipo: 'text', orientacao: 'Maior número de pessoas simultâneas no espaço.' },
+            { id: 'acessibilidade', label: 'Precisa de acessibilidade — rampa, elevador, banheiro adaptado?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'], orientacao: 'Garante conformidade e inclusão.' },
+            { id: 'normas', label: 'Há normas setoriais a cumprir — vigilância sanitária, bombeiros, ABNT?', tipo: 'textarea', orientacao: 'Exigências legais específicas do seu setor.' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 4,
+      titulo: 'Estética e Referências',
+      blocos: [
+        {
+          id: 'F',
+          titulo: 'Estética e Referências',
+          perguntas: [
+            { id: 'estilo', label: 'Estilo desejado para o espaço', tipo: 'multiselect', opcoes: ['Minimalista', 'Contemporâneo', 'Industrial', 'Clássico', 'Sofisticado', 'Criativo'], orientacao: 'A linguagem visual do ambiente.' },
+            { id: 'paleta', label: 'Paleta de cores — alinhada à marca ou livre?', tipo: 'select', opcoes: ['Alinhada à marca', 'Livre', 'Equilíbrio entre as duas'], orientacao: 'O quanto as cores devem seguir a identidade visual.' },
+            { id: 'materiais', label: 'Materiais preferidos', tipo: 'multiselect', opcoes: ['Madeira', 'Pedra natural', 'Mármore', 'Concreto', 'Metal', 'Vidro', 'Tecidos naturais'], orientacao: 'Materiais que combinam com a marca.' },
+            { id: 'nao_quer', label: 'O que definitivamente não quer ver no espaço?', tipo: 'textarea', orientacao: 'Elementos a evitar de qualquer forma.' },
+            { id: 'sofisticacao', label: 'Nível de sofisticação do acabamento', tipo: 'select', opcoes: ['Econômico', 'Médio', 'Premium'], orientacao: 'Define o padrão de especificação.' },
+            { id: 'referencias', label: 'Imagens, referências, links de inspiração', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, fotos...', orientacao: 'Referências visuais do resultado desejado.' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 5,
+      titulo: 'Financeiro e Processo',
+      blocos: [
+        {
+          id: 'G',
+          titulo: 'Financeiro e Cronograma',
+          perguntas: [
+            { id: 'orcamento', label: 'Orçamento total disponível', tipo: 'select', opcoes: ['Até R$ 100 mil', 'R$ 100 mil – R$ 300 mil', 'R$ 300 mil – R$ 600 mil', 'R$ 600 mil – R$ 1M', 'Acima de R$ 1M'], orientacao: 'Estimativa global para o projeto e execução.' },
+            { id: 'orcamento_tipo', label: 'O orçamento é fixo ou flexível?', tipo: 'select', opcoes: ['Fixo', 'Flexível', 'Prefiro discutir na reunião'], orientacao: 'Margem de negociação do investimento.' },
+            { id: 'expansao', label: 'Tem previsão de expansão futura?', tipo: 'select', opcoes: ['Sim', 'Não', 'Talvez'], orientacao: 'O projeto pode já considerar o crescimento.' },
+            { id: 'inauguracao', label: 'Data de inauguração desejada', tipo: 'text', placeholder: 'Ex: dezembro de 2026', orientacao: 'Data-alvo para a abertura.' },
+            { id: 'funcionando_obra', label: 'O espaço está em funcionamento durante a reforma?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não se aplica'], orientacao: 'Impacta o planejamento das etapas da obra.' },
+            { id: 'faseamento', label: 'Faseamento é possível?', tipo: 'select', opcoes: ['Sim', 'Não', 'Talvez'], orientacao: 'Executar o projeto por etapas.' },
+          ]
+        },
+        {
+          id: 'H',
+          titulo: 'Processo e Aprovações',
+          perguntas: [
+            { id: 'decisores', label: 'Quem são os decisores — sócio único, comitê, diretoria?', tipo: 'textarea', orientacao: 'Quem aprova as decisões do projeto.' },
+            { id: 'locacao', label: 'Já tem contrato de locação ou é imóvel próprio?', tipo: 'select', opcoes: ['Locação', 'Imóvel próprio', 'Em negociação'], orientacao: 'A posse influencia o nível de intervenção possível.' },
+            { id: 'restricao_condominio', label: 'Há restrições do condomínio comercial?', tipo: 'textarea', orientacao: 'Horários de obra, fachada, tipo de intervenção.' },
+            { id: 'aprovacao_prefeitura', label: 'Precisa de aprovação de projeto pela prefeitura?', tipo: 'select', opcoes: ['Sim', 'Não', 'Não sei'], orientacao: 'Define a necessidade de aprovação legal.' },
+            { id: 'responsavel_obra', label: 'Tem arquiteto ou engenheiro responsável pela obra?', tipo: 'select', opcoes: ['Sim', 'Não'], orientacao: 'Profissional já contratado para a execução.' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 6,
+      titulo: 'Expectativas Finais',
+      blocos: [
+        {
+          id: 'I',
+          titulo: 'Expectativas Finais',
+          perguntas: [
+            { id: 'medos', label: 'Quais são seus 3 maiores medos nesse projeto?', tipo: 'textarea', orientacao: 'Ex: estourar orçamento, atraso, não refletir a marca.' },
+            { id: 'frase', label: 'Em uma única frase, descreva a experiência que seu espaço deve proporcionar ao cliente', tipo: 'textarea', placeholder: 'Ex: "Quero que o cliente se sinta acolhido e confiante ao entrar."', orientacao: 'O conceito central do projeto.' },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 const getTipoKey = (tipo: string): string => {
   const t = (tipo || '').toLowerCase().replace(/\s/g, '');
   if (t.includes('int') && t.includes('arq')) return 'ARQINT';
@@ -758,10 +915,14 @@ const BriefingCompleto = () => {
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
   const isInt = tipoKey === 'INTERIORES';
-  const rootCls = `brief-root${isInt ? ' brief-root--int' : ''}`;
+  const isComercial = tipoKey === 'COMERCIAL';
+  const isPremium = isInt || isComercial;
+  const rootCls = `brief-root${isPremium ? ' brief-root--int' : ''}`;
   const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
-    : BRIEFING_ARQINT;
+    : tipoKey === 'COMERCIAL'
+      ? BRIEFING_COMERCIAL
+      : BRIEFING_ARQINT;
   const capitulos = briefingData.capítulos;
   const totalCaps = capitulos.length;
 
@@ -895,27 +1056,36 @@ const BriefingCompleto = () => {
       </button>
     );
 
-    // Versão editorial (split com imagem) — apenas INTERIORES
-    if (isInt) return (
+    // Versão editorial (split com imagem) — INTERIORES e COMERCIAL
+    if (isPremium) return (
       <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', position: 'relative' }}>
         <style>{BRIEFING_STYLES}</style>
         <div className="brief-entry-split">
           <div className="brief-entry-figure">
-            <img src={intHero} alt="Ambiente de interiores" width={960} height={1280} />
+            <img
+              src={isComercial ? comHero : intHero}
+              alt={isComercial ? 'Espaço comercial' : 'Ambiente de interiores'}
+              width={960}
+              height={1280}
+            />
           </div>
           <div className="brief-entry-content">
             <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
-            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>Briefing · Interiores</p>
+            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>
+              {isComercial ? 'Briefing · Comercial' : 'Briefing · Interiores'}
+            </p>
             {projeto?.nome_cliente && (
               <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
                 Seja bem-vindo, {projeto.nome_cliente}.
               </p>
             )}
             <h1 className="brief-entry-title" style={{ color: '#1A1816', marginBottom: '1.25rem' }}>
-              Vamos dar vida aos seus ambientes.
+              {isComercial ? 'Vamos dar forma ao seu espaço.' : 'Vamos dar vida aos seus ambientes.'}
             </h1>
             <p style={{ fontSize: 15, color: '#A89F95', maxWidth: 460, lineHeight: 1.7, marginBottom: '2rem' }}>
-              Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.
+              {isComercial
+                ? 'Este briefing é a base estratégica do seu projeto comercial. Cada resposta traduz a identidade da sua marca em espaço.'
+                : 'Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.'}
             </p>
             <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
               Tempo estimado: 15 minutos
@@ -925,6 +1095,7 @@ const BriefingCompleto = () => {
         </div>
       </div>
     );
+
 
     return (
       <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
@@ -1020,7 +1191,7 @@ const BriefingCompleto = () => {
     }
     if (p.tipo === 'multiselect') {
       const current: string[] = answers[p.id] || [];
-      const estiloMap = tipoKey === 'INTERIORES' ? ESTILO_IMAGENS_INT : ESTILO_IMAGENS;
+      const estiloMap = tipoKey === 'INTERIORES' ? ESTILO_IMAGENS_INT : tipoKey === 'COMERCIAL' ? ESTILO_IMAGENS_COM : ESTILO_IMAGENS;
       const hasImagens = p.opcoes?.every(opt => estiloMap[opt]);
       if (hasImagens) {
         // Normaliza o valor em um mapa de pesos { estilo: 'amo' | 'gosto' }.
