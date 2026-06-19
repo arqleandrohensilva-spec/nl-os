@@ -247,7 +247,8 @@ const BRIEFING_STYLES = `
     --brief-text-4: #BFB8B0;
   }
 
-  .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 1; }
+  .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 2; }
+  .brief-header { background: transparent; }
 
   .brief-header {
     height: 52px; padding: 0 2rem; background: var(--brief-surface);
