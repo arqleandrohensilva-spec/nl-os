@@ -356,10 +356,13 @@ const BRIEFING_STYLES = `
   }
   .brief-stylecard {
     position: relative; border: 1px solid var(--brief-border); border-radius: 10px; overflow: hidden;
-    cursor: pointer; background: var(--brief-surface); padding: 0; text-align: left;
+    background: var(--brief-surface); padding: 0; text-align: left;
     transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
   }
   .brief-stylecard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,24,22,0.12); border-color: var(--brief-accent); }
+  .brief-stylecard__hit {
+    display: block; width: 100%; padding: 0; border: none; background: none; cursor: pointer; text-align: left;
+  }
   .brief-stylecard__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; transition: filter 0.2s; }
   .brief-stylecard__label {
     display: block; padding: 9px 12px; font-size: 12px; letter-spacing: 0.04em; color: #6B6259;
@@ -367,12 +370,27 @@ const BRIEFING_STYLES = `
   }
   .brief-stylecard--active { border-color: var(--brief-accent); box-shadow: 0 0 0 2px var(--brief-accent); }
   .brief-stylecard--active .brief-stylecard__label { color: #9D5E2E; font-weight: 500; }
+  .brief-stylecard--amo { box-shadow: 0 0 0 2px #C0392B; border-color: #C0392B; }
   .brief-stylecard__check {
     position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
     background: var(--brief-accent); color: #fff; display: flex; align-items: center; justify-content: center;
     font-size: 14px; line-height: 1; opacity: 0; transform: scale(0.7); transition: all 0.18s;
   }
   .brief-stylecard--active .brief-stylecard__check { opacity: 1; transform: scale(1); }
+  .brief-stylecard--amo .brief-stylecard__check { background: #C0392B; }
+  .brief-stylecard__weights {
+    display: flex; gap: 6px; padding: 0 10px 10px; font-family: 'Inter', sans-serif;
+  }
+  .brief-weight {
+    flex: 1; padding: 6px 8px; border-radius: 16px; border: 1px solid var(--brief-border);
+    background: var(--brief-surface); font-size: 11px; letter-spacing: 0.03em; color: #8A8178;
+    cursor: pointer; transition: all 0.16s; font-family: 'Inter', sans-serif;
+  }
+  .brief-weight:hover { border-color: var(--brief-accent); color: var(--brief-accent); }
+  .brief-weight--active { border-color: var(--brief-accent); background: var(--brief-accent-bg); color: #9D5E2E; font-weight: 500; }
+  .brief-stylecard__weights .brief-weight:first-child.brief-weight--active {
+    border-color: #C0392B; background: rgba(192,57,43,0.10); color: #C0392B;
+  }
 
   .brief-darkcard {
     background: #1A1816; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem;
@@ -647,33 +665,68 @@ const BriefingCompleto = () => {
       const current: string[] = answers[p.id] || [];
       const hasImagens = p.opcoes?.every(opt => ESTILO_IMAGENS[opt]);
       if (hasImagens) {
+        // Normaliza o valor em um mapa de pesos { estilo: 'amo' | 'gosto' }.
+        const raw = answers[p.id];
+        const pesos: Record<string, string> = Array.isArray(raw)
+          ? raw.reduce((acc: Record<string, string>, k: string) => { acc[k] = 'gosto'; return acc; }, {})
+          : (raw && typeof raw === 'object' ? { ...raw } : {});
+        const setPeso = (opt: string, peso: string) => setVal({ ...pesos, [opt]: peso });
+        const removeOpt = (opt: string) => {
+          const next = { ...pesos };
+          delete next[opt];
+          setVal(next);
+        };
         return (
           <div className="brief-stylegrid">
             {p.opcoes?.map(opt => {
-              const selected = current.includes(opt);
+              const peso = pesos[opt];
+              const selected = !!peso;
               return (
-                <button
+                <div
                   key={opt}
-                  type="button"
-                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}
-                  onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}${peso === 'amo' ? ' brief-stylecard--amo' : ''}`}
                 >
-                  <img
-                    className="brief-stylecard__img"
-                    src={ESTILO_IMAGENS[opt]}
-                    alt={`Estilo ${opt}`}
-                    loading="lazy"
-                    width={768}
-                    height={512}
-                  />
-                  <span className="brief-stylecard__check">✓</span>
-                  <span className="brief-stylecard__label">{opt}</span>
-                </button>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => selected ? removeOpt(opt) : setPeso(opt, 'gosto')}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={ESTILO_IMAGENS[opt]}
+                      alt={`Estilo ${opt}`}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">{peso === 'amo' ? '♥' : '✓'}</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                  {selected && (
+                    <div className="brief-stylecard__weights">
+                      <button
+                        type="button"
+                        className={`brief-weight${peso === 'amo' ? ' brief-weight--active' : ''}`}
+                        onClick={() => setPeso(opt, 'amo')}
+                      >
+                        ♥ Amo
+                      </button>
+                      <button
+                        type="button"
+                        className={`brief-weight${peso === 'gosto' ? ' brief-weight--active' : ''}`}
+                        onClick={() => setPeso(opt, 'gosto')}
+                      >
+                        Gosto
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
         );
       }
+
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => {
