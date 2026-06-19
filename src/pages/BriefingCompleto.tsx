@@ -647,33 +647,68 @@ const BriefingCompleto = () => {
       const current: string[] = answers[p.id] || [];
       const hasImagens = p.opcoes?.every(opt => ESTILO_IMAGENS[opt]);
       if (hasImagens) {
+        // Normaliza o valor em um mapa de pesos { estilo: 'amo' | 'gosto' }.
+        const raw = answers[p.id];
+        const pesos: Record<string, string> = Array.isArray(raw)
+          ? raw.reduce((acc: Record<string, string>, k: string) => { acc[k] = 'gosto'; return acc; }, {})
+          : (raw && typeof raw === 'object' ? { ...raw } : {});
+        const setPeso = (opt: string, peso: string) => setVal({ ...pesos, [opt]: peso });
+        const removeOpt = (opt: string) => {
+          const next = { ...pesos };
+          delete next[opt];
+          setVal(next);
+        };
         return (
           <div className="brief-stylegrid">
             {p.opcoes?.map(opt => {
-              const selected = current.includes(opt);
+              const peso = pesos[opt];
+              const selected = !!peso;
               return (
-                <button
+                <div
                   key={opt}
-                  type="button"
-                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}
-                  onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}${peso === 'amo' ? ' brief-stylecard--amo' : ''}`}
                 >
-                  <img
-                    className="brief-stylecard__img"
-                    src={ESTILO_IMAGENS[opt]}
-                    alt={`Estilo ${opt}`}
-                    loading="lazy"
-                    width={768}
-                    height={512}
-                  />
-                  <span className="brief-stylecard__check">✓</span>
-                  <span className="brief-stylecard__label">{opt}</span>
-                </button>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => selected ? removeOpt(opt) : setPeso(opt, 'gosto')}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={ESTILO_IMAGENS[opt]}
+                      alt={`Estilo ${opt}`}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">{peso === 'amo' ? '♥' : '✓'}</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                  {selected && (
+                    <div className="brief-stylecard__weights">
+                      <button
+                        type="button"
+                        className={`brief-weight${peso === 'amo' ? ' brief-weight--active' : ''}`}
+                        onClick={() => setPeso(opt, 'amo')}
+                      >
+                        ♥ Amo
+                      </button>
+                      <button
+                        type="button"
+                        className={`brief-weight${peso === 'gosto' ? ' brief-weight--active' : ''}`}
+                        onClick={() => setPeso(opt, 'gosto')}
+                      >
+                        Gosto
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
         );
       }
+
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => {
