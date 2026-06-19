@@ -9,6 +9,20 @@ import estiloIndustrial from '@/assets/estilos/industrial.jpg';
 import estiloClassico from '@/assets/estilos/classico.jpg';
 import estiloTropical from '@/assets/estilos/tropical.jpg';
 import estiloRustico from '@/assets/estilos/rustico.jpg';
+import estiloBoho from '@/assets/estilos/boho.jpg';
+import estiloEscandinavo from '@/assets/estilos/escandinavo.jpg';
+
+import matMadeira from '@/assets/materiais/madeira.jpg';
+import matPedra from '@/assets/materiais/pedra-natural.jpg';
+import matMarmore from '@/assets/materiais/marmore.jpg';
+import matConcreto from '@/assets/materiais/concreto.jpg';
+import matMetal from '@/assets/materiais/metal.jpg';
+import matVidro from '@/assets/materiais/vidro.jpg';
+import matTecidos from '@/assets/materiais/tecidos-naturais.jpg';
+
+import iluQuente from '@/assets/iluminacao/quente.jpg';
+import iluFria from '@/assets/iluminacao/fria.jpg';
+import iluEquilibrio from '@/assets/iluminacao/equilibrio.jpg';
 
 const ESTILO_IMAGENS: Record<string, string> = {
   'Moderno': estiloModerno,
@@ -18,7 +32,27 @@ const ESTILO_IMAGENS: Record<string, string> = {
   'Clássico': estiloClassico,
   'Tropical': estiloTropical,
   'Rústico': estiloRustico,
+  'Boho': estiloBoho,
+  'Escandinavo': estiloEscandinavo,
 };
+
+// Imagens visuais para materiais (multiselect simples) e iluminação (seleção única)
+const MATERIAL_IMAGENS: Record<string, string> = {
+  'Madeira': matMadeira,
+  'Pedra natural': matPedra,
+  'Mármore': matMarmore,
+  'Concreto': matConcreto,
+  'Metal': matMetal,
+  'Vidro': matVidro,
+  'Tecidos naturais': matTecidos,
+};
+
+const ILUMINACAO_IMAGENS: Record<string, string> = {
+  'Quente': iluQuente,
+  'Fria': iluFria,
+  'Equilíbrio entre as duas': iluEquilibrio,
+};
+
 
 
 
