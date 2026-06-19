@@ -143,7 +143,7 @@ const BRIEFING_ARQINT: BriefingData = {
             { id: 'ambientes_desejo', label: 'Ambientes desejáveis — se o orçamento permitir', tipo: 'textarea', orientacao: 'Aquilo que você gostaria de ter, mas não é prioridade absoluta.' },
             { id: 'tres_itens', label: 'Quais são os 3 itens que não podem faltar?', tipo: 'textarea', orientacao: 'Os elementos "assinatura" do seu projeto.' },
             { id: 'eliminar', label: 'Algum ambiente que pode ser eliminado se necessário?', tipo: 'textarea', orientacao: 'Espaços que podem ser fundidos ou removidos em caso de ajuste de custos.' },
-            { id: 'futuro', label: 'Existe alguma necessidade futura que devemos considerar?', tipo: 'textarea', placeholder: 'Ex: quarto para filho, espaço para envelhecer, home office maior...', orientacao: 'Pense na evolução da família nos próximos 10 anos.' },
+            { id: 'necessidade_futura', label: 'Existe alguma necessidade futura que devemos considerar?', tipo: 'textarea', placeholder: 'Ex: quarto para filho, espaço para envelhecer, home office maior...', orientacao: 'Pense na evolução da família nos próximos 10 anos.' },
             { id: 'vagas', label: 'Quantas vagas de garagem?', tipo: 'select', opcoes: ['1 vaga', '2 vagas', '3 vagas', '4 vagas', '5 ou mais'], orientacao: 'Considere os veículos atuais e futuros da família.' },
             { id: 'acessibilidade', label: 'Necessidade de acessibilidade ou adaptação?', tipo: 'multiselect', opcoes: ['Suíte no térreo', 'Mobilidade reduzida / cadeirante', 'Idosos na casa', 'Elevador / plataforma', 'Pensar em envelhecer na casa', 'Nenhuma'], orientacao: 'Garante conforto e segurança hoje e no futuro.' },
           ]
