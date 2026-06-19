@@ -879,45 +879,79 @@ const BriefingCompleto = () => {
   );
 
   // ---- TELA DE ENTRADA ----
-  if (!started) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
-      <style>{BRIEFING_STYLES}</style>
-      <Fundo />
-      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
-        <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
-
-        {projeto?.nome_cliente && (
-          <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
-            Seja bem-vindo, {projeto.nome_cliente}.
-          </p>
-        )}
-        <h1 style={{ fontSize: 28, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '1rem' }}>
-          Vamos começar o desenvolvimento do seu projeto.
-        </h1>
-        <p style={{ fontSize: 14, color: '#A89F95', maxWidth: 480, lineHeight: 1.7, marginBottom: '2rem' }}>
-          Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
-        </p>
-        <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
-          Tempo estimado: 15 minutos
-        </p>
-
-        {hasSaved ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            <button className="brief-next" onClick={() => { setCurCap(savedCap); setStarted(true); }}>
-              Continuar de onde parou
-            </button>
-            <button className="brief-back" onClick={() => { setCurCap(0); setStarted(true); }}>
-              Começar do início
-            </button>
-          </div>
-        ) : (
-          <button className="brief-next" onClick={() => { setCurCap(0); setStarted(true); }}>
-            Começar Briefing
-          </button>
-        )}
+  if (!started) {
+    const entryActions = hasSaved ? (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+        <button className="brief-next" onClick={() => { setCurCap(savedCap); setStarted(true); }}>
+          Continuar de onde parou
+        </button>
+        <button className="brief-back" onClick={() => { setCurCap(0); setStarted(true); }}>
+          Começar do início
+        </button>
       </div>
-    </div>
-  );
+    ) : (
+      <button className="brief-next" onClick={() => { setCurCap(0); setStarted(true); }}>
+        Começar Briefing
+      </button>
+    );
+
+    // Versão editorial (split com imagem) — apenas INTERIORES
+    if (isInt) return (
+      <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', position: 'relative' }}>
+        <style>{BRIEFING_STYLES}</style>
+        <div className="brief-entry-split">
+          <div className="brief-entry-figure">
+            <img src={intHero} alt="Ambiente de interiores" width={960} height={1280} />
+          </div>
+          <div className="brief-entry-content">
+            <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
+            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>Briefing · Interiores</p>
+            {projeto?.nome_cliente && (
+              <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
+                Seja bem-vindo, {projeto.nome_cliente}.
+              </p>
+            )}
+            <h1 className="brief-entry-title" style={{ color: '#1A1816', marginBottom: '1.25rem' }}>
+              Vamos dar vida aos seus ambientes.
+            </h1>
+            <p style={{ fontSize: 15, color: '#A89F95', maxWidth: 460, lineHeight: 1.7, marginBottom: '2rem' }}>
+              Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.
+            </p>
+            <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
+              Tempo estimado: 15 minutos
+            </p>
+            {entryActions}
+          </div>
+        </div>
+      </div>
+    );
+
+    return (
+      <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
+        <style>{BRIEFING_STYLES}</style>
+        <Fundo />
+        <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
+
+          {projeto?.nome_cliente && (
+            <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
+              Seja bem-vindo, {projeto.nome_cliente}.
+            </p>
+          )}
+          <h1 className="brief-entry-title" style={{ fontSize: 28, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '1rem' }}>
+            Vamos começar o desenvolvimento do seu projeto.
+          </h1>
+          <p style={{ fontSize: 14, color: '#A89F95', maxWidth: 480, lineHeight: 1.7, marginBottom: '2rem' }}>
+            Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único.
+          </p>
+          <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
+            Tempo estimado: 15 minutos
+          </p>
+          {entryActions}
+        </div>
+      </div>
+    );
+  }
 
   // ---- TELAS DE CAPÍTULO ----
   const cap = capitulos[curCap];
