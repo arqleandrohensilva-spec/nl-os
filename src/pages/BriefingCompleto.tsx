@@ -20,6 +20,7 @@ import estiloIntIndustrial from '@/assets/estilos/int-industrial.jpg';
 import estiloIntRustico from '@/assets/estilos/int-rustico.jpg';
 
 import comHero from '@/assets/estilos/com-hero.jpg';
+import arqintHero from '@/assets/estilos/arqint-hero.jpg';
 import estiloComMinimalista from '@/assets/estilos/com-minimalista.jpg';
 import estiloComContemporaneo from '@/assets/estilos/com-contemporaneo.jpg';
 import estiloComIndustrial from '@/assets/estilos/com-industrial.jpg';
