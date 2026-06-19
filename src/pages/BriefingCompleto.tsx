@@ -258,6 +258,172 @@ const BRIEFING_ARQINT: BriefingData = {
   ]
 };
 
+// --- BRIEFING INTERIORES ---
+const BRIEFING_INTERIORES: BriefingData = {
+  capítulos: [
+    {
+      id: 1,
+      titulo: 'Você e o Seu Projeto',
+      blocos: [
+        {
+          id: 'A',
+          titulo: 'Dados do Projeto',
+          perguntas: [
+            { id: 'nome', label: 'Nome completo', tipo: 'text', prefill: 'nome_cliente', orientacao: 'Informe seu nome completo conforme documento.' },
+            { id: 'telefone', label: 'Telefone', tipo: 'text', prefill: 'whatsapp', orientacao: 'Seu melhor número para contato rápido via WhatsApp.' },
+            { id: 'email', label: 'E-mail', tipo: 'text', orientacao: 'Utilizaremos este e-mail para enviar o material do projeto.' },
+            { id: 'cidade', label: 'Cidade', tipo: 'text', prefill: 'cidade', orientacao: 'Onde o imóvel está localizado.' },
+            { id: 'endereco', label: 'Endereço do imóvel', tipo: 'text' },
+            { id: 'tipo_imovel', label: 'Tipo do imóvel', tipo: 'select', opcoes: ['Apartamento', 'Casa', 'Cobertura'] },
+            { id: 'area_total', label: 'Área total (m²)', tipo: 'text' },
+            { id: 'situacao_imovel', label: 'É imóvel novo, na planta ou usado?', tipo: 'select', opcoes: ['Novo', 'Na planta', 'Usado'] },
+            { id: 'ambientes_projeto', label: 'Quais ambientes fazem parte do projeto?', tipo: 'multiselect', opcoes: ['Sala de estar', 'Sala de jantar', 'Cozinha', 'Suíte master', 'Quartos', 'Banheiros', 'Home office', 'Varanda', 'Área de serviço', 'Todos os ambientes'] },
+            { id: 'tem_planta', label: 'Já tem planta do imóvel disponível?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+          ]
+        }
+      ]
+    },
+    {
+      id: 2,
+      titulo: 'Perfil e Rotina',
+      blocos: [
+        {
+          id: 'B',
+          titulo: 'Perfil dos Moradores',
+          perguntas: [
+            { id: 'qtd_pessoas', label: 'Quantas pessoas vivem no imóvel?', tipo: 'text' },
+            { id: 'composicao', label: 'Composição familiar', tipo: 'textarea', placeholder: 'Casal, filhos (idades), moradores adultos...' },
+            { id: 'pets', label: 'Tem animais de estimação?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'pets_quais', label: 'Quais?', tipo: 'text' },
+            { id: 'acessibilidade', label: 'Algum morador com necessidade de acessibilidade?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'trabalha_casa', label: 'Alguém trabalha em casa?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+          ]
+        },
+        {
+          id: 'C',
+          titulo: 'Estilo de Vida e Uso',
+          perguntas: [
+            { id: 'uso_ambientes', label: 'Como cada ambiente é usado no dia a dia?', tipo: 'textarea' },
+            { id: 'incomoda_hoje', label: 'O que mais te incomoda no espaço como está hoje?', tipo: 'textarea' },
+            { id: 'falta_hoje', label: 'O que falta que você sempre quis ter?', tipo: 'textarea' },
+            { id: 'visitas', label: 'Recebe visitas com frequência?', tipo: 'select', opcoes: ['Raramente', 'Às vezes', 'Com frequência'] },
+            { id: 'cozinha_uso', label: 'Tem hábito de cozinhar? Cozinha é espaço social ou funcional?', tipo: 'textarea' },
+            { id: 'home_office', label: 'Precisa de home office integrado a algum ambiente?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'manutencao', label: 'Qual a tolerância com manutenção de materiais?', tipo: 'select', opcoes: ['Baixa manutenção é essencial', 'Tolero manutenção moderada', 'Não me importo com manutenção'] },
+            { id: 'integracao', label: 'Prefere ambientes mais reservados ou integrados?', tipo: 'select', opcoes: ['Reservados', 'Integrados', 'Equilíbrio entre os dois'] },
+          ]
+        }
+      ]
+    },
+    {
+      id: 3,
+      titulo: 'O Que Existe Hoje',
+      blocos: [
+        {
+          id: 'D',
+          titulo: 'Mobiliário Existente',
+          perguntas: [
+            { id: 'moveis_aproveitar', label: 'Vai aproveitar algum móvel ou peça atual?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'moveis_quais', label: 'Quais móveis ficam?', tipo: 'textarea' },
+            { id: 'itens_afetivos', label: 'Tem obras de arte ou itens afetivos para incorporar?', tipo: 'textarea' },
+            { id: 'mobiliario_novo', label: 'Vai adquirir mobiliário novo integralmente?', tipo: 'select', opcoes: ['Sim', 'Não', 'Parcialmente'] },
+            { id: 'peca_destaque', label: 'Tem alguma peça de design que quer destacar?', tipo: 'textarea' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 4,
+      titulo: 'Estética e Referências',
+      blocos: [
+        {
+          id: 'E',
+          titulo: 'Estética e Referências',
+          perguntas: [
+            { id: 'estilo', label: 'Estilo desejado', tipo: 'multiselect', opcoes: ['Minimalista', 'Contemporâneo', 'Clássico', 'Industrial', 'Rústico', 'Boho', 'Escandinavo'] },
+            { id: 'paleta', label: 'Paleta de cores preferida', tipo: 'textarea' },
+            { id: 'cores_nao', label: 'Cores que não quer de forma alguma', tipo: 'textarea' },
+            { id: 'materiais', label: 'Materiais preferidos', tipo: 'multiselect', opcoes: ['Madeira', 'Pedra natural', 'Mármore', 'Concreto', 'Metal', 'Vidro', 'Tecidos naturais'] },
+            { id: 'referencias', label: 'Referências visuais', tipo: 'textarea', placeholder: 'Imagens, links, Pinterest...' },
+            { id: 'nao_repetir', label: 'Algo que não quer repetir de projetos anteriores?', tipo: 'textarea' },
+          ]
+        },
+        {
+          id: 'F',
+          titulo: 'Iluminação',
+          perguntas: [
+            { id: 'iluminacao_temp', label: 'Preferência por iluminação quente ou fria?', tipo: 'select', opcoes: ['Quente', 'Fria', 'Equilíbrio entre as duas'] },
+            { id: 'iluminacao_destaque', label: 'Gosta de iluminação de destaque?', tipo: 'multiselect', opcoes: ['Spots', 'Pendentes', 'Fita LED', 'Arandelas', 'Nenhuma — prefiro simples'] },
+            { id: 'automacao_luz', label: 'Automação de iluminação é desejada?', tipo: 'select', opcoes: ['Sim', 'Não', 'Talvez'] },
+            { id: 'luz_natural', label: 'Qual o nível de luz natural de cada ambiente?', tipo: 'textarea' },
+          ]
+        }
+      ]
+    },
+    {
+      id: 5,
+      titulo: 'Investimento e Restrições',
+      blocos: [
+        {
+          id: 'G',
+          titulo: 'Restrições do Imóvel',
+          perguntas: [
+            { id: 'restricao_condominio', label: 'Tem restrições do condomínio para horário de obra ou tipo de intervenção?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'restricao_qual', label: 'Quais restrições?', tipo: 'textarea' },
+            { id: 'prazo_condominio', label: 'Tem prazo definido pelo condomínio para execução?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+          ]
+        },
+        {
+          id: 'H',
+          titulo: 'Financeiro e Cronograma',
+          perguntas: [
+            { id: 'orcamento', label: 'Orçamento total (marcenaria + mobiliário + revestimentos + execução)', tipo: 'select', opcoes: ['Até R$ 50 mil', 'R$ 50 mil – R$ 100 mil', 'R$ 100 mil – R$ 200 mil', 'R$ 200 mil – R$ 350 mil', 'Acima de R$ 350 mil'] },
+            { id: 'investir_mais', label: 'Áreas onde prefere investir mais', tipo: 'textarea' },
+            { id: 'economizar', label: 'Áreas onde pode economizar', tipo: 'textarea' },
+            { id: 'prazo_entrega', label: 'Prazo desejado de entrega', tipo: 'select', opcoes: ['O quanto antes', '3 a 6 meses', '6 a 12 meses', 'Mais de 1 ano'] },
+            { id: 'mora_durante_obra', label: 'Vai continuar morando no imóvel durante a obra?', tipo: 'select', opcoes: ['Sim', 'Não', 'Ainda não sei'] },
+            { id: 'fornecedor', label: 'Já tem algum fornecedor ou contratado?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+          ]
+        }
+      ]
+    },
+    {
+      id: 6,
+      titulo: 'Processo e Expectativas',
+      blocos: [
+        {
+          id: 'I',
+          titulo: 'Processo e Comunicação',
+          perguntas: [
+            { id: 'ja_trabalhou', label: 'Já trabalhou com designer de interiores antes?', tipo: 'select', opcoes: ['Sim', 'Não'] },
+            { id: 'funcionou', label: 'O que funcionou? O que mudaria?', tipo: 'textarea' },
+            { id: 'autonomia', label: 'Prefere acompanhar cada decisão ou dar autonomia ao designer?', tipo: 'select', opcoes: ['Acompanhar cada decisão', 'Dar autonomia', 'Equilíbrio entre os dois'] },
+            { id: 'canal', label: 'Canal de comunicação preferido', tipo: 'select', opcoes: ['WhatsApp', 'E-mail', 'Reuniões presenciais'] },
+            { id: 'decisor', label: 'Quem é o decisor final no projeto?', tipo: 'text' },
+          ]
+        },
+        {
+          id: 'J',
+          titulo: 'Expectativas Finais',
+          perguntas: [
+            { id: 'medos', label: 'Quais são seus 3 maiores medos nesse projeto?', tipo: 'textarea' },
+            { id: 'excelente', label: 'O que seria um projeto excelente para você?', tipo: 'textarea' },
+            { id: 'frase', label: 'Em uma única frase, descreva como você quer se sentir nesse espaço quando estiver pronto.', tipo: 'textarea', placeholder: 'Ex: "Quero entrar e sentir que finalmente cheguei em casa."' },
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+const getTipoKey = (tipo: string): string => {
+  const t = (tipo || '').toLowerCase().replace(/\s/g, '');
+  if (t.includes('int') && t.includes('arq')) return 'ARQINT';
+  if (t === 'interiores' || t === 'int') return 'INTERIORES';
+  if (t === 'comercial') return 'COMERCIAL';
+  return 'ARQINT';
+};
+
 // --- DESIGN TOKENS + ESTILOS ---
 const BRIEFING_STYLES = `
   .brief-root, .brief-root * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
