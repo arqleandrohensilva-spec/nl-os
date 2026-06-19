@@ -247,10 +247,10 @@ const BRIEFING_STYLES = `
     --brief-text-4: #BFB8B0;
   }
 
-  .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 1; }
+  .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 2; }
 
   .brief-header {
-    height: 52px; padding: 0 2rem; background: var(--brief-surface);
+    height: 52px; padding: 0 2rem; background: transparent;
     border-bottom: 1px solid var(--brief-border-sub);
     display: flex; align-items: center; justify-content: space-between;
   }
@@ -338,6 +338,37 @@ const BRIEFING_STYLES = `
   .brief-next:disabled { opacity: 0.5; cursor: default; }
 `;
 
+const Fundo = () => (
+  <>
+    {/* Camada 1 — imagem da capa */}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundImage:
+          "url('https://www.dropbox.com/scl/fi/qvuvyvkomvhugkcz8drty/Capa-Branca.png?rlkey=c2320yi5ryugoiw0hw8t0m6b9&raw=1')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0.3,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }}
+    />
+    {/* Camada 2 — lavagem creme por cima */}
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: '#F7F4EF',
+        opacity: 0.58,
+        pointerEvents: 'none',
+        zIndex: 1,
+      }}
+    />
+  </>
+);
+
 const Monograma = () => (
   <div
     style={{
@@ -347,7 +378,7 @@ const Monograma = () => (
       alignItems: 'center',
       justifyContent: 'center',
       pointerEvents: 'none',
-      zIndex: 0,
+      zIndex: 1,
       overflow: 'hidden',
     }}
   >
@@ -475,8 +506,9 @@ const BriefingCompleto = () => {
   if (isFinished) return (
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Fundo />
       <Monograma />
-      <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
@@ -497,8 +529,9 @@ const BriefingCompleto = () => {
   if (!started) return (
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Fundo />
       <Monograma />
-      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 2 }}>
         <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
         {projeto?.nome_cliente && (
@@ -605,6 +638,7 @@ const BriefingCompleto = () => {
   return (
     <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Fundo />
       <Monograma />
 
       {/* Header */}
