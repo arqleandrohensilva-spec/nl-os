@@ -264,7 +264,32 @@ const BRIEFING_STYLES = `
   .brief-dot { width: 6px; height: 6px; border-radius: 50%; background: #DDD7CE; transition: all 0.2s ease; }
   .brief-dot--active { width: 20px; height: 6px; border-radius: 3px; background: var(--brief-accent); }
 
-  .brief-main { max-width: 680px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+  .brief-main {
+    max-width: 680px; margin: 0 auto; padding: 2.5rem 2rem 4rem;
+    background: rgba(250, 248, 245, 0.82);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-radius: 0;
+  }
+
+  .brief-chapname-row {
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 680px; margin: 10px auto 0; padding: 0 2rem;
+    position: relative; z-index: 2;
+  }
+  .brief-chapname { font-size: 11px; font-weight: 400; color: #A89F95; letter-spacing: 0.04em; }
+  .brief-chapcount { font-size: 11px; color: #C8C0B8; }
+
+  .brief-footer { padding: 2rem; text-align: center; background: transparent; position: relative; z-index: 2; }
+  .brief-footer-main { font-size: 11px; font-weight: 400; color: #A89F95; letter-spacing: 0.08em; }
+  .brief-footer-tag { font-size: 9px; font-weight: 500; color: #C8C0B8; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 4px; }
+
+  .brief-h1wrap { position: relative; }
+  .brief-ghostnum {
+    position: absolute; top: -32px; left: -8px; font-family: 'Inter', sans-serif; font-weight: 200;
+    font-size: 112px; line-height: 1; color: #BF7A4A; opacity: 0.06;
+    user-select: none; pointer-events: none; z-index: 0; letter-spacing: -0.04em;
+  }
+  .brief-chapter-fade { transition: opacity 280ms ease, transform 280ms ease; }
 
   .brief-captag { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
   .brief-captag span { font-size: 10px; font-weight: 500; letter-spacing: 0.14em; color: var(--brief-accent); text-transform: uppercase; }
