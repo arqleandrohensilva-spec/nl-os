@@ -478,6 +478,7 @@ const getTipoKey = (tipo: string): string => {
 
 // --- DESIGN TOKENS + ESTILOS ---
 const BRIEFING_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap');
   .brief-root, .brief-root * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
   .brief-root {
     --brief-bg: #F7F4EF;
