@@ -2,6 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+import estiloModerno from '@/assets/estilos/moderno.jpg';
+import estiloContemporaneo from '@/assets/estilos/contemporaneo.jpg';
+import estiloMinimalista from '@/assets/estilos/minimalista.jpg';
+import estiloIndustrial from '@/assets/estilos/industrial.jpg';
+import estiloClassico from '@/assets/estilos/classico.jpg';
+import estiloTropical from '@/assets/estilos/tropical.jpg';
+import estiloRustico from '@/assets/estilos/rustico.jpg';
+
+const ESTILO_IMAGENS: Record<string, string> = {
+  'Moderno': estiloModerno,
+  'Contemporâneo': estiloContemporaneo,
+  'Minimalista': estiloMinimalista,
+  'Industrial': estiloIndustrial,
+  'Clássico': estiloClassico,
+  'Tropical': estiloTropical,
+  'Rústico': estiloRustico,
+};
+
+
 
 interface Pergunta {
   id: string;
