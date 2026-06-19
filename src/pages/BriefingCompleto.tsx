@@ -645,6 +645,35 @@ const BriefingCompleto = () => {
     }
     if (p.tipo === 'multiselect') {
       const current: string[] = answers[p.id] || [];
+      const hasImagens = p.opcoes?.every(opt => ESTILO_IMAGENS[opt]);
+      if (hasImagens) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = current.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}
+                  onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                >
+                  <img
+                    className="brief-stylecard__img"
+                    src={ESTILO_IMAGENS[opt]}
+                    alt={`Estilo ${opt}`}
+                    loading="lazy"
+                    width={768}
+                    height={512}
+                  />
+                  <span className="brief-stylecard__check">✓</span>
+                  <span className="brief-stylecard__label">{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => {
