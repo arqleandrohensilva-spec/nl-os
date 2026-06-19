@@ -1443,19 +1443,33 @@ const BriefingCompleto = () => {
                       <div className="brief-anexo">
                         {answers.manual_marca_anexo ? (
                           <div className="brief-anexo-file">
-                            <span>📎 {answers.manual_marca_anexo.nome}</span>
-                            <button
-                              type="button"
-                              className="brief-anexo-remove"
-                              onClick={() => setAnswers(prev => {
-                                const next = { ...prev };
-                                delete next.manual_marca_anexo;
-                                return next;
-                              })}
-                              aria-label="Remover anexo"
-                            >
-                              ✕
-                            </button>
+                            <span className="brief-anexo-file-name">📎 {answers.manual_marca_anexo.nome}</span>
+                            <div className="brief-anexo-actions">
+                              <label className="brief-anexo-action">
+                                {uploadingAnexo ? 'Enviando...' : 'Trocar'}
+                                <input
+                                  type="file"
+                                  accept="image/*,.pdf,.zip"
+                                  style={{ display: 'none' }}
+                                  disabled={uploadingAnexo}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleAnexoUpload(file);
+                                  }}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                className="brief-anexo-action brief-anexo-action--remove"
+                                onClick={() => setAnswers(prev => {
+                                  const next = { ...prev };
+                                  delete next.manual_marca_anexo;
+                                  return next;
+                                })}
+                              >
+                                Remover
+                              </button>
+                            </div>
                           </div>
                         ) : (
                           <>
