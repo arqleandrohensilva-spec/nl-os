@@ -633,6 +633,9 @@ const Fundo = () => (
 
 const BriefingCompleto = () => {
   const { token } = useParams();
+  const location = useLocation();
+  // Tipo fixo pela rota estática (ex: /briefing/interiores), quando não há token de projeto
+  const tipoFixo = location.pathname.split('/').filter(Boolean).pop() || '';
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
   const [started, setStarted] = useState(false);
