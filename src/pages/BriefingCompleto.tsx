@@ -1056,27 +1056,36 @@ const BriefingCompleto = () => {
       </button>
     );
 
-    // Versão editorial (split com imagem) — apenas INTERIORES
-    if (isInt) return (
+    // Versão editorial (split com imagem) — INTERIORES e COMERCIAL
+    if (isPremium) return (
       <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', position: 'relative' }}>
         <style>{BRIEFING_STYLES}</style>
         <div className="brief-entry-split">
           <div className="brief-entry-figure">
-            <img src={intHero} alt="Ambiente de interiores" width={960} height={1280} />
+            <img
+              src={isComercial ? comHero : intHero}
+              alt={isComercial ? 'Espaço comercial' : 'Ambiente de interiores'}
+              width={960}
+              height={1280}
+            />
           </div>
           <div className="brief-entry-content">
             <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
-            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>Briefing · Interiores</p>
+            <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.14em', color: '#BF7A4A', textTransform: 'uppercase', marginBottom: '1rem' }}>
+              {isComercial ? 'Briefing · Comercial' : 'Briefing · Interiores'}
+            </p>
             {projeto?.nome_cliente && (
               <p style={{ fontSize: 14, color: '#A89F95', marginBottom: '0.75rem' }}>
                 Seja bem-vindo, {projeto.nome_cliente}.
               </p>
             )}
             <h1 className="brief-entry-title" style={{ color: '#1A1816', marginBottom: '1.25rem' }}>
-              Vamos dar vida aos seus ambientes.
+              {isComercial ? 'Vamos dar forma ao seu espaço.' : 'Vamos dar vida aos seus ambientes.'}
             </h1>
             <p style={{ fontSize: 15, color: '#A89F95', maxWidth: 460, lineHeight: 1.7, marginBottom: '2rem' }}>
-              Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.
+              {isComercial
+                ? 'Este briefing é a base estratégica do seu projeto comercial. Cada resposta traduz a identidade da sua marca em espaço.'
+                : 'Este briefing é a base estratégica de tudo que construiremos. Cada resposta define um caminho único para o seu espaço.'}
             </p>
             <p style={{ fontSize: 11, color: '#BFB8B0', letterSpacing: '0.06em', marginBottom: '2.5rem' }}>
               Tempo estimado: 15 minutos
@@ -1086,6 +1095,7 @@ const BriefingCompleto = () => {
         </div>
       </div>
     );
+
 
     return (
       <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
