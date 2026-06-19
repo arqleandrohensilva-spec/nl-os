@@ -757,6 +757,8 @@ const BriefingCompleto = () => {
   const [visible, setVisible] = useState(true);
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
+  const isInt = tipoKey === 'INTERIORES';
+  const rootCls = `brief-root${isInt ? ' brief-root--int' : ''}`;
   const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
     : BRIEFING_ARQINT;
