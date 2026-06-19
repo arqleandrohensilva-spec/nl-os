@@ -873,14 +873,19 @@ const BRIEFING_STYLES = `
   .brief-anexo-btn:hover { background: #F6E3D5; }
   .brief-anexo-hint { font-size: 11px; color: var(--brief-text-4); margin-top: 6px; }
   .brief-anexo-file {
-    display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 12px;
+    display: inline-flex; align-items: center; gap: 14px; margin-top: 10px; padding: 8px 12px;
     border-radius: 6px; border: 1px solid var(--brief-border); background: var(--brief-surface);
-    font-size: 12px; color: var(--brief-text-2);
+    font-size: 12px; color: var(--brief-text-2); flex-wrap: wrap;
   }
-  .brief-anexo-remove {
-    border: none; background: none; color: var(--brief-text-3); cursor: pointer; font-size: 14px; line-height: 1;
+  .brief-anexo-file-name { font-weight: 500; }
+  .brief-anexo-actions { display: inline-flex; align-items: center; gap: 10px; }
+  .brief-anexo-action {
+    border: none; background: none; cursor: pointer; font-size: 12px; line-height: 1;
+    color: var(--brief-text-3); text-decoration: underline; text-underline-offset: 3px;
+    padding: 0; transition: color .2s;
   }
-  .brief-anexo-remove:hover { color: #C0392B; }
+  .brief-anexo-action:hover { color: var(--brief-text-1); }
+  .brief-anexo-action--remove:hover { color: #C0392B; }
 `;
 
 
@@ -1443,19 +1448,33 @@ const BriefingCompleto = () => {
                       <div className="brief-anexo">
                         {answers.manual_marca_anexo ? (
                           <div className="brief-anexo-file">
-                            <span>📎 {answers.manual_marca_anexo.nome}</span>
-                            <button
-                              type="button"
-                              className="brief-anexo-remove"
-                              onClick={() => setAnswers(prev => {
-                                const next = { ...prev };
-                                delete next.manual_marca_anexo;
-                                return next;
-                              })}
-                              aria-label="Remover anexo"
-                            >
-                              ✕
-                            </button>
+                            <span className="brief-anexo-file-name">📎 {answers.manual_marca_anexo.nome}</span>
+                            <div className="brief-anexo-actions">
+                              <label className="brief-anexo-action">
+                                {uploadingAnexo ? 'Enviando...' : 'Trocar'}
+                                <input
+                                  type="file"
+                                  accept="image/*,.pdf,.zip"
+                                  style={{ display: 'none' }}
+                                  disabled={uploadingAnexo}
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleAnexoUpload(file);
+                                  }}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                className="brief-anexo-action brief-anexo-action--remove"
+                                onClick={() => setAnswers(prev => {
+                                  const next = { ...prev };
+                                  delete next.manual_marca_anexo;
+                                  return next;
+                                })}
+                              >
+                                Remover
+                              </button>
+                            </div>
                           </div>
                         ) : (
                           <>
