@@ -12,6 +12,12 @@ import estiloRustico from '@/assets/estilos/rustico.jpg';
 import estiloBoho from '@/assets/estilos/boho.jpg';
 import estiloEscandinavo from '@/assets/estilos/escandinavo.jpg';
 
+import estiloIntMinimalista from '@/assets/estilos/int-minimalista.jpg';
+import estiloIntContemporaneo from '@/assets/estilos/int-contemporaneo.jpg';
+import estiloIntClassico from '@/assets/estilos/int-classico.jpg';
+import estiloIntIndustrial from '@/assets/estilos/int-industrial.jpg';
+import estiloIntRustico from '@/assets/estilos/int-rustico.jpg';
+
 import matMadeira from '@/assets/materiais/madeira.jpg';
 import matPedra from '@/assets/materiais/pedra-natural.jpg';
 import matMarmore from '@/assets/materiais/marmore.jpg';
@@ -32,6 +38,17 @@ const ESTILO_IMAGENS: Record<string, string> = {
   'Clássico': estiloClassico,
   'Tropical': estiloTropical,
   'Rústico': estiloRustico,
+  'Boho': estiloBoho,
+  'Escandinavo': estiloEscandinavo,
+};
+
+// Imagens focadas em ambientes internos para o briefing de INTERIORES
+const ESTILO_IMAGENS_INT: Record<string, string> = {
+  'Minimalista': estiloIntMinimalista,
+  'Contemporâneo': estiloIntContemporaneo,
+  'Clássico': estiloIntClassico,
+  'Industrial': estiloIntIndustrial,
+  'Rústico': estiloIntRustico,
   'Boho': estiloBoho,
   'Escandinavo': estiloEscandinavo,
 };
