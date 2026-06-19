@@ -644,7 +644,10 @@ const BriefingCompleto = () => {
   const [savedCap, setSavedCap] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  const capitulos = BRIEFING_ARQINT.capítulos;
+  const briefingData = getTipoKey(projeto?.tipo || '') === 'INTERIORES'
+    ? BRIEFING_INTERIORES
+    : BRIEFING_ARQINT;
+  const capitulos = briefingData.capítulos;
   const totalCaps = capitulos.length;
 
   useEffect(() => {
