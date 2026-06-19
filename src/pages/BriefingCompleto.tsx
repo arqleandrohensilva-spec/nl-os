@@ -858,14 +858,14 @@ const BriefingCompleto = () => {
 
   // ---- TELA FINAL ----
   if (isFinished) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
+    <div className={rootCls} style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
       <Fundo />
       <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 2 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
-        <h1 style={{ fontSize: 32, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
+        <h1 className="brief-final-title" style={{ fontSize: 32, fontWeight: 300, color: '#1A1816', letterSpacing: '-0.02em', lineHeight: 1.2, marginBottom: '1.25rem' }}>
           Obrigado.
         </h1>
         <p style={{ fontSize: 14, color: '#A89F95', lineHeight: 1.7, marginBottom: '2rem' }}>
