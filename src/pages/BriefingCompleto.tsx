@@ -601,8 +601,9 @@ const BriefingCompleto = () => {
   const isFull = (p: Pergunta) => p.tipo === 'textarea' || p.tipo === 'multiselect';
 
   return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816' }}>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Monograma />
 
       {/* Header */}
       <header className="brief-header">
