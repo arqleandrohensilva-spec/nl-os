@@ -493,9 +493,10 @@ const BriefingCompleto = () => {
 
   // ---- TELA DE ENTRADA ----
   if (!started) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem' }}>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
-      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+      <Monograma />
+      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
         {projeto?.nome_cliente && (
