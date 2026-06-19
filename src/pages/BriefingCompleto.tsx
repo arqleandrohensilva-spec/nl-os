@@ -1436,10 +1436,49 @@ const BriefingCompleto = () => {
                     <label className="brief-flabel">{p.label}</label>
                     {p.orientacao && <p className="brief-fhint">{p.orientacao}</p>}
                     {renderInput(p)}
+                    {p.id === 'manual_marca' && answers.manual_marca === 'Sim' && (
+                      <div className="brief-anexo">
+                        {answers.manual_marca_anexo ? (
+                          <div className="brief-anexo-file">
+                            <span>📎 {answers.manual_marca_anexo.nome}</span>
+                            <button
+                              type="button"
+                              className="brief-anexo-remove"
+                              onClick={() => setAnswers(prev => {
+                                const next = { ...prev };
+                                delete next.manual_marca_anexo;
+                                return next;
+                              })}
+                              aria-label="Remover anexo"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <label className="brief-anexo-btn">
+                              {uploadingAnexo ? 'Enviando...' : '📎 Anexar arquivo (se desejar)'}
+                              <input
+                                type="file"
+                                accept="image/*,.pdf,.zip"
+                                style={{ display: 'none' }}
+                                disabled={uploadingAnexo}
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) handleAnexoUpload(file);
+                                }}
+                              />
+                            </label>
+                            <p className="brief-anexo-hint">Manual de marca, logo ou paleta — PDF, imagem ou ZIP.</p>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </div>
+
           </div>
         ))}
 
