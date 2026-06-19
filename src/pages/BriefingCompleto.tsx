@@ -1181,7 +1181,7 @@ const BriefingCompleto = () => {
     }
     if (p.tipo === 'multiselect') {
       const current: string[] = answers[p.id] || [];
-      const estiloMap = tipoKey === 'INTERIORES' ? ESTILO_IMAGENS_INT : ESTILO_IMAGENS;
+      const estiloMap = tipoKey === 'INTERIORES' ? ESTILO_IMAGENS_INT : tipoKey === 'COMERCIAL' ? ESTILO_IMAGENS_COM : ESTILO_IMAGENS;
       const hasImagens = p.opcoes?.every(opt => estiloMap[opt]);
       if (hasImagens) {
         // Normaliza o valor em um mapa de pesos { estilo: 'amo' | 'gosto' }.
