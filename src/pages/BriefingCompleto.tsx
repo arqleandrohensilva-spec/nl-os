@@ -62,6 +62,16 @@ const ESTILO_IMAGENS_INT: Record<string, string> = {
   'Escandinavo': estiloEscandinavo,
 };
 
+// Imagens focadas em ambientes comerciais para o briefing COMERCIAL
+const ESTILO_IMAGENS_COM: Record<string, string> = {
+  'Minimalista': estiloComMinimalista,
+  'Contemporâneo': estiloComContemporaneo,
+  'Industrial': estiloComIndustrial,
+  'Clássico': estiloComClassico,
+  'Sofisticado': estiloComSofisticado,
+  'Criativo': estiloComCriativo,
+};
+
 // Imagens visuais para materiais (multiselect simples) e iluminação (seleção única)
 const MATERIAL_IMAGENS: Record<string, string> = {
   'Madeira': matMadeira,
