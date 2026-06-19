@@ -625,7 +625,7 @@ const BRIEFING_COMERCIAL: BriefingData = {
   ]
 };
 
-
+const getTipoKey = (tipo: string): string => {
   const t = (tipo || '').toLowerCase().replace(/\s/g, '');
   if (t.includes('int') && t.includes('arq')) return 'ARQINT';
   if (t === 'interiores' || t === 'int') return 'INTERIORES';
