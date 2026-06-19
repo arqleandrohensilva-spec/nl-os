@@ -948,7 +948,7 @@ const BriefingCompleto = () => {
       {/* Header */}
       <header className="brief-header">
         <span className="brief-logo">NL ARQUITETOS</span>
-        <span className="brief-badge">Briefing · {getTipoKey(projeto?.tipo || '') === 'INTERIORES' ? 'INTERIORES' : 'ARQ+INT'}</span>
+        <span className="brief-badge">Briefing · {tipoKey === 'INTERIORES' ? 'INTERIORES' : tipoKey === 'COMERCIAL' ? 'COMERCIAL' : 'ARQ+INT'}</span>
       </header>
 
       {/* Barra de progresso */}
