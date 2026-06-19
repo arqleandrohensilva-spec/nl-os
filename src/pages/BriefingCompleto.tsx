@@ -9,6 +9,20 @@ import estiloIndustrial from '@/assets/estilos/industrial.jpg';
 import estiloClassico from '@/assets/estilos/classico.jpg';
 import estiloTropical from '@/assets/estilos/tropical.jpg';
 import estiloRustico from '@/assets/estilos/rustico.jpg';
+import estiloBoho from '@/assets/estilos/boho.jpg';
+import estiloEscandinavo from '@/assets/estilos/escandinavo.jpg';
+
+import matMadeira from '@/assets/materiais/madeira.jpg';
+import matPedra from '@/assets/materiais/pedra-natural.jpg';
+import matMarmore from '@/assets/materiais/marmore.jpg';
+import matConcreto from '@/assets/materiais/concreto.jpg';
+import matMetal from '@/assets/materiais/metal.jpg';
+import matVidro from '@/assets/materiais/vidro.jpg';
+import matTecidos from '@/assets/materiais/tecidos-naturais.jpg';
+
+import iluQuente from '@/assets/iluminacao/quente.jpg';
+import iluFria from '@/assets/iluminacao/fria.jpg';
+import iluEquilibrio from '@/assets/iluminacao/equilibrio.jpg';
 
 const ESTILO_IMAGENS: Record<string, string> = {
   'Moderno': estiloModerno,
@@ -18,7 +32,27 @@ const ESTILO_IMAGENS: Record<string, string> = {
   'Clássico': estiloClassico,
   'Tropical': estiloTropical,
   'Rústico': estiloRustico,
+  'Boho': estiloBoho,
+  'Escandinavo': estiloEscandinavo,
 };
+
+// Imagens visuais para materiais (multiselect simples) e iluminação (seleção única)
+const MATERIAL_IMAGENS: Record<string, string> = {
+  'Madeira': matMadeira,
+  'Pedra natural': matPedra,
+  'Mármore': matMarmore,
+  'Concreto': matConcreto,
+  'Metal': matMetal,
+  'Vidro': matVidro,
+  'Tecidos naturais': matTecidos,
+};
+
+const ILUMINACAO_IMAGENS: Record<string, string> = {
+  'Quente': iluQuente,
+  'Fria': iluFria,
+  'Equilíbrio entre as duas': iluEquilibrio,
+};
+
 
 
 
@@ -828,6 +862,36 @@ const BriefingCompleto = () => {
       );
     }
     if (p.tipo === 'select') {
+      const hasImgSelect = p.opcoes?.every(opt => ILUMINACAO_IMAGENS[opt]);
+      if (hasImgSelect) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = answers[p.id] === opt;
+              return (
+                <div key={opt} className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => setVal(selected ? '' : opt)}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={ILUMINACAO_IMAGENS[opt]}
+                      alt={opt}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">✓</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => (
@@ -908,6 +972,40 @@ const BriefingCompleto = () => {
           </div>
         );
       }
+
+      // Multiselect com imagens simples (sem peso amo/gosto), ex: materiais
+      const hasMaterial = p.opcoes?.every(opt => MATERIAL_IMAGENS[opt]);
+      if (hasMaterial) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = current.includes(opt);
+              return (
+                <div key={opt} className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={MATERIAL_IMAGENS[opt]}
+                      alt={opt}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">✓</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
+
+
 
       return (
         <div className="brief-chips">
