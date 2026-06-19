@@ -407,6 +407,7 @@ const BriefingCompleto = () => {
   const [isFinished, setIsFinished] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const [savedCap, setSavedCap] = useState(0);
+  const [visible, setVisible] = useState(true);
 
   const capitulos = BRIEFING_ARQINT.capítulos;
   const totalCaps = capitulos.length;
