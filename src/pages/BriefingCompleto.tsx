@@ -1040,6 +1040,9 @@ const BriefingCompleto = () => {
         acc[cap.titulo] = cap.blocos.reduce((bAcc: any, bloco) => {
           bAcc[bloco.titulo] = bloco.perguntas.reduce((pAcc: any, p) => {
             pAcc[p.label] = answers[p.id] ?? null;
+            if (p.id === 'manual_marca' && answers.manual_marca_anexo) {
+              pAcc['Anexo (manual de marca / logo / paleta)'] = answers.manual_marca_anexo.url;
+            }
             return pAcc;
           }, {});
           return bAcc;
