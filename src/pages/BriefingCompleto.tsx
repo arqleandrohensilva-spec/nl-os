@@ -647,7 +647,8 @@ const BriefingCompleto = () => {
   const [savedCap, setSavedCap] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  const briefingData = getTipoKey(projeto?.tipo || '') === 'INTERIORES'
+  const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
+  const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
     : BRIEFING_ARQINT;
   const capitulos = briefingData.capítulos;
