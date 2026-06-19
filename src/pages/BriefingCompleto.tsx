@@ -2,6 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+import estiloModerno from '@/assets/estilos/moderno.jpg';
+import estiloContemporaneo from '@/assets/estilos/contemporaneo.jpg';
+import estiloMinimalista from '@/assets/estilos/minimalista.jpg';
+import estiloIndustrial from '@/assets/estilos/industrial.jpg';
+import estiloClassico from '@/assets/estilos/classico.jpg';
+import estiloTropical from '@/assets/estilos/tropical.jpg';
+import estiloRustico from '@/assets/estilos/rustico.jpg';
+
+const ESTILO_IMAGENS: Record<string, string> = {
+  'Moderno': estiloModerno,
+  'Contemporâneo': estiloContemporaneo,
+  'Minimalista': estiloMinimalista,
+  'Industrial': estiloIndustrial,
+  'Clássico': estiloClassico,
+  'Tropical': estiloTropical,
+  'Rústico': estiloRustico,
+};
+
+
 
 interface Pergunta {
   id: string;
@@ -332,6 +351,29 @@ const BRIEFING_STYLES = `
   .brief-chip:hover { border-color: var(--brief-accent); color: var(--brief-accent); }
   .brief-chip--active { background: var(--brief-accent-bg); border-color: var(--brief-accent); color: #9D5E2E; font-weight: 500; }
 
+  .brief-stylegrid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; width: 100%;
+  }
+  .brief-stylecard {
+    position: relative; border: 1px solid var(--brief-border); border-radius: 10px; overflow: hidden;
+    cursor: pointer; background: var(--brief-surface); padding: 0; text-align: left;
+    transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  }
+  .brief-stylecard:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(26,24,22,0.12); border-color: var(--brief-accent); }
+  .brief-stylecard__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; transition: filter 0.2s; }
+  .brief-stylecard__label {
+    display: block; padding: 9px 12px; font-size: 12px; letter-spacing: 0.04em; color: #6B6259;
+    font-family: 'Inter', sans-serif;
+  }
+  .brief-stylecard--active { border-color: var(--brief-accent); box-shadow: 0 0 0 2px var(--brief-accent); }
+  .brief-stylecard--active .brief-stylecard__label { color: #9D5E2E; font-weight: 500; }
+  .brief-stylecard__check {
+    position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--brief-accent); color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; line-height: 1; opacity: 0; transform: scale(0.7); transition: all 0.18s;
+  }
+  .brief-stylecard--active .brief-stylecard__check { opacity: 1; transform: scale(1); }
+
   .brief-darkcard {
     background: #1A1816; border-radius: 0 8px 8px 0; padding: 1.25rem 1.5rem;
     border-left: 3px solid var(--brief-accent);
@@ -603,6 +645,35 @@ const BriefingCompleto = () => {
     }
     if (p.tipo === 'multiselect') {
       const current: string[] = answers[p.id] || [];
+      const hasImagens = p.opcoes?.every(opt => ESTILO_IMAGENS[opt]);
+      if (hasImagens) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = current.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}
+                  onClick={() => setVal(selected ? current.filter(i => i !== opt) : [...current, opt])}
+                >
+                  <img
+                    className="brief-stylecard__img"
+                    src={ESTILO_IMAGENS[opt]}
+                    alt={`Estilo ${opt}`}
+                    loading="lazy"
+                    width={768}
+                    height={512}
+                  />
+                  <span className="brief-stylecard__check">✓</span>
+                  <span className="brief-stylecard__label">{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+        );
+      }
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => {
