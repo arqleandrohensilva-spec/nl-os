@@ -862,6 +862,36 @@ const BriefingCompleto = () => {
       );
     }
     if (p.tipo === 'select') {
+      const hasImgSelect = p.opcoes?.every(opt => ILUMINACAO_IMAGENS[opt]);
+      if (hasImgSelect) {
+        return (
+          <div className="brief-stylegrid">
+            {p.opcoes?.map(opt => {
+              const selected = answers[p.id] === opt;
+              return (
+                <div key={opt} className={`brief-stylecard${selected ? ' brief-stylecard--active' : ''}`}>
+                  <button
+                    type="button"
+                    className="brief-stylecard__hit"
+                    onClick={() => setVal(selected ? '' : opt)}
+                  >
+                    <img
+                      className="brief-stylecard__img"
+                      src={ILUMINACAO_IMAGENS[opt]}
+                      alt={opt}
+                      loading="lazy"
+                      width={768}
+                      height={512}
+                    />
+                    <span className="brief-stylecard__check">✓</span>
+                    <span className="brief-stylecard__label">{opt}</span>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        );
+      }
       return (
         <div className="brief-chips">
           {p.opcoes?.map(opt => (
