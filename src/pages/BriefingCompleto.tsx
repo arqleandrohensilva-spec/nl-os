@@ -247,6 +247,8 @@ const BRIEFING_STYLES = `
     --brief-text-4: #BFB8B0;
   }
 
+  .brief-header, .brief-progress-track, .brief-dots, .brief-main { position: relative; z-index: 1; }
+
   .brief-header {
     height: 52px; padding: 0 2rem; background: var(--brief-surface);
     border-bottom: 1px solid var(--brief-border-sub);
@@ -335,6 +337,37 @@ const BRIEFING_STYLES = `
   .brief-next:hover { background: var(--brief-accent-dark); }
   .brief-next:disabled { opacity: 0.5; cursor: default; }
 `;
+
+const Monograma = () => (
+  <div
+    style={{
+      position: 'fixed',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      pointerEvents: 'none',
+      zIndex: 0,
+      overflow: 'hidden',
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "'Inter', sans-serif",
+        fontWeight: 200,
+        fontSize: 'clamp(220px, 38vw, 480px)',
+        letterSpacing: '-0.04em',
+        color: '#BF7A4A',
+        opacity: 0.07,
+        userSelect: 'none',
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      NL
+    </span>
+  </div>
+);
 
 const BriefingCompleto = () => {
   const { token } = useParams();
@@ -440,9 +473,10 @@ const BriefingCompleto = () => {
 
   // ---- TELA FINAL ----
   if (isFinished) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
-      <div style={{ maxWidth: 520, textAlign: 'center' }}>
+      <Monograma />
+      <div style={{ maxWidth: 520, textAlign: 'center', position: 'relative', zIndex: 1 }}>
         <div className="brief-captag" style={{ justifyContent: 'center', marginBottom: '2.5rem' }}>
           <span style={{ flex: 'none' }}>Briefing concluído</span>
         </div>
@@ -461,9 +495,10 @@ const BriefingCompleto = () => {
 
   // ---- TELA DE ENTRADA ----
   if (!started) return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem' }}>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', display: 'flex', alignItems: 'center', padding: '2rem', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
-      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+      <Monograma />
+      <div style={{ maxWidth: 560, margin: '0 auto', position: 'relative', zIndex: 1 }}>
         <p className="brief-logo" style={{ fontSize: 13, letterSpacing: '0.14em', marginBottom: '2.5rem' }}>NL ARQUITETOS</p>
 
         {projeto?.nome_cliente && (
@@ -568,8 +603,9 @@ const BriefingCompleto = () => {
   const isFull = (p: Pergunta) => p.tipo === 'textarea' || p.tipo === 'multiselect';
 
   return (
-    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816' }}>
+    <div className="brief-root" style={{ minHeight: '100vh', background: '#F7F4EF', color: '#1A1816', position: 'relative' }}>
       <style>{BRIEFING_STYLES}</style>
+      <Monograma />
 
       {/* Header */}
       <header className="brief-header">
