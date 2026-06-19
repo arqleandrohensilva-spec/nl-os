@@ -862,7 +862,27 @@ const BRIEFING_STYLES = `
     .brief-entry-figure { height: 240px; }
     .brief-entry-content { padding: 3rem 2rem; }
   }
+
+  /* Anexo opcional (upload) */
+  .brief-anexo { margin-top: 12px; }
+  .brief-anexo-btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 6px;
+    border: 1px dashed var(--brief-accent); background: var(--brief-accent-bg); color: #9D5E2E;
+    font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.18s;
+  }
+  .brief-anexo-btn:hover { background: #F6E3D5; }
+  .brief-anexo-hint { font-size: 11px; color: var(--brief-text-4); margin-top: 6px; }
+  .brief-anexo-file {
+    display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 12px;
+    border-radius: 6px; border: 1px solid var(--brief-border); background: var(--brief-surface);
+    font-size: 12px; color: var(--brief-text-2);
+  }
+  .brief-anexo-remove {
+    border: none; background: none; color: var(--brief-text-3); cursor: pointer; font-size: 14px; line-height: 1;
+  }
+  .brief-anexo-remove:hover { color: #C0392B; }
 `;
+
 
 const Fundo = () => (
   <>
