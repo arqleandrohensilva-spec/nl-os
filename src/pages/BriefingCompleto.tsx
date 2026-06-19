@@ -912,6 +912,29 @@ const BriefingCompleto = () => {
   const [hasSaved, setHasSaved] = useState(false);
   const [savedCap, setSavedCap] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [uploadingAnexo, setUploadingAnexo] = useState(false);
+
+  const handleAnexoUpload = async (file: File) => {
+    if (!file) return;
+    setUploadingAnexo(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `${token || 'sem-token'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await supabase.storage.from('briefing-anexos').upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data: signed } = await supabase.storage
+        .from('briefing-anexos')
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
+      setAnswers(prev => ({
+        ...prev,
+        manual_marca_anexo: { nome: file.name, url: signed?.signedUrl || path },
+      }));
+    } catch (e) {
+      console.error('Erro ao enviar anexo', e);
+    } finally {
+      setUploadingAnexo(false);
+    }
+  };
 
   const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
   const isInt = tipoKey === 'INTERIORES';
