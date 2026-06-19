@@ -1182,6 +1182,7 @@ const BriefingCompleto = () => {
       {/* Área principal */}
       <main className="brief-main">
         <div
+          key={curCap}
           className="brief-chapter-fade"
           style={{
             opacity: visible ? 1 : 0,
