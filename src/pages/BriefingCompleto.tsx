@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 import estiloModerno from '@/assets/estilos/moderno.jpg';
@@ -633,6 +633,9 @@ const Fundo = () => (
 
 const BriefingCompleto = () => {
   const { token } = useParams();
+  const location = useLocation();
+  // Tipo fixo pela rota estática (ex: /briefing/interiores), quando não há token de projeto
+  const tipoFixo = location.pathname.split('/').filter(Boolean).pop() || '';
   const [loading, setLoading] = useState(true);
   const [projeto, setProjeto] = useState<any>(null);
   const [started, setStarted] = useState(false);
@@ -644,7 +647,8 @@ const BriefingCompleto = () => {
   const [savedCap, setSavedCap] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  const briefingData = getTipoKey(projeto?.tipo || '') === 'INTERIORES'
+  const tipoKey = getTipoKey(projeto?.tipo || tipoFixo);
+  const briefingData = tipoKey === 'INTERIORES'
     ? BRIEFING_INTERIORES
     : BRIEFING_ARQINT;
   const capitulos = briefingData.capítulos;
@@ -944,7 +948,7 @@ const BriefingCompleto = () => {
       {/* Header */}
       <header className="brief-header">
         <span className="brief-logo">NL ARQUITETOS</span>
-        <span className="brief-badge">Briefing · {getTipoKey(projeto?.tipo || '') === 'INTERIORES' ? 'INTERIORES' : 'ARQ+INT'}</span>
+        <span className="brief-badge">Briefing · {tipoKey === 'INTERIORES' ? 'INTERIORES' : tipoKey === 'COMERCIAL' ? 'COMERCIAL' : 'ARQ+INT'}</span>
       </header>
 
       {/* Barra de progresso */}
