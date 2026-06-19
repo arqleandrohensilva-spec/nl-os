@@ -144,6 +144,8 @@ const BRIEFING_ARQINT: BriefingData = {
             { id: 'tres_itens', label: 'Quais são os 3 itens que não podem faltar?', tipo: 'textarea', orientacao: 'Os elementos "assinatura" do seu projeto.' },
             { id: 'eliminar', label: 'Algum ambiente que pode ser eliminado se necessário?', tipo: 'textarea', orientacao: 'Espaços que podem ser fundidos ou removidos em caso de ajuste de custos.' },
             { id: 'futuro', label: 'Existe alguma necessidade futura que devemos considerar?', tipo: 'textarea', placeholder: 'Ex: quarto para filho, espaço para envelhecer, home office maior...', orientacao: 'Pense na evolução da família nos próximos 10 anos.' },
+            { id: 'vagas', label: 'Quantas vagas de garagem?', tipo: 'select', opcoes: ['1 vaga', '2 vagas', '3 vagas', '4 vagas', '5 ou mais'], orientacao: 'Considere os veículos atuais e futuros da família.' },
+            { id: 'acessibilidade', label: 'Necessidade de acessibilidade ou adaptação?', tipo: 'multiselect', opcoes: ['Suíte no térreo', 'Mobilidade reduzida / cadeirante', 'Idosos na casa', 'Elevador / plataforma', 'Pensar em envelhecer na casa', 'Nenhuma'], orientacao: 'Garante conforto e segurança hoje e no futuro.' },
           ]
         },
         {
@@ -152,6 +154,7 @@ const BRIEFING_ARQINT: BriefingData = {
           perguntas: [
             { id: 'sustentabilidade', label: 'Interesse em sustentabilidade', tipo: 'multiselect', opcoes: ['Energia solar', 'Aquecimento solar', 'Reaproveitamento de água', 'Ventilação cruzada', 'Eficiência energética', 'Materiais sustentáveis'], orientacao: 'Soluções que reduzem o custo de manutenção e impacto ambiental.' },
             { id: 'tecnologia_arq', label: 'Interesse em tecnologia na estrutura', tipo: 'multiselect', opcoes: ['Automação residencial', 'Carregador para veículo elétrico', 'Infraestrutura para câmeras', 'Internet cabeada', 'Gerador'], orientacao: 'Infraestrutura básica necessária antes de fechar as paredes.' },
+            { id: 'climatizacao', label: 'Conforto térmico e climatização', tipo: 'multiselect', opcoes: ['Ar-condicionado central', 'Ar-condicionado por ambiente', 'Lareira', 'Aquecimento de piso', 'Ventilação natural priorizada', 'Cortinas / brises'], orientacao: 'Impacta a infraestrutura elétrica, forros e o partido do projeto.' },
           ]
         }
       ]
@@ -166,6 +169,7 @@ const BRIEFING_ARQINT: BriefingData = {
           perguntas: [
             { id: 'ambientes_int', label: 'Ambientes a trabalhar nos interiores', tipo: 'multiselect', opcoes: ['Sala de estar', 'Sala de jantar', 'Cozinha', 'Área gourmet', 'Suíte master', 'Quartos adicionais', 'Banheiros', 'Escritório', 'Cinema', 'Academia', 'Lavabo'], orientacao: 'Onde faremos o detalhamento fino de móveis e decoração.' },
             { id: 'pe_direito', label: 'Pé-direito desejado', tipo: 'select', opcoes: ['Padrão', 'Diferenciado em alguns ambientes', 'Alto em toda a casa'], orientacao: 'A altura do teto impacta diretamente na amplitude do espaço.' },
+            { id: 'cozinha_tipo', label: 'Como imagina a cozinha?', tipo: 'select', opcoes: ['Totalmente aberta / integrada', 'Semiaberta (com possibilidade de fechar)', 'Fechada / separada', 'Com cozinha de apoio (suja)', 'Ainda não sei'], orientacao: 'Uma das decisões de partido mais importantes dos interiores.' },
           ]
         },
         {
@@ -186,6 +190,8 @@ const BRIEFING_ARQINT: BriefingData = {
             { id: 'materiais_nao', label: 'Materiais que não gostaria de utilizar', tipo: 'textarea' },
             { id: 'referencias_int', label: 'Referências de interiores', tipo: 'textarea', placeholder: 'Links do Pinterest, Instagram, ambientes que admira...' },
             { id: 'nao_quer_int', label: 'O que definitivamente não quer ver nos interiores?', tipo: 'textarea' },
+            { id: 'cores_gosta', label: 'Paleta de cores que mais lhe agrada', tipo: 'multiselect', opcoes: ['Tons neutros / off-white', 'Tons terrosos', 'Tons amadeirados', 'Cinzas e grafite', 'Verdes', 'Azuis', 'Preto e branco', 'Cores quentes', 'Tons pastel'], orientacao: 'Define a atmosfera e a temperatura dos ambientes.' },
+            { id: 'cores_nao', label: 'Cores que prefere evitar', tipo: 'textarea', orientacao: 'Cores que não combinam com você ou que cansam com o tempo.' },
           ]
         },
         {
@@ -209,6 +215,9 @@ const BRIEFING_ARQINT: BriefingData = {
             { id: 'limite', label: 'Existe um limite máximo?', tipo: 'select', opcoes: ['Sim', 'Não', 'Prefiro discutir na reunião'], orientacao: 'Fundamental para o controle financeiro do projeto.' },
             { id: 'concentrar', label: 'Onde deseja concentrar os investimentos?', tipo: 'textarea', orientacao: 'Ex: Fachada, área social, automação.' },
             { id: 'padrao', label: 'Preferência de padrão', tipo: 'select', opcoes: ['Alto padrão em áreas estratégicas', 'Padrão bom uniforme em toda a casa', 'Ainda não sei'], orientacao: 'Define a especificação de materiais.' },
+            { id: 'recurso', label: 'Como pretende viabilizar o investimento?', tipo: 'select', opcoes: ['Recursos próprios', 'Financiamento bancário', 'Misto (próprio + financiamento)', 'Venda de outro imóvel', 'Ainda definindo'], orientacao: 'A forma de recurso influencia as etapas e o desembolso da obra.' },
+            { id: 'inicio', label: 'Quando deseja iniciar o projeto?', tipo: 'select', opcoes: ['O quanto antes', 'Nos próximos 3 meses', 'Em 3 a 6 meses', 'Em 6 a 12 meses', 'Sem data definida'], orientacao: 'Ajuda a planejar o cronograma de trabalho.' },
+            { id: 'prazo_entrega', label: 'Existe um prazo desejado para concluir a obra?', tipo: 'textarea', placeholder: 'Ex: Antes do nascimento do bebê, fim de 2026, festa de casamento...', orientacao: 'Datas-alvo ou eventos importantes que devemos respeitar.' },
           ]
         },
         {
