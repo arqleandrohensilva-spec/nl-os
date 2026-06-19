@@ -19,6 +19,14 @@ import estiloIntClassico from '@/assets/estilos/int-classico.jpg';
 import estiloIntIndustrial from '@/assets/estilos/int-industrial.jpg';
 import estiloIntRustico from '@/assets/estilos/int-rustico.jpg';
 
+import comHero from '@/assets/estilos/com-hero.jpg';
+import estiloComMinimalista from '@/assets/estilos/com-minimalista.jpg';
+import estiloComContemporaneo from '@/assets/estilos/com-contemporaneo.jpg';
+import estiloComIndustrial from '@/assets/estilos/com-industrial.jpg';
+import estiloComClassico from '@/assets/estilos/com-classico.jpg';
+import estiloComSofisticado from '@/assets/estilos/com-sofisticado.jpg';
+import estiloComCriativo from '@/assets/estilos/com-criativo.jpg';
+
 import matMadeira from '@/assets/materiais/madeira.jpg';
 import matPedra from '@/assets/materiais/pedra-natural.jpg';
 import matMarmore from '@/assets/materiais/marmore.jpg';
