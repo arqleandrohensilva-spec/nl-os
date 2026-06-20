@@ -887,6 +887,43 @@ const BRIEFING_STYLES = `
   }
   .brief-anexo-action:hover { color: var(--brief-text-1); }
   .brief-anexo-action--remove:hover { color: #C0392B; }
+
+  /* ===== Responsivo — tablet ===== */
+  @media (max-width: 900px) {
+    .brief-root--int .brief-entry-title { font-size: 34px; }
+    .brief-root--int .brief-final-title { font-size: 36px; }
+    .brief-root--int .brief-captitle { font-size: 30px; }
+  }
+
+  /* ===== Responsivo — mobile ===== */
+  @media (max-width: 600px) {
+    .brief-header { padding: 0 1.25rem; }
+    .brief-badge { font-size: 10px; }
+    .brief-chapname-row { padding: 0 1.25rem; }
+    .brief-main { padding: 2rem 1.25rem 3rem; }
+
+    .brief-ghostnum { font-size: 84px; top: -22px; }
+    .brief-captitle { font-size: 24px; }
+    .brief-root--int .brief-captitle { font-size: 28px; }
+    .brief-root--int .brief-entry-title { font-size: 30px; }
+    .brief-root--int .brief-final-title { font-size: 30px; }
+
+    .brief-entry-content { padding: 2.5rem 1.5rem; }
+    .brief-entry-figure { height: 200px; }
+
+    /* Navegação: empilha botões e mantém alvos de toque grandes */
+    .brief-nav { flex-wrap: wrap; gap: 12px; }
+    .brief-nav .brief-counter { order: 3; width: 100%; text-align: center; }
+    .brief-back { flex: 0 0 auto; padding: 12px 16px; }
+    .brief-next { flex: 1 1 auto; min-width: 0; padding: 14px 20px; }
+  }
+
+  @media (max-width: 360px) {
+    .brief-header { padding: 0 1rem; }
+    .brief-main { padding: 1.75rem 1rem 2.5rem; }
+    .brief-chapname-row { padding: 0 1rem; }
+    .brief-chapname { font-size: 10px; }
+  }
 `;
 
 
