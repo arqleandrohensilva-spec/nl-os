@@ -37,6 +37,7 @@ import ClienteFicha from "./pages/ClienteFicha.tsx";
 import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
 import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
+import AuthCallback from "./pages/AuthCallback.tsx";
 
 const queryClient = new QueryClient();
 
