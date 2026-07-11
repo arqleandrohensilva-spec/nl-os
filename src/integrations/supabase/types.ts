@@ -1255,6 +1255,658 @@ export type Database = {
           },
         ]
       }
+      mkt_analises_concorrentes: {
+        Row: {
+          created_at: string
+          handle: string
+          id: string
+          legendas_brutas: string
+          nicho: string | null
+          resultado: Json
+        }
+        Insert: {
+          created_at?: string
+          handle: string
+          id?: string
+          legendas_brutas: string
+          nicho?: string | null
+          resultado: Json
+        }
+        Update: {
+          created_at?: string
+          handle?: string
+          id?: string
+          legendas_brutas?: string
+          nicho?: string | null
+          resultado?: Json
+        }
+        Relationships: []
+      }
+      mkt_antes_depois: {
+        Row: {
+          ambiente: string | null
+          conteudos: Json | null
+          created_at: string
+          descricao_transformacao: string | null
+          id: string
+          imagem_antes_id: string | null
+          imagem_depois_id: string | null
+          linha: string
+          nome: string
+          projeto_id: string | null
+          status_publicacao: Json
+        }
+        Insert: {
+          ambiente?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          descricao_transformacao?: string | null
+          id?: string
+          imagem_antes_id?: string | null
+          imagem_depois_id?: string | null
+          linha: string
+          nome: string
+          projeto_id?: string | null
+          status_publicacao?: Json
+        }
+        Update: {
+          ambiente?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          descricao_transformacao?: string | null
+          id?: string
+          imagem_antes_id?: string | null
+          imagem_depois_id?: string | null
+          linha?: string
+          nome?: string
+          projeto_id?: string | null
+          status_publicacao?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_antes_depois_imagem_antes_id_fkey"
+            columns: ["imagem_antes_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_biblioteca_imagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_antes_depois_imagem_depois_id_fkey"
+            columns: ["imagem_depois_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_biblioteca_imagens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_antes_depois_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_biblioteca_imagens: {
+        Row: {
+          ambiente: string | null
+          conteudos_gerados: Json | null
+          copies: Json | null
+          created_at: string
+          descricao_tecnica: string | null
+          id: string
+          linha: string
+          nome_arquivo: string
+          projeto_id: string | null
+          status_canais: Json
+          tags: string[]
+          tipo: string
+          ultima_vez_usada: string | null
+          url_storage: string
+          vezes_usada: number
+        }
+        Insert: {
+          ambiente?: string | null
+          conteudos_gerados?: Json | null
+          copies?: Json | null
+          created_at?: string
+          descricao_tecnica?: string | null
+          id?: string
+          linha: string
+          nome_arquivo: string
+          projeto_id?: string | null
+          status_canais?: Json
+          tags?: string[]
+          tipo: string
+          ultima_vez_usada?: string | null
+          url_storage: string
+          vezes_usada?: number
+        }
+        Update: {
+          ambiente?: string | null
+          conteudos_gerados?: Json | null
+          copies?: Json | null
+          created_at?: string
+          descricao_tecnica?: string | null
+          id?: string
+          linha?: string
+          nome_arquivo?: string
+          projeto_id?: string | null
+          status_canais?: Json
+          tags?: string[]
+          tipo?: string
+          ultima_vez_usada?: string | null
+          url_storage?: string
+          vezes_usada?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_biblioteca_imagens_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_projetos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_configuracoes: {
+        Row: {
+          chave: string
+          id: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          chave: string
+          id?: string
+          updated_at?: string
+          valor: string
+        }
+        Update: {
+          chave?: string
+          id?: string
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: []
+      }
+      mkt_dores: {
+        Row: {
+          categoria: string
+          created_at: string
+          descricao: string | null
+          id: string
+          titulo: string
+          ultima_vez_usada: string | null
+          vezes_usada: number
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo: string
+          ultima_vez_usada?: string | null
+          vezes_usada?: number
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          titulo?: string
+          ultima_vez_usada?: string | null
+          vezes_usada?: number
+        }
+        Relationships: []
+      }
+      mkt_estudos_caso: {
+        Row: {
+          cidade: string | null
+          conteudos: Json | null
+          created_at: string
+          detalhe_tecnico: string | null
+          id: string
+          imagens_ids: string[]
+          linha: string
+          nome_projeto: string
+          partido: string
+          problema: string
+          restricoes: string | null
+          resultado: string
+          solucoes: string[]
+          status: string
+        }
+        Insert: {
+          cidade?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          detalhe_tecnico?: string | null
+          id?: string
+          imagens_ids?: string[]
+          linha: string
+          nome_projeto: string
+          partido: string
+          problema: string
+          restricoes?: string | null
+          resultado: string
+          solucoes?: string[]
+          status?: string
+        }
+        Update: {
+          cidade?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          detalhe_tecnico?: string | null
+          id?: string
+          imagens_ids?: string[]
+          linha?: string
+          nome_projeto?: string
+          partido?: string
+          problema?: string
+          restricoes?: string | null
+          resultado?: string
+          solucoes?: string[]
+          status?: string
+        }
+        Relationships: []
+      }
+      mkt_lancamentos: {
+        Row: {
+          bairro: string | null
+          cidade: string
+          construtora: string | null
+          conteudos: Json | null
+          created_at: string
+          data_lancamento: string | null
+          descricao: string | null
+          faixa_preco: string | null
+          id: string
+          nome: string
+          notas: string | null
+          oportunidade_linha: string | null
+          status: string | null
+          tipo: string
+          url_fonte: string | null
+        }
+        Insert: {
+          bairro?: string | null
+          cidade: string
+          construtora?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          data_lancamento?: string | null
+          descricao?: string | null
+          faixa_preco?: string | null
+          id?: string
+          nome: string
+          notas?: string | null
+          oportunidade_linha?: string | null
+          status?: string | null
+          tipo: string
+          url_fonte?: string | null
+        }
+        Update: {
+          bairro?: string | null
+          cidade?: string
+          construtora?: string | null
+          conteudos?: Json | null
+          created_at?: string
+          data_lancamento?: string | null
+          descricao?: string | null
+          faixa_preco?: string | null
+          id?: string
+          nome?: string
+          notas?: string | null
+          oportunidade_linha?: string | null
+          status?: string | null
+          tipo?: string
+          url_fonte?: string | null
+        }
+        Relationships: []
+      }
+      mkt_objecoes: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          id: string
+          post_id: string | null
+          respondida: boolean
+          texto: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          respondida?: boolean
+          texto: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          respondida?: boolean
+          texto?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_objecoes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_performance: {
+        Row: {
+          comentarios: number
+          compartilhamentos: number
+          curtidas: number
+          id: string
+          post_id: string
+          registrado_em: string
+          salvamentos: number
+          views: number
+        }
+        Insert: {
+          comentarios?: number
+          compartilhamentos?: number
+          curtidas?: number
+          id?: string
+          post_id: string
+          registrado_em?: string
+          salvamentos?: number
+          views?: number
+        }
+        Update: {
+          comentarios?: number
+          compartilhamentos?: number
+          curtidas?: number
+          id?: string
+          post_id?: string
+          registrado_em?: string
+          salvamentos?: number
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_performance_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_posts: {
+        Row: {
+          ano: number | null
+          briefing_visual: string | null
+          copy_cta: string | null
+          copy_legenda: string | null
+          copy_roteiro: string | null
+          created_at: string
+          data_publicacao: string | null
+          dor_id: string | null
+          formato: string
+          id: string
+          linha: string
+          mes: number | null
+          observacao: string | null
+          pilar: string | null
+          raciocinio: Json | null
+          semana: number | null
+          status: string
+        }
+        Insert: {
+          ano?: number | null
+          briefing_visual?: string | null
+          copy_cta?: string | null
+          copy_legenda?: string | null
+          copy_roteiro?: string | null
+          created_at?: string
+          data_publicacao?: string | null
+          dor_id?: string | null
+          formato: string
+          id?: string
+          linha: string
+          mes?: number | null
+          observacao?: string | null
+          pilar?: string | null
+          raciocinio?: Json | null
+          semana?: number | null
+          status?: string
+        }
+        Update: {
+          ano?: number | null
+          briefing_visual?: string | null
+          copy_cta?: string | null
+          copy_legenda?: string | null
+          copy_roteiro?: string | null
+          created_at?: string
+          data_publicacao?: string | null
+          dor_id?: string | null
+          formato?: string
+          id?: string
+          linha?: string
+          mes?: number | null
+          observacao?: string | null
+          pilar?: string | null
+          raciocinio?: Json | null
+          semana?: number | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_posts_dor_id_fkey"
+            columns: ["dor_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_dores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_projetos: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          linha: string
+          nome: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          linha: string
+          nome: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          linha?: string
+          nome?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      mkt_prospeccao_historico: {
+        Row: {
+          created_at: string
+          data_evento: string | null
+          descricao: string
+          id: string
+          prospeccao_id: string | null
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          data_evento?: string | null
+          descricao: string
+          id?: string
+          prospeccao_id?: string | null
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          data_evento?: string | null
+          descricao?: string
+          id?: string
+          prospeccao_id?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_prospeccao_historico_prospeccao_id_fkey"
+            columns: ["prospeccao_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_prospeccoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_prospeccoes: {
+        Row: {
+          canal_abordagem: string | null
+          cargo: string | null
+          created_at: string
+          data_followup: string | null
+          data_primeiro_contato: string | null
+          email: string | null
+          empresa: string | null
+          id: string
+          instagram: string | null
+          lancamento_id: string | null
+          linha_interesse: string | null
+          mensagem_enviada: string | null
+          nome_contato: string | null
+          notas: string | null
+          origem: string
+          potencial: string | null
+          status: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          canal_abordagem?: string | null
+          cargo?: string | null
+          created_at?: string
+          data_followup?: string | null
+          data_primeiro_contato?: string | null
+          email?: string | null
+          empresa?: string | null
+          id?: string
+          instagram?: string | null
+          lancamento_id?: string | null
+          linha_interesse?: string | null
+          mensagem_enviada?: string | null
+          nome_contato?: string | null
+          notas?: string | null
+          origem: string
+          potencial?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          canal_abordagem?: string | null
+          cargo?: string | null
+          created_at?: string
+          data_followup?: string | null
+          data_primeiro_contato?: string | null
+          email?: string | null
+          empresa?: string | null
+          id?: string
+          instagram?: string | null
+          lancamento_id?: string | null
+          linha_interesse?: string | null
+          mensagem_enviada?: string | null
+          nome_contato?: string | null
+          notas?: string | null
+          origem?: string
+          potencial?: string | null
+          status?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_prospeccoes_lancamento_id_fkey"
+            columns: ["lancamento_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_lancamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_radar_buscas: {
+        Row: {
+          created_at: string
+          id: string
+          novos_lancamentos: number | null
+          resultados_encontrados: number | null
+          resumo: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          novos_lancamentos?: number | null
+          resultados_encontrados?: number | null
+          resumo?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          novos_lancamentos?: number | null
+          resultados_encontrados?: number | null
+          resumo?: string | null
+        }
+        Relationships: []
+      }
+      mkt_uso_ia: {
+        Row: {
+          created_at: string
+          custo_brl: number
+          custo_usd: number
+          detalhes: Json | null
+          id: string
+          modelo: string
+          modulo: string
+          operacao: string
+          tokens_input: number
+          tokens_output: number
+        }
+        Insert: {
+          created_at?: string
+          custo_brl?: number
+          custo_usd?: number
+          detalhes?: Json | null
+          id?: string
+          modelo?: string
+          modulo: string
+          operacao: string
+          tokens_input?: number
+          tokens_output?: number
+        }
+        Update: {
+          created_at?: string
+          custo_brl?: number
+          custo_usd?: number
+          detalhes?: Json | null
+          id?: string
+          modelo?: string
+          modulo?: string
+          operacao?: string
+          tokens_input?: number
+          tokens_output?: number
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           created_at: string
