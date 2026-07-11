@@ -50,6 +50,7 @@ const App = () => (
         <Routes>
           {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
           <Route path="/p/:tipo/:slug" element={<PropostaCliente />} />
