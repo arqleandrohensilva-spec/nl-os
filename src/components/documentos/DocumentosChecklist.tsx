@@ -83,7 +83,7 @@ const DocumentosChecklist = ({ projeto }: { projeto: Projeto }) => {
         .from('leads')
         .select('whats')
         .eq('id', projeto.cliente_id)
-        .single();
+        .maybeSingle();
       
       if (data) setLeadPhone(data.whats);
     } catch (error) {

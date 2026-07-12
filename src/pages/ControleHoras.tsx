@@ -56,8 +56,8 @@ const ControleHoras = () => {
           supabase.from('projeto_horas_log').select('*').order('criado_em', { ascending: false }),
           supabase.from('projetos').select('*').eq('status_geral', 'ativo'),
           supabase.from('projeto_etapas').select('*'),
-          // Using cast to any because the table might not be in the generated types yet
-          supabase.from('base_financeira' as any).select('valor_mensal, categoria')
+          // Custos do escritório (custos fixos mensais) para o cálculo de custo/hora
+          supabase.from('custos_escritorio').select('valor, categoria, frequencia, ativo')
         ]);
 
         setLogs(logsRes.data || []);
@@ -80,8 +80,15 @@ const ControleHoras = () => {
     return userEmail.split('@')[0];
   };
 
-  // Custo/hora
-  const custoFixoTotal = (baseFinanceira || []).reduce((s, i) => s + Number(i.valor_mensal || 0), 0);
+  // Custo/hora — soma os custos fixos convertidos para equivalente mensal
+  const custoFixoTotal = (baseFinanceira || [])
+    .filter((i: any) => i.ativo !== false)
+    .reduce((s: number, i: any) => {
+      const valor = Number(i.valor || 0);
+      if (i.frequencia === 'anual') return s + valor / 12;
+      if (i.frequencia === 'percentual') return s; // percentuais não entram no custo fixo mensal
+      return s + valor; // 'mensal' (padrão)
+    }, 0);
   const horasProdutivas = 160; // 8h * 20 dias
   const custoHora = custoFixoTotal / horasProdutivas;
 

@@ -466,7 +466,7 @@ const DocumentosContratos = () => {
         valores: contractFormData.honorarios,
         status: 'Gerado',
         revisao: (contractFormData as any).revisao || 1
-      }).select().single();
+      }).select().maybeSingle();
 
 
       if (error) throw error;

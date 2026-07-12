@@ -130,7 +130,7 @@ const GestaoProjetos = () => {
       }
 
       // Calculate Fee Burns for all projects
-      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').single();
+      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').maybeSingle();
       const custoHora = configEsc?.custo_hora || 67.37;
 
       const { data: allSessoes } = await supabase.from('sessoes_horas').select('projeto_id, duracao_minutos');

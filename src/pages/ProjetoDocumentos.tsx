@@ -128,7 +128,7 @@ const ProjetoDocumentos = () => {
 
   useEffect(() => {
     const fetchProjeto = async () => {
-      const { data } = await supabase.from('projetos').select('nome_cliente, tipo').eq('id', id).single();
+      const { data } = await supabase.from('projetos').select('nome_cliente, tipo').eq('id', id).maybeSingle();
       if (data) {
         setProjeto(data);
         const tipoNomeLocal = data.tipo?.includes('Interiores') ? 'Arquitetura + Interiores' 

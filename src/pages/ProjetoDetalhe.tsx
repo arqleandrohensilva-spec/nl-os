@@ -104,7 +104,7 @@ const ProjetoDetalhe = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).single();
+      const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).maybeSingle();
       if (pData) {
         setProjeto(pData);
         if (pData.cliente_id) {
@@ -128,7 +128,7 @@ const ProjetoDetalhe = () => {
       if (cData) setChecklist(cData);
       const { data: hData } = await supabase.from('projeto_horas_log').select('*').eq('projeto_id', id).order('criado_em', { ascending: false });
       if (hData) setHorasLog(hData);
-      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').single();
+      const { data: configEsc } = await supabase.from('config_escritorio').select('custo_hora').maybeSingle();
       const cHora = configEsc?.custo_hora || 67.37;
       setCustoHora(cHora);
 

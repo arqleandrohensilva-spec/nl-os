@@ -295,7 +295,7 @@ const PropostaCalculadora = () => {
             data: new Date().toISOString().split('T')[0]
           })
           .select()
-          .single();
+          .maybeSingle();
           
         if (propCreateError) throw propCreateError;
         currentProposalId = newProp.id;

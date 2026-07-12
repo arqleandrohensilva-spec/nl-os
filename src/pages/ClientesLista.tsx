@@ -91,7 +91,7 @@ const ClientesLista = () => {
           tipo_projeto: briefing.tipo_projeto,
           briefing_preenchido: true,
           etapa_fluxo: 'pre_briefing'
-        }).select().single();
+        }).select().maybeSingle();
 
         if (clienteError) throw clienteError;
         clienteId = novoCliente.id;
