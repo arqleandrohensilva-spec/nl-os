@@ -38,6 +38,7 @@ import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
 import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
+import RedirectToCalculadora from "./components/RedirectToCalculadora.tsx";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
           {/* Rotas Protegidas */}
           <Route element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/app" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/clientes" element={<ClientesLista />} />
             <Route path="/clientes/novo" element={<ClienteFicha />} />
@@ -88,7 +90,7 @@ const App = () => (
             <Route path="/calculadora" element={<CalculadoraList />} />
             <Route path="/calculadora/nova-proposta" element={<PropostaCalculadora />} />
             <Route path="/calculadora/:proposalId" element={<PropostaCalculadora />} />
-            <Route path="/proposta/calculadora/:proposalId" element={<Navigate to="/calculadora/:proposalId" replace />} />
+            <Route path="/proposta/calculadora/:proposalId" element={<RedirectToCalculadora />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
             <Route path="/sistema/admin" element={<PainelAdministrativo />} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
