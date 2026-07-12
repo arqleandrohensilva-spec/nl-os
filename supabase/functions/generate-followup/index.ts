@@ -5,6 +5,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const jsonResponse = (payload: unknown, status = 200) =>
+  new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+
 export const handler = async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -12,34 +18,33 @@ export const handler = async (req: Request) => {
 
   try {
     const { proposal, analysisContext } = await req.json()
-    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
     const MOCK_AI = Deno.env.get('MOCK_AI') === 'true'
 
-    if (!ANTHROPIC_API_KEY && !MOCK_AI) {
-      return new Response(
-        JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    if (!LOVABLE_API_KEY && !MOCK_AI) {
+      // Return 200 with error body so the client can show a friendly message
+      // instead of throwing a generic "non-2xx" error.
+      return jsonResponse({ error: 'IA indisponível: LOVABLE_API_KEY não configurada.' })
     }
 
-    const { 
-      cliente, 
-      tipo, 
-      status, 
-      views_count = 0, 
-      data: sentDate, 
-      validade = 30 
-    } = proposal
+    const {
+      cliente,
+      tipo,
+      status,
+      views_count = 0,
+      data: sentDate,
+      validade = 30,
+    } = proposal ?? {}
 
     const now = new Date()
     const sentAt = new Date(sentDate)
     const daysSinceSent = Math.floor((now.getTime() - sentAt.getTime()) / (1000 * 60 * 60 * 24))
-    
+
     const expiryDate = new Date(sentAt)
     expiryDate.setDate(expiryDate.getDate() + validade)
     const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
 
-    let context = `
+    const context = `
     Cliente: ${cliente}
     Tipo de proposta: ${tipo}
     Status atual: ${status}
@@ -61,87 +66,70 @@ export const handler = async (req: Request) => {
       specificInstruction = "Faça um follow-up padrão, mantendo o tom da NL Arquitetos."
     }
 
-    const systemPrompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta. 
-    Tom: condutor, técnico, sem pressão, sem urgência artificial. 
-    Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz. 
+    const systemPrompt = `Você é o assistente da NL Arquitetos. Gere uma mensagem curta e profissional para WhatsApp de follow-up de proposta.
+    Tom: condutor, técnico, sem pressão, sem urgência artificial.
+    Nunca use "oportunidade única", "corre", "promoção". A NL não pressiona — conduz.
     Máximo 3 linhas. Termine com uma pergunta aberta simples.`
 
     const userPrompt = `Contexto da proposta:
     ${context}
-    
+
     ${analysisContext ? `Análise de Engajamento Adicional: ${analysisContext}\n` : ''}
-    
+
     Instrução específica: ${specificInstruction}
-    
+
     Gere a mensagem de WhatsApp.`
 
-    const prompt = `${systemPrompt}\n\n${userPrompt}`;
-
-    let data;
     if (MOCK_AI) {
-      console.log("Running in MOCK_AI mode");
-      data = {
-        content: [
-          {
-            text: `[MOCK] Baseado no contexto (${cliente}, ${views_count} views), aqui está o follow-up sugerido.`
-          }
-        ]
-      };
-    } else {
-      const body = {
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 1024,
-        messages: [{ role: "user", content: prompt }]
-      };
-      console.log("Sending to Anthropic:", JSON.stringify(body));
-
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY!,
-          "anthropic-version": "2023-06-01"
-        },
-        body: JSON.stringify(body)
-      });
-      
-      data = await response.json();
-      console.log("Anthropic response:", JSON.stringify(data));
+      console.log("Running in MOCK_AI mode")
+      return jsonResponse({
+        message: `[MOCK] Baseado no contexto (${cliente}, ${views_count} views), aqui está o follow-up sugerido.`,
+      })
     }
 
-    if (data?.error) {
-      let errorMessage = data.error.message || JSON.stringify(data.error);
-      if (errorMessage.includes("credit balance is too low")) {
-        errorMessage = "O saldo da sua conta Anthropic acabou. Por favor, adicione créditos no console da Anthropic (Plans & Billing) para continuar usando a IA.";
-      }
-      return new Response(JSON.stringify({ error: errorMessage }), { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    })
+
+    if (response.status === 429) {
+      return jsonResponse({ error: "Limite de requisições da IA atingido. Tente novamente em instantes." })
+    }
+    if (response.status === 402) {
+      return jsonResponse({ error: "Créditos de IA esgotados. Adicione créditos para continuar usando a IA." })
     }
 
-    const message = data?.content?.[0]?.text;
+    const data = await response.json()
+
+    if (!response.ok || data?.error) {
+      const errorMessage = data?.error?.message || data?.error || `Falha na IA (HTTP ${response.status})`
+      console.error("AI gateway error:", JSON.stringify(data))
+      return jsonResponse({ error: errorMessage })
+    }
+
+    const message = data?.choices?.[0]?.message?.content
 
     if (!message) {
-      return new Response(JSON.stringify({ error: "Empty response from AI" }), { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      });
+      return jsonResponse({ error: "Resposta vazia da IA." })
     }
 
-    return new Response(JSON.stringify({ message }), { 
-      status: 200, 
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-    });
-
+    return jsonResponse({ message })
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    console.error("generate-followup error:", error)
+    return jsonResponse({ error: (error as Error).message ?? "Erro inesperado ao gerar follow-up." })
   }
 }
 
 if (import.meta.main) {
-  serve(handler);
+  serve(handler)
 }
