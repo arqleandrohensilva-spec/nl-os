@@ -102,7 +102,7 @@ const ClienteFicha = () => {
         .from('clientes')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -447,7 +447,7 @@ const ClienteFicha = () => {
           proposta_id: proposta?.id || null
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (projectError) {
         console.error('ERRO ao criar projeto:', projectError);
@@ -844,7 +844,7 @@ const ClienteFicha = () => {
         valores: contractData.honorarios as any,
         status: 'Gerado',
         revisao: novaRevisao
-      }).select().single();
+      }).select().maybeSingle();
 
       if (dbError) throw dbError;
 
@@ -988,7 +988,7 @@ const ClienteFicha = () => {
                           endereco_imovel: formData.endereco_imovel,
                           origem: formData.origem,
                           etapa_fluxo: 'ficha'
-                        }).select().single();
+                        }).select().maybeSingle();
                         
                         if (error) throw error;
                         

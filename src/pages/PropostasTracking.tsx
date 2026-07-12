@@ -190,7 +190,7 @@ const PropostasTracking = () => {
         .from('proposals')
         .insert([newProposal as any])
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -287,7 +287,7 @@ const PropostasTracking = () => {
         .from('proposals')
         .select('*, cliente_id')
         .eq('id', proposalToApprove.id)
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 
@@ -308,7 +308,7 @@ const PropostasTracking = () => {
           proposta_id: proposta.id
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (projectError) throw projectError;
 

@@ -31,7 +31,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const { data } = await supabase.from('config_escritorio').select('custo_hora, mercados').single();
+      const { data } = await supabase.from('config_escritorio').select('custo_hora, mercados').maybeSingle();
       if (data) setCustoHora(data.custo_hora);
     };
     fetchConfig();
@@ -114,7 +114,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
           slug_cliente: slugCliente
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -356,7 +356,7 @@ const LeadDetailPanel = ({ lead, onClose, onUpdateStage, onDelete, onAddLog }: L
                         data: new Date().toISOString().split('T')[0]
                       })
                       .select()
-                      .single();
+                      .maybeSingle();
                     if (newProp) navigate(`/calculadora/${newProp.id}`);
                   }
                 }}

@@ -183,7 +183,7 @@ const FinanceiroProjetos = () => {
       setParcelas(updatedParcelas);
 
       // Fetch config for cost/hour
-      const { data: cData } = await supabase.from('config_escritorio').select('*').single();
+      const { data: cData } = await supabase.from('config_escritorio').select('*').maybeSingle();
       setConfigEscritorio(cData);
       const custoHora = cData?.custo_hora || 0;
 
@@ -426,7 +426,7 @@ const FinanceiroProjetos = () => {
         .from('financeiro_parcelas')
         .select('notificacoes_enviadas')
         .eq('id', p.id)
-        .single();
+        .maybeSingle();
 
       const currentNotificacoes = Array.isArray(currentData?.notificacoes_enviadas) 
         ? currentData.notificacoes_enviadas 

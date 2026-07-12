@@ -72,7 +72,7 @@ const BibliotecaServicos = () => {
     try {
       const [sRes, cRes] = await Promise.all([
         supabase.from('servicos').select('*').order('nome'),
-        supabase.from('config_escritorio').select('*').single()
+        supabase.from('config_escritorio').select('*').maybeSingle()
       ]);
 
       setServicos((sRes.data || []) as Servico[]);

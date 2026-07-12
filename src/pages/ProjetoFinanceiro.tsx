@@ -87,7 +87,7 @@ const ProjetoFinanceiro = () => {
         .from('projetos')
         .select('*')
         .eq('id', id)
-        .single();
+        .maybeSingle();
       
       if (pData) {
         setProjeto(pData);

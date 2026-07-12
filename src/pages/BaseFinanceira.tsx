@@ -557,7 +557,7 @@ Máximo 3 linhas. Sem markdown. Em português.
   const fetchData = async () => {
     try {
       const [configRes, costsRes] = await Promise.all([
-        supabase.from('config_escritorio').select('*').single(),
+        supabase.from('config_escritorio').select('*').maybeSingle(),
         supabase.from('custos_escritorio').select('*').eq('ativo', true)
       ]);
 

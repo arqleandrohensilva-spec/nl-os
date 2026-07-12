@@ -242,7 +242,7 @@ const ConfiguracoesSistema = () => {
         .from('dropbox_settings')
         .select('*')
         .eq('id', '00000000-0000-0000-0000-000000000001')
-        .single();
+        .maybeSingle();
 
       if (!dropboxError && dropboxData && dropboxData.refresh_token) {
         setDropboxStatus('connected');

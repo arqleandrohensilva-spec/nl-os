@@ -84,7 +84,7 @@ export const generateContractDocx = async (data: ContractData) => {
       .from("dropbox_settings")
       .select("contract_template_path, vendor_template_path")
       .eq("id", "00000000-0000-0000-0000-000000000001")
-      .single();
+      .maybeSingle();
 
     const templatePath =
       (dropboxSettings as any)?.contract_template_path ||

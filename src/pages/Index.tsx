@@ -149,7 +149,7 @@ const Index = () => {
           etapa_atual: 'Briefing'
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -218,7 +218,7 @@ const Index = () => {
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const { data } = await supabase.from('config_escritorio').select('*').single();
+      const { data } = await supabase.from('config_escritorio').select('*').maybeSingle();
       if (data) setConfig(data as ConfigEscritorio);
     };
     fetchConfig();
@@ -515,7 +515,7 @@ const Index = () => {
         .from('lead_logs')
         .insert({ ...log, lead_id: leadId })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -535,7 +535,7 @@ const Index = () => {
         .from('lead_logs')
         .insert({ ...log, lead_id: leadId })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
