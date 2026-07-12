@@ -313,13 +313,13 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       .lt('updated_at', fiveDaysAgo);
 
     for (const lead of (leadsProposta || [])) {
-      if (!hasRecent('urgente', `/`)) {
+      if (!hasRecent('urgente', `/pipeline`)) {
         const diff = Math.floor((today.getTime() - new Date(lead.updated_at).getTime()) / (1000 * 60 * 60 * 24));
         await supabase.from('notificacoes').insert({
           user_id: user.id,
           tipo: 'urgente',
           titulo: `${lead.nome} · Proposta sem retorno há ${diff} dias`,
-          modulo: '/'
+          modulo: '/pipeline'
         });
       }
     }
@@ -332,12 +332,12 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       .eq('data_vencimento', twoDaysFromNow);
 
     for (const p of (parcelasVencendo || [])) {
-      if (!hasRecent('financeiro', '/financeiro/projetos')) {
+      if (!hasRecent('financeiro', '/financeiro')) {
         await supabase.from('notificacoes').insert({
           user_id: user.id,
           tipo: 'financeiro',
           titulo: `Parcela de R$ ${Number(p.valor).toLocaleString('pt-BR')} vence em 2 dias · ${p.cliente_nome}`,
-          modulo: '/financeiro/projetos'
+          modulo: '/financeiro'
         });
       }
     }
@@ -351,14 +351,14 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       .lt('proxima_acao_data', sevenDaysAgo);
 
     for (const lead of (leadsSemContato || [])) {
-      if (!hasRecent('lead', '/')) {
+      if (!hasRecent('lead', '/pipeline')) {
         const actionDate = lead.proxima_acao_data ? new Date(lead.proxima_acao_data) : new Date();
         const diff = Math.floor((today.getTime() - actionDate.getTime()) / (1000 * 60 * 60 * 24));
         await supabase.from('notificacoes').insert({
           user_id: user.id,
           tipo: 'lead',
           titulo: `${lead.nome} · Sem contato há ${diff} dias`,
-          modulo: '/'
+          modulo: '/pipeline'
         });
       }
     }
