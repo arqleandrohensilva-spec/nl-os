@@ -1,3 +1,4 @@
+import { useUserRole } from '@/hooks/use-user-role';
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users, ChevronLeft, ChevronRight, LayoutDashboard, FileSpreadsheet } from 'lucide-react';
