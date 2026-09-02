@@ -52,6 +52,7 @@ const App = () => (
         <Routes>
           {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/nao-encontrado" element={<NotFound />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
@@ -94,7 +95,6 @@ const App = () => (
             <Route path="/proposta/calculadora/:proposalId" element={<RedirectToCalculadora />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
             <Route path="/sistema/admin" element={<AdminRoute><PainelAdministrativo /></AdminRoute>} />
-            <Route path="/nao-encontrado" element={<NotFound />} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
             <Route path="/marketing/ia" element={<MarketingIA />} />
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
