@@ -975,7 +975,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Button 
                       variant="outline" 
                       className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
-                      onClick={() => window.location.href = '/horas'}
+                      onClick={() => window.location.href = '/projetos/horas'}
                     >
                       IR PARA CONTROLE DE HORAS <ArrowUpRight size={14} />
                     </Button>
@@ -1040,7 +1040,7 @@ Máximo 3 linhas. Sem markdown. Em português.
                     <Button 
                       variant="outline" 
                       className="w-full border-white/10 text-[10px] uppercase tracking-widest h-12 hover:bg-white/5 gap-2"
-                      onClick={() => window.location.href = '/horas'}
+                      onClick={() => window.location.href = '/projetos/horas'}
                     >
                       OTIMIZAR EFICIÊNCIA <ArrowUpRight size={14} />
                     </Button>

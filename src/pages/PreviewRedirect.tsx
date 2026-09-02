@@ -9,7 +9,7 @@ export default function PreviewRedirect() {
   useEffect(() => {
     async function redirect() {
       if (!token) {
-        navigate('/404', { replace: true });
+        navigate('/nao-encontrado', { replace: true });
         return;
       }
 
