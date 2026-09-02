@@ -22,7 +22,7 @@ const PainelAdministrativo = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const { data: recentClients } = useQuery({
+  const { data: recentClients, isLoading: loadingClients } = useQuery({
     queryKey: ['admin-recent-clients'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,7 +39,7 @@ const PainelAdministrativo = () => {
     }
   });
 
-  const { data: recentProjects } = useQuery({
+  const { data: recentProjects, isLoading: loadingProjects } = useQuery({
     queryKey: ['admin-recent-projects'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -110,7 +110,9 @@ const PainelAdministrativo = () => {
                     Últimos Clientes
                   </h3>
                   <div className="space-y-4">
-                    {recentClients && recentClients.length > 0 ? recentClients.map((cliente) => (
+                    {loadingClients ? (
+                      <p className="text-[10px] text-white/30 uppercase tracking-widest animate-pulse">Carregando clientes...</p>
+                    ) : recentClients && recentClients.length > 0 ? recentClients.map((cliente) => (
                       <div key={cliente.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                         <div>
                           <p className="text-[11px] text-white font-medium">{cliente.nome}</p>
@@ -143,7 +145,9 @@ const PainelAdministrativo = () => {
                     Briefings Recentes
                   </h3>
                   <div className="space-y-4">
-                    {recentProjects && recentProjects.length > 0 ? recentProjects.map((projeto) => (
+                    {loadingProjects ? (
+                      <p className="text-[10px] text-white/30 uppercase tracking-widest animate-pulse">Carregando briefings...</p>
+                    ) : recentProjects && recentProjects.length > 0 ? recentProjects.map((projeto) => (
                       <div key={projeto.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                         <div>
                           <p className="text-[11px] text-white font-medium">{projeto.nome}</p>
