@@ -95,6 +95,7 @@ const App = () => (
             <Route path="/proposta/calculadora/:proposalId" element={<RedirectToCalculadora />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
             <Route path="/sistema/admin" element={<AdminRoute><PainelAdministrativo /></AdminRoute>} />
+            <Route path="/sistema/usuarios" element={<AdminRoute><GestaoUsuarios /></AdminRoute>} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
             <Route path="/marketing/ia" element={<MarketingIA />} />
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
