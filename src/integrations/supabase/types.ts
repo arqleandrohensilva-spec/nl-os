@@ -3022,16 +3022,6 @@ export type Database = {
         Args: { p_respostas: Json; p_tipo_projeto: string; p_token: string }
         Returns: boolean
       }
-      submit_project_message_by_token: {
-        Args: {
-          p_message: string
-          p_project_id: string
-          p_sender?: string
-          p_token: string
-          p_type?: string
-        }
-        Returns: boolean
-      }
       submit_survey_by_token: {
         Args: {
           p_avaliacao_processo: string
