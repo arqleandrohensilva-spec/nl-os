@@ -28,9 +28,9 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
       <div className="flex min-h-screen items-center justify-center bg-[#0A0A0A] px-6">
         <div className="max-w-md text-center space-y-5">
           <ShieldAlert className="w-10 h-10 text-bronze mx-auto" />
-          <h1 className="text-2xl font-cormorant uppercase tracking-[0.2em] text-white">Acesso restrito</h1>
+          <h1 className="text-2xl font-cormorant uppercase tracking-[0.2em] text-white">Acesso negado</h1>
           <p className="text-[11px] uppercase tracking-widest text-white/40 leading-relaxed">
-            Esta área é exclusiva para administradores do sistema. Solicite acesso ao responsável pelo NL OS.
+            Você não possui permissão para acessar esta área. Entre em contato com o administrador para mais informações.
           </p>
           <Button
             onClick={() => navigate('/dashboard')}
