@@ -2863,6 +2863,14 @@ export type Database = {
       }
     }
     Functions: {
+      approve_stage_by_token: {
+        Args: { p_etapa_id: string; p_nome: string; p_token: string }
+        Returns: boolean
+      }
+      find_proposal_id_by_link: {
+        Args: { p_slug: string; p_tipo: string }
+        Returns: string
+      }
       get_briefing_by_token: {
         Args: { p_token: string }
         Returns: {
