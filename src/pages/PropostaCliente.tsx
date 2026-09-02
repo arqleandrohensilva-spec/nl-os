@@ -145,10 +145,8 @@ const PropostaCliente = () => {
           console.error("Erro ao registrar tracking:", trackErr);
         }
 
-        // Registrar visualização de forma robusta localmente
-        if (tipo && slug) {
-          registrarView(tipo, slug);
-        }
+        // A view já é registrada acima (evita contagem duplicada).
+
 
         setProposta(data);
       }
