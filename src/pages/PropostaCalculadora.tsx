@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
+import { criarPropostaPublica, atualizarPropostaPublica } from '@/lib/propostas-backend';
 import { toast } from 'sonner';
 import { 
   ChevronLeft, 
