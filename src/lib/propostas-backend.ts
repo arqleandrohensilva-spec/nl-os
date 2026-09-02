@@ -20,7 +20,7 @@ export interface PropostaPublicaPayload {
   nome_cliente?: string | null;
   cidade?: string | null;
   estado?: string | null;
-  area?: string | null;
+  area?: string | number | null;
   valor_executivo?: string | null;
   valor_completo?: string | null;
   objetivo?: string | null;

@@ -23,7 +23,7 @@ const PropostaCliente = () => {
         const tempoSegundos = Math.round((Date.now() - startTime) / 1000);
         
         // Salvar tempo no NL OS
-        nlSupabase
+        supabase
           .from("proposal_views")
           .update({ tempo_segundos: tempoSegundos })
           .eq("proposal_id", proposalIdRef.current)
@@ -72,7 +72,7 @@ const PropostaCliente = () => {
           temposFormatados[key] = Math.round(temposSecao[key] / 1000);
         });
 
-        nlSupabase
+        supabase
           .from("proposal_views")
           .update({ secoes_tempo: temposFormatados })
           .eq("proposal_id", proposalIdRef.current)
@@ -124,7 +124,7 @@ const PropostaCliente = () => {
 
         // Registrar view no NL OS para tracking interno
         try {
-          const { data: propostas } = await nlSupabase
+          const { data: propostas } = await supabase
             .from("proposals")
             .select("id, link_proposta")
             .not("link_proposta", "is", null);
@@ -136,7 +136,7 @@ const PropostaCliente = () => {
 
           if (propostaNl?.id) {
             proposalIdRef.current = propostaNl.id;
-            await nlSupabase.from("proposal_views").insert({
+            await supabase.from("proposal_views").insert({
               proposal_id: propostaNl.id,
               viewed_at: new Date().toISOString()
             });
