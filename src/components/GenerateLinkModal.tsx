@@ -18,6 +18,7 @@ import {
 import { Link2, Copy, ExternalLink, Check } from 'lucide-react';
 import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
+import { criarPropostaPublica } from '@/lib/propostas-backend';
 
 interface Proposal {
   id: string;
@@ -91,55 +92,40 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
       ];
 
       let finalLink = "";
-      let finalSlug = "";
+      let ultimoErro = "";
 
-      // Loop de tentativas para tratar conflitos de slug (Erro 409)
+      // Loop de tentativas para tratar conflitos de slug (409)
       for (const attemptSlug of slugAttempts) {
-        try {
-          const response = await fetch('https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Prefer': 'return=representation'
-            },
-            body: JSON.stringify({
-              tipo: typeSlug,
-              slug: attemptSlug,
-              nome_cliente: nomeCliente,
-              cidade: cidade,
-              area: area || null,
-              valor_executivo: valorExecutivo || null,
-              valor_completo: valorCompleto || null,
-              objetivo: objetivo,
-              tipo_negocio: tipo_negocio,
-            })
-          });
+        const resultado = await criarPropostaPublica({
+          tipo: typeSlug,
+          slug: attemptSlug,
+          nome_cliente: nomeCliente,
+          cidade: cidade,
+          area: area || null,
+          valor_executivo: valorExecutivo || null,
+          valor_completo: valorCompleto || null,
+          objetivo: objetivo,
+          tipo_negocio: tipo_negocio,
+        });
 
-          if (response.ok) {
-            finalSlug = attemptSlug;
-            const baseUrl = `https://proposta.nl.arq.br`;
-            finalLink = `${baseUrl}/p/${typeSlug}/${finalSlug}`;
-            break;
-          } else if (response.status === 409) {
-            console.warn(`Conflito de slug (${attemptSlug}), tentando próxima variação...`);
-            continue;
-          } else {
-            const responseText = await response.text();
-            console.error('Erro Supabase Externo:', response.status, responseText);
-            throw new Error(`Erro ao salvar no servidor de propostas (HTTP ${response.status})`);
-          }
-        } catch (err: any) {
-          // Se for 409, o loop continua. Se for outro erro, interrompe a menos que seja erro de rede
-          if (err.message?.includes('409')) continue;
-          throw err;
+        if (resultado.ok) {
+          finalLink = resultado.link;
+          break;
         }
+
+        ultimoErro = resultado.erro;
+        if (resultado.conflito) continue;
+        throw new Error(`Erro ao salvar no servidor de propostas: ${resultado.erro}`);
       }
 
       if (!finalLink) {
-        throw new Error("Não foi possível gerar um link único após várias tentativas.");
+        throw new Error(
+          ultimoErro
+            ? `Não foi possível gerar um link único. ${ultimoErro}`
+            : "Não foi possível gerar um link único após várias tentativas."
+        );
       }
+
 
       // 2. Salvar o link na tabela local do NL OS
       const { error: updateError } = await supabase
