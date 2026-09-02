@@ -179,6 +179,7 @@ const SectionAccordion = ({
 const Sidebar = ({ user: initialUser }: { user: string }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin } = useUserRole();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [popoverAberto, setPopoverAberto] = useState<string | null>(null);
