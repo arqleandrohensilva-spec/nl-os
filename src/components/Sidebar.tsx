@@ -1,3 +1,4 @@
+import { useUserRole } from '@/hooks/use-user-role';
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { LogOut, ChevronDown, LayoutGrid, DollarSign, PenTool, FileText, BarChart3, Settings, Bell, Calculator, Users, ChevronLeft, ChevronRight, LayoutDashboard, FileSpreadsheet } from 'lucide-react';
@@ -179,6 +180,7 @@ const SectionAccordion = ({
 const Sidebar = ({ user: initialUser }: { user: string }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAdmin } = useUserRole();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [popoverAberto, setPopoverAberto] = useState<string | null>(null);
@@ -598,12 +600,15 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'CONFIGURAÇÕES'}
         >
-          <NavItem 
-            label="Admin" 
-            active={location.pathname === '/sistema/admin'} 
-            onClick={() => navigate('/sistema/admin')} 
-            isCollapsed={isCollapsed}
-          />
+          {isAdmin && (
+            <NavItem 
+              label="Admin" 
+              active={location.pathname === '/sistema/admin'} 
+              onClick={() => navigate('/sistema/admin')} 
+              isCollapsed={isCollapsed}
+            />
+          )}
+
           <NavItem 
             label="Sistema" 
             active={location.pathname === '/sistema/configuracoes'} 

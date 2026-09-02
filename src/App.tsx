@@ -39,6 +39,7 @@ import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import RedirectToCalculadora from "./components/RedirectToCalculadora.tsx";
+import AdminRoute from "./components/AdminRoute.tsx";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
         <Routes>
           {/* Rotas Públicas */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/nao-encontrado" element={<NotFound />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/proposta/:tipo" element={<PropostaVisualizacao />} />
@@ -92,7 +94,7 @@ const App = () => (
             <Route path="/calculadora/:proposalId" element={<PropostaCalculadora />} />
             <Route path="/proposta/calculadora/:proposalId" element={<RedirectToCalculadora />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
-            <Route path="/sistema/admin" element={<PainelAdministrativo />} />
+            <Route path="/sistema/admin" element={<AdminRoute><PainelAdministrativo /></AdminRoute>} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
             <Route path="/marketing/ia" element={<MarketingIA />} />
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />

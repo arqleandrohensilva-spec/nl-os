@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/integrations/supabase/client';
+import { criarPropostaPublica, atualizarPropostaPublica } from '@/lib/propostas-backend';
 import { toast } from 'sonner';
 import { 
   ChevronLeft, 
@@ -363,78 +364,39 @@ const PropostaCalculadora = () => {
         (!versaoSuffix && !existingSlug.includes('-v'))
       );
 
-      if (shouldPatch) {
-        try {
-          const updateResponse = await fetch(`https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes?slug=eq.${existingSlug}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI'
-            },
-            body: JSON.stringify({
-              nome_cliente: proposal.cliente,
-              cidade: proposal.cidade,
-              estado: proposal.estado,
-              area: proposal.area || null,
-              valor_executivo: Math.round(totals.valorExecutivo).toString(),
-              valor_completo: Math.round(totals.valorCompleto).toString(),
-              objetivo: proposal.objetivo || "",
-              tipo_negocio: finalTipoNegocio,
-              tipo: typeSlug,
-              updated_at: new Date().toISOString()
-            })
-          });
+      const dadosProposta = {
+        nome_cliente: proposal.cliente,
+        cidade: proposal.cidade,
+        estado: proposal.estado,
+        area: proposal.area || null,
+        valor_executivo: Math.round(totals.valorExecutivo).toString(),
+        valor_completo: Math.round(totals.valorCompleto).toString(),
+        objetivo: proposal.objetivo || "",
+        tipo_negocio: finalTipoNegocio,
+        tipo: typeSlug,
+      };
 
-          if (updateResponse.ok) {
-            finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${existingSlug}`;
-          } else {
-            const errorText = await updateResponse.text();
-            console.error("PATCH error response:", errorText);
-          }
-        } catch (err) {
-          console.error("PATCH connection error:", err);
+      if (shouldPatch) {
+        const atualizacao = await atualizarPropostaPublica(existingSlug, dadosProposta);
+        if (atualizacao.ok === true) {
+          finalLink = atualizacao.link;
+        } else {
+          console.error("Falha ao atualizar proposta publicada:", atualizacao.erro);
         }
       }
 
       // 3. If no finalLink (either update failed, or we need a new versioned slug)
       if (!finalLink) {
         for (const attemptSlug of slugAttempts) {
-          try {
-            const createResponse = await fetch(`https://sjqazidnuqdqadbkawph.supabase.co/rest/v1/propostas_clientes`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqcWF6aWRudXFkcWFkYmthd3BoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MzI0NjMsImV4cCI6MjA5NDAwODQ2M30.vT_1aEOPjjw_KCKJ0KsAzJG40e07DvFSONICVIBAGHI',
-                'Prefer': 'return=representation'
-              },
-              body: JSON.stringify({
-                slug: attemptSlug,
-                nome_cliente: proposal.cliente,
-                cidade: proposal.cidade,
-                estado: proposal.estado,
-                area: proposal.area || null,
-                valor_executivo: Math.round(totals.valorExecutivo).toString(),
-                valor_completo: Math.round(totals.valorCompleto).toString(),
-                objetivo: proposal.objetivo || "",
-                tipo_negocio: finalTipoNegocio,
-                tipo: typeSlug
-              })
-            });
-
-            if (createResponse.ok) {
-              finalLink = `https://proposta.nl.arq.br/p/${typeSlug}/${attemptSlug}`;
-              break;
-            } else {
-              const errorText = await createResponse.text();
-              console.error(`POST error for slug ${attemptSlug}:`, errorText);
-            }
-          } catch (err) {
-            console.error(`POST connection error for slug ${attemptSlug}:`, err);
+          const criacao = await criarPropostaPublica({ ...dadosProposta, slug: attemptSlug });
+          if (criacao.ok === true) {
+            finalLink = criacao.link;
+            break;
           }
+          console.error(`Falha ao criar proposta (${attemptSlug}):`, criacao.erro);
         }
       }
+
 
       if (!finalLink) {
         throw new Error("Não foi possível gerar o link da proposta. Verifique sua conexão e tente novamente.");

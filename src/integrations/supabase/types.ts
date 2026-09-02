@@ -2664,6 +2664,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          criado_em: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       contratos_clientes: {
@@ -2857,9 +2878,17 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       increment_proposal_access: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
+      app_role: "admin" | "gestor" | "user"
       notification_type:
         | "urgente"
         | "financeiro"
@@ -2993,6 +3022,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "gestor", "user"],
       notification_type: [
         "urgente",
         "financeiro",
