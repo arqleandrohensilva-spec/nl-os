@@ -108,14 +108,15 @@ const GenerateLinkModal = ({ proposal, isOpen, onClose, onLinkGenerated }: Gener
           tipo_negocio: tipo_negocio,
         });
 
-        if (resultado.ok) {
+        if (resultado.ok === true) {
           finalLink = resultado.link;
           break;
+        } else {
+          ultimoErro = resultado.erro;
+          if (resultado.conflito) continue;
+          throw new Error(`Erro ao salvar no servidor de propostas: ${resultado.erro}`);
         }
 
-        ultimoErro = resultado.erro;
-        if (resultado.conflito) continue;
-        throw new Error(`Erro ao salvar no servidor de propostas: ${resultado.erro}`);
       }
 
       if (!finalLink) {
