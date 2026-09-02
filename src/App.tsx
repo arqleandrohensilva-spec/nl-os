@@ -37,6 +37,7 @@ import ClienteFicha from "./pages/ClienteFicha.tsx";
 import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
 import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
+import GestaoUsuarios from "./pages/GestaoUsuarios.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import RedirectToCalculadora from "./components/RedirectToCalculadora.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
