@@ -216,18 +216,12 @@ function PaginaClienteContent() {
     }
 
     try {
-      const { data: enviada, error: mensagemError } = await (supabase.rpc as any)(
-        'submit_project_message_by_token',
-        {
-          p_token: projeto.token_cliente || param,
-          p_project_id: projeto.id,
-          p_message: textoAjuste,
-          p_type: 'ajuste',
-          p_sender: projeto.nome_cliente,
-        }
-      );
+      const { error: mensagemError } = await (supabase.from('mensagens_cliente') as any).insert({
+        projeto_id: projeto.id,
+        token_cliente: projeto.token_cliente,
+        mensagem: textoAjuste,
+      });
       if (mensagemError) throw mensagemError;
-      if (!enviada) throw new Error('Não foi possível validar o acesso ao projeto.');
       
       try {
         await (supabase.from('notificacoes') as any).insert({
@@ -254,18 +248,12 @@ function PaginaClienteContent() {
 
     setEnviandoMensagem(true);
     try {
-      const { data: enviada, error: mensagemError } = await (supabase.rpc as any)(
-        'submit_project_message_by_token',
-        {
-          p_token: projeto.token_cliente || param,
-          p_project_id: projeto.id,
-          p_message: textoMensagem,
-          p_type: 'mensagem',
-          p_sender: projeto.nome_cliente,
-        }
-      );
+      const { error: mensagemError } = await (supabase.from('mensagens_cliente') as any).insert({
+        projeto_id: projeto.id,
+        token_cliente: projeto.token_cliente,
+        mensagem: textoMensagem,
+      });
       if (mensagemError) throw mensagemError;
-      if (!enviada) throw new Error('Não foi possível validar o acesso ao projeto.');
       
       try {
         await (supabase.from('notificacoes') as any).insert({

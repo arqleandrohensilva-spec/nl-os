@@ -989,12 +989,9 @@ const BriefingCompleto = () => {
       const path = `${token}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage.from('briefing-anexos').upload(path, file, { upsert: false });
       if (error) throw error;
-      const { data: signed } = await supabase.storage
-        .from('briefing-anexos')
-        .createSignedUrl(path, 60 * 60 * 24 * 365 * 5);
       setAnswers(prev => ({
         ...prev,
-        manual_marca_anexo: { nome: file.name, url: signed?.signedUrl || path },
+        manual_marca_anexo: { nome: file.name, url: path },
       }));
     } catch (e) {
       console.error('Erro ao enviar anexo', e);
