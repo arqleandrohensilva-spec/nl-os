@@ -177,16 +177,17 @@ function PaginaClienteContent() {
     }
 
     try {
-      const { error: updateError } = await (supabase
-        .from('projeto_etapas') as any)
-        .update({
-          status: 'Aprovado',
-          aprovado_por: nomeAprovador,
-          data_aprovacao: new Date().toISOString()
-        })
-        .eq('id', selectedEtapa.id);
+      const { data: aprovado, error: updateError } = await (supabase.rpc as any)(
+        'approve_stage_by_token',
+        {
+          p_token: projeto?.token_cliente || param,
+          p_etapa_id: selectedEtapa.id,
+          p_nome: nomeAprovador,
+        }
+      );
 
       if (updateError) throw updateError;
+      if (!aprovado) throw new Error('Não foi possível validar o acesso.');
       
       try {
         await (supabase.from('notificacoes') as any).insert({
