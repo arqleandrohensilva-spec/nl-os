@@ -2863,6 +2863,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_project_document: {
+        Args: { p_object_name: string }
+        Returns: boolean
+      }
       get_briefing_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -3010,6 +3014,7 @@ export type Database = {
         Returns: boolean
       }
       increment_proposal_access: { Args: { p_id: string }; Returns: undefined }
+      user_owns_project: { Args: { p_project_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "gestor" | "user"
