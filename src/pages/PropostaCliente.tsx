@@ -85,30 +85,8 @@ const PropostaCliente = () => {
     };
   }, []);
 
-  const registrarView = async (pTipo: string, pSlug: string) => {
-    try {
-      // Buscar todas as propostas com link para encontrar o match ideal
-      const { data: propostas } = await supabase
-        .from('proposals')
-        .select('id, link_proposta')
-        .not('link_proposta', 'is', null);
 
-      const propostaMatch = propostas?.find(p => {
-        const link = (p.link_proposta || '').toLowerCase();
-        return link.endsWith(`/${pSlug}`) || 
-               link.includes(`/${pTipo}/${pSlug}`);
-      });
 
-      if (propostaMatch?.id) {
-        await supabase.from('proposal_views').insert({
-          proposal_id: propostaMatch.id,
-          viewed_at: new Date().toISOString()
-        });
-      }
-    } catch (err) {
-      console.error('Erro ao registrar view:', err);
-    }
-  };
 
   useEffect(() => {
     const buscarProposta = async () => {
