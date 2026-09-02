@@ -39,6 +39,7 @@ import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import RedirectToCalculadora from "./components/RedirectToCalculadora.tsx";
+import AdminRoute from "./components/AdminRoute.tsx";
 
 const queryClient = new QueryClient();
 
