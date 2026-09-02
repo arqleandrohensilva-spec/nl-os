@@ -204,15 +204,8 @@ const PesquisaSatisfacao = () => {
 
       if (surveyError) throw surveyError;
 
-      if (notaGeral >= 9) {
-        const textoDepoimento = `"${comentario || 'Experiência excelente com a NL Arquitetos!'}"\n\n— ${survey.cliente_nome}\n(Avaliação Geral: ${notaGeral}/10)`;
-        
-        await supabase.from('depoimentos').insert({
-          pesquisa_id: survey.id,
-          texto_formatado: textoDepoimento,
-          status: 'PENDENTE'
-        });
-      }
+
+
 
       setSubmitted(true);
       toast({
