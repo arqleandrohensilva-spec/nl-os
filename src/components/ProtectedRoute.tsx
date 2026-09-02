@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { Session } from '@supabase/supabase-js';
-import { isLovablePreview, autoLoginPreview } from '@/lib/dev-auth';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -15,12 +14,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(async ({ data }) => {
-      // No preview do Lovable, entra automaticamente com o usuário fixo.
-      if (!data.session && isLovablePreview()) {
-        const ok = await autoLoginPreview();
-        if (ok) return; // onAuthStateChange atualiza a sessão e o loading
-      }
+    supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });

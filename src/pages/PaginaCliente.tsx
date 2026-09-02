@@ -216,12 +216,12 @@ function PaginaClienteContent() {
     }
 
     try {
-      await (supabase.from('mensagens_cliente') as any).insert({
+      const { error: mensagemError } = await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
         token_cliente: projeto.token_cliente,
         mensagem: textoAjuste,
-        tipo: 'ajuste'
       });
+      if (mensagemError) throw mensagemError;
       
       try {
         await (supabase.from('notificacoes') as any).insert({
@@ -248,13 +248,12 @@ function PaginaClienteContent() {
 
     setEnviandoMensagem(true);
     try {
-      await (supabase.from('mensagens_cliente') as any).insert({
+      const { error: mensagemError } = await (supabase.from('mensagens_cliente') as any).insert({
         projeto_id: projeto.id,
         token_cliente: projeto.token_cliente,
-        nome_remetente: projeto.nome_cliente,
         mensagem: textoMensagem,
-        tipo: 'mensagem'
       });
+      if (mensagemError) throw mensagemError;
       
       try {
         await (supabase.from('notificacoes') as any).insert({
