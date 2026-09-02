@@ -186,6 +186,12 @@ const PainelAdministrativo = () => {
           <TabsContent value="access" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <AdminCard 
+                title="Usuários e Permissões" 
+                desc="Cadastre usuários, crie perfis e defina permissões por módulo."
+                icon={<Users size={20} />}
+                onClick={() => navigate('/sistema/usuarios')}
+              />
+              <AdminCard 
                 title="Configurações do Sistema" 
                 desc="Gerencie Dropbox, templates e metas mensais."
                 icon={<SettingsIcon size={20} />}
