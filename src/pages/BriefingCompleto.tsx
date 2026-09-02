@@ -979,10 +979,14 @@ const BriefingCompleto = () => {
 
   const handleAnexoUpload = async (file: File) => {
     if (!file) return;
+    if (!token || !projeto) {
+      console.error('O anexo exige um briefing vinculado a um projeto válido.');
+      return;
+    }
     setUploadingAnexo(true);
     try {
       const ext = file.name.split('.').pop();
-      const path = `${token || 'sem-token'}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${token}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error } = await supabase.storage.from('briefing-anexos').upload(path, file, { upsert: false });
       if (error) throw error;
       const { data: signed } = await supabase.storage
