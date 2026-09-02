@@ -3010,6 +3010,22 @@ export type Database = {
         Returns: boolean
       }
       increment_proposal_access: { Args: { p_id: string }; Returns: undefined }
+      submit_briefing_by_token: {
+        Args: { p_respostas: Json; p_tipo_projeto: string; p_token: string }
+        Returns: boolean
+      }
+      submit_survey_by_token: {
+        Args: {
+          p_avaliacao_processo: string
+          p_avaliacao_resultado: string
+          p_comentario: string
+          p_nota_geral: number
+          p_token: string
+          p_video_path?: string
+          p_video_url?: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "gestor" | "user"
