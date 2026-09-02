@@ -102,20 +102,15 @@ const PropostaCliente = () => {
 
         // Registrar view no NL OS para tracking interno
         try {
-          const { data: propostas } = await supabase
-            .from("proposals")
-            .select("id, link_proposta")
-            .not("link_proposta", "is", null);
+          const { data: propostaNlId } = await (supabase.rpc as any)(
+            "find_proposal_id_by_link",
+            { p_tipo: tipo, p_slug: slug }
+          );
 
-          const propostaNl = propostas?.find((p: any) => {
-            const link = (p.link_proposta || "").toLowerCase();
-            return link.endsWith(`/${slug}`) || link.includes(`/${tipo}/${slug}`);
-          });
-
-          if (propostaNl?.id) {
-            proposalIdRef.current = propostaNl.id;
+          if (propostaNlId) {
+            proposalIdRef.current = propostaNlId;
             await supabase.from("proposal_views").insert({
-              proposal_id: propostaNl.id,
+              proposal_id: propostaNlId,
               viewed_at: new Date().toISOString()
             });
           }
