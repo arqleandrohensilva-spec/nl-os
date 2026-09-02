@@ -192,18 +192,15 @@ const PesquisaSatisfacao = () => {
       }
 
       const { error: surveyError } = await supabase
-        .from('pesquisas_satisfacao')
-        .update({
-          nota_geral: notaGeral,
-          avaliacao_processo: avaliacaoProcesso,
-          avaliacao_resultado: avaliacaoResultado,
-          comentario,
-          video_url: uploadedVideoUrl,
-          video_dropbox_path: uploadedVideoPath,
-          status: 'RESPONDIDA',
-          respondida_em: new Date().toISOString()
-        })
-        .eq('id', survey.id);
+        .rpc('submit_survey_by_token', {
+          p_token: token as string,
+          p_nota_geral: notaGeral,
+          p_avaliacao_processo: avaliacaoProcesso,
+          p_avaliacao_resultado: avaliacaoResultado,
+          p_comentario: comentario,
+          p_video_url: uploadedVideoUrl,
+          p_video_path: uploadedVideoPath,
+        });
 
       if (surveyError) throw surveyError;
 
