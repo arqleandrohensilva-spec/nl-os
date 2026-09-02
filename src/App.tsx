@@ -37,6 +37,7 @@ import ClienteFicha from "./pages/ClienteFicha.tsx";
 import ProjetoDocumentos from "./pages/ProjetoDocumentos.tsx";
 import BriefingCompleto from "./pages/BriefingCompleto.tsx";
 import PainelAdministrativo from "./pages/PainelAdministrativo.tsx";
+import GestaoUsuarios from "./pages/GestaoUsuarios.tsx";
 import AuthCallback from "./pages/AuthCallback.tsx";
 import RedirectToCalculadora from "./components/RedirectToCalculadora.tsx";
 import AdminRoute from "./components/AdminRoute.tsx";
@@ -95,6 +96,7 @@ const App = () => (
             <Route path="/proposta/calculadora/:proposalId" element={<RedirectToCalculadora />} />
             <Route path="/sistema/configuracoes" element={<ConfiguracoesSistema />} />
             <Route path="/sistema/admin" element={<AdminRoute><PainelAdministrativo /></AdminRoute>} />
+            <Route path="/sistema/usuarios" element={<AdminRoute><GestaoUsuarios /></AdminRoute>} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
             <Route path="/marketing/ia" element={<MarketingIA />} />
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
