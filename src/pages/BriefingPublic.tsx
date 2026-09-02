@@ -105,27 +105,14 @@ const BriefingPublic = () => {
     setSubmitting(true);
     try {
       if (token && briefing) {
-        // Modo com token - Atualizar existente
-        const updateData: any = {
-          status: 'preenchido',
-          respostas: formData,
-          tipo_projeto: projetoType,
-          preenchido_em: new Date().toISOString()
-        };
-
-        const { error } = await supabase.from('briefings').update(updateData).eq('id', briefing.id);
+        // Modo com token - envio seguro via função protegida por token
+        const { data: ok, error } = await supabase.rpc('submit_briefing_by_token', {
+          p_token: token,
+          p_respostas: formData,
+          p_tipo_projeto: projetoType,
+        });
         if (error) throw error;
-        
-        if (briefing.cliente_id) {
-          const clienteUpdate: any = {
-            tipo_projeto: projetoType,
-            area_m2: formData.area_estimada || formData.area_terreno,
-            orcamento: formData.orcamento,
-            briefing_preenchido: true,
-            etapa_fluxo: 'pre_briefing'
-          };
-          await supabase.from('clientes').update(clienteUpdate).eq('id', briefing.cliente_id);
-        }
+        if (!ok) throw new Error('Token inválido');
       } else {
         // Modo público - Criar novo
         const insertData: any = {
