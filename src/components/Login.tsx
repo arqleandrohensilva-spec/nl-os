@@ -55,16 +55,15 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <div className="w-full max-w-[320px] flex flex-col items-center">
-        <img 
-          src="https://krzuroijejfozljhchok.supabase.co/storage/v1/object/public/assets/logo.png" 
-          alt="NL Arquitetos" 
-          className="w-48 mb-2"
-        />
-        <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em] mb-6">
+        <h1 className="text-2xl tracking-[0.22em] text-graphite font-light mb-2">
+          NL ARQUITETOS
+        </h1>
+        <p className="text-[10px] font-medium text-graphite/50 uppercase tracking-[0.2em] mb-6">
           Sistema Operacional · NL Arquitetos
         </p>
 
         <div className="w-8 h-[1px] bg-bronze/40 mb-10" />
+
 
         <form onSubmit={mode === 'login' ? handleLogin : handleForgot} className="w-full space-y-4">
           <Input
@@ -72,7 +71,7 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
             placeholder="USUÁRIO"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="h-11 border-white/10 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider"
+            className="h-11 border-graphite/20 text-graphite placeholder:text-graphite/40 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider"
           />
 
           {mode === 'login' && (
@@ -82,12 +81,12 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
                 placeholder="SENHA"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="h-11 border-white/10 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider pr-10"
+                className="h-11 border-graphite/20 text-graphite placeholder:text-graphite/40 focus:border-bronze focus:ring-0 rounded-none text-xs tracking-wider pr-10"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-graphite/40 hover:text-graphite transition-colors"
                 aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
               >
                 {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -96,7 +95,7 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
           )}
 
           {isLoading && (
-            <p className="text-[10px] text-white/40 uppercase text-center animate-pulse">
+            <p className="text-[10px] text-graphite/50 uppercase text-center animate-pulse">
               {mode === 'login' ? 'Autenticando...' : 'Enviando...'}
             </p>
           )}
@@ -113,7 +112,7 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
             <button
               type="button"
               onClick={() => setMode(mode === 'login' ? 'forgot' : 'login')}
-              className="text-[9px] uppercase tracking-[0.2em] text-white/40 hover:text-bronze transition-colors"
+              className="text-[9px] uppercase tracking-[0.2em] text-graphite/50 hover:text-bronze transition-colors"
             >
               {mode === 'login' ? 'Esqueci minha senha' : 'Voltar ao login'}
             </button>
