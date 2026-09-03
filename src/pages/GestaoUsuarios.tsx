@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { MODULOS } from '@/hooks/use-permissoes';
+import { useUserRole } from '@/hooks/use-user-role';
 
 type Perfil = { id: string; nome: string; descricao: string | null; sistema: boolean };
 type Permissao = { perfil_id: string; modulo: string; permitido: boolean };
