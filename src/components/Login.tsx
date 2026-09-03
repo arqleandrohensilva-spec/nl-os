@@ -55,16 +55,15 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <div className="w-full max-w-[320px] flex flex-col items-center">
-        <img 
-          src="https://krzuroijejfozljhchok.supabase.co/storage/v1/object/public/assets/logo.png" 
-          alt="NL Arquitetos" 
-          className="w-48 mb-2"
-        />
-        <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em] mb-6">
+        <h1 className="text-2xl tracking-[0.22em] text-graphite font-light mb-2">
+          NL ARQUITETOS
+        </h1>
+        <p className="text-[10px] font-medium text-graphite/50 uppercase tracking-[0.2em] mb-6">
           Sistema Operacional · NL Arquitetos
         </p>
 
         <div className="w-8 h-[1px] bg-bronze/40 mb-10" />
+
 
         <form onSubmit={mode === 'login' ? handleLogin : handleForgot} className="w-full space-y-4">
           <Input
