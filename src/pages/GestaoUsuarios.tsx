@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { Users, ShieldCheck, KeyRound, Plus, Trash2, Pencil, Loader2 } from 'lucide-react';
+import { Users, ShieldCheck, KeyRound, Plus, Trash2, Pencil, Loader2, LayoutDashboard, UserCheck, UserX, Search, Eye, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
