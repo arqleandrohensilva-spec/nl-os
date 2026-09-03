@@ -290,18 +290,64 @@ const GestaoUsuarios = () => {
         </header>
 
         <Tabs value={tab} onValueChange={setTab} className="space-y-8">
-          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-none h-auto gap-1">
-            {[
-              { v: 'usuarios', l: 'Usuários' },
-              { v: 'perfis', l: 'Perfis' },
-              { v: 'permissoes', l: 'Permissões' },
-            ].map((t) => (
+          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-none h-auto gap-1 flex-wrap">
+            {abas.map((t) => (
               <TabsTrigger key={t.v} value={t.v}
                 className="rounded-none px-6 py-2.5 text-[10px] uppercase tracking-widest data-[state=active]:bg-bronze data-[state=active]:text-white">
                 {t.l}
               </TabsTrigger>
             ))}
           </TabsList>
+
+          {/* VISÃO GERAL */}
+          <TabsContent value="visao" className="space-y-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { l: 'Usuários', v: metricas.total, i: Users },
+                { l: 'Ativos', v: metricas.ativos, i: UserCheck },
+                { l: 'Inativos', v: metricas.inativos, i: UserX },
+                { l: 'Administradores', v: metricas.admins, i: ShieldCheck },
+                { l: 'Perfis de acesso', v: metricas.perfis, i: KeyRound },
+                { l: 'Sem perfil vinculado', v: metricas.semPerfil, i: UserX },
+                { l: 'Acessos em 7 dias', v: metricas.recentes, i: Clock },
+                { l: 'Módulos do sistema', v: MODULOS.length, i: LayoutDashboard },
+              ].map((m) => (
+                <div key={m.l} className="bg-[#1A1816] border border-white/5 p-6">
+                  <m.i size={14} className="text-bronze mb-4" />
+                  <p className="text-3xl font-cormorant text-white">{m.v}</p>
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest mt-1">{m.l}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className={cardCls}>
+              <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase mb-8 flex items-center gap-2">
+                <ShieldCheck size={16} className="text-bronze" /> Distribuição por perfil
+              </h3>
+              {distribuicao.length === 0 ? (
+                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum perfil cadastrado</p>
+              ) : (
+                <div className="space-y-4">
+                  {distribuicao.map((d) => (
+                    <div key={d.perfil.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-white uppercase tracking-widest">{d.perfil.nome}</p>
+                        <p className="text-[9px] text-white/35 uppercase tracking-widest">
+                          {d.usuarios} usuário(s) · {d.modulos}/{MODULOS.length} módulos
+                        </p>
+                      </div>
+                      <div className="h-1 bg-white/5">
+                        <div className="h-full bg-bronze transition-all"
+                          style={{ width: `${metricas.total ? (d.usuarios / metricas.total) * 100 : 0}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+
 
           {/* USUÁRIOS */}
           <TabsContent value="usuarios">
