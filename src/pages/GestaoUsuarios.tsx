@@ -352,22 +352,44 @@ const GestaoUsuarios = () => {
           {/* USUÁRIOS */}
           <TabsContent value="usuarios">
             <div className={cardCls}>
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase flex items-center gap-2">
                   <Users size={16} className="text-bronze" /> Usuários do sistema
                 </h3>
-                <Button onClick={abrirNovo} className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
-                  <Plus size={12} className="mr-2" /> Novo usuário
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative">
+                    <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                    <Input value={busca} onChange={(e) => setBusca(e.target.value)}
+                      placeholder="Buscar por nome ou e-mail" className={`${inputCls} pl-8 w-[240px]`} />
+                  </div>
+                  <Select value={filtroPerfil} onValueChange={setFiltroPerfil}>
+                    <SelectTrigger className="w-[190px] rounded-none bg-white/5 border-white/10 text-white text-[10px] uppercase tracking-widest">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none bg-[#1A1816] border-white/10 text-white">
+                      <SelectItem value="todos" className="text-[11px]">Todos os perfis</SelectItem>
+                      <SelectItem value="admin" className="text-[11px]">Administradores</SelectItem>
+                      <SelectItem value="sem" className="text-[11px]">Sem perfil</SelectItem>
+                      {perfis.map((p) => (
+                        <SelectItem key={p.id} value={p.id} className="text-[11px]">{p.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {isAdmin && (
+                    <Button onClick={abrirNovo} className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
+                      <Plus size={12} className="mr-2" /> Novo usuário
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {loading ? (
                 <p className="text-[10px] text-white/30 uppercase tracking-widest animate-pulse">Carregando usuários...</p>
-              ) : usuarios.length === 0 ? (
-                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum usuário cadastrado</p>
+              ) : usuariosFiltrados.length === 0 ? (
+                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum usuário encontrado</p>
               ) : (
                 <div className="space-y-3">
-                  {usuarios.map((u) => (
+                  {usuariosFiltrados.map((u) => (
                     <div key={u.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                       <div className="space-y-1">
                         <p className="text-[12px] text-white font-medium">{u.profile?.nome || u.email}</p>
@@ -384,22 +406,34 @@ const GestaoUsuarios = () => {
                           {u.profile?.ativo === false && (
                             <Badge variant="outline" className="rounded-none border-red-500/40 text-red-400 text-[8px] uppercase tracking-widest">Inativo</Badge>
                           )}
+                          <Badge variant="outline" className="rounded-none border-white/10 text-white/35 text-[8px] uppercase tracking-widest">
+                            {modulosDoUsuario(u).length} módulos
+                          </Badge>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => abrirEdicao(u)}
-                          className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Editar">
-                          <Pencil size={12} />
+                        <Button variant="ghost" size="sm" onClick={() => setDetalhe(u)}
+                          className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Ver permissões">
+                          <Eye size={12} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setExcluir(u)}
-                          className="h-8 w-8 p-0 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-none" title="Excluir">
-                          <Trash2 size={12} />
-                        </Button>
+                        {isAdmin && (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => abrirEdicao(u)}
+                              className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Editar">
+                              <Pencil size={12} />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setExcluir(u)}
+                              className="h-8 w-8 p-0 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-none" title="Excluir">
+                              <Trash2 size={12} />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
+
             </div>
           </TabsContent>
 
