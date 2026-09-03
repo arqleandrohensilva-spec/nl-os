@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { Users, ShieldCheck, KeyRound, Plus, Trash2, Pencil, Loader2 } from 'lucide-react';
+import { Users, ShieldCheck, KeyRound, Plus, Trash2, Pencil, Loader2, LayoutDashboard, UserCheck, UserX, Search, Eye, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { MODULOS } from '@/hooks/use-permissoes';
+import { useUserRole } from '@/hooks/use-user-role';
 
 type Perfil = { id: string; nome: string; descricao: string | null; sistema: boolean };
 type Permissao = { perfil_id: string; modulo: string; permitido: boolean };
@@ -39,7 +40,11 @@ const inputCls = 'rounded-none bg-white/5 border-white/10 text-white text-xs pla
 const cardCls = 'bg-[#1A1816] border border-white/5 p-8';
 
 const GestaoUsuarios = () => {
-  const [tab, setTab] = useState('usuarios');
+  const { isAdmin } = useUserRole();
+  const [tab, setTab] = useState('visao');
+  const [busca, setBusca] = useState('');
+  const [filtroPerfil, setFiltroPerfil] = useState<string>('todos');
+  const [detalhe, setDetalhe] = useState<Usuario | null>(null);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
   const [permissoes, setPermissoes] = useState<Permissao[]>([]);
@@ -218,6 +223,59 @@ const GestaoUsuarios = () => {
 
   const nomePerfil = (id: string) => perfis.find((p) => p.id === id)?.nome || '—';
 
+  // ---------- dashboard / filtros ----------
+  const modulosDoUsuario = (u: Usuario) => {
+    if (u.roles.includes('admin')) return MODULOS.map((m) => m.key);
+    return [...new Set(
+      permissoes
+        .filter((p) => p.permitido && u.perfis.includes(p.perfil_id))
+        .map((p) => p.modulo),
+    )];
+  };
+
+  const metricas = useMemo(() => {
+    const seteDias = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return {
+      total: usuarios.length,
+      admins: usuarios.filter((u) => u.roles.includes('admin')).length,
+      ativos: usuarios.filter((u) => u.profile?.ativo !== false).length,
+      inativos: usuarios.filter((u) => u.profile?.ativo === false).length,
+      semPerfil: usuarios.filter((u) => !u.perfis.length && !u.roles.includes('admin')).length,
+      recentes: usuarios.filter((u) => u.last_sign_in_at && new Date(u.last_sign_in_at).getTime() > seteDias).length,
+      perfis: perfis.length,
+    };
+  }, [usuarios, perfis]);
+
+  const distribuicao = useMemo(
+    () => perfis.map((p) => ({
+      perfil: p,
+      usuarios: usuarios.filter((u) => u.perfis.includes(p.id)).length,
+      modulos: permissoes.filter((x) => x.perfil_id === p.id && x.permitido).length,
+    })),
+    [perfis, usuarios, permissoes],
+  );
+
+  const usuariosFiltrados = useMemo(() => {
+    const q = busca.trim().toLowerCase();
+    return usuarios.filter((u) => {
+      const alvo = `${u.profile?.nome || ''} ${u.email || ''}`.toLowerCase();
+      const okBusca = !q || alvo.includes(q);
+      const okPerfil =
+        filtroPerfil === 'todos' ||
+        (filtroPerfil === 'admin' && u.roles.includes('admin')) ||
+        (filtroPerfil === 'sem' && !u.perfis.length) ||
+        u.perfis.includes(filtroPerfil);
+      return okBusca && okPerfil;
+    });
+  }, [usuarios, busca, filtroPerfil]);
+
+  const abas = [
+    { v: 'visao', l: 'Visão geral' },
+    { v: 'usuarios', l: 'Usuários' },
+    ...(isAdmin ? [{ v: 'perfis', l: 'Perfis' }, { v: 'permissoes', l: 'Permissões' }] : []),
+  ];
+
+
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
@@ -232,12 +290,8 @@ const GestaoUsuarios = () => {
         </header>
 
         <Tabs value={tab} onValueChange={setTab} className="space-y-8">
-          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-none h-auto gap-1">
-            {[
-              { v: 'usuarios', l: 'Usuários' },
-              { v: 'perfis', l: 'Perfis' },
-              { v: 'permissoes', l: 'Permissões' },
-            ].map((t) => (
+          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-none h-auto gap-1 flex-wrap">
+            {abas.map((t) => (
               <TabsTrigger key={t.v} value={t.v}
                 className="rounded-none px-6 py-2.5 text-[10px] uppercase tracking-widest data-[state=active]:bg-bronze data-[state=active]:text-white">
                 {t.l}
@@ -245,25 +299,97 @@ const GestaoUsuarios = () => {
             ))}
           </TabsList>
 
+          {/* VISÃO GERAL */}
+          <TabsContent value="visao" className="space-y-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { l: 'Usuários', v: metricas.total, i: Users },
+                { l: 'Ativos', v: metricas.ativos, i: UserCheck },
+                { l: 'Inativos', v: metricas.inativos, i: UserX },
+                { l: 'Administradores', v: metricas.admins, i: ShieldCheck },
+                { l: 'Perfis de acesso', v: metricas.perfis, i: KeyRound },
+                { l: 'Sem perfil vinculado', v: metricas.semPerfil, i: UserX },
+                { l: 'Acessos em 7 dias', v: metricas.recentes, i: Clock },
+                { l: 'Módulos do sistema', v: MODULOS.length, i: LayoutDashboard },
+              ].map((m) => (
+                <div key={m.l} className="bg-[#1A1816] border border-white/5 p-6">
+                  <m.i size={14} className="text-bronze mb-4" />
+                  <p className="text-3xl font-cormorant text-white">{m.v}</p>
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest mt-1">{m.l}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className={cardCls}>
+              <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase mb-8 flex items-center gap-2">
+                <ShieldCheck size={16} className="text-bronze" /> Distribuição por perfil
+              </h3>
+              {distribuicao.length === 0 ? (
+                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum perfil cadastrado</p>
+              ) : (
+                <div className="space-y-4">
+                  {distribuicao.map((d) => (
+                    <div key={d.perfil.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] text-white uppercase tracking-widest">{d.perfil.nome}</p>
+                        <p className="text-[9px] text-white/35 uppercase tracking-widest">
+                          {d.usuarios} usuário(s) · {d.modulos}/{MODULOS.length} módulos
+                        </p>
+                      </div>
+                      <div className="h-1 bg-white/5">
+                        <div className="h-full bg-bronze transition-all"
+                          style={{ width: `${metricas.total ? (d.usuarios / metricas.total) * 100 : 0}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+
+
           {/* USUÁRIOS */}
           <TabsContent value="usuarios">
             <div className={cardCls}>
-              <div className="flex items-center justify-between mb-8">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
                 <h3 className="text-sm font-bold text-white tracking-[0.1em] uppercase flex items-center gap-2">
                   <Users size={16} className="text-bronze" /> Usuários do sistema
                 </h3>
-                <Button onClick={abrirNovo} className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
-                  <Plus size={12} className="mr-2" /> Novo usuário
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative">
+                    <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+                    <Input value={busca} onChange={(e) => setBusca(e.target.value)}
+                      placeholder="Buscar por nome ou e-mail" className={`${inputCls} pl-8 w-[240px]`} />
+                  </div>
+                  <Select value={filtroPerfil} onValueChange={setFiltroPerfil}>
+                    <SelectTrigger className="w-[190px] rounded-none bg-white/5 border-white/10 text-white text-[10px] uppercase tracking-widest">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-none bg-[#1A1816] border-white/10 text-white">
+                      <SelectItem value="todos" className="text-[11px]">Todos os perfis</SelectItem>
+                      <SelectItem value="admin" className="text-[11px]">Administradores</SelectItem>
+                      <SelectItem value="sem" className="text-[11px]">Sem perfil</SelectItem>
+                      {perfis.map((p) => (
+                        <SelectItem key={p.id} value={p.id} className="text-[11px]">{p.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {isAdmin && (
+                    <Button onClick={abrirNovo} className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
+                      <Plus size={12} className="mr-2" /> Novo usuário
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {loading ? (
                 <p className="text-[10px] text-white/30 uppercase tracking-widest animate-pulse">Carregando usuários...</p>
-              ) : usuarios.length === 0 ? (
-                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum usuário cadastrado</p>
+              ) : usuariosFiltrados.length === 0 ? (
+                <p className="text-[10px] text-white/20 uppercase tracking-widest">Nenhum usuário encontrado</p>
               ) : (
                 <div className="space-y-3">
-                  {usuarios.map((u) => (
+                  {usuariosFiltrados.map((u) => (
                     <div key={u.id} className="flex items-center justify-between border-b border-white/5 pb-3">
                       <div className="space-y-1">
                         <p className="text-[12px] text-white font-medium">{u.profile?.nome || u.email}</p>
@@ -280,22 +406,34 @@ const GestaoUsuarios = () => {
                           {u.profile?.ativo === false && (
                             <Badge variant="outline" className="rounded-none border-red-500/40 text-red-400 text-[8px] uppercase tracking-widest">Inativo</Badge>
                           )}
+                          <Badge variant="outline" className="rounded-none border-white/10 text-white/35 text-[8px] uppercase tracking-widest">
+                            {modulosDoUsuario(u).length} módulos
+                          </Badge>
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => abrirEdicao(u)}
-                          className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Editar">
-                          <Pencil size={12} />
+                        <Button variant="ghost" size="sm" onClick={() => setDetalhe(u)}
+                          className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Ver permissões">
+                          <Eye size={12} />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => setExcluir(u)}
-                          className="h-8 w-8 p-0 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-none" title="Excluir">
-                          <Trash2 size={12} />
-                        </Button>
+                        {isAdmin && (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => abrirEdicao(u)}
+                              className="h-8 w-8 p-0 text-white/40 hover:text-bronze hover:bg-bronze/10 rounded-none" title="Editar">
+                              <Pencil size={12} />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => setExcluir(u)}
+                              className="h-8 w-8 p-0 text-white/40 hover:text-red-400 hover:bg-red-500/10 rounded-none" title="Excluir">
+                              <Trash2 size={12} />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   ))}
                 </div>
               )}
+
             </div>
           </TabsContent>
 
@@ -520,6 +658,80 @@ const GestaoUsuarios = () => {
               className="rounded-none text-[10px] uppercase tracking-widest text-white/50 hover:text-white">Cancelar</Button>
             <Button onClick={salvarPerfil}
               className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DETALHE DO USUÁRIO — PERMISSÕES HERDADAS */}
+      <Dialog open={!!detalhe} onOpenChange={(o) => !o && setDetalhe(null)}>
+        <DialogContent className="rounded-none bg-[#1A1816] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-cormorant italic text-2xl">
+              {detalhe?.profile?.nome || detalhe?.email}
+            </DialogTitle>
+            <DialogDescription className="text-[10px] uppercase tracking-widest text-white/35">
+              Perfis vinculados e permissões herdadas
+            </DialogDescription>
+          </DialogHeader>
+
+          {detalhe && (
+            <div className="space-y-6 py-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-white/10 p-4">
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest">Situação</p>
+                  <p className="text-[11px] text-white mt-1">{detalhe.profile?.ativo === false ? 'Inativo' : 'Ativo'}</p>
+                </div>
+                <div className="border border-white/10 p-4">
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest">Último acesso</p>
+                  <p className="text-[11px] text-white mt-1">
+                    {detalhe.last_sign_in_at ? new Date(detalhe.last_sign_in_at).toLocaleString('pt-BR') : 'Nunca acessou'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-widest text-white/50">Perfis</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {detalhe.roles.includes('admin') && (
+                    <Badge className="rounded-none bg-bronze text-white text-[8px] uppercase tracking-widest">Administrador</Badge>
+                  )}
+                  {detalhe.perfis.length === 0 && !detalhe.roles.includes('admin') && (
+                    <span className="text-[10px] text-white/30 uppercase tracking-widest">Nenhum perfil vinculado</span>
+                  )}
+                  {detalhe.perfis.map((pid) => (
+                    <Badge key={pid} variant="outline" className="rounded-none border-white/15 text-white/50 text-[8px] uppercase tracking-widest">
+                      {nomePerfil(pid)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-widest text-white/50">Permissões herdadas</p>
+                <div className="border border-white/10 divide-y divide-white/5">
+                  {MODULOS.map((m) => {
+                    const ok = modulosDoUsuario(detalhe).includes(m.key);
+                    return (
+                      <div key={m.key} className="flex items-center justify-between px-4 py-2.5">
+                        <span className={`text-[11px] ${ok ? 'text-white' : 'text-white/25'}`}>{m.nome}</span>
+                        <span className={`text-[8px] uppercase tracking-widest ${ok ? 'text-bronze' : 'text-white/20'}`}>
+                          {ok ? 'Permitido' : 'Bloqueado'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            {isAdmin && detalhe && (
+              <Button onClick={() => { const u = detalhe; setDetalhe(null); abrirEdicao(u); }}
+                className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
+                Editar usuário
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
