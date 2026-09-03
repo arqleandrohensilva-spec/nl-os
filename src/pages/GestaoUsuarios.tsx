@@ -662,6 +662,80 @@ const GestaoUsuarios = () => {
         </DialogContent>
       </Dialog>
 
+      {/* DETALHE DO USUÁRIO — PERMISSÕES HERDADAS */}
+      <Dialog open={!!detalhe} onOpenChange={(o) => !o && setDetalhe(null)}>
+        <DialogContent className="rounded-none bg-[#1A1816] border-white/10 text-white max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-cormorant italic text-2xl">
+              {detalhe?.profile?.nome || detalhe?.email}
+            </DialogTitle>
+            <DialogDescription className="text-[10px] uppercase tracking-widest text-white/35">
+              Perfis vinculados e permissões herdadas
+            </DialogDescription>
+          </DialogHeader>
+
+          {detalhe && (
+            <div className="space-y-6 py-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border border-white/10 p-4">
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest">Situação</p>
+                  <p className="text-[11px] text-white mt-1">{detalhe.profile?.ativo === false ? 'Inativo' : 'Ativo'}</p>
+                </div>
+                <div className="border border-white/10 p-4">
+                  <p className="text-[9px] text-white/35 uppercase tracking-widest">Último acesso</p>
+                  <p className="text-[11px] text-white mt-1">
+                    {detalhe.last_sign_in_at ? new Date(detalhe.last_sign_in_at).toLocaleString('pt-BR') : 'Nunca acessou'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-widest text-white/50">Perfis</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {detalhe.roles.includes('admin') && (
+                    <Badge className="rounded-none bg-bronze text-white text-[8px] uppercase tracking-widest">Administrador</Badge>
+                  )}
+                  {detalhe.perfis.length === 0 && !detalhe.roles.includes('admin') && (
+                    <span className="text-[10px] text-white/30 uppercase tracking-widest">Nenhum perfil vinculado</span>
+                  )}
+                  {detalhe.perfis.map((pid) => (
+                    <Badge key={pid} variant="outline" className="rounded-none border-white/15 text-white/50 text-[8px] uppercase tracking-widest">
+                      {nomePerfil(pid)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-[10px] uppercase tracking-widest text-white/50">Permissões herdadas</p>
+                <div className="border border-white/10 divide-y divide-white/5">
+                  {MODULOS.map((m) => {
+                    const ok = modulosDoUsuario(detalhe).includes(m.key);
+                    return (
+                      <div key={m.key} className="flex items-center justify-between px-4 py-2.5">
+                        <span className={`text-[11px] ${ok ? 'text-white' : 'text-white/25'}`}>{m.nome}</span>
+                        <span className={`text-[8px] uppercase tracking-widest ${ok ? 'text-bronze' : 'text-white/20'}`}>
+                          {ok ? 'Permitido' : 'Bloqueado'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            {isAdmin && detalhe && (
+              <Button onClick={() => { const u = detalhe; setDetalhe(null); abrirEdicao(u); }}
+                className="rounded-none bg-bronze hover:bg-bronze/80 text-white uppercase tracking-widest text-[10px] font-bold">
+                Editar usuário
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* CONFIRMAÇÕES */}
       <AlertDialog open={!!excluir} onOpenChange={(o) => !o && setExcluir(null)}>
         <AlertDialogContent className="rounded-none bg-[#1A1816] border-white/10 text-white">
