@@ -40,7 +40,11 @@ const inputCls = 'rounded-none bg-white/5 border-white/10 text-white text-xs pla
 const cardCls = 'bg-[#1A1816] border border-white/5 p-8';
 
 const GestaoUsuarios = () => {
-  const [tab, setTab] = useState('usuarios');
+  const { isAdmin } = useUserRole();
+  const [tab, setTab] = useState('visao');
+  const [busca, setBusca] = useState('');
+  const [filtroPerfil, setFiltroPerfil] = useState<string>('todos');
+  const [detalhe, setDetalhe] = useState<Usuario | null>(null);
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
   const [permissoes, setPermissoes] = useState<Permissao[]>([]);
