@@ -223,6 +223,59 @@ const GestaoUsuarios = () => {
 
   const nomePerfil = (id: string) => perfis.find((p) => p.id === id)?.nome || '—';
 
+  // ---------- dashboard / filtros ----------
+  const modulosDoUsuario = (u: Usuario) => {
+    if (u.roles.includes('admin')) return MODULOS.map((m) => m.key);
+    return [...new Set(
+      permissoes
+        .filter((p) => p.permitido && u.perfis.includes(p.perfil_id))
+        .map((p) => p.modulo),
+    )];
+  };
+
+  const metricas = useMemo(() => {
+    const seteDias = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return {
+      total: usuarios.length,
+      admins: usuarios.filter((u) => u.roles.includes('admin')).length,
+      ativos: usuarios.filter((u) => u.profile?.ativo !== false).length,
+      inativos: usuarios.filter((u) => u.profile?.ativo === false).length,
+      semPerfil: usuarios.filter((u) => !u.perfis.length && !u.roles.includes('admin')).length,
+      recentes: usuarios.filter((u) => u.last_sign_in_at && new Date(u.last_sign_in_at).getTime() > seteDias).length,
+      perfis: perfis.length,
+    };
+  }, [usuarios, perfis]);
+
+  const distribuicao = useMemo(
+    () => perfis.map((p) => ({
+      perfil: p,
+      usuarios: usuarios.filter((u) => u.perfis.includes(p.id)).length,
+      modulos: permissoes.filter((x) => x.perfil_id === p.id && x.permitido).length,
+    })),
+    [perfis, usuarios, permissoes],
+  );
+
+  const usuariosFiltrados = useMemo(() => {
+    const q = busca.trim().toLowerCase();
+    return usuarios.filter((u) => {
+      const alvo = `${u.profile?.nome || ''} ${u.email || ''}`.toLowerCase();
+      const okBusca = !q || alvo.includes(q);
+      const okPerfil =
+        filtroPerfil === 'todos' ||
+        (filtroPerfil === 'admin' && u.roles.includes('admin')) ||
+        (filtroPerfil === 'sem' && !u.perfis.length) ||
+        u.perfis.includes(filtroPerfil);
+      return okBusca && okPerfil;
+    });
+  }, [usuarios, busca, filtroPerfil]);
+
+  const abas = [
+    { v: 'visao', l: 'Visão geral' },
+    { v: 'usuarios', l: 'Usuários' },
+    ...(isAdmin ? [{ v: 'perfis', l: 'Perfis' }, { v: 'permissoes', l: 'Permissões' }] : []),
+  ];
+
+
   return (
     <div className="flex min-h-screen bg-[#0F0F0F]">
       <Sidebar user={sessionStorage.getItem('nl_user') || 'Sócio'} />
