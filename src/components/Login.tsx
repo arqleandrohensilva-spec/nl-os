@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Eye, EyeOff } from 'lucide-react';
+import logo from '@/assets/logo.png';
 
 const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   const [username, setUsername] = useState('');
@@ -55,9 +56,11 @@ const Login = ({ onLogin }: { onLogin: (user: string) => void }) => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <div className="w-full max-w-[320px] flex flex-col items-center">
-        <h1 className="text-2xl tracking-[0.22em] text-graphite font-light mb-2">
-          NL ARQUITETOS
-        </h1>
+        <img
+          src={logo}
+          alt="NL Arquitetos"
+          className="h-20 w-auto object-contain mx-auto mb-2"
+        />
         <p className="text-[10px] font-medium text-graphite/50 uppercase tracking-[0.2em] mb-6">
           Sistema Operacional · NL Arquitetos
         </p>
