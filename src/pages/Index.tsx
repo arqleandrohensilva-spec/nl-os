@@ -30,6 +30,7 @@ import {
 import { parseISO, differenceInDays, isBefore, startOfDay } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
+import { NL_LOGO_PDF_DATA_URL } from '@/assets/logo-pdf';
 import autoTable from 'jspdf-autotable';
 import { cn } from '@/lib/utils';
 import { 
