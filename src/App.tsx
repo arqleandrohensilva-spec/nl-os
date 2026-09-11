@@ -24,7 +24,7 @@ import ConfiguracoesSistema from "./pages/ConfiguracoesSistema.tsx";
 import BriefingPublic from "./pages/BriefingPublic.tsx";
 import SatisfacaoDashboard from "./pages/SatisfacaoDashboard.tsx";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao.tsx";
-import MarketingIA from "./pages/MarketingIA.tsx";
+
 import ScriptsAtendimento from "./pages/ScriptsAtendimento.tsx";
 import ModoApresentacao from "./pages/ModoApresentacao.tsx";
 import PaginaCliente from "./pages/PaginaCliente.tsx";
@@ -98,7 +98,7 @@ const App = () => (
             <Route path="/sistema/admin" element={<AdminRoute><PainelAdministrativo /></AdminRoute>} />
             <Route path="/sistema/usuarios" element={<AdminRoute><GestaoUsuarios /></AdminRoute>} />
             <Route path="/marketing/satisfacao" element={<SatisfacaoDashboard />} />
-            <Route path="/marketing/ia" element={<MarketingIA />} />
+            
             <Route path="/scripts-atendimento" element={<ScriptsAtendimento />} />
             <Route path="/apresentacao/:id" element={<ModoApresentacao />} />
           </Route>

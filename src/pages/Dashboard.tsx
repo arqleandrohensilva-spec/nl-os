@@ -1016,10 +1016,13 @@ const Dashboard = () => {
                       </p>
                       <Button 
                         onClick={() => {
+                          if (aiInsight.modulo === 'marketing') {
+                            window.open('https://nlosmktv2.lovable.app', '_blank');
+                            return;
+                          }
                           const routeMap: Record<string, string> = {
                             'pipeline': '/pipeline',
                             'financeiro': '/financeiro/base',
-                            'marketing': '/marketing/ia',
                             'sistemas': '/sistema/configuracoes',
                             'projetos': '/projetos/gestao'
                           };

@@ -227,7 +227,7 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
       setOpenSections(prev => ({ ...prev, 'CONFIGURAÇÕES': true }));
     } else if (path === '/sistema/configuracoes') {
       setOpenSections(prev => ({ ...prev, 'CONFIGURAÇÕES': true }));
-    } else if (path === '/marketing/ia' || path === '/marketing/satisfacao' || path === '/scripts-atendimento') {
+    } else if (path === '/marketing/satisfacao' || path === '/scripts-atendimento') {
       setOpenSections(prev => ({ ...prev, 'MARKETING': true }));
     } else if (path === '/calculadora' || path.startsWith('/calculadora/') || path === '/propostas/tracking') {
       setOpenSections(prev => ({ ...prev, 'PROPOSTAS': true }));
@@ -571,12 +571,6 @@ const Sidebar = ({ user: initialUser }: { user: string }) => {
           onPopoverClick={(label, top) => { setPopoverAberto(label); setPopoverPosition(top); }}
           isPopoverOpen={popoverAberto === 'MARKETING'}
         >
-          <NavItem 
-            label="Marketing com IA" 
-            active={location.pathname === '/marketing/ia'} 
-            onClick={() => navigate('/marketing/ia')} 
-            isCollapsed={isCollapsed}
-          />
           <NavItem 
             label="Pesquisa de Satisfação" 
             active={location.pathname === '/marketing/satisfacao'} 
