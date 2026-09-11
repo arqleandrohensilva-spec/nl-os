@@ -439,6 +439,7 @@ export type Database = {
           created_at: string | null
           etapa_atual: string | null
           id: string
+          projeto_id: string | null
           proxima_entrega: string | null
           status: string | null
           tipo: string | null
@@ -449,6 +450,7 @@ export type Database = {
           created_at?: string | null
           etapa_atual?: string | null
           id?: string
+          projeto_id?: string | null
           proxima_entrega?: string | null
           status?: string | null
           tipo?: string | null
@@ -459,6 +461,7 @@ export type Database = {
           created_at?: string | null
           etapa_atual?: string | null
           id?: string
+          projeto_id?: string | null
           proxima_entrega?: string | null
           status?: string | null
           tipo?: string | null
