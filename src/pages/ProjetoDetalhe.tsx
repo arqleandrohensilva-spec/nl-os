@@ -222,7 +222,7 @@ const ProjetoDetalhe = () => {
       if (error) throw error;
 
       toast.success("Contexto enviado para o Marketing IA");
-      navigate('/marketing/ia?tab=captions');
+      window.open('https://nlosmktv2.lovable.app', '_blank');
     } catch (error: any) {
       console.error('Error sending to marketing IA:', error);
       toast.error('Erro ao enviar contexto: ' + error.message);
