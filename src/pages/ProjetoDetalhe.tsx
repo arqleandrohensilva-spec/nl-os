@@ -211,6 +211,7 @@ const ProjetoDetalhe = () => {
       const { error } = await supabase
         .from('contexto_marketing_ativo')
         .insert({
+          projeto_id: projeto.id,
           cliente: projeto.nome_cliente,
           tipo: projeto.tipo,
           etapa_atual: projeto.etapa_atual,
