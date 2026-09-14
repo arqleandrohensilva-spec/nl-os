@@ -17,6 +17,14 @@ export async function excluirClienteCompleto(
 ): Promise<ResultadoExclusao> {
   const { excluirDropbox = true } = opcoes;
 
+  // Guarda: id precisa ser um UUID real. Leads sem cliente vinculado abrem a
+  // ficha em /clientes/null, e a string "null" passava batido gerando o erro
+  // "invalid input syntax for type uuid: null" no banco.
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!clienteId || !UUID_RE.test(clienteId)) {
+    throw new Error('Cliente sem ID válido — nada a excluir (provável lead sem cliente vinculado).');
+  }
+
   const { data: cliente, error: clienteError } = await supabase
     .from('clientes')
     .select('id, nome, tipo_projeto')

@@ -39,7 +39,16 @@ const ClienteFicha = () => {
   const [openSections, setOpenSections] = useState<string[]>(['ficha']);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isNewClient, setIsNewClient] = useState(!id);
-  
+
+  // Rota /clientes/null (lead sem cliente vinculado) chega com id === "null".
+  // Redireciona pra lista em vez de abrir uma ficha quebrada.
+  useEffect(() => {
+    if (id && (id === 'null' || id === 'undefined')) {
+      toast.error('Este lead não tem um cliente vinculado.');
+      navigate('/clientes');
+    }
+  }, [id, navigate]);
+
   useEffect(() => {
     setIsNewClient(!id);
     if (!id) {
