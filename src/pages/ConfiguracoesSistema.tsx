@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ExclusaoClientes from '@/components/ExclusaoClientes';
 
 const iconMap: Record<string, any> = {
   ClipboardList,
