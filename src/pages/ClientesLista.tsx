@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import BriefingModal from '@/components/BriefingModal';
+import { excluirClienteCompleto } from '@/lib/excluir-cliente';
 
 
 const STAGE_MAP: Record<string, { label: string; color: string }> = {
