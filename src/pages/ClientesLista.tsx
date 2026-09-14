@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye, Trash2 } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye, Trash2, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -146,10 +146,18 @@ const ClientesLista = () => {
       );
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       queryClient.invalidateQueries({ queryKey: ['clientes-exclusao'] });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     } catch (error: any) {
       console.error('Erro ao excluir cliente:', error);
       toast.error('Erro ao excluir cliente: ' + (error?.message || 'tente novamente'));
     }
+  };
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['clientes'] });
+    queryClient.invalidateQueries({ queryKey: ['briefings-pendentes'] });
+    queryClient.invalidateQueries({ queryKey: ['leads'] });
+    toast.success("Lista atualizada");
   };
 
   const handleArquivar = async (briefingId: string) => {
@@ -186,13 +194,24 @@ const ClientesLista = () => {
             <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] mt-1 font-['Courier_New']">Gestão da carteira NL OS</p>
           </div>
           
-          <Button 
-            onClick={() => navigate('/clientes/novo')}
-            className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest"
-          >
-            <Plus size={16} className="mr-2" />
-            NOVO CLIENTE
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleRefresh}
+              variant="ghost"
+              title="Atualizar lista"
+              className="bg-transparent border border-white/10 text-white/60 hover:text-[#8B7355] hover:border-[#8B7355] rounded-none px-4 font-['Courier_New'] text-xs font-bold uppercase tracking-widest"
+            >
+              <RefreshCw size={16} className="mr-2" />
+              ATUALIZAR
+            </Button>
+            <Button
+              onClick={() => navigate('/clientes/novo')}
+              className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest"
+            >
+              <Plus size={16} className="mr-2" />
+              NOVO CLIENTE
+            </Button>
+          </div>
         </div>
 
         {briefingsPendentes && briefingsPendentes.length > 0 && (

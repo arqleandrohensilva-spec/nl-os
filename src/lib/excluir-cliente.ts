@@ -75,6 +75,7 @@ export async function excluirClienteCompleto(
   }
 
   // 3) Registros vinculados diretamente ao cliente
+  await supabase.from('leads').delete().eq('cliente_id', clienteId); // Pipeline
   await supabase.from('financeiro_parcelas').delete().eq('cliente_id', clienteId);
   await supabase.from('contratos').delete().eq('cliente_id', clienteId);
   await supabase.from('proposals').delete().eq('cliente_id', clienteId);

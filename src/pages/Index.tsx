@@ -13,6 +13,7 @@ import {
   Settings2,
   Eye,
   Download,
+  RefreshCw,
   Users,
   X,
   TrendingUp,
@@ -694,8 +695,15 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-6">
-
-              <button 
+              <button
+                onClick={() => { fetchLeads(); toast.success('Pipeline atualizado'); }}
+                disabled={isLoading}
+                className="p-2 text-white/40 hover:text-bronze transition-colors disabled:opacity-40"
+                title="Atualizar Pipeline"
+              >
+                <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
+              </button>
+              <button
                 onClick={exportToPDF}
                 className="p-2 text-white/40 hover:text-bronze transition-colors"
                 title="Exportar Pipeline"

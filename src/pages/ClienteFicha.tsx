@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, History, User, Phone, Pencil, Save, Clock, Copy, ExternalLink, Check, Calendar, Plus, Eye, Calculator, ChevronDown, Loader2, Info, Download } from 'lucide-react';
+import { ArrowLeft, History, User, Phone, Pencil, Save, Clock, Copy, ExternalLink, Check, Calendar, Plus, Eye, Calculator, ChevronDown, Loader2, Info, Download, Trash2 } from 'lucide-react';
+import { excluirClienteCompleto } from '@/lib/excluir-cliente';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -1056,6 +1057,32 @@ const ClienteFicha = () => {
                     className="bg-transparent border border-[#8B7355] text-[#8B7355] hover:bg-[#8B7355] hover:text-[#0D0D0D] rounded-none px-6 ml-8 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-colors"
                   >
                     {isEditing ? 'SALVAR' : 'EDITAR'}
+                  </Button>
+                )}
+                {id && !isEditing && (
+                  <Button
+                    onClick={async () => {
+                      if (!confirm(`Excluir ${formData.nome || 'este cliente'} do sistema? Serão apagados os projetos, o lead no Pipeline e os registros vinculados, além da pasta no Dropbox. Esta ação não pode ser desfeita.`)) return;
+                      try {
+                        const resultado = await excluirClienteCompleto(id, { excluirDropbox: true });
+                        queryClient.invalidateQueries({ queryKey: ['clientes'] });
+                        queryClient.invalidateQueries({ queryKey: ['leads'] });
+                        toast.success(
+                          `Cliente excluído. Pastas removidas no Dropbox: ${resultado.pastasExcluidas.length}` +
+                          (resultado.pastasComFalha.length ? ` · falhas: ${resultado.pastasComFalha.length}` : '')
+                        );
+                        navigate('/clientes');
+                      } catch (err: any) {
+                        console.error('Erro ao excluir cliente:', err);
+                        toast.error('Erro ao excluir cliente: ' + (err?.message || 'tente novamente'));
+                      }
+                    }}
+                    variant="ghost"
+                    title="Excluir cliente do sistema"
+                    className="bg-transparent border border-red-500/40 text-red-400 hover:bg-red-500 hover:text-white rounded-none px-6 ml-3 font-['Courier_New'] text-[10px] font-bold uppercase tracking-widest transition-colors"
+                  >
+                    <Trash2 size={14} className="mr-2" />
+                    EXCLUIR
                   </Button>
                 )}
               </div>
