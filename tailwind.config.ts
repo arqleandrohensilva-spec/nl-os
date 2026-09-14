@@ -77,7 +77,9 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        cormorant: ['"Cormorant Garamond"', 'serif'],
+        // Tipografia unificada: a classe font-cormorant renderiza Inter.
+        cormorant: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },
