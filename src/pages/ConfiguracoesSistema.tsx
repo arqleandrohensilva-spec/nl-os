@@ -578,6 +578,10 @@ const ConfiguracoesSistema = () => {
               </div>
             </div>
           </div>
+
+          <div className="mt-8">
+            <ExclusaoClientes />
+          </div>
         </div>
       </main>
     </div>
