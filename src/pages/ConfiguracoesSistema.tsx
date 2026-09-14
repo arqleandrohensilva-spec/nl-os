@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import ExclusaoClientes from '@/components/ExclusaoClientes';
 
 const iconMap: Record<string, any> = {
   ClipboardList,
@@ -577,6 +578,10 @@ const ConfiguracoesSistema = () => {
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-8">
+            <ExclusaoClientes />
           </div>
         </div>
       </main>
