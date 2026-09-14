@@ -134,21 +134,20 @@ const ClientesLista = () => {
 
   const handleExcluirCliente = async (e: React.MouseEvent, id: string, nome: string) => {
     e.stopPropagation();
-    if (!confirm(`Tem certeza que deseja excluir o cliente ${nome}? Esta ação não pode ser desfeita.`)) return;
+    if (!confirm(`Tem certeza que deseja excluir o cliente ${nome}? Serão apagados os projetos e registros vinculados, além da pasta do projeto no Dropbox. Esta ação não pode ser desfeita.`)) return;
 
     try {
-      const { error } = await supabase
-        .from('clientes')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
+      const resultado = await excluirClienteCompleto(id, { excluirDropbox: true });
 
-      toast.success("Cliente excluído com sucesso");
+      toast.success(
+        `Cliente excluído. Pastas removidas no Dropbox: ${resultado.pastasExcluidas.length}` +
+        (resultado.pastasComFalha.length ? ` · falhas: ${resultado.pastasComFalha.length}` : '')
+      );
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
-    } catch (error) {
+      queryClient.invalidateQueries({ queryKey: ['clientes-exclusao'] });
+    } catch (error: any) {
       console.error('Erro ao excluir cliente:', error);
-      toast.error('Erro ao excluir cliente');
+      toast.error('Erro ao excluir cliente: ' + (error?.message || 'tente novamente'));
     }
   };
 
