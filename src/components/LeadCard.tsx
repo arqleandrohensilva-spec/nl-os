@@ -1,10 +1,27 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Lead } from '@/lib/types';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MoreVertical } from 'lucide-react';
 import { parseISO, differenceInDays } from 'date-fns';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+} from '@/components/ui/dropdown-menu';
+
+const STAGES_MOVER = [
+  'Novo Lead',
+  'Reunião Agendada',
+  'Briefing Preenchido',
+  'Proposta Enviada',
+  'Negociação',
+  'Fechado',
+  'Perdido',
+];
 
 interface LeadCardProps {
   lead: Lead;
@@ -16,7 +33,7 @@ interface LeadCardProps {
   onConvertProject?: (lead: Lead) => void;
 }
 
-const LeadCard = ({ lead, onClick }: LeadCardProps) => {
+const LeadCard = ({ lead, onClick, onUpdateStatus }: LeadCardProps) => {
   const dataRef = lead.etapa_desde || (lead as any).updated_at || (lead as any).created_at || (lead as any).criado_em || lead.criado;
   const daysInStage = dataRef 
     ? Math.floor((new Date().getTime() - new Date(dataRef).getTime()) / (1000 * 60 * 60 * 24))
@@ -73,15 +90,46 @@ const LeadCard = ({ lead, onClick }: LeadCardProps) => {
         lead.stage === 'Perdido' && "opacity-40 grayscale-[0.5]"
       )}
     >
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start gap-2">
         <h3 className="text-white font-medium text-sm leading-tight truncate pr-2">
           {lead.nome}
         </h3>
-        {formatCurrency(lead.orcamento) && (
-          <span className="text-white/80 text-[10px] font-medium whitespace-nowrap">
-            {formatCurrency(lead.orcamento)}
-          </span>
-        )}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {formatCurrency(lead.orcamento) && (
+            <span className="text-white/80 text-[10px] font-medium whitespace-nowrap">
+              {formatCurrency(lead.orcamento)}
+            </span>
+          )}
+          {onUpdateStatus && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-white/40 hover:text-white transition-opacity p-0.5 -mr-1 rounded-sm"
+                  aria-label="Mover lead de etapa"
+                >
+                  <MoreVertical size={14} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuLabel>Mover para</DropdownMenuLabel>
+                {STAGES_MOVER.filter((s) => s !== lead.stage).map((s) => (
+                  <DropdownMenuItem
+                    key={s}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onUpdateStatus(lead.id, s);
+                    }}
+                  >
+                    {s}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       <div className="text-white/40 text-[10px] uppercase tracking-wider truncate">

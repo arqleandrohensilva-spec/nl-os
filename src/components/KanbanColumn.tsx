@@ -43,10 +43,10 @@ const KanbanColumn = ({ stage, leads, onLeadClick, onUpdateStatus, onQuickNote, 
     <div className={cn(
       "w-full flex-shrink-1 flex flex-col h-full bg-[#111111] border transition-all duration-200 rounded-[2px]",
       isOver ? "border-bronze shadow-[inset_0_0_0_1px_#8B7355]" : "border-white/10",
-      isLost && "opacity-45 bg-black/[0.02]"
+      isLost && !isOver && "bg-red-500/[0.04] border-red-500/20"
     )}>
       {/* Header */}
-      <div className={cn("p-6 pb-4 relative", isLost && "opacity-45")}>
+      <div className={cn("p-6 pb-4 relative")}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div 
