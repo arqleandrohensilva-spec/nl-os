@@ -2,9 +2,70 @@ import { supabase } from '@/integrations/supabase/client';
 
 const BASE_DROPBOX = '/NL Arquitetos/07 - Projetos NL OS/01 - Clientes';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function normalizarWhats(w?: string | null): string {
+  return (w ?? '').replace(/\D/g, '');
+}
+
 export interface ResultadoExclusao {
   pastasExcluidas: string[];
   pastasComFalha: string[];
+}
+
+/**
+ * SOFT DELETE — "arquiva" o cliente e seus leads (marca excluido=true).
+ * Some de todas as telas (Clientes, Pipeline, Dashboard...) mas continua no
+ * banco, listável na aba "Excluídos" e restaurável. Também pega leads órfãos
+ * (sem cliente_id) casando pelo WhatsApp/nome, que era o que sobrava no Pipeline.
+ */
+export async function arquivarCliente(clienteId: string): Promise<void> {
+  if (!clienteId || !UUID_RE.test(clienteId)) {
+    throw new Error('Cliente sem ID válido — nada a excluir (provável lead sem cliente vinculado).');
+  }
+  const agora = new Date().toISOString();
+
+  const { data: cliente, error: cliErr } = await supabase
+    .from('clientes')
+    .select('id, nome, whatsapp')
+    .eq('id', clienteId)
+    .maybeSingle();
+  if (cliErr) throw cliErr;
+  if (!cliente) throw new Error('Cliente não encontrado.');
+
+  // Leads vinculados
+  const { error: leadErr } = await supabase
+    .from('leads')
+    .update({ excluido: true, excluido_em: agora })
+    .eq('cliente_id', clienteId);
+  if (leadErr) throw leadErr;
+
+  // Leads órfãos (sem cliente_id) que casam pelo WhatsApp/nome do cliente
+  const whats = normalizarWhats(cliente.whatsapp);
+  if (whats) {
+    const { data: orfaos } = await supabase.from('leads').select('id, whats').is('cliente_id', null);
+    const ids = (orfaos || []).filter((l: any) => normalizarWhats(l.whats) === whats).map((l: any) => l.id);
+    if (ids.length) {
+      await supabase.from('leads').update({ excluido: true, excluido_em: agora }).in('id', ids);
+    }
+  }
+
+  const { error } = await supabase
+    .from('clientes')
+    .update({ excluido: true, excluido_em: agora })
+    .eq('id', clienteId);
+  if (error) throw error;
+}
+
+/** Restaura um cliente arquivado (e seus leads) de volta ao sistema. */
+export async function restaurarCliente(clienteId: string): Promise<void> {
+  if (!clienteId || !UUID_RE.test(clienteId)) throw new Error('Cliente sem ID válido.');
+  await supabase.from('leads').update({ excluido: false, excluido_em: null }).eq('cliente_id', clienteId);
+  const { error } = await supabase
+    .from('clientes')
+    .update({ excluido: false, excluido_em: null })
+    .eq('id', clienteId);
+  if (error) throw error;
 }
 
 /**

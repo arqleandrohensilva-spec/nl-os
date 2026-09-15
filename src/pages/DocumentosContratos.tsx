@@ -337,7 +337,7 @@ const DocumentosContratos = () => {
         { data: cData },
         { data: hData }
       ] = await Promise.all([
-        supabase.from('leads').select('*').order('nome', { ascending: true }),
+        supabase.from('leads').select('*').eq('excluido', false).order('nome', { ascending: true }),
         supabase.from('projetos').select('*').order('nome', { ascending: true }),
         supabase.from('briefings').select('*, leads(nome)').order('criado_em', { ascending: false }),
         supabase.from('contratos').select('*, projetos(nome, nome_cliente)').order('criado_em', { ascending: false }),

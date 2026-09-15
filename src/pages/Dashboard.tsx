@@ -123,7 +123,7 @@ const Dashboard = () => {
   const { data: leads = [] } = useQuery({
     queryKey: ['leads-dashboard'],
     queryFn: async () => {
-      const { data } = await supabase.from('leads').select('*');
+      const { data } = await supabase.from('leads').select('*').eq('excluido', false);
       return data || [];
     }
   });

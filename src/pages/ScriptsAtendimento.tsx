@@ -62,7 +62,7 @@ const ScriptsAtendimento = () => {
 
   useEffect(() => {
     const fetchLeads = async () => {
-      const { data } = await supabase.from('leads').select('id, nome, tipo, city, stage, area, origem');
+      const { data } = await supabase.from('leads').select('id, nome, tipo, city, stage, area, origem').eq('excluido', false);
       if (data) {
         const mappedLeads = data.map((l: any) => ({
           ...l,

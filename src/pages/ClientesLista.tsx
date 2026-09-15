@@ -4,14 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import Sidebar from '@/components/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye, Trash2, RefreshCw } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, User, Clock, Check, X as XIcon, Eye, Trash2, RefreshCw, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import BriefingModal from '@/components/BriefingModal';
-import { excluirClienteCompleto } from '@/lib/excluir-cliente';
+import { excluirClienteCompleto, arquivarCliente, restaurarCliente } from '@/lib/excluir-cliente';
 
 
 const STAGE_MAP: Record<string, { label: string; color: string }> = {
@@ -28,6 +28,7 @@ const ClientesLista = () => {
   const [search, setSearch] = useState('');
   const [selectedBriefing, setSelectedBriefing] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [aba, setAba] = useState<'ativos' | 'excluidos'>('ativos');
 
 
   const queryClient = useQueryClient();
@@ -45,11 +46,12 @@ const ClientesLista = () => {
   });
 
   const { data: clientes, isLoading } = useQuery({
-    queryKey: ['clientes'],
+    queryKey: ['clientes', aba],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('clientes')
         .select('*')
+        .eq('excluido', aba === 'excluidos')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data;
@@ -133,23 +135,52 @@ const ClientesLista = () => {
     }
   };
 
+  // Soft delete: manda o cliente (e seus leads) pra aba "Excluídos".
   const handleExcluirCliente = async (e: React.MouseEvent, id: string, nome: string) => {
     e.stopPropagation();
-    if (!confirm(`Tem certeza que deseja excluir o cliente ${nome}? Serão apagados os projetos e registros vinculados, além da pasta do projeto no Dropbox. Esta ação não pode ser desfeita.`)) return;
-
+    if (!confirm(`Mover ${nome} para "Excluídos"? Ele some do sistema (Clientes, Pipeline, Dashboard), mas pode ser restaurado depois.`)) return;
     try {
-      const resultado = await excluirClienteCompleto(id, { excluirDropbox: true });
-
-      toast.success(
-        `Cliente excluído. Pastas removidas no Dropbox: ${resultado.pastasExcluidas.length}` +
-        (resultado.pastasComFalha.length ? ` · falhas: ${resultado.pastasComFalha.length}` : '')
-      );
+      await arquivarCliente(id);
+      toast.success(`${nome} movido para Excluídos`);
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
       queryClient.invalidateQueries({ queryKey: ['clientes-exclusao'] });
       queryClient.invalidateQueries({ queryKey: ['leads'] });
     } catch (error: any) {
       console.error('Erro ao excluir cliente:', error);
       toast.error('Erro ao excluir cliente: ' + (error?.message || 'tente novamente'));
+    }
+  };
+
+  // Restaura um cliente arquivado de volta ao sistema.
+  const handleRestaurar = async (e: React.MouseEvent, id: string, nome: string) => {
+    e.stopPropagation();
+    try {
+      await restaurarCliente(id);
+      toast.success(`${nome} restaurado`);
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+    } catch (error: any) {
+      console.error('Erro ao restaurar cliente:', error);
+      toast.error('Erro ao restaurar: ' + (error?.message || 'tente novamente'));
+    }
+  };
+
+  // Exclusão DEFINITIVA (irreversível): apaga tudo + pasta no Dropbox.
+  const handleExcluirDefinitivo = async (e: React.MouseEvent, id: string, nome: string) => {
+    e.stopPropagation();
+    if (!confirm(`EXCLUIR DEFINITIVAMENTE ${nome}? Apaga projetos, registros e a pasta no Dropbox. NÃO pode ser desfeito.`)) return;
+    try {
+      const resultado = await excluirClienteCompleto(id, { excluirDropbox: true });
+      toast.success(
+        `Cliente excluído de vez. Pastas removidas no Dropbox: ${resultado.pastasExcluidas.length}` +
+        (resultado.pastasComFalha.length ? ` · falhas: ${resultado.pastasComFalha.length}` : '')
+      );
+      queryClient.invalidateQueries({ queryKey: ['clientes'] });
+      queryClient.invalidateQueries({ queryKey: ['clientes-exclusao'] });
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
+    } catch (error: any) {
+      console.error('Erro ao excluir definitivamente:', error);
+      toast.error('Erro ao excluir: ' + (error?.message || 'tente novamente'));
     }
   };
 
@@ -293,8 +324,24 @@ const ClientesLista = () => {
           </div>
         )}
 
-        <div className="flex items-center gap-3 mb-8">
-          <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF]/40 tracking-widest uppercase">CARTEIRA DE CLIENTES</h2>
+        <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
+          <h2 className="text-sm font-['Courier_New'] font-bold text-[#E8E4DF]/40 tracking-widest uppercase">
+            {aba === 'excluidos' ? 'CLIENTES EXCLUÍDOS' : 'CARTEIRA DE CLIENTES'}
+          </h2>
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-none">
+            {(['ativos', 'excluidos'] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setAba(t)}
+                className={cn(
+                  "px-4 py-1.5 text-[9px] font-bold uppercase tracking-widest font-['Courier_New'] transition-colors",
+                  aba === t ? 'bg-[#8B7355] text-white' : 'text-white/40 hover:text-white'
+                )}
+              >
+                {t === 'ativos' ? 'Ativos' : 'Excluídos'}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="relative mb-8 group">
@@ -334,13 +381,32 @@ const ClientesLista = () => {
                   <h3 className="text-lg font-bold text-white group-hover:text-[#8B7355] transition-colors uppercase font-['Courier_New']">
                     {cliente.nome}
                   </h3>
-                  <button
-                    onClick={(e) => handleExcluirCliente(e, cliente.id, cliente.nome)}
-                    className="text-white/20 hover:text-red-500 transition-colors p-1"
-                    title="Excluir Cliente"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {aba === 'ativos' ? (
+                    <button
+                      onClick={(e) => handleExcluirCliente(e, cliente.id, cliente.nome)}
+                      className="text-white/20 hover:text-red-500 transition-colors p-1"
+                      title="Mover para Excluídos"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={(e) => handleRestaurar(e, cliente.id, cliente.nome)}
+                        className="text-white/30 hover:text-green-500 transition-colors p-1"
+                        title="Restaurar cliente"
+                      >
+                        <RotateCcw size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => handleExcluirDefinitivo(e, cliente.id, cliente.nome)}
+                        className="text-white/30 hover:text-red-600 transition-colors p-1"
+                        title="Excluir definitivamente"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-3">

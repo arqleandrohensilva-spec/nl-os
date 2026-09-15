@@ -291,6 +291,7 @@ const Index = () => {
           *,
           logs:lead_logs(*)
         `)
+        .eq('excluido', false)
         .order('created_at', { ascending: false });
 
       if (leadsError) throw leadsError;
