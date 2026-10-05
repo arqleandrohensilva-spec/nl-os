@@ -616,7 +616,7 @@ const ClienteFicha = () => {
       try {
         if (id) {
           await supabase.from('leads')
-            .update({ stage: 'FECHADO', fechado_em: new Date().toISOString() } as any)
+            .update({ stage: 'Fechado', fechado_em: new Date().toISOString() } as any)
             .eq('cliente_id', clienteId);
         } else {
           await supabase.from('leads').insert({
@@ -626,7 +626,7 @@ const ClienteFicha = () => {
             tipo: andamentoTipo,
             area: andamentoArea ? Number(andamentoArea) : 0,
             origem: formData.origem || 'Fechado por fora',
-            stage: 'FECHADO',
+            stage: 'Fechado',
             etapa_desde: new Date().toISOString(),
             fechado_em: new Date().toISOString(),
             cliente_id: clienteId,
