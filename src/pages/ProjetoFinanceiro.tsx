@@ -77,6 +77,7 @@ const ProjetoFinanceiro = () => {
   const [editandoData, setEditandoData] = useState<string | null>(null);
   const [editandoValor, setEditandoValor] = useState<string | null>(null);
   const [editandoDesc, setEditandoDesc] = useState<string | null>(null);
+  const [editandoRecebido, setEditandoRecebido] = useState<string | null>(null);
   const [modalNovaParcela, setModalNovaParcela] = useState(false);
   // tipoVenc: 'data' = vence numa data | 'etapa' = vence quando chega numa etapa do projeto
   const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '', tipoVenc: 'data' as 'data' | 'etapa', etapa: '' });
@@ -920,10 +921,34 @@ const ProjetoFinanceiro = () => {
                             </div>
                             <div className="text-right">
                                 <div className="text-[14px] font-['Georgia'] text-[#4ade80]">
-                                    R$ {(p.valor_recebido || p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    {editandoRecebido === p.id ? (
+                                      <input
+                                        defaultValue={Number(p.valor_recebido || p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                        autoFocus
+                                        onBlur={async (e) => {
+                                          const v = parseFloat(String(e.target.value).replace(/\./g, '').replace(',', '.'));
+                                          if (!isNaN(v) && v !== Number(p.valor_recebido || p.valor)) {
+                                            const { error } = await supabase.from('financeiro_parcelas').update({ valor_recebido: v }).eq('id', p.id);
+                                            if (error) toast.error('Erro ao salvar: ' + error.message);
+                                            else toast.success('Valor recebido atualizado.');
+                                          }
+                                          setEditandoRecebido(null);
+                                          fetchData();
+                                        }}
+                                        style={{ width: '110px', textAlign: 'right', background: '#1c1c1c', border: '1px solid #4ade80', color: '#4ade80', padding: '3px 6px', fontFamily: 'Georgia, serif', fontSize: '14px', borderRadius: '3px' }}
+                                      />
+                                    ) : (
+                                      <span
+                                        onClick={() => setEditandoRecebido(p.id)}
+                                        style={{ cursor: 'pointer', borderBottom: '1px dashed #4ade80', paddingBottom: '1px' }}
+                                        title="Clique para corrigir o valor recebido"
+                                      >
+                                        R$ {(p.valor_recebido || p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                      </span>
+                                    )}
                                 </div>
-                                <Button 
-                                    variant="link" 
+                                <Button
+                                    variant="link"
                                     className="h-auto p-0 text-[10px] text-[#8B7355] uppercase font-bold mt-1"
                                     onClick={() => handleGerarRecibo(p)}
 
