@@ -337,93 +337,91 @@ const ClienteFicha = () => {
     }
   };
 
+  // Cria toda a estrutura de pastas do projeto no Dropbox (parametrizado por nome + tipo).
+  // Mapeamento de tipo robusto: aceita 'Arq+Int', 'ARQ+INT', 'Interiores', 'INT', 'Comercial', 'COM'.
+  const criarPastasProjeto = async (nomeCliente: string, tipoRaw: string) => {
+    const t = (tipoRaw || 'ARQ+INT').toUpperCase();
+    const isInt = t.includes('INT') && !t.includes('ARQ'); // só Interiores puro
+    const isCom = t.includes('COM');
+    const tipoNome = isInt ? 'Interiores' : isCom ? 'Comercial' : 'Arquitetura + Interiores';
+
+    const basePath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipoNome}`;
+    const doc = `${basePath}/08 - Documentos`;
+
+    const pasta04 = isInt
+      ? `${basePath}/04 - Projeto de Interiores`
+      : isCom
+      ? `${basePath}/04 - Projeto Comercial`
+      : `${basePath}/04 - Projeto Executivo`;
+
+    const aprovacao1 = isInt
+      ? `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Layout`
+      : isCom
+      ? `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Fluxo de Atendimento`
+      : `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Estudo Preliminar`;
+
+    const todasAsPastas = [
+      basePath,
+      `${basePath}/01 - Briefing`,
+      `${basePath}/02 - Conceito`,
+      `${basePath}/03 - Estudo Preliminar`,
+      pasta04,
+      `${basePath}/05 - Detalhamento`,
+      `${basePath}/06 - Obra`,
+      `${basePath}/07 - Marketing`,
+      doc,
+      `${doc}/01 - Briefing`,
+      `${doc}/01 - Briefing/Pre-Briefing`,
+      `${doc}/01 - Briefing/Briefing Completo`,
+      `${doc}/02 - Proposta e Contrato`,
+      `${doc}/02 - Proposta e Contrato/Carta Proposta`,
+      `${doc}/02 - Proposta e Contrato/NDA`,
+      `${doc}/02 - Proposta e Contrato/Contrato`,
+      `${doc}/02 - Proposta e Contrato/RRT`,
+      `${doc}/03 - Cronograma do Projeto`,
+      `${doc}/04 - Atas e Reunioes`,
+      `${doc}/05 - Decisoes e Aprovacoes`,
+      aprovacao1,
+      `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Anteprojeto`,
+      `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Executivo`,
+      `${doc}/06 - Alteracoes e Aditivos`,
+      `${doc}/07 - Relatorios Tecnicos`,
+      `${doc}/07 - Relatorios Tecnicos/Visita Tecnica Inicial`,
+      `${doc}/07 - Relatorios Tecnicos/Visitas de Obra`,
+      `${doc}/08 - Encerramento`,
+      `${doc}/08 - Encerramento/Protocolo de Entrega`,
+      `${doc}/08 - Encerramento/Checklist de Entrega`,
+      `${doc}/08 - Encerramento/Termo de Encerramento`,
+      `${doc}/08 - Encerramento/Autorizacao de Publicacao`,
+    ].filter(Boolean) as string[];
+
+    const relatorioExtra = isInt
+      ? `${doc}/07 - Relatorios Tecnicos/Curadoria de Materiais`
+      : isCom
+      ? `${doc}/07 - Relatorios Tecnicos/Estudo de Viabilidade`
+      : null;
+    if (relatorioExtra) todasAsPastas.push(relatorioExtra);
+
+    const criarPasta = async (path: string) => {
+      try {
+        await supabase.functions.invoke('dropbox-proxy', {
+          body: { action: 'create_folder', path }
+        });
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (e) {
+        console.warn('Pasta não criada (pode já existir):', path);
+      }
+    };
+
+    for (const pasta of todasAsPastas) {
+      await criarPasta(pasta);
+    }
+  };
+
   const handleCreateFolders = async () => {
     if (!cliente || !id) return;
     try {
-      // Criar estrutura de pastas no Dropbox
-      const nomeCliente = cliente.nome || 'Cliente';
-      const tipo = cliente.tipo_projeto || 'ARQ+INT';
-
-      const tipoNome = (tipo === 'ARQ+INT' || tipo === 'Arquitetura + Interiores')
-        ? 'Arquitetura + Interiores'
-        : (tipo === 'INT' || tipo === 'Interiores')
-        ? 'Interiores'
-        : 'Comercial';
-
-      const basePath = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nomeCliente} - ${tipoNome}`;
-      const doc = `${basePath}/08 - Documentos`;
-
-      // Pasta 04 varia por tipo
-      const pasta04 = (tipo === 'INT' || tipo === 'Interiores')
-        ? `${basePath}/04 - Projeto de Interiores`
-        : (tipo === 'COM' || tipo === 'Comercial')
-        ? `${basePath}/04 - Projeto Comercial`
-        : `${basePath}/04 - Projeto Executivo`;
-
-      // Aprovações variam por tipo
-      const aprovacao1 = (tipo === 'INT' || tipo === 'Interiores')
-        ? `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Layout`
-        : (tipo === 'COM' || tipo === 'Comercial')
-        ? `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Fluxo de Atendimento`
-        : `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Estudo Preliminar`;
-
-      const todasAsPastas = [
-        basePath,
-        `${basePath}/01 - Briefing`,
-        `${basePath}/02 - Conceito`,
-        `${basePath}/03 - Estudo Preliminar`,
-        pasta04,
-        `${basePath}/05 - Detalhamento`,
-        `${basePath}/06 - Obra`,
-        `${basePath}/07 - Marketing`,
-        doc,
-        `${doc}/01 - Briefing`,
-        `${doc}/01 - Briefing/Pre-Briefing`,
-        `${doc}/01 - Briefing/Briefing Completo`,
-        `${doc}/02 - Proposta e Contrato`,
-        `${doc}/02 - Proposta e Contrato/Carta Proposta`,
-        `${doc}/02 - Proposta e Contrato/NDA`,
-        `${doc}/02 - Proposta e Contrato/Contrato`,
-        `${doc}/02 - Proposta e Contrato/RRT`,
-        `${doc}/03 - Cronograma do Projeto`,
-        `${doc}/04 - Atas e Reunioes`,
-        `${doc}/05 - Decisoes e Aprovacoes`,
-        aprovacao1,
-        `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Anteprojeto`,
-        `${doc}/05 - Decisoes e Aprovacoes/Aprovacao Executivo`,
-        `${doc}/06 - Alteracoes e Aditivos`,
-        `${doc}/07 - Relatorios Tecnicos`,
-        `${doc}/07 - Relatorios Tecnicos/Visita Tecnica Inicial`,
-        `${doc}/07 - Relatorios Tecnicos/Visitas de Obra`,
-        `${doc}/08 - Encerramento`,
-        `${doc}/08 - Encerramento/Protocolo de Entrega`,
-        `${doc}/08 - Encerramento/Checklist de Entrega`,
-        `${doc}/08 - Encerramento/Termo de Encerramento`,
-        `${doc}/08 - Encerramento/Autorizacao de Publicacao`,
-      ].filter(Boolean) as string[];
-
-      const relatorioExtra = (tipo === 'INT' || tipo === 'Interiores')
-        ? `${doc}/07 - Relatorios Tecnicos/Curadoria de Materiais`
-        : (tipo === 'COM' || tipo === 'Comercial')
-        ? `${doc}/07 - Relatorios Tecnicos/Estudo de Viabilidade`
-        : null;
-
-      if (relatorioExtra) todasAsPastas.push(relatorioExtra);
-
-      const criarPasta = async (path: string) => {
-        try {
-          await supabase.functions.invoke('dropbox-proxy', {
-            body: { action: 'create_folder', path }
-          });
-          await new Promise(resolve => setTimeout(resolve, 300));
-        } catch (e) {
-          console.warn('Pasta não criada (pode já existir):', path);
-        }
-      };
-
-      for (const pasta of todasAsPastas) {
-        await criarPasta(pasta);
-      }
+      await criarPastasProjeto(cliente.nome || 'Cliente', cliente.tipo_projeto || 'ARQ+INT');
     } catch (error) {
       console.error('Erro ao criar pastas:', error);
       toast.error('Erro ao criar pastas no Dropbox');
@@ -503,6 +501,13 @@ const ClienteFicha = () => {
           etapa: ETAPAS_PROJETO[i],
           status: i < idxAtual ? 'concluido' : i === idxAtual ? 'em_andamento' : 'pendente',
         });
+      }
+
+      // 3.5) Cria as pastas do projeto no Dropbox (igual ao fluxo normal) — best-effort
+      try {
+        await criarPastasProjeto(nomeCliente, andamentoTipo);
+      } catch (folderErr) {
+        console.warn('Pastas não criadas (não bloqueia):', folderErr);
       }
 
       // 4) Lead FECHADO — novo cliente cria; existente só atualiza o lead dele — best-effort
