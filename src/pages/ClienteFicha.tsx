@@ -46,6 +46,11 @@ const ClienteFicha = () => {
   const [andamentoEtapa, setAndamentoEtapa] = useState('Briefing');
   const [etapasFeitas, setEtapasFeitas] = useState({ pre_briefing: true, reuniao: true, proposta: true, contrato: true });
   const [salvandoAndamento, setSalvandoAndamento] = useState(false);
+  // Financeiro opcional do contrato (por fora): gera as parcelas automaticamente.
+  const [andamentoValor, setAndamentoValor] = useState('');
+  const [andamentoModo, setAndamentoModo] = useState<'avista' | 'marcos' | 'parcelado'>('marcos');
+  const [andamentoParcelasN, setAndamentoParcelasN] = useState('3');
+  const [andamentoVencimento, setAndamentoVencimento] = useState(new Date().toISOString().split('T')[0]);
 
   // Rota /clientes/null (lead sem cliente vinculado) chega com id === "null".
   // Redireciona pra lista em vez de abrir uma ficha quebrada.
@@ -508,6 +513,53 @@ const ClienteFicha = () => {
         await criarPastasProjeto(nomeCliente, andamentoTipo);
       } catch (folderErr) {
         console.warn('Pastas não criadas (não bloqueia):', folderErr);
+      }
+
+      // 3.6) Financeiro: gera as parcelas do contrato se um valor foi informado — best-effort
+      try {
+        const parseValorBR = (v: string) => parseFloat(String(v).replace(/\./g, '').replace(',', '.')) || 0;
+        const total = parseValorBR(andamentoValor);
+        if (total > 0) {
+          const baseVenc = andamentoVencimento ? new Date(andamentoVencimento + 'T00:00:00') : new Date();
+          const addMeses = (d: Date, m: number) => {
+            const x = new Date(d);
+            x.setMonth(x.getMonth() + m);
+            return x.toISOString().split('T')[0];
+          };
+          const r2 = (n: number) => Math.round(n * 100) / 100;
+          let parcelas: { descricao: string; valor: number; data_vencimento: string }[] = [];
+          if (andamentoModo === 'avista') {
+            parcelas = [{ descricao: 'Pagamento único', valor: r2(total), data_vencimento: addMeses(baseVenc, 0) }];
+          } else if (andamentoModo === 'marcos') {
+            parcelas = [
+              { descricao: 'Marco 1 — Entrada (30%)', valor: r2(total * 0.3), data_vencimento: addMeses(baseVenc, 0) },
+              { descricao: 'Marco 2 — Anteprojeto aprovado (40%)', valor: r2(total * 0.4), data_vencimento: addMeses(baseVenc, 1) },
+              { descricao: 'Marco 3 — Entrega do executivo (30%)', valor: r2(total * 0.3), data_vencimento: addMeses(baseVenc, 2) },
+            ];
+          } else {
+            const n = Math.max(1, parseInt(andamentoParcelasN, 10) || 1);
+            const vp = r2(total / n);
+            parcelas = Array.from({ length: n }, (_, i) => ({
+              descricao: `Parcela ${i + 1}/${n}`,
+              valor: vp,
+              data_vencimento: addMeses(baseVenc, i),
+            }));
+          }
+          const rows = parcelas.map((p, i) => ({
+            projeto_id: novoProjeto.id,
+            cliente_id: clienteId,
+            cliente_nome: nomeCliente,
+            numero_parcela: i + 1,
+            total_parcelas: parcelas.length,
+            descricao: p.descricao,
+            valor: p.valor,
+            data_vencimento: p.data_vencimento,
+            status: 'PENDENTE',
+          }));
+          await supabase.from('financeiro_parcelas').insert(rows as any);
+        }
+      } catch (finErr) {
+        console.warn('Parcelas não criadas (não bloqueia):', finErr);
       }
 
       // 4) Lead FECHADO — novo cliente cria; existente só atualiza o lead dele — best-effort
@@ -1336,6 +1388,71 @@ const ClienteFicha = () => {
                             </label>
                           ))}
                         </div>
+                      </div>
+
+                      {/* FINANCEIRO (opcional) — gera as parcelas do contrato por fora */}
+                      <div className="space-y-3 border-t border-white/5 pt-4">
+                        <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">
+                          Financeiro do contrato (opcional)
+                        </Label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                          <div className="space-y-2">
+                            <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Valor total do contrato (R$)</Label>
+                            <Input
+                              value={andamentoValor}
+                              onChange={(e) => setAndamentoValor(e.target.value)}
+                              placeholder="Ex: 15000,00"
+                              className="bg-white/5 border-white/10 rounded-none h-9 text-xs"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">1ª cobrança</Label>
+                            <Input
+                              type="date"
+                              value={andamentoVencimento}
+                              onChange={(e) => setAndamentoVencimento(e.target.value)}
+                              className="bg-white/5 border-white/10 rounded-none h-9 text-xs"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Como parcelar</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {([
+                              ['marcos', '30 / 40 / 30'],
+                              ['avista', 'À vista'],
+                              ['parcelado', 'Parcelar em Nx'],
+                            ] as const).map(([v, label]) => (
+                              <button
+                                key={v}
+                                onClick={() => setAndamentoModo(v)}
+                                className={cn(
+                                  "px-3 py-1.5 text-[9px] uppercase border transition-all font-['Courier_New']",
+                                  andamentoModo === v
+                                    ? "bg-[#8B7355] border-[#8B7355] text-white"
+                                    : "bg-transparent border-[#2A2A2A] text-white/40 hover:border-[#8B7355]"
+                                )}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {andamentoModo === 'parcelado' && (
+                          <div className="space-y-2 max-w-[160px]">
+                            <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Nº de parcelas</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={andamentoParcelasN}
+                              onChange={(e) => setAndamentoParcelasN(e.target.value)}
+                              className="bg-white/5 border-white/10 rounded-none h-9 text-xs"
+                            />
+                          </div>
+                        )}
+                        <p className="text-white/25 text-[9px] font-['Courier_New'] uppercase tracking-widest leading-relaxed">
+                          Deixe o valor em branco pra pular — dá pra lançar depois na aba Financeiro.
+                        </p>
                       </div>
 
                       <div className="flex justify-end">
