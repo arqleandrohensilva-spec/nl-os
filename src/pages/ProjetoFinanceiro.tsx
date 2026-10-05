@@ -75,6 +75,8 @@ const ProjetoFinanceiro = () => {
   });
 
   const [editandoData, setEditandoData] = useState<string | null>(null);
+  const [editandoValor, setEditandoValor] = useState<string | null>(null);
+  const [editandoDesc, setEditandoDesc] = useState<string | null>(null);
   const [modalNovaParcela, setModalNovaParcela] = useState(false);
   // tipoVenc: 'data' = vence numa data | 'etapa' = vence quando chega numa etapa do projeto
   const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '', tipoVenc: 'data' as 'data' | 'etapa', etapa: '' });
@@ -721,9 +723,57 @@ const ProjetoFinanceiro = () => {
             {parcelas.map((p) => (
                 <div key={p.id} className="grid grid-cols-[0.5fr_2.5fr_1.2fr_1.2fr_1fr_1.2fr] p-4 items-center border-t border-white/5 hover:bg-white/[0.01] transition-colors">
                     <div className="font-['Courier_New'] text-[11px] text-[#333]">{p.numero_parcela.toString().padStart(2, '0')}</div>
-                    <div className="font-['Arial'] text-[13px] text-[#ccc]">{p.descricao}</div>
+                    <div className="font-['Arial'] text-[13px] text-[#ccc]">
+                        {editandoDesc === p.id ? (
+                          <input
+                            defaultValue={p.descricao}
+                            autoFocus
+                            onBlur={async (e) => {
+                              const nova = e.target.value.trim();
+                              if (nova && nova !== p.descricao) {
+                                const { error } = await supabase.from('financeiro_parcelas').update({ descricao: nova }).eq('id', p.id);
+                                if (error) toast.error('Erro ao salvar: ' + error.message);
+                              }
+                              setEditandoDesc(null);
+                              fetchData();
+                            }}
+                            style={{ width: '100%', background: '#1c1c1c', border: '1px solid #8B7355', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Arial', fontSize: '12px', borderRadius: '3px' }}
+                          />
+                        ) : (
+                          <span
+                            onClick={() => setEditandoDesc(p.id)}
+                            style={{ cursor: 'pointer', borderBottom: '1px dashed #333', paddingBottom: '1px' }}
+                            title="Clique para editar"
+                          >
+                            {p.descricao}
+                          </span>
+                        )}
+                    </div>
                     <div className="font-['Georgia'] text-[14px] text-white">
-                        R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {editandoValor === p.id ? (
+                          <input
+                            defaultValue={Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            autoFocus
+                            onBlur={async (e) => {
+                              const v = parseFloat(String(e.target.value).replace(/\./g, '').replace(',', '.'));
+                              if (!isNaN(v) && v !== Number(p.valor)) {
+                                const { error } = await supabase.from('financeiro_parcelas').update({ valor: v }).eq('id', p.id);
+                                if (error) toast.error('Erro ao salvar: ' + error.message);
+                              }
+                              setEditandoValor(null);
+                              fetchData();
+                            }}
+                            style={{ width: '100%', background: '#1c1c1c', border: '1px solid #8B7355', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Georgia, serif', fontSize: '13px', borderRadius: '3px' }}
+                          />
+                        ) : (
+                          <span
+                            onClick={() => setEditandoValor(p.id)}
+                            style={{ cursor: 'pointer', borderBottom: '1px dashed #333', paddingBottom: '1px' }}
+                            title="Clique para editar o valor"
+                          >
+                            R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        )}
                     </div>
                     <div className="font-['Arial'] text-[13px] text-[#555]">
                         {!p.data_vencimento && p.etapa_vinculada ? (
