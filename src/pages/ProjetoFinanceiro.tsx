@@ -311,8 +311,10 @@ const ProjetoFinanceiro = () => {
         toast.error('Dados de contato do cliente não encontrados');
         return;
     }
-    const dataFormatada = format(parseISO(parcela.data_vencimento), 'dd/MM/yyyy');
-    const msg = `Olá ${projeto.nome_cliente}, lembrando que o ${parcela.descricao} no valor de R$ ${parcela.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} vence em ${dataFormatada}. Qualquer dúvida estou à disposição.`;
+    const quando = parcela.data_vencimento
+      ? `vence em ${format(parseISO(parcela.data_vencimento), 'dd/MM/yyyy')}`
+      : (parcela.etapa_vinculada ? `será cobrado na etapa ${parcela.etapa_vinculada}` : 'está em aberto');
+    const msg = `Olá ${projeto.nome_cliente}, lembrando que o ${parcela.descricao} no valor de R$ ${parcela.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} ${quando}. Qualquer dúvida estou à disposição.`;
     window.open(`https://wa.me/55${lead.whats.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -684,9 +686,11 @@ const ProjetoFinanceiro = () => {
                     R$ {Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </div>
                   
-                  {/* Data */}
+                  {/* Data (ou etapa, quando a cobrança é por etapa) */}
                   <div style={{ fontFamily: 'Arial', fontSize: '11px', color: '#777', textAlign: 'center', marginBottom: '4px' }}>
-                    {format(parseISO(p.data_vencimento), 'dd/MM/yy')}
+                    {p.data_vencimento
+                      ? format(parseISO(p.data_vencimento), 'dd/MM/yy')
+                      : (p.etapa_vinculada ? `↳ ${p.etapa_vinculada}` : '—')}
                   </div>
                   
                   {/* Status */}
