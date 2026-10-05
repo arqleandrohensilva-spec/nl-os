@@ -807,9 +807,21 @@ const ClienteFicha = () => {
     }
   };
 
-  const currentStepIndex = (cliente?.etapa_fluxo === 'projeto') 
-    ? ETAPAS.length 
+  const currentStepIndex = (cliente?.etapa_fluxo === 'projeto')
+    ? ETAPAS.length
     : ETAPAS.findIndex(e => e.id === (cliente?.etapa_fluxo || 'ficha'));
+
+  // Marcação manual "etapa feita ou não" (por etapa) — guardada em clientes.etapas_status (jsonb)
+  const etapasStatus = (cliente?.etapas_status || {}) as Record<string, boolean>;
+  const etapaFeita = (etapaId: string) => !!etapasStatus[etapaId];
+  const toggleEtapaFeita = async (etapaId: string) => {
+    if (!id) return;
+    const novo = { ...etapasStatus, [etapaId]: !etapasStatus[etapaId] };
+    const { error } = await supabase.from('clientes').update({ etapas_status: novo } as any).eq('id', id);
+    if (error) { toast.error('Erro ao atualizar etapa: ' + error.message); return; }
+    queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+    toast.success(novo[etapaId] ? 'Etapa marcada como feita.' : 'Etapa desmarcada.');
+  };
 
   const toggleSection = (sectionId: string) => {
     setOpenSections(prev => 
@@ -1172,8 +1184,8 @@ const ClienteFicha = () => {
         <div className="bg-[#161616] p-8 border border-white/5 relative">
           <div className="flex justify-between items-center relative z-10">
             {ETAPAS.map((etapa, idx) => {
-              const isCompleted = idx < currentStepIndex;
-              const isCurrent = idx === currentStepIndex;
+              const isCompleted = idx < currentStepIndex || etapaFeita(etapa.id);
+              const isCurrent = idx === currentStepIndex && !etapaFeita(etapa.id);
               return (
                 <div key={etapa.id} className="flex flex-col items-center gap-2 flex-1">
                   <div className={cn(
@@ -1588,17 +1600,19 @@ const ClienteFicha = () => {
             className="p-4 border-b border-white/5 flex justify-between items-center cursor-pointer"
           >
             <h2 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.3em] font-bold">ETAPA 2 — PRÉ-BRIEFING</h2>
-            <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('pre_briefing') ? 'Fechar' : 'Abrir'}</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleEtapaFeita('pre_briefing'); }}
+                className={cn("text-[9px] uppercase font-bold tracking-widest font-['Courier_New'] px-2 py-1 border transition-colors", etapaFeita('pre_briefing') ? "border-emerald-500 text-emerald-400" : "border-white/20 text-white/40 hover:border-[#8B7355] hover:text-[#8B7355]")}
+              >
+                {etapaFeita('pre_briefing') ? '✓ FEITO' : 'MARCAR FEITO'}
+              </button>
+              <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('pre_briefing') ? 'Fechar' : 'Abrir'}</span>
+            </div>
           </div>
 
           {openSections.includes('pre_briefing') && (
             <div className="p-8 space-y-8">
-              {cliente?.etapa_fluxo === 'projeto' && (
-                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
-                </div>
-              )}
               <div className="space-y-4">
                 <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Link para envio</Label>
                 <div className="flex gap-2">
@@ -1634,9 +1648,9 @@ const ClienteFicha = () => {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : cliente?.etapa_fluxo === 'projeto' ? "bg-emerald-500" : "bg-yellow-500")} />
+                    <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : "bg-yellow-500")} />
                     <span className="text-[10px] uppercase font-bold tracking-widest font-['Courier_New'] text-white/60">
-                      {briefing ? 'BRIEFING PREENCHIDO ✓' : cliente?.etapa_fluxo === 'projeto' ? 'PULADO (EM ANDAMENTO)' : 'AGUARDANDO PREENCHIMENTO'}
+                      {briefing ? 'BRIEFING PREENCHIDO ✓' : 'AGUARDANDO PREENCHIMENTO'}
                     </span>
                   </div>
                   {briefing && (
@@ -1706,17 +1720,19 @@ const ClienteFicha = () => {
             className="p-4 border-b border-white/5 flex justify-between items-center cursor-pointer"
           >
             <h2 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.3em] font-bold">ETAPA 3 — REUNIÃO</h2>
-            <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('reuniao') ? 'Fechar' : 'Abrir'}</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleEtapaFeita('reuniao'); }}
+                className={cn("text-[9px] uppercase font-bold tracking-widest font-['Courier_New'] px-2 py-1 border transition-colors", etapaFeita('reuniao') ? "border-emerald-500 text-emerald-400" : "border-white/20 text-white/40 hover:border-[#8B7355] hover:text-[#8B7355]")}
+              >
+                {etapaFeita('reuniao') ? '✓ FEITO' : 'MARCAR FEITO'}
+              </button>
+              <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('reuniao') ? 'Fechar' : 'Abrir'}</span>
+            </div>
           </div>
 
           {openSections.includes('reuniao') && (
             <div className="p-8 space-y-8">
-              {cliente?.etapa_fluxo === 'projeto' && (
-                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
-                </div>
-              )}
               {!cliente?.reuniao_data || isRescheduling ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1982,17 +1998,19 @@ const ClienteFicha = () => {
             className="p-4 border-b border-white/5 flex justify-between items-center cursor-pointer"
           >
             <h2 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.3em] font-bold">ETAPA 4 — PROPOSTA</h2>
-            <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('proposta') ? 'Fechar' : 'Abrir'}</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleEtapaFeita('proposta'); }}
+                className={cn("text-[9px] uppercase font-bold tracking-widest font-['Courier_New'] px-2 py-1 border transition-colors", etapaFeita('proposta') ? "border-emerald-500 text-emerald-400" : "border-white/20 text-white/40 hover:border-[#8B7355] hover:text-[#8B7355]")}
+              >
+                {etapaFeita('proposta') ? '✓ FEITO' : 'MARCAR FEITO'}
+              </button>
+              <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('proposta') ? 'Fechar' : 'Abrir'}</span>
+            </div>
           </div>
 
           {openSections.includes('proposta') && (
             <div className="p-8 space-y-8">
-              {cliente?.etapa_fluxo === 'projeto' && (
-                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
-                </div>
-              )}
               {/* ANEXAR PROPOSTA FEITA POR FORA (cliente avulso) */}
               <div className="p-4 bg-[#0D0D0D] border border-[#8B7355]/30 flex items-center justify-between gap-4 flex-wrap">
                 <div>
@@ -2286,7 +2304,15 @@ const ClienteFicha = () => {
             className="p-4 border-b border-white/5 flex justify-between items-center cursor-pointer"
           >
             <h2 className="text-[#8B7355] font-['Courier_New'] text-[10px] uppercase tracking-[0.3em] font-bold">ETAPA 5 — CONTRATO</h2>
-            <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('contrato') ? 'Fechar' : 'Abrir'}</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); toggleEtapaFeita('contrato'); }}
+                className={cn("text-[9px] uppercase font-bold tracking-widest font-['Courier_New'] px-2 py-1 border transition-colors", etapaFeita('contrato') ? "border-emerald-500 text-emerald-400" : "border-white/20 text-white/40 hover:border-[#8B7355] hover:text-[#8B7355]")}
+              >
+                {etapaFeita('contrato') ? '✓ FEITO' : 'MARCAR FEITO'}
+              </button>
+              <span className="text-[10px] text-white/20 uppercase font-bold">{openSections.includes('contrato') ? 'Fechar' : 'Abrir'}</span>
+            </div>
           </div>
 
           {openSections.includes('contrato') && (
