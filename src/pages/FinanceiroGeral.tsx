@@ -31,6 +31,7 @@ import { toast } from "sonner";
 const FinanceiroGeral = () => {
   const navigate = useNavigate();
   const [parcelas, setParcelas] = useState<any[]>([]);
+  const [editandoValorGeral, setEditandoValorGeral] = useState<string | null>(null);
   const [projetos, setProjetos] = useState<any[]>([]);
   const [baseFinanceira, setBaseFinanceira] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -350,7 +351,33 @@ const FinanceiroGeral = () => {
                       <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.5fr 0.8fr 0.8fr 0.8fr 0.8fr', gap: 0, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
                           <div style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>{p.cliente_nome}</div>
                           <div style={{ fontSize: '12px', color: '#888' }}>{p.descricao}</div>
-                          <div style={{ fontSize: '13px' }}>R$ {p.valor.toLocaleString('pt-BR')}</div>
+                          <div style={{ fontSize: '13px' }}>
+                              {editandoValorGeral === p.id ? (
+                                <input
+                                  defaultValue={Number(p.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                  autoFocus
+                                  onBlur={async (e) => {
+                                    const v = parseFloat(String(e.target.value).replace(/\./g, '').replace(',', '.'));
+                                    if (!isNaN(v) && v !== Number(p.valor)) {
+                                      const { error } = await supabase.from('financeiro_parcelas').update({ valor: v }).eq('id', p.id);
+                                      if (error) toast.error('Erro ao salvar: ' + error.message);
+                                      else toast.success('Valor atualizado.');
+                                    }
+                                    setEditandoValorGeral(null);
+                                    fetchData();
+                                  }}
+                                  style={{ width: '90px', background: '#1c1c1c', border: '1px solid #8B7355', color: '#e8e8e8', padding: '3px 6px', fontFamily: 'Georgia, serif', fontSize: '13px', borderRadius: '3px' }}
+                                />
+                              ) : (
+                                <span
+                                  onClick={() => setEditandoValorGeral(p.id)}
+                                  style={{ cursor: 'pointer', borderBottom: '1px dashed #444', paddingBottom: '1px' }}
+                                  title="Clique para editar o valor"
+                                >
+                                  R$ {p.valor.toLocaleString('pt-BR')}
+                                </span>
+                              )}
+                          </div>
                           <div style={{ fontSize: '12px', color: '#555' }}>{format(p.data_vencimento ? parseISO(p.data_vencimento) : new Date(), 'dd/MM/yyyy')}</div>
                           <div>
                               <span className={cn(
