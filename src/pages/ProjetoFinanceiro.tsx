@@ -38,7 +38,8 @@ interface Parcela {
   total_parcelas: number;
   descricao: string;
   valor: number;
-  data_vencimento: string;
+  data_vencimento?: string | null;
+  etapa_vinculada?: string | null;
   status: string;
   data_recebimento?: string;
   valor_recebido?: number;
@@ -75,7 +76,9 @@ const ProjetoFinanceiro = () => {
 
   const [editandoData, setEditandoData] = useState<string | null>(null);
   const [modalNovaParcela, setModalNovaParcela] = useState(false);
-  const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '' });
+  // tipoVenc: 'data' = vence numa data | 'etapa' = vence quando chega numa etapa do projeto
+  const [novaParcelaData, setNovaParcelaData] = useState({ descricao: '', valor: '', data_vencimento: '', tipoVenc: 'data' as 'data' | 'etapa', etapa: '' });
+  const [etapasProjeto, setEtapasProjeto] = useState<string[]>([]);
 
   const fetchData = async () => {
     if (!id) return;
@@ -115,6 +118,13 @@ const ProjetoFinanceiro = () => {
         }
       }
 
+      // Buscar as etapas do projeto (para cobrança por etapa)
+      const { data: etapasData } = await supabase
+        .from('projeto_etapas')
+        .select('etapa')
+        .eq('projeto_id', id);
+      setEtapasProjeto((etapasData || []).map((e: any) => e.etapa).filter(Boolean));
+
       // Buscar parcelas do projeto
       const { data: parcelasRaw } = await supabase
         .from('financeiro_parcelas')
@@ -125,7 +135,9 @@ const ProjetoFinanceiro = () => {
       // Calcular status real de cada parcela
       const processedParcelas = (parcelasRaw || []).map(p => {
         if (p.status === 'PAGO' || p.status === 'PAGO PARCIAL') return p;
-        
+        // Cobrança por etapa (sem data) fica só como PENDENTE — vence quando chegar na etapa.
+        if (!p.data_vencimento) return { ...p, status: 'PENDENTE' };
+
         const dateVenc = parseISO(p.data_vencimento);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -159,8 +171,8 @@ const ProjetoFinanceiro = () => {
     const recebido = parcelas.filter(p => p.status === 'PAGO' || p.status === 'PAGO PARCIAL').reduce((acc, p) => acc + (p.valor_recebido || p.valor || 0), 0);
     const emAberto = total - recebido;
     const proximoVencimento = parcelas
-      .filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL')
-      .sort((a, b) => new Date(a.data_vencimento).getTime() - new Date(b.data_vencimento).getTime())[0]?.data_vencimento;
+      .filter(p => p.status !== 'PAGO' && p.status !== 'PAGO PARCIAL' && p.data_vencimento)
+      .sort((a, b) => new Date(a.data_vencimento as string).getTime() - new Date(b.data_vencimento as string).getTime())[0]?.data_vencimento;
 
     return { total, recebido, emAberto, proximoVencimento };
   }, [parcelas]);
@@ -710,10 +722,17 @@ const ProjetoFinanceiro = () => {
                         R$ {p.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </div>
                     <div className="font-['Arial'] text-[13px] text-[#555]">
-                        {editandoData === p.id ? (
+                        {!p.data_vencimento && p.etapa_vinculada ? (
+                          <span
+                            style={{ color: '#8B7355', fontFamily: 'Courier New', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                            title="Vence ao chegar nesta etapa do projeto"
+                          >
+                            ↳ {p.etapa_vinculada}
+                          </span>
+                        ) : editandoData === p.id ? (
                           <input
                             type="date"
-                            defaultValue={p.data_vencimento}
+                            defaultValue={p.data_vencimento || ''}
                             autoFocus
                             onBlur={async (e) => {
                               await supabase.from('financeiro_parcelas').update({ data_vencimento: e.target.value }).eq('id', p.id);
@@ -728,7 +747,7 @@ const ProjetoFinanceiro = () => {
                             style={{ cursor: p.status !== 'PAGO' ? 'pointer' : 'default', borderBottom: p.status !== 'PAGO' ? '1px dashed #333' : 'none', paddingBottom: '1px' }}
                             title={p.status !== 'PAGO' ? 'Clique para editar' : ''}
                           >
-                            {format(parseISO(p.data_vencimento), 'dd/MM/yyyy')}
+                            {p.data_vencimento ? format(parseISO(p.data_vencimento), 'dd/MM/yyyy') : '—'}
                           </span>
                         )}
                     </div>
@@ -878,19 +897,53 @@ const ProjetoFinanceiro = () => {
                   <input value={novaParcelaData.valor} onChange={e => setNovaParcelaData(p => ({ ...p, valor: e.target.value }))} placeholder="0,00" style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
                 </div>
                 <div>
-                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Data de Vencimento</label>
-                  <input type="date" value={novaParcelaData.data_vencimento} onChange={e => setNovaParcelaData(p => ({ ...p, data_vencimento: e.target.value }))} style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                  <label style={{ fontFamily: 'Courier New', fontSize: '8px', color: '#8B7355', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', marginBottom: '4px' }}>Vencimento</label>
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '8px' }}>
+                    {([['data', 'Por data'], ['etapa', 'Por etapa']] as const).map(([v, label]) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setNovaParcelaData(p => ({ ...p, tipoVenc: v }))}
+                        style={{ flex: 1, padding: '7px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em', borderRadius: '4px', border: '1px solid ' + (novaParcelaData.tipoVenc === v ? '#8B7355' : '#333'), background: novaParcelaData.tipoVenc === v ? '#8B7355' : 'transparent', color: novaParcelaData.tipoVenc === v ? '#fff' : '#888' }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  {novaParcelaData.tipoVenc === 'data' ? (
+                    <input type="date" value={novaParcelaData.data_vencimento} onChange={e => setNovaParcelaData(p => ({ ...p, data_vencimento: e.target.value }))} style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }} />
+                  ) : (
+                    <select value={novaParcelaData.etapa} onChange={e => setNovaParcelaData(p => ({ ...p, etapa: e.target.value }))} style={{ width: '100%', background: '#0d0d0d', border: '1px solid rgba(255,255,255,0.1)', color: '#e8e8e8', padding: '8px 12px', fontFamily: 'Arial', fontSize: '13px', borderRadius: '4px', boxSizing: 'border-box' as const }}>
+                      <option value="">Selecione a etapa…</option>
+                      {(etapasProjeto.length > 0 ? etapasProjeto : ['Briefing', 'Estudo Preliminar', 'Anteprojeto', 'Executivo', 'Entrega']).map(et => (
+                        <option key={et} value={et}>{et}</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '8px', marginTop: '20px' }}>
                 <button
                   onClick={async () => {
                     const valor = parseFloat(novaParcelaData.valor.replace(/\./g, '').replace(',', '.'));
-                    if (!novaParcelaData.descricao || !valor || !novaParcelaData.data_vencimento) { toast.error('Preencha todos os campos'); return; }
-                    await supabase.from('financeiro_parcelas').insert({ projeto_id: id, cliente_id: projeto?.cliente_id, cliente_nome: projeto?.nome_cliente, numero_parcela: parcelas.length + 1, total_parcelas: parcelas.length + 1, descricao: novaParcelaData.descricao, valor, data_vencimento: novaParcelaData.data_vencimento, status: 'PENDENTE' });
+                    if (!novaParcelaData.descricao || !valor) { toast.error('Preencha descrição e valor'); return; }
+                    if (novaParcelaData.tipoVenc === 'data' && !novaParcelaData.data_vencimento) { toast.error('Informe a data de vencimento'); return; }
+                    if (novaParcelaData.tipoVenc === 'etapa' && !novaParcelaData.etapa) { toast.error('Selecione a etapa'); return; }
+                    await supabase.from('financeiro_parcelas').insert({
+                      projeto_id: id,
+                      cliente_id: projeto?.cliente_id,
+                      cliente_nome: projeto?.nome_cliente,
+                      numero_parcela: parcelas.length + 1,
+                      total_parcelas: parcelas.length + 1,
+                      descricao: novaParcelaData.descricao,
+                      valor,
+                      data_vencimento: novaParcelaData.tipoVenc === 'data' ? novaParcelaData.data_vencimento : null,
+                      etapa_vinculada: novaParcelaData.tipoVenc === 'etapa' ? novaParcelaData.etapa : null,
+                      status: 'PENDENTE',
+                    } as any);
                     toast.success('Cobrança adicionada!');
                     setModalNovaParcela(false);
-                    setNovaParcelaData({ descricao: '', valor: '', data_vencimento: '' });
+                    setNovaParcelaData({ descricao: '', valor: '', data_vencimento: '', tipoVenc: 'data', etapa: '' });
                     fetchData();
                   }}
                   style={{ flex: 1, background: '#8B7355', color: '#fff', border: 'none', padding: '10px', cursor: 'pointer', fontFamily: 'Courier New', fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}
