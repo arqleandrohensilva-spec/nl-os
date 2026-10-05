@@ -433,6 +433,48 @@ const ClienteFicha = () => {
     }
   };
 
+  // Anexa um arquivo feito POR FORA (proposta ou contrato) direto na pasta do
+  // cliente no Dropbox. Garante a estrutura de pastas antes de subir.
+  const [anexando, setAnexando] = useState<'proposta' | 'contrato' | null>(null);
+  const anexarPorFora = async (file: File, tipo: 'proposta' | 'contrato') => {
+    if (!file || !cliente || !id) return;
+    setAnexando(tipo);
+    try {
+      const nome = cliente.nome || formData.nome || 'Cliente';
+      const tipoRaw = cliente.tipo_projeto || formData.tipo_projeto || 'ARQ+INT';
+      // Garante a estrutura de pastas (cria as que faltam) — best-effort
+      try {
+        await criarPastasProjeto(nome, tipoRaw);
+      } catch (e) {
+        console.warn('Pastas (anexo) não criadas:', e);
+      }
+      const t = tipoRaw.toUpperCase();
+      const isInt = t.includes('INT') && !t.includes('ARQ');
+      const isCom = t.includes('COM');
+      const tipoNome = isInt ? 'Interiores' : isCom ? 'Comercial' : 'Arquitetura + Interiores';
+      const sub = tipo === 'proposta' ? 'Carta Proposta' : 'Contrato';
+      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/${sub}/${file.name}`;
+      const base64File = await blobToBase64(file);
+      const { error } = await supabase.functions.invoke('dropbox-proxy', {
+        body: { action: 'upload', path, content: base64File },
+      });
+      if (error) throw error;
+      if (tipo === 'contrato') {
+        await supabase.from('clientes').update({
+          contrato_assinado: true,
+          contrato_assinado_em: new Date().toISOString(),
+        } as any).eq('id', id);
+        queryClient.invalidateQueries({ queryKey: ['cliente', id] });
+      }
+      toast.success(`${tipo === 'proposta' ? 'Proposta' : 'Contrato'} anexado no Dropbox!`);
+    } catch (e: any) {
+      console.error('Erro ao anexar por fora:', e);
+      toast.error('Erro ao anexar: ' + (e?.message ?? 'tente novamente'));
+    } finally {
+      setAnexando(null);
+    }
+  };
+
   // Cria um cliente que já está EM ANDAMENTO (contrato fechado por fora):
   // cria o cliente + o projeto ativo de uma vez, pulando o funil (pré-briefing,
   // reunião, proposta, contrato). Registra no histórico o que foi feito por fora.
@@ -1925,6 +1967,22 @@ const ClienteFicha = () => {
 
           {openSections.includes('proposta') && (
             <div className="p-8 space-y-8">
+              {/* ANEXAR PROPOSTA FEITA POR FORA (cliente avulso) */}
+              <div className="p-4 bg-[#0D0D0D] border border-[#8B7355]/30 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <div className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">Proposta feita por fora?</div>
+                  <div className="text-[10px] text-white/40 mt-1 font-['Arial']">Anexe o arquivo (PDF/DOCX) — vai pra pasta do cliente no Dropbox (Carta Proposta).</div>
+                </div>
+                <label className="cursor-pointer bg-[#8B7355] hover:bg-[#8B7355]/80 text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest font-['Courier_New'] rounded-none shrink-0">
+                  {anexando === 'proposta' ? 'ENVIANDO...' : 'ANEXAR PROPOSTA'}
+                  <input
+                    type="file"
+                    className="hidden"
+                    disabled={anexando !== null}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) anexarPorFora(f, 'proposta'); e.currentTarget.value = ''; }}
+                  />
+                </label>
+              </div>
               {!proposta ? (
                 <div className="text-center py-10 border border-dashed border-white/5 bg-[#0D0D0D]">
                   <p className="text-[10px] uppercase text-white/20 font-['Courier_New'] mb-6">Nenhuma proposta vinculada a este cliente</p>
@@ -2207,6 +2265,22 @@ const ClienteFicha = () => {
 
           {openSections.includes('contrato') && (
             <div className="p-8 space-y-8">
+              {/* ANEXAR CONTRATO FEITO POR FORA (cliente avulso) */}
+              <div className="p-4 bg-[#0D0D0D] border border-[#8B7355]/30 flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <div className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-['Courier_New']">Contrato fechado por fora?</div>
+                  <div className="text-[10px] text-white/40 mt-1 font-['Arial']">Anexe o contrato assinado (PDF/DOCX) — vai pra pasta do cliente no Dropbox (Contrato) e marca como assinado.</div>
+                </div>
+                <label className="cursor-pointer bg-[#8B7355] hover:bg-[#8B7355]/80 text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest font-['Courier_New'] rounded-none shrink-0">
+                  {anexando === 'contrato' ? 'ENVIANDO...' : 'ANEXAR CONTRATO'}
+                  <input
+                    type="file"
+                    className="hidden"
+                    disabled={anexando !== null}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) anexarPorFora(f, 'contrato'); e.currentTarget.value = ''; }}
+                  />
+                </label>
+              </div>
               {!contrato ? (
                 <div className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
