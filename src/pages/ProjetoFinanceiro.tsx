@@ -929,7 +929,7 @@ const ProjetoFinanceiro = () => {
                     if (!novaParcelaData.descricao || !valor) { toast.error('Preencha descrição e valor'); return; }
                     if (novaParcelaData.tipoVenc === 'data' && !novaParcelaData.data_vencimento) { toast.error('Informe a data de vencimento'); return; }
                     if (novaParcelaData.tipoVenc === 'etapa' && !novaParcelaData.etapa) { toast.error('Selecione a etapa'); return; }
-                    await supabase.from('financeiro_parcelas').insert({
+                    const payload: any = {
                       projeto_id: id,
                       cliente_id: projeto?.cliente_id,
                       cliente_nome: projeto?.nome_cliente,
@@ -940,7 +940,19 @@ const ProjetoFinanceiro = () => {
                       data_vencimento: novaParcelaData.tipoVenc === 'data' ? novaParcelaData.data_vencimento : null,
                       etapa_vinculada: novaParcelaData.tipoVenc === 'etapa' ? novaParcelaData.etapa : null,
                       status: 'PENDENTE',
-                    } as any);
+                    };
+                    let { error: insErr } = await supabase.from('financeiro_parcelas').insert(payload);
+                    // Fallback: se a coluna etapa_vinculada ainda não existe no banco, salva sem ela
+                    if (insErr && /etapa_vinculada/i.test(insErr.message || '')) {
+                      const semEtapa = { ...payload };
+                      delete semEtapa.etapa_vinculada;
+                      if (novaParcelaData.tipoVenc === 'etapa') {
+                        semEtapa.descricao = `${novaParcelaData.descricao} — ref. etapa: ${novaParcelaData.etapa}`;
+                      }
+                      const retry = await supabase.from('financeiro_parcelas').insert(semEtapa);
+                      insErr = retry.error;
+                    }
+                    if (insErr) { toast.error('Erro ao salvar: ' + insErr.message); return; }
                     toast.success('Cobrança adicionada!');
                     setModalNovaParcela(false);
                     setNovaParcelaData({ descricao: '', valor: '', data_vencimento: '', tipoVenc: 'data', etapa: '' });
