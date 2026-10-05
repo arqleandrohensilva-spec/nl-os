@@ -39,6 +39,13 @@ const ClienteFicha = () => {
   const [openSections, setOpenSections] = useState<string[]>(['ficha']);
   const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [isNewClient, setIsNewClient] = useState(!id);
+  // Cliente já em andamento (fechado por fora): cria cliente + projeto direto.
+  const [emAndamento, setEmAndamento] = useState(false);
+  const [andamentoTipo, setAndamentoTipo] = useState<'Arq+Int' | 'Interiores' | 'Comercial'>('Arq+Int');
+  const [andamentoArea, setAndamentoArea] = useState('');
+  const [andamentoEtapa, setAndamentoEtapa] = useState('Briefing');
+  const [etapasFeitas, setEtapasFeitas] = useState({ pre_briefing: true, reuniao: true, proposta: true, contrato: true });
+  const [salvandoAndamento, setSalvandoAndamento] = useState(false);
 
   // Rota /clientes/null (lead sem cliente vinculado) chega com id === "null".
   // Redireciona pra lista em vez de abrir uma ficha quebrada.
@@ -416,6 +423,114 @@ const ClienteFicha = () => {
     } catch (error) {
       console.error('Erro ao criar pastas:', error);
       toast.error('Erro ao criar pastas no Dropbox');
+    }
+  };
+
+  // Cria um cliente que já está EM ANDAMENTO (contrato fechado por fora):
+  // cria o cliente + o projeto ativo de uma vez, pulando o funil (pré-briefing,
+  // reunião, proposta, contrato). Registra no histórico o que foi feito por fora.
+  const ETAPAS_PROJETO = ['Briefing', 'Estudo Preliminar', 'Anteprojeto', 'Executivo'];
+  const handleCriarEmAndamento = async () => {
+    if (!formData.nome?.trim()) {
+      toast.error('Preencha ao menos o nome do cliente.');
+      return;
+    }
+    setSalvandoAndamento(true);
+    try {
+      // 1) Cliente direto na etapa "projeto"
+      const { data: novoCliente, error: cErr } = await supabase.from('clientes').insert({
+        nome: formData.nome,
+        whatsapp: formData.whatsapp,
+        email: formData.email,
+        cpf_cnpj: formData.cpf_cnpj,
+        cidade: formData.cidade,
+        endereco_imovel: formData.endereco_imovel,
+        origem: formData.origem || 'Fechado por fora',
+        tipo_projeto: andamentoTipo,
+        area_m2: andamentoArea ? Number(andamentoArea) : null,
+        etapa_fluxo: 'projeto',
+        briefing_preenchido: etapasFeitas.pre_briefing,
+        contrato_assinado: etapasFeitas.contrato,
+        contrato_assinado_em: etapasFeitas.contrato ? new Date().toISOString() : null,
+      } as any).select().maybeSingle();
+      if (cErr) throw cErr;
+      if (!novoCliente) throw new Error('Cliente não retornado.');
+
+      // 2) Projeto ativo na etapa escolhida
+      const { data: novoProjeto, error: pErr } = await supabase.from('projetos').insert({
+        nome: `Projeto ${formData.nome}`,
+        nome_cliente: formData.nome,
+        tipo: andamentoTipo,
+        cidade: formData.cidade,
+        area_m2: andamentoArea ? parseFloat(andamentoArea) : 0,
+        etapa_atual: andamentoEtapa,
+        status_geral: 'ativo',
+        data_inicio: new Date().toISOString().split('T')[0],
+        cliente_id: novoCliente.id,
+        proposta_id: null,
+      } as any).select().maybeSingle();
+      if (pErr) throw pErr;
+      if (!novoProjeto) throw new Error('Projeto não retornado.');
+
+      // 3) Etapas do projeto (anteriores à atual = concluídas)
+      const idxAtual = ETAPAS_PROJETO.indexOf(andamentoEtapa);
+      for (let i = 0; i < ETAPAS_PROJETO.length; i++) {
+        await supabase.from('projeto_etapas').insert({
+          projeto_id: novoProjeto.id,
+          etapa: ETAPAS_PROJETO[i],
+          status: i < idxAtual ? 'concluido' : i === idxAtual ? 'em_andamento' : 'pendente',
+        });
+      }
+
+      // 4) Lead marcado como FECHADO (mantém o pipeline coerente) — best-effort
+      try {
+        await supabase.from('leads').insert({
+          nome: formData.nome,
+          whats: formData.whatsapp || '',
+          cidade: formData.cidade || '',
+          tipo: andamentoTipo,
+          area: andamentoArea ? Number(andamentoArea) : 0,
+          origem: formData.origem || 'Fechado por fora',
+          stage: 'FECHADO',
+          etapa_desde: new Date().toISOString(),
+          fechado_em: new Date().toISOString(),
+          cliente_id: novoCliente.id,
+        } as any);
+      } catch (leadErr) {
+        console.warn('Lead FECHADO não criado (não bloqueia):', leadErr);
+      }
+
+      // 5) Histórico do que já havia sido feito por fora — best-effort
+      try {
+        const feitas = Object.entries({
+          'Pré-briefing': etapasFeitas.pre_briefing,
+          'Reunião': etapasFeitas.reuniao,
+          'Proposta': etapasFeitas.proposta,
+          'Contrato': etapasFeitas.contrato,
+        })
+          .filter(([, v]) => v)
+          .map(([k]) => k);
+        await supabase.from('historico_clientes').insert({
+          cliente_id: novoCliente.id,
+          tipo: 'etapa_fluxo',
+          descricao:
+            `Cliente cadastrado já EM ANDAMENTO (fechado por fora). Etapa do projeto: ${andamentoEtapa}.` +
+            (feitas.length ? ` Já realizado por fora: ${feitas.join(', ')}.` : ' Etapas iniciais puladas.'),
+          status_anterior: 'ficha',
+          status_novo: 'projeto',
+          data_hora: new Date().toISOString(),
+        } as any);
+      } catch (histErr) {
+        console.warn('Histórico não registrado (não bloqueia):', histErr);
+      }
+
+      toast.success('Cliente em andamento criado e projeto iniciado!');
+      navigate(`/projetos/detalhe/${novoProjeto.id}`);
+    } catch (err: any) {
+      console.error('Erro ao criar cliente em andamento:', err);
+      toast.error('Erro ao criar cliente em andamento: ' + (err?.message ?? 'tente novamente'));
+    } finally {
+      setSalvandoAndamento(false);
     }
   };
 
@@ -1092,6 +1207,114 @@ const ClienteFicha = () => {
                   </Button>
                 )}
               </div>
+
+              {/* CLIENTE JÁ EM ANDAMENTO (fechado por fora) — só na criação */}
+              {!id && (
+                <div className="bg-[#0D0D0D] border border-[#8B7355]/40 p-6 space-y-5">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={emAndamento}
+                      onChange={(e) => setEmAndamento(e.target.checked)}
+                      className="accent-[#8B7355] w-4 h-4"
+                    />
+                    <span className="text-[#8B7355] font-['Courier_New'] text-[11px] uppercase tracking-[0.2em] font-bold">
+                      Cliente já em andamento (fechado por fora)
+                    </span>
+                  </label>
+                  <p className="text-white/30 text-[10px] font-['Courier_New'] uppercase tracking-widest leading-relaxed">
+                    Cria o cliente e o projeto de uma vez, pulando o funil. O contrato você anexa depois na aba Documentos do projeto.
+                  </p>
+
+                  {emAndamento && (
+                    <div className="space-y-5 pt-1">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div className="space-y-2">
+                          <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Tipo do projeto</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {(['Arq+Int', 'Interiores', 'Comercial'] as const).map((t) => (
+                              <button
+                                key={t}
+                                onClick={() => setAndamentoTipo(t)}
+                                className={cn(
+                                  "px-3 py-1.5 text-[9px] uppercase border transition-all font-['Courier_New']",
+                                  andamentoTipo === t
+                                    ? "bg-[#8B7355] border-[#8B7355] text-white"
+                                    : "bg-transparent border-[#2A2A2A] text-white/40 hover:border-[#8B7355]"
+                                )}
+                              >
+                                {t}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Área (m²)</Label>
+                          <Input
+                            type="number"
+                            value={andamentoArea}
+                            onChange={(e) => setAndamentoArea(e.target.value)}
+                            className="bg-white/5 border-white/10 rounded-none h-9 text-xs"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Etapa atual do projeto</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {ETAPAS_PROJETO.map((e) => (
+                              <button
+                                key={e}
+                                onClick={() => setAndamentoEtapa(e)}
+                                className={cn(
+                                  "px-3 py-1.5 text-[9px] uppercase border transition-all font-['Courier_New']",
+                                  andamentoEtapa === e
+                                    ? "bg-[#8B7355] border-[#8B7355] text-white"
+                                    : "bg-transparent border-[#2A2A2A] text-white/40 hover:border-[#8B7355]"
+                                )}
+                              >
+                                {e}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">
+                          O que já foi feito por fora (histórico)
+                        </Label>
+                        <div className="flex flex-wrap gap-4">
+                          {([
+                            ['pre_briefing', 'Pré-briefing'],
+                            ['reuniao', 'Reunião'],
+                            ['proposta', 'Proposta'],
+                            ['contrato', 'Contrato'],
+                          ] as const).map(([k, label]) => (
+                            <label key={k} className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={etapasFeitas[k]}
+                                onChange={(e) => setEtapasFeitas((prev) => ({ ...prev, [k]: e.target.checked }))}
+                                className="accent-[#8B7355] w-4 h-4"
+                              />
+                              <span className="text-white/60 text-[10px] uppercase tracking-widest font-['Courier_New']">{label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end">
+                        <Button
+                          onClick={handleCriarEmAndamento}
+                          disabled={salvandoAndamento}
+                          className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest h-12 disabled:opacity-40"
+                        >
+                          {salvandoAndamento ? 'CRIANDO...' : 'SALVAR E INICIAR PROJETO'}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* QUALIFICAÇÃO BLOCO */}
               <div className="bg-[#0D0D0D] border border-white/5 p-6 space-y-6">
