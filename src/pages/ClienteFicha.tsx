@@ -295,6 +295,10 @@ const ClienteFicha = () => {
         reuniao_link: cliente.reuniao_link || '',
         reuniao_notas: cliente.reuniao_notas || ''
       }));
+      // Pré-preenche o atalho "em andamento" com o que já está cadastrado
+      const tipoC = (cliente.tipo_projeto || '').toUpperCase();
+      setAndamentoTipo(tipoC.includes('COM') ? 'Comercial' : (tipoC.includes('INT') && !tipoC.includes('ARQ')) ? 'Interiores' : 'Arq+Int');
+      if (cliente.area_m2) setAndamentoArea(cliente.area_m2.toString());
       if (cliente.etapa_fluxo) {
         // Se já estiver em projeto, abrir a última seção (contrato)
         setOpenSections(cliente.etapa_fluxo === 'projeto' ? ['contrato'] : [cliente.etapa_fluxo]);
@@ -437,36 +441,55 @@ const ClienteFicha = () => {
     }
     setSalvandoAndamento(true);
     try {
-      // 1) Cliente direto na etapa "projeto"
-      const { data: novoCliente, error: cErr } = await supabase.from('clientes').insert({
-        nome: formData.nome,
-        whatsapp: formData.whatsapp,
-        email: formData.email,
-        cpf_cnpj: formData.cpf_cnpj,
-        cidade: formData.cidade,
-        endereco_imovel: formData.endereco_imovel,
-        origem: formData.origem || 'Fechado por fora',
-        tipo_projeto: andamentoTipo,
-        area_m2: andamentoArea ? Number(andamentoArea) : null,
-        etapa_fluxo: 'projeto',
-        briefing_preenchido: etapasFeitas.pre_briefing,
-        contrato_assinado: etapasFeitas.contrato,
-        contrato_assinado_em: etapasFeitas.contrato ? new Date().toISOString() : null,
-      } as any).select().maybeSingle();
-      if (cErr) throw cErr;
-      if (!novoCliente) throw new Error('Cliente não retornado.');
+      // 1) Cliente — se já existe (id), converte; senão, cria direto na etapa "projeto"
+      const nomeCliente = ((id ? cliente?.nome : formData.nome) || formData.nome || '').trim();
+      const cidadeCliente = (id ? (cliente?.cidade || formData.cidade) : formData.cidade) || '';
+      let clienteId: string;
+
+      if (id) {
+        const patch: any = {
+          etapa_fluxo: 'projeto',
+          tipo_projeto: andamentoTipo,
+          briefing_preenchido: etapasFeitas.pre_briefing,
+          contrato_assinado: etapasFeitas.contrato,
+          contrato_assinado_em: etapasFeitas.contrato ? new Date().toISOString() : null,
+        };
+        if (andamentoArea) patch.area_m2 = Number(andamentoArea);
+        const { error: uErr } = await supabase.from('clientes').update(patch).eq('id', id);
+        if (uErr) throw uErr;
+        clienteId = id;
+      } else {
+        const { data: novoCliente, error: cErr } = await supabase.from('clientes').insert({
+          nome: formData.nome,
+          whatsapp: formData.whatsapp,
+          email: formData.email,
+          cpf_cnpj: formData.cpf_cnpj,
+          cidade: formData.cidade,
+          endereco_imovel: formData.endereco_imovel,
+          origem: formData.origem || 'Fechado por fora',
+          tipo_projeto: andamentoTipo,
+          area_m2: andamentoArea ? Number(andamentoArea) : null,
+          etapa_fluxo: 'projeto',
+          briefing_preenchido: etapasFeitas.pre_briefing,
+          contrato_assinado: etapasFeitas.contrato,
+          contrato_assinado_em: etapasFeitas.contrato ? new Date().toISOString() : null,
+        } as any).select().maybeSingle();
+        if (cErr) throw cErr;
+        if (!novoCliente) throw new Error('Cliente não retornado.');
+        clienteId = novoCliente.id;
+      }
 
       // 2) Projeto ativo na etapa escolhida
       const { data: novoProjeto, error: pErr } = await supabase.from('projetos').insert({
-        nome: `Projeto ${formData.nome}`,
-        nome_cliente: formData.nome,
+        nome: `Projeto ${nomeCliente}`,
+        nome_cliente: nomeCliente,
         tipo: andamentoTipo,
-        cidade: formData.cidade,
+        cidade: cidadeCliente,
         area_m2: andamentoArea ? parseFloat(andamentoArea) : 0,
         etapa_atual: andamentoEtapa,
         status_geral: 'ativo',
         data_inicio: new Date().toISOString().split('T')[0],
-        cliente_id: novoCliente.id,
+        cliente_id: clienteId,
         proposta_id: null,
       } as any).select().maybeSingle();
       if (pErr) throw pErr;
@@ -482,22 +505,28 @@ const ClienteFicha = () => {
         });
       }
 
-      // 4) Lead marcado como FECHADO (mantém o pipeline coerente) — best-effort
+      // 4) Lead FECHADO — novo cliente cria; existente só atualiza o lead dele — best-effort
       try {
-        await supabase.from('leads').insert({
-          nome: formData.nome,
-          whats: formData.whatsapp || '',
-          cidade: formData.cidade || '',
-          tipo: andamentoTipo,
-          area: andamentoArea ? Number(andamentoArea) : 0,
-          origem: formData.origem || 'Fechado por fora',
-          stage: 'FECHADO',
-          etapa_desde: new Date().toISOString(),
-          fechado_em: new Date().toISOString(),
-          cliente_id: novoCliente.id,
-        } as any);
+        if (id) {
+          await supabase.from('leads')
+            .update({ stage: 'FECHADO', fechado_em: new Date().toISOString() } as any)
+            .eq('cliente_id', clienteId);
+        } else {
+          await supabase.from('leads').insert({
+            nome: nomeCliente,
+            whats: formData.whatsapp || '',
+            cidade: cidadeCliente,
+            tipo: andamentoTipo,
+            area: andamentoArea ? Number(andamentoArea) : 0,
+            origem: formData.origem || 'Fechado por fora',
+            stage: 'FECHADO',
+            etapa_desde: new Date().toISOString(),
+            fechado_em: new Date().toISOString(),
+            cliente_id: clienteId,
+          } as any);
+        }
       } catch (leadErr) {
-        console.warn('Lead FECHADO não criado (não bloqueia):', leadErr);
+        console.warn('Lead FECHADO não ajustado (não bloqueia):', leadErr);
       }
 
       // 5) Histórico do que já havia sido feito por fora — best-effort
@@ -511,10 +540,10 @@ const ClienteFicha = () => {
           .filter(([, v]) => v)
           .map(([k]) => k);
         await supabase.from('historico_clientes').insert({
-          cliente_id: novoCliente.id,
+          cliente_id: clienteId,
           tipo: 'etapa_fluxo',
           descricao:
-            `Cliente cadastrado já EM ANDAMENTO (fechado por fora). Etapa do projeto: ${andamentoEtapa}.` +
+            `${id ? 'Cliente convertido para' : 'Cliente cadastrado já'} EM ANDAMENTO (fechado por fora). Etapa do projeto: ${andamentoEtapa}.` +
             (feitas.length ? ` Já realizado por fora: ${feitas.join(', ')}.` : ' Etapas iniciais puladas.'),
           status_anterior: 'ficha',
           status_novo: 'projeto',
@@ -1208,8 +1237,8 @@ const ClienteFicha = () => {
                 )}
               </div>
 
-              {/* CLIENTE JÁ EM ANDAMENTO (fechado por fora) — só na criação */}
-              {!id && (
+              {/* CLIENTE JÁ EM ANDAMENTO (fechado por fora) — criação OU conversão de cliente existente */}
+              {(!id || (cliente && cliente.etapa_fluxo !== 'projeto')) && (
                 <div className="bg-[#0D0D0D] border border-[#8B7355]/40 p-6 space-y-5">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
@@ -1219,11 +1248,13 @@ const ClienteFicha = () => {
                       className="accent-[#8B7355] w-4 h-4"
                     />
                     <span className="text-[#8B7355] font-['Courier_New'] text-[11px] uppercase tracking-[0.2em] font-bold">
-                      Cliente já em andamento (fechado por fora)
+                      {id ? 'Iniciar projeto — cliente já em andamento (fechado por fora)' : 'Cliente já em andamento (fechado por fora)'}
                     </span>
                   </label>
                   <p className="text-white/30 text-[10px] font-['Courier_New'] uppercase tracking-widest leading-relaxed">
-                    Cria o cliente e o projeto de uma vez, pulando o funil. O contrato você anexa depois na aba Documentos do projeto.
+                    {id
+                      ? 'Transforma este cliente em projeto ativo de uma vez, pulando o funil. O contrato você anexa depois na aba Documentos do projeto.'
+                      : 'Cria o cliente e o projeto de uma vez, pulando o funil. O contrato você anexa depois na aba Documentos do projeto.'}
                   </p>
 
                   {emAndamento && (
@@ -1308,7 +1339,7 @@ const ClienteFicha = () => {
                           disabled={salvandoAndamento}
                           className="bg-[#8B7355] hover:bg-[#8B7355]/80 text-white rounded-none px-8 font-['Courier_New'] text-xs font-bold uppercase tracking-widest h-12 disabled:opacity-40"
                         >
-                          {salvandoAndamento ? 'CRIANDO...' : 'SALVAR E INICIAR PROJETO'}
+                          {salvandoAndamento ? 'CRIANDO...' : id ? 'INICIAR PROJETO AGORA' : 'SALVAR E INICIAR PROJETO'}
                         </Button>
                       </div>
                     </div>
