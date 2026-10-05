@@ -1593,6 +1593,12 @@ const ClienteFicha = () => {
 
           {openSections.includes('pre_briefing') && (
             <div className="p-8 space-y-8">
+              {cliente?.etapa_fluxo === 'projeto' && (
+                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
+                </div>
+              )}
               <div className="space-y-4">
                 <Label className="text-[9px] uppercase tracking-widest text-white/30 font-['Courier_New']">Link para envio</Label>
                 <div className="flex gap-2">
@@ -1628,9 +1634,9 @@ const ClienteFicha = () => {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : "bg-yellow-500")} />
+                    <div className={cn("w-2 h-2 rounded-full", briefing ? "bg-green-500" : cliente?.etapa_fluxo === 'projeto' ? "bg-emerald-500" : "bg-yellow-500")} />
                     <span className="text-[10px] uppercase font-bold tracking-widest font-['Courier_New'] text-white/60">
-                      {briefing ? 'BRIEFING PREENCHIDO ✓' : 'AGUARDANDO PREENCHIMENTO'}
+                      {briefing ? 'BRIEFING PREENCHIDO ✓' : cliente?.etapa_fluxo === 'projeto' ? 'PULADO (EM ANDAMENTO)' : 'AGUARDANDO PREENCHIMENTO'}
                     </span>
                   </div>
                   {briefing && (
@@ -1705,6 +1711,12 @@ const ClienteFicha = () => {
 
           {openSections.includes('reuniao') && (
             <div className="p-8 space-y-8">
+              {cliente?.etapa_fluxo === 'projeto' && (
+                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
+                </div>
+              )}
               {!cliente?.reuniao_data || isRescheduling ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1975,6 +1987,12 @@ const ClienteFicha = () => {
 
           {openSections.includes('proposta') && (
             <div className="p-8 space-y-8">
+              {cliente?.etapa_fluxo === 'projeto' && (
+                <div className="flex items-center gap-2 p-3 bg-[#0D0D0D] border border-emerald-600/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[10px] uppercase tracking-widest font-['Courier_New'] text-emerald-500 font-bold">✓ Etapa pulada — cliente fechado por fora (em andamento)</span>
+                </div>
+              )}
               {/* ANEXAR PROPOSTA FEITA POR FORA (cliente avulso) */}
               <div className="p-4 bg-[#0D0D0D] border border-[#8B7355]/30 flex items-center justify-between gap-4 flex-wrap">
                 <div>
