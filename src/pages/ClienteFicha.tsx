@@ -453,8 +453,15 @@ const ClienteFicha = () => {
       const isCom = t.includes('COM');
       const tipoNome = isInt ? 'Interiores' : isCom ? 'Comercial' : 'Arquitetura + Interiores';
       const sub = tipo === 'proposta' ? 'Carta Proposta' : 'Contrato';
-      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/${sub}/${file.name}`;
-      const base64File = await blobToBase64(file);
+      const pastaDropbox = `${nome} - ${tipoNome}/08 - Documentos/02 - Proposta e Contrato/${sub}`;
+      const path = `/NL Arquitetos/07 - Projetos NL OS/01 - Clientes/${pastaDropbox}/${file.name}`;
+      // Converte o arquivo em base64 (sem o prefixo data:) para o dropbox-proxy
+      const base64File = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
       const { error } = await supabase.functions.invoke('dropbox-proxy', {
         body: { action: 'upload', path, content: base64File },
       });
@@ -466,7 +473,8 @@ const ClienteFicha = () => {
         } as any).eq('id', id);
         queryClient.invalidateQueries({ queryKey: ['cliente', id] });
       }
-      toast.success(`${tipo === 'proposta' ? 'Proposta' : 'Contrato'} anexado no Dropbox!`);
+      const label = tipo === 'proposta' ? 'Proposta' : 'Contrato';
+      toast.success(`✅ ${label} anexado! "${file.name}" subiu no Dropbox em: ${pastaDropbox}`, { duration: 7000 });
     } catch (e: any) {
       console.error('Erro ao anexar por fora:', e);
       toast.error('Erro ao anexar: ' + (e?.message ?? 'tente novamente'));
