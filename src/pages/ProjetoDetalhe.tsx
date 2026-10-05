@@ -102,6 +102,9 @@ const ProjetoDetalhe = () => {
   const [custoHora, setCustoHora] = useState(67.37);
   // Seletor rápido da etapa de execução atual do projeto (marca tudo que já passou).
   const [salvandoEtapaAtual, setSalvandoEtapaAtual] = useState(false);
+  // "Sobre o projeto (para o Marketing)" — descrição que viaja pro NL MKT.
+  const [descMarketing, setDescMarketing] = useState('');
+  const [salvandoDescMkt, setSalvandoDescMkt] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -109,6 +112,7 @@ const ProjetoDetalhe = () => {
       const { data: pData } = await supabase.from('projetos').select('*').eq('id', id).maybeSingle();
       if (pData) {
         setProjeto(pData);
+        setDescMarketing(pData.descricao_marketing || '');
         if (pData.cliente_id) {
           const { data: cData } = await supabase
             .from('contratos_clientes')
@@ -191,6 +195,22 @@ const ProjetoDetalhe = () => {
     }
   };
 
+  // Salva a descrição do projeto usada pelo Marketing.
+  const salvarDescMarketing = async () => {
+    if (!id) return;
+    setSalvandoDescMkt(true);
+    try {
+      const { error } = await supabase.from('projetos').update({ descricao_marketing: descMarketing } as any).eq('id', id);
+      if (error) throw error;
+      toast.success('Descrição do projeto salva (para o Marketing).');
+    } catch (e: any) {
+      console.error('Erro ao salvar descrição de marketing:', e);
+      toast.error('Erro ao salvar: ' + (e?.message ?? 'tente novamente'));
+    } finally {
+      setSalvandoDescMkt(false);
+    }
+  };
+
   const toggleCheck = async (itemId: string, status: boolean) => {
     await supabase.from('projeto_checklist').update({ concluido: !status }).eq('id', itemId);
     fetchData();
@@ -251,13 +271,15 @@ const ProjetoDetalhe = () => {
           etapa_atual: projeto.etapa_atual,
           status: projeto.status_geral,
           proxima_entrega: nextDeliveryEtapa ? nextDeliveryEtapa.etapa : 'Concluído',
+          descricao: descMarketing || (projeto as any).descricao_marketing || null,
+          projeto_id: id,
           user_id: session.user.id
-        });
+        } as any);
 
       if (error) throw error;
 
-      toast.success("Contexto enviado para o Marketing IA");
-      navigate('/marketing/ia?tab=captions');
+      toast.success("Enviado para o Marketing! Abra o NL MKT e escolha este projeto.");
+      window.open('https://nlosmktv2.lovable.app', '_blank');
     } catch (error: any) {
       console.error('Error sending to marketing IA:', error);
       toast.error('Erro ao enviar contexto: ' + error.message);
@@ -409,6 +431,31 @@ const ProjetoDetalhe = () => {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* SOBRE O PROJETO (PARA O MARKETING) */}
+          <div className="bg-[#141414] border border-[#8B7355]/30 p-4 space-y-3">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-mono">Sobre o projeto — para o Marketing</div>
+                <div className="text-[11px] text-white/40 mt-1">Descreva em 2–3 linhas (estilo, destaques, história). O NL MKT usa isso pra criar conteúdo em cima do projeto.</div>
+              </div>
+              <Button
+                size="sm"
+                disabled={salvandoDescMkt}
+                className="text-[10px] uppercase font-mono bg-[#8B7355] hover:bg-[#8B7355]/80 tracking-widest px-6 shrink-0 disabled:opacity-40"
+                onClick={salvarDescMarketing}
+              >
+                {salvandoDescMkt ? 'Salvando…' : 'Salvar'}
+              </Button>
+            </div>
+            <textarea
+              value={descMarketing}
+              onChange={(e) => setDescMarketing(e.target.value)}
+              rows={3}
+              placeholder="Ex: Apartamento 120m², estilo contemporâneo, destaque pra integração cozinha-living e marcenaria sob medida."
+              className="w-full bg-[#0d0d0d] border border-white/10 text-[#e8e8e8] text-xs rounded px-3 py-2 font-['Arial'] resize-y focus:outline-none focus:border-[#8B7355]"
+            />
           </div>
 
           {/* ETAPAS */}
