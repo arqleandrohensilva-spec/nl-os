@@ -100,6 +100,8 @@ const ProjetoDetalhe = () => {
   const [valorTotalProjeto, setValorTotalProjeto] = useState(0);
   const [horasLancadasTotal, setHorasLancadasTotal] = useState(0);
   const [custoHora, setCustoHora] = useState(67.37);
+  // Seletor rápido da etapa de execução atual do projeto (marca tudo que já passou).
+  const [salvandoEtapaAtual, setSalvandoEtapaAtual] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -154,6 +156,39 @@ const ProjetoDetalhe = () => {
   const updateEtapaStatus = async (etapaId: string, status: string) => {
     await supabase.from('projeto_etapas').update({ status }).eq('id', etapaId);
     fetchData();
+  };
+
+  // Define a etapa de execução atual do projeto de uma vez (marca as anteriores como passadas).
+  const definirEtapaAtual = async (novaEtapa: string) => {
+    if (!id || !novaEtapa) return;
+    setSalvandoEtapaAtual(true);
+    try {
+      const { error } = await supabase.from('projetos').update({ etapa_atual: novaEtapa }).eq('id', id);
+      if (error) throw error;
+      // Reflete também nas linhas de projeto_etapas (best-effort, sem duplicar)
+      try {
+        const alvoIdx = ETAPAS_CONFIG.findIndex(c => c.id === novaEtapa);
+        for (let i = 0; i < ETAPAS_CONFIG.length; i++) {
+          const cfg = ETAPAS_CONFIG[i];
+          const statusAlvo = i < alvoIdx ? 'CONCLUIDO' : i === alvoIdx ? 'EM_ANDAMENTO' : 'PENDENTE';
+          const existente = etapas.find(et => et.etapa === cfg.id);
+          if (existente) {
+            await supabase.from('projeto_etapas').update({ status: statusAlvo }).eq('id', existente.id);
+          } else {
+            await supabase.from('projeto_etapas').insert({ projeto_id: id, etapa: cfg.id, status: statusAlvo });
+          }
+        }
+      } catch (e2) {
+        console.warn('Etapas detalhadas não atualizadas (não bloqueia):', e2);
+      }
+      toast.success('Etapa do projeto atualizada!');
+      fetchData();
+    } catch (e: any) {
+      console.error('Erro ao definir etapa atual:', e);
+      toast.error('Erro ao atualizar etapa: ' + (e?.message ?? 'tente novamente'));
+    } finally {
+      setSalvandoEtapaAtual(false);
+    }
   };
 
   const toggleCheck = async (itemId: string, status: boolean) => {
@@ -211,7 +246,6 @@ const ProjetoDetalhe = () => {
       const { error } = await supabase
         .from('contexto_marketing_ativo')
         .insert({
-          projeto_id: projeto.id,
           cliente: projeto.nome_cliente,
           tipo: projeto.tipo,
           etapa_atual: projeto.etapa_atual,
@@ -223,7 +257,7 @@ const ProjetoDetalhe = () => {
       if (error) throw error;
 
       toast.success("Contexto enviado para o Marketing IA");
-      window.open('https://nlosmktv2.lovable.app', '_blank');
+      navigate('/marketing/ia?tab=captions');
     } catch (error: any) {
       console.error('Error sending to marketing IA:', error);
       toast.error('Erro ao enviar contexto: ' + error.message);
@@ -355,6 +389,27 @@ const ProjetoDetalhe = () => {
               </Button>
             </div>
           )}
+
+          {/* DEFINIR ETAPA ATUAL (atalho — cliente em andamento / fechado por fora) */}
+          <div className="bg-[#141414] border border-[#8B7355]/30 p-4 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="text-[9px] uppercase text-[#8B7355] font-bold tracking-widest font-mono">Etapa atual do projeto</div>
+              <div className="text-[11px] text-white/40 mt-1">Define onde o projeto está agora — marca de uma vez tudo que já passou (sem aprovar uma por uma).</div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <select
+                value={projeto.etapa_atual?.toUpperCase() || ''}
+                disabled={salvandoEtapaAtual}
+                onChange={(e) => definirEtapaAtual(e.target.value)}
+                className="bg-[#0d0d0d] border border-white/10 text-[#e8e8e8] text-xs rounded px-3 py-2 font-mono disabled:opacity-40"
+              >
+                <option value="" disabled>Selecione a etapa…</option>
+                {ETAPAS_CONFIG.map((c) => (
+                  <option key={c.id} value={c.id}>{c.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
 
           {/* ETAPAS */}
           <section className="space-y-4">
